@@ -433,3 +433,467 @@ paths:
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RoleRequest" } } } }
       responses: { "200": { description: OK }, "403": { description: Forbidden }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      description: Opaque session token from one of the /auth endpoints.
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string, enum: [bad_request, validation_failed, unauthorized, forbidden, not_found, conflict, unavailable, internal] }
+            message: { type: string }
+            fields: { type: object, additionalProperties: { type: string } }
+    List:
+      type: object
+      required: [items, next_cursor]
+      properties:
+        items: { type: array, items: {} }
+        next_cursor: { type: string, description: Empty when there is no further page }
+    City:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+        region: { type: string }
+        country_code: { type: string }
+        center_lat: { type: number }
+        center_lng: { type: number }
+        bbox: { type: object, properties: { min_lat: { type: number }, min_lng: { type: number }, max_lat: { type: number }, max_lng: { type: number } } }
+        timezone: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CityDetail:
+      allOf:
+        - $ref: "#/components/schemas/City"
+        - type: object
+          properties:
+            topics: { type: array, items: { $ref: "#/components/schemas/Topic" } }
+    Topic:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        city_id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+        moment_count: { type: integer, description: Published moments carrying this topic }
+    MediaAsset:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [image, video, audio] }
+        public_url: { type: string, format: uri }
+        mime_type: { type: string }
+        width: { type: integer, nullable: true }
+        height: { type: integer, nullable: true }
+        duration_seconds: { type: number, nullable: true }
+        caption: { type: string }
+        credit: { type: string }
+        license: { type: string, description: "Licence identifier such as CC-BY-4.0, CC0-1.0, PD-US, all-rights-reserved" }
+        license_url: { type: string }
+        source_url: { type: string }
+        status: { $ref: "#/components/schemas/EntityStatus" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    EntityStatus:
+      type: string
+      enum: [draft, in_review, published, archived]
+    TravelMode:
+      type: string
+      enum: [walk, bike]
+    PlaceSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        city_id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+        summary: { type: string }
+        kind: { type: string, description: "building, park, street, station, monument, site, or free text" }
+        latitude: { type: number }
+        longitude: { type: number }
+        arrival_radius_m: { type: number }
+        address: { type: string }
+        status: { $ref: "#/components/schemas/EntityStatus" }
+        primary_moment_id: { type: string, format: uuid, nullable: true }
+        moment_count: { type: integer }
+        distance_m: { type: number, description: "Only present on ?near= queries" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    PlaceDetail:
+      allOf:
+        - $ref: "#/components/schemas/PlaceSummary"
+        - type: object
+          properties:
+            primary_moment: { $ref: "#/components/schemas/MomentSummary", nullable: true }
+            moments: { type: array, items: { $ref: "#/components/schemas/MomentSummary" } }
+    Source:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string }
+        url: { type: string }
+        publisher: { type: string }
+        retrieved_at: { type: string, format: date, nullable: true }
+        license: { type: string }
+        note: { type: string }
+    MomentSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        place_id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        excerpt: { type: string }
+        date_start: { type: string, format: date, nullable: true }
+        date_end: { type: string, format: date, nullable: true }
+        date_precision: { type: string, enum: [day, month, year, circa] }
+        date_display: { type: string }
+        hero_media: { $ref: "#/components/schemas/MediaAsset", nullable: true }
+        has_narration: { type: boolean }
+        status: { $ref: "#/components/schemas/EntityStatus" }
+        topic_ids: { type: array, items: { type: string, format: uuid } }
+    MomentDetail:
+      allOf:
+        - $ref: "#/components/schemas/MomentSummary"
+        - type: object
+          properties:
+            body: { type: string, description: Markdown }
+            media: { type: array, items: { $ref: "#/components/schemas/MediaAsset" } }
+            sources: { type: array, items: { $ref: "#/components/schemas/Source" } }
+            topics: { type: array, items: { $ref: "#/components/schemas/Topic" } }
+            narration: { $ref: "#/components/schemas/MediaAsset", nullable: true, description: "Audio asset; null means use on-device speech" }
+            created_at: { type: string, format: date-time }
+            updated_at: { type: string, format: date-time }
+    RouteSummary:
+      type: object
+      properties:
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        status: { type: string, enum: [pending, ready, failed] }
+        distance_m: { type: number }
+        duration_s: { type: integer }
+        estimated_minutes: { type: integer, nullable: true, description: Present only when status is ready }
+        error: { type: string }
+        computed_at: { type: string, format: date-time, nullable: true }
+    RouteLeg:
+      type: object
+      properties:
+        from_position: { type: integer }
+        to_position: { type: integer }
+        distance_m: { type: number }
+        duration_s: { type: integer }
+        geometry: { type: array, items: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }, description: "[lng, lat] pairs" }
+    TourRoute:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        tour_id: { type: string, format: uuid }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        status: { type: string, enum: [pending, ready, failed] }
+        provider: { type: string }
+        distance_m: { type: number }
+        duration_s: { type: integer }
+        geometry:
+          nullable: true
+          type: object
+          description: GeoJSON LineString
+          properties:
+            type: { type: string, enum: [LineString] }
+            coordinates: { type: array, items: { type: array, items: { type: number }, minItems: 2, maxItems: 2 } }
+        legs: { type: array, items: { $ref: "#/components/schemas/RouteLeg" } }
+        error: { type: string }
+        computed_at: { type: string, format: date-time, nullable: true }
+    TourSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        city_id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        topic_id: { type: string, format: uuid, nullable: true }
+        topic: { $ref: "#/components/schemas/Topic", nullable: true }
+        modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
+        hero_media: { $ref: "#/components/schemas/MediaAsset", nullable: true }
+        status: { $ref: "#/components/schemas/EntityStatus" }
+        visibility: { type: string, enum: [public, unlisted, private] }
+        owner_account_id: { type: string, format: uuid, nullable: true, description: Set for user routes }
+        stop_count: { type: integer }
+        routes: { type: object, additionalProperties: { $ref: "#/components/schemas/RouteSummary" }, description: Keyed by mode }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    TourStop:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        position: { type: integer, description: 1-based }
+        place: { $ref: "#/components/schemas/PlaceSummary" }
+        featured_moment_id: { type: string, format: uuid, nullable: true, description: Curator's explicit choice, or null }
+        featured_moment: { $ref: "#/components/schemas/MomentSummary", nullable: true, description: The explicit choice or the place's primary moment }
+        note: { type: string }
+    TourDetail:
+      allOf:
+        - $ref: "#/components/schemas/TourSummary"
+        - type: object
+          properties:
+            stops: { type: array, items: { $ref: "#/components/schemas/TourStop" } }
+    TourProgress:
+      type: object
+      properties:
+        account_id: { type: string, format: uuid }
+        tour_id: { type: string, format: uuid }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        visited_positions: { type: array, items: { type: integer } }
+        started_at: { type: string, format: date-time }
+        completed_at: { type: string, format: date-time, nullable: true }
+        updated_at: { type: string, format: date-time }
+    Account:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        provider: { type: string, enum: [apple, google, dev] }
+        email: { type: string }
+        display_name: { type: string }
+        role: { type: string, enum: [visitor, curator, admin] }
+        last_sign_in_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+    Session:
+      type: object
+      properties:
+        token: { type: string }
+        expires_at: { type: string, format: date-time }
+        account: { $ref: "#/components/schemas/Account" }
+    Candidate:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [place, moment, media] }
+        origin: { type: string, enum: [import, draft, user] }
+        source_name: { type: string, nullable: true }
+        external_id: { type: string, nullable: true }
+        submitted_by_account_id: { type: string, format: uuid, nullable: true }
+        target_place_id: { type: string, format: uuid, nullable: true }
+        target_moment_id: { type: string, format: uuid, nullable: true }
+        payload: { type: object, description: Shaped like the create request for the kind }
+        status: { type: string, enum: [pending, approved, rejected] }
+        reviewer_account_id: { type: string, format: uuid, nullable: true }
+        review_note: { type: string }
+        approved_entity_id: { type: string, format: uuid, nullable: true }
+        reviewed_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Job:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [compute_route, generate_narration] }
+        payload: { type: object }
+        status: { type: string, enum: [queued, running, done, failed] }
+        attempts: { type: integer }
+        max_attempts: { type: integer }
+        run_after: { type: string, format: date-time }
+        last_error: { type: string }
+        started_at: { type: string, format: date-time, nullable: true }
+        finished_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+    StopInput:
+      type: object
+      required: [place_id]
+      properties:
+        place_id: { type: string, format: uuid }
+        featured_moment_id: { type: string, format: uuid, nullable: true, description: Ignored for user routes }
+        note: { type: string }
+    CreateUserTourRequest:
+      type: object
+      required: [city, title, stops]
+      properties:
+        city: { type: string, description: City id or slug }
+        title: { type: string }
+        summary: { type: string }
+        modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" }, description: Defaults to both }
+        visibility: { type: string, enum: [unlisted, private], default: unlisted }
+        stops: { type: array, minItems: 2, maxItems: 30, items: { $ref: "#/components/schemas/StopInput" } }
+    UpdateUserTourRequest:
+      type: object
+      properties:
+        title: { type: string }
+        summary: { type: string }
+        modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
+        visibility: { type: string, enum: [unlisted, private] }
+        stops: { type: array, minItems: 2, maxItems: 30, items: { $ref: "#/components/schemas/StopInput" } }
+    ProgressRequest:
+      type: object
+      required: [mode]
+      properties:
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        visited_positions: { type: array, items: { type: integer, minimum: 1 } }
+        completed: { type: boolean }
+    CreateCityRequest:
+      type: object
+      required: [name, center_lat, center_lng, bbox_min_lat, bbox_min_lng, bbox_max_lat, bbox_max_lng]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        region: { type: string }
+        country_code: { type: string, default: US }
+        center_lat: { type: number }
+        center_lng: { type: number }
+        bbox_min_lat: { type: number }
+        bbox_min_lng: { type: number }
+        bbox_max_lat: { type: number }
+        bbox_max_lng: { type: number }
+        timezone: { type: string, default: America/Chicago }
+    UpdateCityRequest:
+      type: object
+      properties:
+        name: { type: string }
+        region: { type: string }
+        country_code: { type: string }
+        center_lat: { type: number }
+        center_lng: { type: number }
+        bbox_min_lat: { type: number }
+        bbox_min_lng: { type: number }
+        bbox_max_lat: { type: number }
+        bbox_max_lng: { type: number }
+        timezone: { type: string }
+    CreateTopicRequest:
+      type: object
+      required: [city_id, name]
+      properties:
+        city_id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+    UpdateTopicRequest:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+    CreatePlaceRequest:
+      type: object
+      required: [city_id, name, latitude, longitude]
+      properties:
+        city_id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+        summary: { type: string }
+        kind: { type: string, default: site }
+        latitude: { type: number }
+        longitude: { type: number }
+        arrival_radius_m: { type: number, default: 40, maximum: 500 }
+        address: { type: string }
+    UpdatePlaceRequest:
+      type: object
+      properties:
+        name: { type: string }
+        summary: { type: string }
+        kind: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        arrival_radius_m: { type: number }
+        address: { type: string }
+        primary_moment_id: { type: string, format: uuid, description: Must belong to the place; empty string clears }
+    CreateMomentRequest:
+      type: object
+      required: [place_id, title]
+      properties:
+        place_id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        body: { type: string, description: Markdown }
+        date_start: { type: string, format: date }
+        date_end: { type: string, format: date }
+        date_precision: { type: string, enum: [day, month, year, circa], default: year }
+        date_display: { type: string }
+        hero_media_id: { type: string, format: uuid, nullable: true }
+        topic_ids: { type: array, items: { type: string, format: uuid } }
+        sources: { type: array, items: { $ref: "#/components/schemas/Source" } }
+    UpdateMomentRequest:
+      type: object
+      properties:
+        title: { type: string }
+        body: { type: string }
+        date_start: { type: string, format: date, description: Empty string clears }
+        date_end: { type: string, format: date }
+        date_precision: { type: string, enum: [day, month, year, circa] }
+        date_display: { type: string }
+        hero_media_id: { type: string, format: uuid, description: Empty string clears }
+    MediaListRequest:
+      type: object
+      required: [media_ids]
+      properties:
+        media_ids: { type: array, items: { type: string, format: uuid } }
+    SourcesRequest:
+      type: object
+      required: [sources]
+      properties:
+        sources: { type: array, items: { $ref: "#/components/schemas/Source" } }
+    TopicsRequest:
+      type: object
+      required: [topic_ids]
+      properties:
+        topic_ids: { type: array, items: { type: string, format: uuid } }
+    MediaMetadataRequest:
+      type: object
+      properties:
+        caption: { type: string }
+        credit: { type: string }
+        license: { type: string }
+        license_url: { type: string }
+        source_url: { type: string }
+    CreateTourRequest:
+      type: object
+      required: [city_id, title]
+      properties:
+        city_id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        topic_id: { type: string, format: uuid, nullable: true }
+        modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
+        hero_media_id: { type: string, format: uuid, nullable: true }
+        visibility: { type: string, enum: [public, unlisted, private], default: public }
+        stops: { type: array, maxItems: 30, items: { $ref: "#/components/schemas/StopInput" } }
+    UpdateTourRequest:
+      type: object
+      properties:
+        title: { type: string }
+        summary: { type: string }
+        topic_id: { type: string, format: uuid, description: Empty string clears }
+        modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
+        hero_media_id: { type: string, format: uuid, description: Empty string clears }
+        visibility: { type: string, enum: [public, unlisted, private] }
+    StopsRequest:
+      type: object
+      required: [stops]
+      properties:
+        stops: { type: array, minItems: 1, maxItems: 30, items: { $ref: "#/components/schemas/StopInput" } }
+    CreateCandidateRequest:
+      type: object
+      required: [kind, payload]
+      properties:
+        kind: { type: string, enum: [place, moment, media] }
+        origin: { type: string, enum: [import, draft, user], default: draft }
+        source_name: { type: string, nullable: true }
+        external_id: { type: string, nullable: true, description: "Unique with source_name; duplicates return 409" }
+        target_place_id: { type: string, format: uuid, nullable: true }
+        target_moment_id: { type: string, format: uuid, nullable: true }
+        payload: { type: object }
+    ReviewRequest:
+      type: object
+      properties:
+        note: { type: string }
+        payload: { type: object, description: Top-level keys overlaid on the stored payload before creating the entity }
+    RoleRequest:
+      type: object
+      required: [role]
+      properties:
+        role: { type: string, enum: [visitor, curator, admin] }

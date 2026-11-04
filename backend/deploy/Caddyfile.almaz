@@ -1,5 +1,5 @@
 {
-	# Almaz / Cloudflare edge terminates public DNS; Caddy proxies to the NUC API.
+	# Almaz / Cloudflare edge terminates public DNS; Caddy proxies to the NUC.
 	# Set a real contact email before going live.
 	email ops@example.com
 }
@@ -8,4 +8,10 @@ museum-api.example.com {
 	encode zstd gzip
 	# Replace nuc.lan or 192.168.x.x with the NUC hostname/IP reachable from Almaz.
 	reverse_proxy http://nuc.lan:8080
+}
+
+museum-media.example.com {
+	encode zstd gzip
+	# MinIO bucket with anonymous download enabled; see docs/deployment/nuc-almaz.md.
+	reverse_proxy http://nuc.lan:9000
 }

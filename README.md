@@ -29,7 +29,7 @@ In another shell:
 
 ```bash
 make api-health
-make api-nearby
+make api-tour
 make ios-run
 ```
 
@@ -62,8 +62,10 @@ make migrate-down
 make db-shell
 make db-reset
 make api-health
-make api-spaces
-make api-nearby
+make api-cities
+make api-places
+make api-tour
+make backend-test
 make ios-build
 make ios-run
 make ios-simulators
@@ -71,23 +73,66 @@ make ios-simulators
 
 ## Backend
 
-The backend exposes:
+One Go API serves every client. The contract is `backend/api/openapi.yaml`; a
+test fails if the router and the document drift.
+
+Core ideas:
+
+- A **city** is a museum. A **topic** is a wing.
+- A **place** is a wall: a point on the map with an arrival radius.
+- A **moment** is an exhibit: a dated story at a place, with media, sources, and topics. A place has many moments and one primary moment.
+- A **tour** is an ordered walk or ride through places. Curated tours feature one moment per stop chosen for the topic. User routes feature each place's primary moment.
+- A **route** per tour and mode (walk, bike) is computed by a background job and served as GeoJSON.
+- Every unreviewed thing (imports, drafts, user proposals) is a **candidate** in one review queue.
+
+Public endpoints:
 
 - `GET /healthz`
-- `GET /api/v1/spaces`
-- `GET /api/v1/spaces/nearby?lat=41.794&lng=-88.007&radius_m=5000`
-- `GET /api/v1/spaces/{space_id}`
-- `GET /api/v1/exhibits/{exhibit_id}`
-- `POST /api/v1/contributions`
-- `GET /api/v1/admin/contributions?status=pending|approved|rejected|all`
-- `PATCH /api/v1/admin/contributions/{id}/status`
+- `GET /api/v1/cities`, `GET /api/v1/cities/{city}`
+- `GET /api/v1/cities/{city}/places?near=lat,lng&radius_m=&bbox=&topic=`
+- `GET /api/v1/cities/{city}/tours?topic=&mode=`
+- `GET /api/v1/places/{place}`, `GET /api/v1/places/{place}/moments`
+- `GET /api/v1/moments/{id}`, `GET /api/v1/topics/{id}`, `GET /api/v1/media/{id}`
+- `GET /api/v1/tours/{tour}`, `GET /api/v1/tours/{tour}/route?mode=walk|bike`
 
-Admin moderation routes require `Authorization: Bearer <ADMIN_BEARER_TOKEN>`.
-If `ADMIN_BEARER_TOKEN` is unset on the server, admin routes return 503 and stay closed.
+Sign-in and personal data (`Authorization: Bearer <token>`):
 
-Migrations seed Downers Grove test data.
+- `POST /api/v1/auth/apple`, `POST /api/v1/auth/google`, `POST /api/v1/auth/dev` (only with `DEV_AUTH_ENABLED=true`)
+- `GET /api/v1/me`, `DELETE /api/v1/auth/session`
+- `GET|POST /api/v1/me/tours`, `GET|PATCH|DELETE /api/v1/me/tours/{id}`
+- `GET /api/v1/me/saved`, `PUT|DELETE /api/v1/me/saved/{tour}`
+- `GET /api/v1/me/progress`, `GET|PUT /api/v1/me/progress/{tour}`
+
+Curator and admin endpoints live under `/api/v1/admin` and require the
+`curator` or `admin` role. Accounts whose email is listed in
+`ADMIN_BOOTSTRAP_EMAILS` become admins on first sign-in.
+
+Every error is `{"error": {"code", "message", "fields"?}}`. Lists are
+`{"items": [...], "next_cursor": ""}`.
+
+### Providers
+
+| Concern | Dev default | Production option |
+| --- | --- | --- |
+| Routing | `straightline` | `valhalla` (self-hosted, `--profile routing`) |
+| Narration | `none` (on-device speech) | `openai` (any OpenAI-compatible speech endpoint) |
+| Media | `fs` (served at `/media/files/`) | `s3` (MinIO, R2, S3) |
+| LLM drafting | unset | `anthropic` or `openai` (next cycle) |
+
+See `backend/.env.example` for every variable. `go run ./cmd/migrate up` applies migrations without Docker.
+
+### Tests
+
+```bash
+make backend-test
+```
+
+That starts a throwaway Postgres in Docker and runs the full suite against it.
+Without `TEST_DATABASE_URL`, `go test ./...` runs only the pure unit tests.
 
 ## iOS app
+
+> The iOS app still targets the previous API and does not run against this backend yet. It is rebuilt in the next cycle.
 
 Current tabs:
 
@@ -125,8 +170,6 @@ Override order in the app:
 3. Info.plist key `InvisibleMuseum.apiBaseURL`
 4. Default `https://museum-api.subcult.tv`
 
-The local iOS admin token is stored in `UserDefaults["InvisibleMuseum.adminBearerToken"]`.
-
 For NUC/Almaz deployment, the intended shape is:
 
 ```txt
@@ -138,9 +181,7 @@ iOS app
 
 ## Notes
 
-- Contribution moderation is available in the Profile screen; set an admin token first.
 - Use HTTPS for any non-local admin access.
-- Rotate the admin token by updating the env var and restarting the backend.
 - App icon is currently a generated placeholder.
 
 ## License

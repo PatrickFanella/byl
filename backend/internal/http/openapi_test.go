@@ -1,7 +1,6 @@
 package httpapi
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"regexp"
@@ -74,6 +73,30 @@ func TestRouterMatchesOpenAPI(t *testing.T) {
 			strings.Join(missing, "\n  "), strings.Join(extra, "\n  "))
 	}
 	if len(served) == 0 {
-		t.Fatal(fmt.Sprintf("router served no routes"))
+		t.Fatal("router served no routes")
+	}
+}
+
+func TestOpenAPIRefsResolve(t *testing.T) {
+	raw, err := os.ReadFile("../../api/openapi.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var doc struct {
+		Components struct {
+			Schemas map[string]any `yaml:"schemas"`
+		} `yaml:"components"`
+	}
+	if err := yaml.Unmarshal(raw, &doc); err != nil {
+		t.Fatal(err)
+	}
+	refRe := regexp.MustCompile(`#/components/schemas/([A-Za-z]+)`)
+	for _, m := range refRe.FindAllStringSubmatch(string(raw), -1) {
+		if _, ok := doc.Components.Schemas[m[1]]; !ok {
+			t.Errorf("unresolved $ref %s", m[0])
+		}
+	}
+	if len(doc.Components.Schemas) < 20 {
+		t.Fatalf("expected the response and request schemas to be documented, found %d", len(doc.Components.Schemas))
 	}
 }
