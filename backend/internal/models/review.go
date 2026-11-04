@@ -1,0 +1,58 @@
+package models
+
+import (
+	"encoding/json"
+	"time"
+)
+
+// Candidate is an entry in the unified review queue.
+type Candidate struct {
+	ID                   string          `json:"id"`
+	Kind                 CandidateKind   `json:"kind"`
+	Origin               CandidateOrigin `json:"origin"`
+	SourceName           *string         `json:"source_name"`
+	ExternalID           *string         `json:"external_id"`
+	SubmittedByAccountID *string         `json:"submitted_by_account_id"`
+	TargetPlaceID        *string         `json:"target_place_id"`
+	TargetMomentID       *string         `json:"target_moment_id"`
+	Payload              json.RawMessage `json:"payload"`
+	Status               CandidateStatus `json:"status"`
+	ReviewerAccountID    *string         `json:"reviewer_account_id"`
+	ReviewNote           string          `json:"review_note"`
+	ApprovedEntityID     *string         `json:"approved_entity_id"`
+	ReviewedAt           *time.Time      `json:"reviewed_at"`
+	CreatedAt            time.Time       `json:"created_at"`
+	UpdatedAt            time.Time       `json:"updated_at"`
+}
+
+// Job is a background job row.
+type Job struct {
+	ID          string          `json:"id"`
+	Kind        string          `json:"kind"`
+	Payload     json.RawMessage `json:"payload"`
+	Status      JobStatus       `json:"status"`
+	Attempts    int             `json:"attempts"`
+	MaxAttempts int             `json:"max_attempts"`
+	RunAfter    time.Time       `json:"run_after"`
+	LastError   string          `json:"last_error"`
+	StartedAt   *time.Time      `json:"started_at"`
+	FinishedAt  *time.Time      `json:"finished_at"`
+	CreatedAt   time.Time       `json:"created_at"`
+}
+
+// Job kinds handled by the worker.
+const (
+	JobKindComputeRoute      = "compute_route"
+	JobKindGenerateNarration = "generate_narration"
+)
+
+// ComputeRoutePayload is the payload of a compute_route job.
+type ComputeRoutePayload struct {
+	TourID string     `json:"tour_id"`
+	Mode   TravelMode `json:"mode"`
+}
+
+// GenerateNarrationPayload is the payload of a generate_narration job.
+type GenerateNarrationPayload struct {
+	MomentID string `json:"moment_id"`
+}
