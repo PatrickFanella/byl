@@ -8,7 +8,7 @@ Cloudflare and Caddy stay on Almaz and reverse-proxy the public hostname to the 
 - `postgres` stays on the private Docker network only.
 - `api` listens on `:8080` inside Docker and publishes `8080` on the NUC for Almaz to reach. It also runs the background job worker.
 - `minio` stores uploaded media and narration audio. Publish port `9000` to the LAN so Caddy can serve the bucket, or front it with Cloudflare R2 later by changing the `S3_*` variables.
-- `valhalla` computes walking and cycling routes from an Illinois OpenStreetMap extract. Its first start downloads the extract and builds tiles; budget 20 to 60 minutes and several GB of disk. Routes queue until it is ready.
+- `valhalla` computes walking and cycling routes from an Illinois OpenStreetMap extract. Its first start downloads the extract and builds tiles; budget 20 to 60 minutes and several GB of disk. Route jobs that run before it is ready fail after three attempts; retry them from the admin API once Valhalla reports it is serving tiles, or publish tours after that point.
 
 ## Environment
 

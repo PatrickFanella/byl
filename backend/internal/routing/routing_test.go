@@ -40,7 +40,7 @@ func TestStraightLineRoute(t *testing.T) {
 }
 
 func TestDecodePolyline6(t *testing.T) {
-	// Valhalla documentation sample (precision 6).
+	// Google polyline sample, decoded here at 1e-6 precision.
 	pts := DecodePolyline6("_p~iF~ps|U_ulLnnqC_mqNvxq`@")
 	if len(pts) != 3 {
 		t.Fatalf("expected 3 points, got %d", len(pts))

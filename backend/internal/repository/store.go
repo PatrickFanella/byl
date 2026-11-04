@@ -30,6 +30,9 @@ type Store struct{ pool *pgxpool.Pool }
 // New wraps a pool.
 func New(pool *pgxpool.Pool) *Store { return &Store{pool: pool} }
 
+// Pool exposes the underlying pool for tests and tooling.
+func (s *Store) Pool() *pgxpool.Pool { return s.pool }
+
 // Ping checks database connectivity.
 func (s *Store) Ping(ctx context.Context) error { return s.pool.Ping(ctx) }
 

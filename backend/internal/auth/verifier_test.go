@@ -62,7 +62,7 @@ func newFakeJWKS(t *testing.T) (*fakeJWKS, *httptest.Server) {
 
 func baseClaims(aud string) jwt.MapClaims {
 	return jwt.MapClaims{
-		"iss": "https://issuer.example", "aud": aud, "sub": "subject-1", "email": "p@example.com", "name": "Pat",
+		"iss": "https://issuer.example", "aud": aud, "sub": "subject-1", "email": "p@example.com", "email_verified": true, "name": "Pat",
 		"iat": time.Now().Add(-time.Minute).Unix(), "exp": time.Now().Add(time.Hour).Unix(),
 	}
 }
@@ -142,5 +142,26 @@ func TestAppleAndGoogleDefaults(t *testing.T) {
 	g := NewGoogle([]string{"x.apps.googleusercontent.com"}).(*jwksVerifier)
 	if g.jwksURL != "https://www.googleapis.com/oauth2/v3/certs" || len(g.issuers) != 2 {
 		t.Fatalf("google: %+v", g)
+	}
+}
+
+func TestVerifierDropsUnverifiedEmail(t *testing.T) {
+	f, srv := newFakeJWKS(t)
+	v := NewJWKSVerifier(srv.URL, []string{"https://issuer.example"}, []string{"client-a"}, time.Hour)
+	claims := baseClaims("client-a")
+	claims["email_verified"] = false
+	id, err := v.Verify(context.Background(), f.sign(t, claims, "k1"))
+	if err != nil || id.Email != "" {
+		t.Fatalf("unverified email must be dropped: %v %+v", err, id)
+	}
+	claims["email_verified"] = "true"
+	id, _ = v.Verify(context.Background(), f.sign(t, claims, "k1"))
+	if id.Email != "p@example.com" {
+		t.Fatalf("string true (Apple style) must count as verified: %+v", id)
+	}
+	delete(claims, "email_verified")
+	id, _ = v.Verify(context.Background(), f.sign(t, claims, "k1"))
+	if id.Email != "" {
+		t.Fatalf("missing email_verified must not be trusted: %+v", id)
 	}
 }

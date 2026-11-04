@@ -79,7 +79,7 @@ func (d Deps) createMyTour(w http.ResponseWriter, r *http.Request) {
 // myTour loads a tour the current account owns, or writes 404.
 func (d Deps) myTour(w http.ResponseWriter, r *http.Request) (*models.TourDetail, bool) {
 	a := accountFrom(r.Context())
-	tour, err := d.Store.GetTour(r.Context(), chi.URLParam(r, "id"))
+	tour, err := d.Store.GetTour(r.Context(), chi.URLParam(r, "id"), false)
 	if err != nil {
 		d.fail(w, err)
 		return nil, false
@@ -130,7 +130,7 @@ func (d Deps) updateMyTour(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	updated, err := d.Store.GetTour(r.Context(), tour.ID)
+	updated, err := d.Store.GetTour(r.Context(), tour.ID, false)
 	if err != nil {
 		d.fail(w, err)
 		return

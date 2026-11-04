@@ -22,7 +22,7 @@ func countJobs(t *testing.T, s *Store, ctx context.Context, kind string) int {
 
 func TestGetSeedTourResolvesFeaturedMoments(t *testing.T) {
 	s, ctx := newStore(t)
-	tour, err := s.GetTour(ctx, "downtown-memory-loop")
+	tour, err := s.GetTour(ctx, "downtown-memory-loop", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestReplaceStopsValidatesAndRequeues(t *testing.T) {
 		Geometry: &models.LineString{Type: "LineString", Coordinates: [][2]float64{{-88.0092, 41.7959}, {-88.0099, 41.7952}}}}); err != nil {
 		t.Fatal(err)
 	}
-	tour, _ := s.GetTour(ctx, testdb.SeedTourID)
+	tour, _ := s.GetTour(ctx, testdb.SeedTourID, false)
 	if tour.Routes[models.TravelModeWalk].Status != models.RouteStatusReady || *tour.Routes[models.TravelModeWalk].EstimatedMinutes != 14 {
 		t.Fatalf("route after upsert: %+v", tour.Routes[models.TravelModeWalk])
 	}
@@ -81,7 +81,7 @@ func TestReplaceStopsValidatesAndRequeues(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tour, _ = s.GetTour(ctx, testdb.SeedTourID)
+	tour, _ = s.GetTour(ctx, testdb.SeedTourID, false)
 	if len(tour.Stops) != 2 || tour.Stops[1].FeaturedMoment.ID != testdb.SeedMomentPlatformID {
 		t.Fatalf("stops: %+v", tour.Stops)
 	}
@@ -152,7 +152,7 @@ func TestListToursVisibilityAndOwner(t *testing.T) {
 	if err := s.DeleteTour(ctx, mine[0].ID); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.GetTour(ctx, mine[0].ID); !errors.Is(err, ErrNotFound) {
+	if _, err := s.GetTour(ctx, mine[0].ID, false); !errors.Is(err, ErrNotFound) {
 		t.Fatalf("expected ErrNotFound after delete, got %v", err)
 	}
 }

@@ -60,7 +60,7 @@ func TestComputeRouteJobsProduceReadyRoutes(t *testing.T) {
 	if n := drain(t, w, ctx); n != 2 {
 		t.Fatalf("expected 2 seed jobs processed, got %d", n)
 	}
-	tour, err := store.GetTour(ctx, testdb.SeedTourID)
+	tour, err := store.GetTour(ctx, testdb.SeedTourID, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,3 +171,43 @@ func TestPlainTextStripsMarkdown(t *testing.T) {
 }
 
 func quiet() *slog.Logger { return slog.New(slog.NewTextHandler(io.Discard, nil)) }
+
+// Finding 4: jobs left running by a crashed or restarted worker are requeued.
+func TestStaleRunningJobsAreRequeued(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	pool := testdbPool(t, store)
+	if _, err := pool.Exec(ctx, `UPDATE jobs SET status = 'running', started_at = now() - interval '1 hour', attempts = 1`); err != nil {
+		t.Fatal(err)
+	}
+	if n := drain(t, w, ctx); n != 2 {
+		t.Fatalf("stale running jobs should be reclaimed, processed %d", n)
+	}
+	done, _ := store.ListJobs(ctx, models.JobStatusDone, 10, 0)
+	if len(done) != 2 {
+		t.Fatalf("expected 2 done, got %d", len(done))
+	}
+	// A job that just started must not be stolen.
+	_ = store.Enqueue(ctx, "noop", map[string]string{})
+	if _, err := pool.Exec(ctx, `UPDATE jobs SET status = 'running', started_at = now() WHERE kind = 'noop'`); err != nil {
+		t.Fatal(err)
+	}
+	if n := drain(t, w, ctx); n != 0 {
+		t.Fatalf("fresh running job must not be reclaimed, processed %d", n)
+	}
+}
+
+// Finding 4: completion is recorded even when the request context is already cancelled.
+func TestCompletionSurvivesCancelledContext(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	cctx, cancel := context.WithCancel(ctx)
+	job, err := store.ClaimJob(ctx, time.Now())
+	if err != nil || job == nil {
+		t.Fatal(err)
+	}
+	cancel()
+	w.finish(cctx, job, errors.New("interrupted"))
+	got, _ := store.GetJob(ctx, job.ID)
+	if got.Status != models.JobStatusQueued {
+		t.Fatalf("interrupted job should be requeued, got %+v", got)
+	}
+}

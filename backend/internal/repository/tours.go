@@ -207,7 +207,10 @@ func (s *Store) ListTours(ctx context.Context, f TourFilter) ([]models.TourSumma
 		where = append(where, fmt.Sprintf("t.owner_account_id = $%d", add(f.OwnerID)))
 	}
 	if f.SavedByAccountID != "" {
-		where = append(where, fmt.Sprintf("EXISTS (SELECT 1 FROM saved_tours st WHERE st.tour_id = t.id AND st.account_id = $%d)", add(f.SavedByAccountID)))
+		n := add(f.SavedByAccountID)
+		where = append(where, fmt.Sprintf("EXISTS (SELECT 1 FROM saved_tours st WHERE st.tour_id = t.id AND st.account_id = $%d)", n))
+		// A saved tour is only listed while the saver could still open it.
+		where = append(where, fmt.Sprintf("(t.owner_account_id = $%d OR (t.visibility <> 'private' AND t.status = 'published'))", n))
 	}
 	if f.PublicOnly {
 		where = append(where, "t.visibility = 'public' AND t.status = 'published'")
@@ -244,7 +247,8 @@ func (s *Store) ResolveTourID(ctx context.Context, ref string) (string, error) {
 }
 
 // GetTour returns a tour with stops regardless of status or visibility; callers apply access rules.
-func (s *Store) GetTour(ctx context.Context, ref string) (*models.TourDetail, error) {
+// With publicOnly, unpublished featured moments are replaced by the place's primary moment when that is published.
+func (s *Store) GetTour(ctx context.Context, ref string, publicOnly bool) (*models.TourDetail, error) {
 	id, err := s.ResolveTourID(ctx, ref)
 	if err != nil {
 		return nil, err
@@ -256,16 +260,20 @@ func (s *Store) GetTour(ctx context.Context, ref string) (*models.TourDetail, er
 	if len(tours) == 0 {
 		return nil, ErrNotFound
 	}
-	stops, err := s.tourStops(ctx, id)
+	stops, err := s.tourStops(ctx, id, publicOnly)
 	if err != nil {
 		return nil, err
 	}
 	return &models.TourDetail{TourSummary: tours[0], Stops: stops}, nil
 }
 
-func (s *Store) tourStops(ctx context.Context, tourID string) ([]models.TourStop, error) {
-	rows, err := s.pool.Query(ctx, `SELECT ts.id, ts.position, ts.place_id, ts.featured_moment_id, ts.note, COALESCE(ts.featured_moment_id, p.primary_moment_id)
-		FROM tour_stops ts JOIN places p ON p.id = ts.place_id WHERE ts.tour_id = $1 ORDER BY ts.position`, tourID)
+func (s *Store) tourStops(ctx context.Context, tourID string, publicOnly bool) ([]models.TourStop, error) {
+	rows, err := s.pool.Query(ctx, `SELECT ts.id, ts.position, ts.place_id, ts.featured_moment_id, ts.note,
+		CASE WHEN $2 THEN COALESCE(
+			(SELECT fm.id FROM moments fm WHERE fm.id = ts.featured_moment_id AND fm.status = 'published'),
+			(SELECT pm.id FROM moments pm WHERE pm.id = p.primary_moment_id AND pm.status = 'published'))
+		ELSE COALESCE(ts.featured_moment_id, p.primary_moment_id) END
+		FROM tour_stops ts JOIN places p ON p.id = ts.place_id WHERE ts.tour_id = $1 ORDER BY ts.position`, tourID, publicOnly)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +377,7 @@ func (s *Store) CreateTour(ctx context.Context, in CreateTourInput) (*models.Tou
 	if err != nil {
 		return nil, mapErr(err)
 	}
-	return s.GetTour(ctx, id)
+	return s.GetTour(ctx, id, false)
 }
 
 // UpdateTour patches a tour; changing modes adds or removes route rows and jobs.
@@ -398,7 +406,7 @@ func (s *Store) UpdateTour(ctx context.Context, id string, in UpdateTourInput) (
 	if err != nil {
 		return nil, mapErr(err)
 	}
-	return s.GetTour(ctx, id)
+	return s.GetTour(ctx, id, false)
 }
 
 // ReplaceStops sets the stop list and requeues every route.
@@ -526,6 +534,26 @@ func (s *Store) TourPublishBlockers(ctx context.Context, id string) ([]string, e
 		out = append(out, fmt.Sprintf("stop %d: place %s is %s, not published", pos, slug, status))
 	}
 	rows.Close()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	mrows, err := s.pool.Query(ctx, `SELECT ts.position, m.slug, m.status FROM tour_stops ts JOIN moments m ON m.id = ts.featured_moment_id WHERE ts.tour_id = $1 AND m.status <> 'published' ORDER BY ts.position`, id)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	for mrows.Next() {
+		var pos int
+		var slug, status string
+		if err := mrows.Scan(&pos, &slug, &status); err != nil {
+			mrows.Close()
+			return nil, err
+		}
+		out = append(out, fmt.Sprintf("stop %d: featured moment %s is %s, not published", pos, slug, status))
+	}
+	mrows.Close()
+	if err := mrows.Err(); err != nil {
+		return nil, err
+	}
 	var stopCount int
 	if err := s.pool.QueryRow(ctx, `SELECT count(*) FROM tour_stops WHERE tour_id = $1`, id).Scan(&stopCount); err != nil {
 		return nil, err
@@ -636,4 +664,23 @@ func (s *Store) RecomputeRoutes(ctx context.Context, tourID string) error {
 		}
 		return syncRoutesTx(ctx, tx, tourID, modes, true)
 	}))
+}
+
+// PublishedCuratedToursUsingPlace returns slugs of published curated (ownerless) tours that stop at the place.
+func (s *Store) PublishedCuratedToursUsingPlace(ctx context.Context, placeID string) ([]string, error) {
+	rows, err := s.pool.Query(ctx, `SELECT DISTINCT t.slug FROM tours t JOIN tour_stops ts ON ts.tour_id = t.id
+		WHERE ts.place_id = $1 AND t.status = 'published' AND t.owner_account_id IS NULL ORDER BY t.slug`, placeID)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var slug string
+		if err := rows.Scan(&slug); err != nil {
+			return nil, err
+		}
+		out = append(out, slug)
+	}
+	return out, rows.Err()
 }

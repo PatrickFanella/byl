@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -55,7 +56,7 @@ func NewRouter(d Deps) http.Handler {
 
 	r.Get("/healthz", d.healthz)
 	if d.MediaFSDir != "" {
-		r.Handle("/media/files/*", http.StripPrefix("/media/files/", http.FileServer(http.Dir(d.MediaFSDir))))
+		r.Handle("/media/files/*", http.StripPrefix("/media/files/", noDirListing(http.Dir(d.MediaFSDir))))
 	}
 
 	r.Route("/api/v1", func(r chi.Router) {
@@ -185,4 +186,28 @@ func canSeeTour(t *models.TourSummary, a *models.Account) bool {
 		return isCurator
 	}
 	return true
+}
+
+// noDirListing serves files but answers 404 for directories.
+func noDirListing(root http.FileSystem) http.Handler {
+	fs := http.FileServer(root)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		p := r.URL.Path
+		if strings.HasSuffix(p, "/") {
+			http.NotFound(w, r)
+			return
+		}
+		f, err := root.Open(p)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		info, err := f.Stat()
+		f.Close()
+		if err != nil || info.IsDir() {
+			http.NotFound(w, r)
+			return
+		}
+		fs.ServeHTTP(w, r)
+	})
 }

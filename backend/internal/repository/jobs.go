@@ -102,3 +102,13 @@ func (s *Store) RetryJob(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// ReclaimStaleJobs requeues jobs that have been running longer than olderThan (a worker died mid-job).
+func (s *Store) ReclaimStaleJobs(ctx context.Context, olderThan time.Duration) (int64, error) {
+	tag, err := s.pool.Exec(ctx, `UPDATE jobs SET status = 'queued', run_after = now(), last_error = 'reclaimed: worker did not finish', updated_at = now()
+		WHERE status = 'running' AND started_at < now() - $1::interval`, olderThan)
+	if err != nil {
+		return 0, mapErr(err)
+	}
+	return tag.RowsAffected(), nil
+}

@@ -44,7 +44,7 @@ help:
 	@printf "  make nuc-up               Start deployment stack\n"
 	@printf "  make nuc-down             Stop deployment stack\n"
 	@printf "  make nuc-logs             Follow deployment logs\n"
-	@printf "  make nuc-smoke            Health + moderation smoke checks\n"
+	@printf "  make nuc-smoke            Health + cities smoke checks\n"
 	@printf "  make nuc-rollback         Goose rollback one migration\n\n"
 	@printf "iOS:\n"
 	@printf "  make ios-build            Build iOS app for simulator\n"

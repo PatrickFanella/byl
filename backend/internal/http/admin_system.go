@@ -14,7 +14,7 @@ func (d Deps) adminListJobs(w http.ResponseWriter, r *http.Request) {
 		writeValidation(w, map[string]string{"status": "must be queued, running, done, or failed"})
 		return
 	}
-	jobs, err := d.Store.ListJobs(r.Context(), status, queryInt(r, "limit", 50), queryInt(r, "offset", 0))
+	jobs, err := d.Store.ListJobs(r.Context(), status, queryInt(r, "limit", 50), queryOffset(r))
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -37,7 +37,7 @@ func (d Deps) adminRetryJob(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) adminListAccounts(w http.ResponseWriter, r *http.Request) {
-	accounts, err := d.Store.ListAccounts(r.Context(), queryInt(r, "limit", 50), queryInt(r, "offset", 0))
+	accounts, err := d.Store.ListAccounts(r.Context(), queryInt(r, "limit", 50), queryOffset(r))
 	if err != nil {
 		d.fail(w, err)
 		return

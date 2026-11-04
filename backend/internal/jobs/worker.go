@@ -76,8 +76,16 @@ func (w *Worker) Run(ctx context.Context) {
 	wg.Wait()
 }
 
+// staleAfter is how long a job may sit in running before another worker reclaims it.
+const staleAfter = 10 * time.Minute
+
 // RunOnce claims and runs at most one job. It reports whether a job was claimed.
 func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
+	if n, err := w.store.ReclaimStaleJobs(ctx, staleAfter); err != nil {
+		return false, err
+	} else if n > 0 {
+		w.log.Warn("reclaimed stale jobs", "count", n)
+	}
 	job, err := w.store.ClaimJob(ctx, w.now())
 	if err != nil {
 		return false, err
@@ -86,19 +94,31 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 	runErr := w.dispatch(ctx, job)
+	return true, w.finish(ctx, job, runErr)
+}
+
+// finish records the outcome. It uses a context that survives cancellation so a shutdown
+// mid-job still leaves the row queued or done rather than stuck in running.
+func (w *Worker) finish(ctx context.Context, job *models.Job, runErr error) error {
+	wctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 15*time.Second)
+	defer cancel()
 	if runErr == nil {
-		return true, w.store.CompleteJob(ctx, job.ID)
+		return w.store.CompleteJob(wctx, job.ID)
 	}
-	final := job.Attempts >= job.MaxAttempts
-	w.log.Warn("job failed", "id", job.ID, "kind", job.Kind, "attempt", job.Attempts, "final", final, "error", runErr)
+	interrupted := ctx.Err() != nil
+	final := job.Attempts >= job.MaxAttempts && !interrupted
+	w.log.Warn("job failed", "id", job.ID, "kind", job.Kind, "attempt", job.Attempts, "final", final, "interrupted", interrupted, "error", runErr)
 	if final {
-		if err := w.onFinalFailure(ctx, job, runErr); err != nil {
+		if err := w.onFinalFailure(wctx, job, runErr); err != nil {
 			w.log.Error("record final failure", "id", job.ID, "error", err)
 		}
-		return true, w.store.FailJob(ctx, job.ID, runErr.Error(), nil)
+		return w.store.FailJob(wctx, job.ID, runErr.Error(), nil)
 	}
 	retry := w.now().Add(w.backoff(job.Attempts))
-	return true, w.store.FailJob(ctx, job.ID, runErr.Error(), &retry)
+	if interrupted {
+		retry = w.now()
+	}
+	return w.store.FailJob(wctx, job.ID, runErr.Error(), &retry)
 }
 
 func (w *Worker) dispatch(ctx context.Context, job *models.Job) error {

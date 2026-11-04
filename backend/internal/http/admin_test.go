@@ -193,6 +193,15 @@ func TestAdminTourPublishing(t *testing.T) {
 	if r := env.get(t, "/api/v1/cities/downers-grove/tours?topic=downtown-after-dark", ""); len(items(t, r)) != 1 {
 		t.Fatalf("public listing after publish: %s", r.raw)
 	}
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/routes/recompute", curator, nil); r.status != 409 {
+		t.Fatalf("recompute on a published tour must be refused: %d %s", r.status, r.raw)
+	}
+	if r := env.do(t, http.MethodPatch, "/api/v1/admin/tours/"+tourID, curator, map[string]any{"title": "Night Walk II"}); r.status != 200 || r.body["title"] != "Night Walk II" {
+		t.Fatalf("title change on a published tour is fine: %d %s", r.status, r.raw)
+	}
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/unpublish", curator, nil); r.status != 200 || r.body["status"] != "draft" {
+		t.Fatalf("unpublish: %d %s", r.status, r.raw)
+	}
 	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/routes/recompute", curator, nil); r.status != 202 {
 		t.Fatalf("recompute: %d %s", r.status, r.raw)
 	}
@@ -200,11 +209,8 @@ func TestAdminTourPublishing(t *testing.T) {
 	if r.body["routes"].(map[string]any)["walk"].(map[string]any)["status"] != "pending" {
 		t.Fatalf("recompute should mark pending: %s", r.raw)
 	}
-	if r := env.do(t, http.MethodPatch, "/api/v1/admin/tours/"+tourID, curator, map[string]any{"title": "Night Walk II", "modes": []string{"walk", "bike"}}); r.status != 200 || len(r.body["modes"].([]any)) != 2 {
-		t.Fatalf("patch tour: %d %s", r.status, r.raw)
-	}
-	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/unpublish", curator, nil); r.status != 200 || r.body["status"] != "draft" {
-		t.Fatalf("unpublish: %d %s", r.status, r.raw)
+	if r := env.do(t, http.MethodPatch, "/api/v1/admin/tours/"+tourID, curator, map[string]any{"modes": []string{"walk", "bike"}}); r.status != 200 || len(r.body["modes"].([]any)) != 2 {
+		t.Fatalf("patch modes on draft tour: %d %s", r.status, r.raw)
 	}
 	if r := env.get(t, "/api/v1/admin/tours?city="+testdb.SeedCityID, curator); r.status != 200 || len(items(t, r)) != 2 {
 		t.Fatalf("admin tour list: %d %s", r.status, r.raw)

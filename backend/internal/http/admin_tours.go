@@ -28,10 +28,28 @@ func (d Deps) adminListTours(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, listResponse{Items: tours, NextCursor: next})
 }
 
-func (d Deps) adminGetTour(w http.ResponseWriter, r *http.Request) {
-	tour, err := d.Store.GetTour(r.Context(), chi.URLParam(r, "id"))
+// adminTour resolves {id} (id or slug) to a tour, or writes the error.
+func (d Deps) adminTour(w http.ResponseWriter, r *http.Request) (*models.TourDetail, bool) {
+	tour, err := d.Store.GetTour(r.Context(), chi.URLParam(r, "id"), false)
 	if err != nil {
 		d.fail(w, err)
+		return nil, false
+	}
+	return tour, true
+}
+
+// lockedForEditing reports whether a published curated tour would lose its geometry; writes 409 when so.
+func lockedForEditing(w http.ResponseWriter, tour *models.TourDetail) bool {
+	if tour.Status == models.EntityStatusPublished && tour.OwnerAccountID == nil {
+		writeError(w, http.StatusConflict, "conflict", "tour is published; unpublish it before changing stops, modes, or routes")
+		return true
+	}
+	return false
+}
+
+func (d Deps) adminGetTour(w http.ResponseWriter, r *http.Request) {
+	tour, ok := d.adminTour(w, r)
+	if !ok {
 		return
 	}
 	writeJSON(w, http.StatusOK, tour)
@@ -66,6 +84,13 @@ func (d Deps) adminUpdateTour(w http.ResponseWriter, r *http.Request) {
 		writeValidation(w, f)
 		return
 	}
+	existing, ok := d.adminTour(w, r)
+	if !ok {
+		return
+	}
+	if req.Modes != nil && lockedForEditing(w, existing) {
+		return
+	}
 	in := repository.UpdateTourInput{Title: req.Title, Summary: req.Summary, Modes: req.Modes, HeroMediaID: req.HeroMediaID, Visibility: req.Visibility}
 	if req.TopicID != nil {
 		if strings.TrimSpace(*req.TopicID) == "" {
@@ -74,7 +99,7 @@ func (d Deps) adminUpdateTour(w http.ResponseWriter, r *http.Request) {
 			in.TopicID = req.TopicID
 		}
 	}
-	tour, err := d.Store.UpdateTour(r.Context(), chi.URLParam(r, "id"), in)
+	tour, err := d.Store.UpdateTour(r.Context(), existing.ID, in)
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -91,16 +116,19 @@ func (d Deps) adminSetTourStops(w http.ResponseWriter, r *http.Request) {
 		writeValidation(w, f)
 		return
 	}
-	id := chi.URLParam(r, "id")
-	if err := d.Store.ReplaceStops(r.Context(), id, req.Stops); err != nil {
+	existing, ok := d.adminTour(w, r)
+	if !ok || lockedForEditing(w, existing) {
+		return
+	}
+	if err := d.Store.ReplaceStops(r.Context(), existing.ID, req.Stops); err != nil {
 		d.fail(w, err)
 		return
 	}
-	d.respondTour(w, r, id)
+	d.respondTour(w, r, existing.ID)
 }
 
 func (d Deps) respondTour(w http.ResponseWriter, r *http.Request, id string) {
-	tour, err := d.Store.GetTour(r.Context(), id)
+	tour, err := d.Store.GetTour(r.Context(), id, false)
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -109,11 +137,11 @@ func (d Deps) respondTour(w http.ResponseWriter, r *http.Request, id string) {
 }
 
 func (d Deps) adminPublishTour(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	if _, err := d.Store.GetTour(r.Context(), id); err != nil {
-		d.fail(w, err)
+	tour, ok := d.adminTour(w, r)
+	if !ok {
 		return
 	}
+	id := tour.ID
 	blockers, err := d.Store.TourPublishBlockers(r.Context(), id)
 	if err != nil {
 		d.fail(w, err)
@@ -131,7 +159,11 @@ func (d Deps) adminPublishTour(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) adminUnpublishTour(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	tour, ok := d.adminTour(w, r)
+	if !ok {
+		return
+	}
+	id := tour.ID
 	if err := d.Store.SetTourStatus(r.Context(), id, models.EntityStatusDraft); err != nil {
 		d.fail(w, err)
 		return
@@ -140,7 +172,11 @@ func (d Deps) adminUnpublishTour(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) adminDeleteTour(w http.ResponseWriter, r *http.Request) {
-	if err := d.Store.DeleteTour(r.Context(), chi.URLParam(r, "id")); err != nil {
+	tour, ok := d.adminTour(w, r)
+	if !ok {
+		return
+	}
+	if err := d.Store.DeleteTour(r.Context(), tour.ID); err != nil {
 		d.fail(w, err)
 		return
 	}
@@ -148,7 +184,11 @@ func (d Deps) adminDeleteTour(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) adminRecomputeRoutes(w http.ResponseWriter, r *http.Request) {
-	if err := d.Store.RecomputeRoutes(r.Context(), chi.URLParam(r, "id")); err != nil {
+	tour, ok := d.adminTour(w, r)
+	if !ok || lockedForEditing(w, tour) {
+		return
+	}
+	if err := d.Store.RecomputeRoutes(r.Context(), tour.ID); err != nil {
 		d.fail(w, err)
 		return
 	}

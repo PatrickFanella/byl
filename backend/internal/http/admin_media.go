@@ -69,7 +69,7 @@ func (d Deps) adminUploadMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) adminListMedia(w http.ResponseWriter, r *http.Request) {
-	assets, err := d.Store.ListMedia(r.Context(), queryInt(r, "limit", 50), queryInt(r, "offset", 0))
+	assets, err := d.Store.ListMedia(r.Context(), queryInt(r, "limit", 50), queryOffset(r))
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -82,7 +82,19 @@ func (d Deps) adminUpdateMedia(w http.ResponseWriter, r *http.Request) {
 	if !decodeOrFail(w, r, &req) {
 		return
 	}
-	asset, err := d.Store.UpdateMediaMetadata(r.Context(), chi.URLParam(r, "id"), req)
+	id := chi.URLParam(r, "id")
+	if req.License != nil && strings.TrimSpace(*req.License) == "" {
+		n, err := d.Store.PublishedMomentsUsingMedia(r.Context(), id)
+		if err != nil {
+			d.fail(w, err)
+			return
+		}
+		if n > 0 {
+			writeError(w, http.StatusConflict, "conflict", "asset is attached to a published moment; unpublish it before removing the license")
+			return
+		}
+	}
+	asset, err := d.Store.UpdateMediaMetadata(r.Context(), id, req)
 	if err != nil {
 		d.fail(w, err)
 		return

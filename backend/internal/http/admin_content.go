@@ -117,8 +117,18 @@ func (d Deps) adminListPlaces(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, listResponse{Items: places, NextCursor: next})
 }
 
+// adminPlaceID resolves {id} (id or slug) or writes the error.
+func (d Deps) adminPlaceID(w http.ResponseWriter, r *http.Request) (string, bool) {
+	id, err := d.Store.ResolvePlaceID(r.Context(), chi.URLParam(r, "id"), r.URL.Query().Get("city"))
+	if err != nil {
+		d.fail(w, err)
+		return "", false
+	}
+	return id, true
+}
+
 func (d Deps) adminGetPlace(w http.ResponseWriter, r *http.Request) {
-	place, err := d.Store.GetPlace(r.Context(), chi.URLParam(r, "id"), "", true)
+	place, err := d.Store.GetPlace(r.Context(), chi.URLParam(r, "id"), r.URL.Query().Get("city"), true)
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -152,7 +162,11 @@ func (d Deps) adminUpdatePlace(w http.ResponseWriter, r *http.Request) {
 		writeValidation(w, f)
 		return
 	}
-	place, err := d.Store.UpdatePlace(r.Context(), chi.URLParam(r, "id"), req)
+	id, ok := d.adminPlaceID(w, r)
+	if !ok {
+		return
+	}
+	place, err := d.Store.UpdatePlace(r.Context(), id, req)
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -162,7 +176,21 @@ func (d Deps) adminUpdatePlace(w http.ResponseWriter, r *http.Request) {
 
 func (d Deps) adminSetPlaceStatus(status models.EntityStatus) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
+		id, ok := d.adminPlaceID(w, r)
+		if !ok {
+			return
+		}
+		if status != models.EntityStatusPublished {
+			using, err := d.Store.PublishedCuratedToursUsingPlace(r.Context(), id)
+			if err != nil {
+				d.fail(w, err)
+				return
+			}
+			if len(using) > 0 {
+				writeError(w, http.StatusConflict, "conflict", "place is a stop on published tours: "+strings.Join(using, ", ")+"; unpublish them first")
+				return
+			}
+		}
 		if err := d.Store.SetPlaceStatus(r.Context(), id, status); err != nil {
 			d.fail(w, err)
 			return
@@ -287,6 +315,22 @@ func (d Deps) adminSetMomentMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := chi.URLParam(r, "id")
+	existing, err := d.Store.GetMoment(r.Context(), id, true)
+	if err != nil {
+		d.fail(w, err)
+		return
+	}
+	if existing.Status == models.EntityStatusPublished {
+		unlicensed, err := d.Store.UnlicensedMedia(r.Context(), req.MediaIDs)
+		if err != nil {
+			d.fail(w, err)
+			return
+		}
+		if len(unlicensed) > 0 {
+			writeError(w, http.StatusConflict, "conflict", "moment is published; these assets have no license: "+strings.Join(unlicensed, ", "))
+			return
+		}
+	}
 	if err := d.Store.ReplaceMomentMedia(r.Context(), id, req.MediaIDs); err != nil {
 		d.fail(w, err)
 		return

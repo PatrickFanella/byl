@@ -88,6 +88,9 @@ func (v *jwksVerifier) Verify(ctx context.Context, raw string) (Identity, error)
 		return Identity{}, fmt.Errorf("%w: missing subject", ErrInvalidToken)
 	}
 	email, _ := claims["email"].(string)
+	if !emailVerified(claims["email_verified"]) {
+		email = ""
+	}
 	name, _ := claims["name"].(string)
 	return Identity{Subject: sub, Email: email, Name: name}, nil
 }
@@ -173,4 +176,15 @@ func (v *jwksVerifier) refresh(ctx context.Context) error {
 	v.keys = keys
 	v.fetchedAt = time.Now()
 	return nil
+}
+
+// emailVerified accepts Google's boolean and Apple's "true" string; anything else is unverified.
+func emailVerified(v any) bool {
+	switch x := v.(type) {
+	case bool:
+		return x
+	case string:
+		return strings.EqualFold(x, "true")
+	}
+	return false
 }

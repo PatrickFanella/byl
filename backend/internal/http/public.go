@@ -17,6 +17,14 @@ type listResponse struct {
 	NextCursor string `json:"next_cursor"`
 }
 
+// queryOffset reads a non-negative offset.
+func queryOffset(r *http.Request) int {
+	if n := queryInt(r, "offset", 0); n > 0 {
+		return n
+	}
+	return 0
+}
+
 func queryInt(r *http.Request, key string, def int) int {
 	v := strings.TrimSpace(r.URL.Query().Get(key))
 	if v == "" {
@@ -200,12 +208,14 @@ func (d Deps) getTopic(w http.ResponseWriter, r *http.Request) {
 
 // visibleTour loads a tour and enforces visibility for the current account.
 func (d Deps) visibleTour(w http.ResponseWriter, r *http.Request) (*models.TourDetail, bool) {
-	tour, err := d.Store.GetTour(r.Context(), chi.URLParam(r, "tour"))
+	a := accountFrom(r.Context())
+	privileged := a != nil && a.Role.AtLeast(models.AccountRoleCurator)
+	tour, err := d.Store.GetTour(r.Context(), chi.URLParam(r, "tour"), !privileged)
 	if err != nil {
 		d.fail(w, err)
 		return nil, false
 	}
-	if !canSeeTour(&tour.TourSummary, accountFrom(r.Context())) {
+	if !canSeeTour(&tour.TourSummary, a) {
 		writeError(w, http.StatusNotFound, "not_found", "not found")
 		return nil, false
 	}

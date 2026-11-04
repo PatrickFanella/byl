@@ -374,3 +374,35 @@ func (s *Store) MomentPublishBlockers(ctx context.Context, momentID string) ([]s
 	}
 	return out, rows.Err()
 }
+
+// PublishedMomentsUsingMedia counts published moments that attach the asset as media or hero.
+func (s *Store) PublishedMomentsUsingMedia(ctx context.Context, mediaID string) (int, error) {
+	if !isUUID(mediaID) {
+		return 0, nil
+	}
+	var n int
+	err := s.pool.QueryRow(ctx, `SELECT count(*) FROM moments m WHERE m.status = 'published'
+		AND (m.hero_media_id = $1 OR EXISTS (SELECT 1 FROM moment_media mm WHERE mm.moment_id = m.id AND mm.media_id = $1))`, mediaID).Scan(&n)
+	return n, mapErr(err)
+}
+
+// UnlicensedMedia returns the ids among mediaIDs whose licence is empty.
+func (s *Store) UnlicensedMedia(ctx context.Context, mediaIDs []string) ([]string, error) {
+	if len(mediaIDs) == 0 {
+		return nil, nil
+	}
+	rows, err := s.pool.Query(ctx, `SELECT id::text FROM media_assets WHERE id = ANY($1::uuid[]) AND license = ''`, mediaIDs)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		out = append(out, id)
+	}
+	return out, rows.Err()
+}
