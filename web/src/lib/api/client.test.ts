@@ -44,7 +44,11 @@ describe('ApiClient', () => {
 	it('maps the error envelope to ApiError with fields', async () => {
 		const failing = vi.fn(async () =>
 			jsonResponse(422, {
-				error: { code: 'validation_failed', message: 'request failed validation', fields: { title: 'is required' } }
+				error: {
+					code: 'validation_failed',
+					message: 'request failed validation',
+					fields: { title: 'is required' }
+				}
 			})
 		) as unknown as typeof fetch;
 		const client = new ApiClient({ baseUrl: '', token: () => null, fetch: failing });
@@ -62,7 +66,9 @@ describe('ApiClient', () => {
 	});
 
 	it('returns undefined for 204', async () => {
-		const noContent = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch;
+		const noContent = vi.fn(
+			async () => new Response(null, { status: 204 })
+		) as unknown as typeof fetch;
 		const client = new ApiClient({ baseUrl: '', token: () => 't', fetch: noContent });
 		await expect(client.del('/api/v1/auth/session')).resolves.toBeUndefined();
 	});

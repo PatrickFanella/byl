@@ -65,8 +65,17 @@ export class ApiClient {
 			}
 		}
 		if (!res.ok) {
-			const envelope = (data as { error?: { code?: string; message?: string; fields?: Record<string, string> } } | undefined)?.error;
-			throw new ApiError(res.status, envelope?.code ?? 'http_error', envelope?.message ?? `request failed with status ${res.status}`, envelope?.fields ?? {});
+			const envelope = (
+				data as
+					| { error?: { code?: string; message?: string; fields?: Record<string, string> } }
+					| undefined
+			)?.error;
+			throw new ApiError(
+				res.status,
+				envelope?.code ?? 'http_error',
+				envelope?.message ?? `request failed with status ${res.status}`,
+				envelope?.fields ?? {}
+			);
 		}
 		return data as T;
 	}

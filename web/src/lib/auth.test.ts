@@ -30,7 +30,10 @@ describe('session', () => {
 	});
 
 	it('persists and restores the token and account', () => {
-		session.set({ token: 'abc', account: { id: '1', email: 'a@b.c', display_name: 'A', role: 'curator' } });
+		session.set({
+			token: 'abc',
+			account: { id: '1', email: 'a@b.c', display_name: 'A', role: 'curator' }
+		});
 		expect(session.token()).toBe('abc');
 		expect(session.account()?.role).toBe('curator');
 		session.restore();
@@ -38,7 +41,10 @@ describe('session', () => {
 	});
 
 	it('clears everything', () => {
-		session.set({ token: 'abc', account: { id: '1', email: 'a@b.c', display_name: 'A', role: 'visitor' } });
+		session.set({
+			token: 'abc',
+			account: { id: '1', email: 'a@b.c', display_name: 'A', role: 'visitor' }
+		});
 		session.clear();
 		expect(session.token()).toBeNull();
 		expect(session.account()).toBeNull();

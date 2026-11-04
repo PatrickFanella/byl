@@ -488,6 +488,7 @@ components:
         next_cursor: { type: string, description: Empty when there is no further page }
     City:
       type: object
+      required: [id, slug, name, region, country_code, center_lat, center_lng, bbox, timezone, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         slug: { type: string }
@@ -508,6 +509,7 @@ components:
             topics: { type: array, items: { $ref: "#/components/schemas/Topic" } }
     Topic:
       type: object
+      required: [id, city_id, slug, name, description, moment_count]
       properties:
         id: { type: string, format: uuid }
         city_id: { type: string, format: uuid }
@@ -517,6 +519,7 @@ components:
         moment_count: { type: integer, description: Published moments carrying this topic }
     MediaAsset:
       type: object
+      required: [id, kind, public_url, mime_type, caption, credit, license, license_url, source_url, status, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         kind: { type: string, enum: [image, video, audio] }
@@ -541,6 +544,7 @@ components:
       enum: [walk, bike]
     PlaceSummary:
       type: object
+      required: [id, city_id, slug, name, summary, kind, latitude, longitude, arrival_radius_m, address, status, moment_count, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         city_id: { type: string, format: uuid }
@@ -577,6 +581,7 @@ components:
         note: { type: string }
     MomentSummary:
       type: object
+      required: [id, place_id, slug, title, excerpt, date_precision, date_display, has_narration, status, topic_ids]
       properties:
         id: { type: string, format: uuid }
         place_id: { type: string, format: uuid }
@@ -605,6 +610,7 @@ components:
             updated_at: { type: string, format: date-time }
     RouteSummary:
       type: object
+      required: [mode, status, distance_m, duration_s]
       properties:
         mode: { $ref: "#/components/schemas/TravelMode" }
         status: { type: string, enum: [pending, ready, failed] }
@@ -615,6 +621,7 @@ components:
         computed_at: { type: string, format: date-time, nullable: true }
     RouteLeg:
       type: object
+      required: [from_position, to_position, distance_m, duration_s, geometry]
       properties:
         from_position: { type: integer }
         to_position: { type: integer }
@@ -623,6 +630,7 @@ components:
         geometry: { type: array, items: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }, description: "[lng, lat] pairs" }
     TourRoute:
       type: object
+      required: [id, tour_id, mode, status, provider, distance_m, duration_s, legs]
       properties:
         id: { type: string, format: uuid }
         tour_id: { type: string, format: uuid }
@@ -643,6 +651,7 @@ components:
         computed_at: { type: string, format: date-time, nullable: true }
     TourSummary:
       type: object
+      required: [id, city_id, slug, title, summary, modes, status, visibility, stop_count, routes, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         city_id: { type: string, format: uuid }
@@ -662,6 +671,7 @@ components:
         updated_at: { type: string, format: date-time }
     TourStop:
       type: object
+      required: [id, position, place, note]
       properties:
         id: { type: string, format: uuid }
         position: { type: integer, description: 1-based }
@@ -677,6 +687,7 @@ components:
             stops: { type: array, items: { $ref: "#/components/schemas/TourStop" } }
     TourProgress:
       type: object
+      required: [account_id, tour_id, mode, visited_positions, started_at, updated_at]
       properties:
         account_id: { type: string, format: uuid }
         tour_id: { type: string, format: uuid }
@@ -687,6 +698,7 @@ components:
         updated_at: { type: string, format: date-time }
     Account:
       type: object
+      required: [id, provider, email, display_name, role, created_at]
       properties:
         id: { type: string, format: uuid }
         provider: { type: string, enum: [apple, google, dev] }
@@ -697,12 +709,14 @@ components:
         created_at: { type: string, format: date-time }
     Session:
       type: object
+      required: [token, expires_at, account]
       properties:
         token: { type: string }
         expires_at: { type: string, format: date-time }
         account: { $ref: "#/components/schemas/Account" }
     Candidate:
       type: object
+      required: [id, kind, origin, payload, status, review_note, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         kind: { type: string, enum: [place, moment, media] }
@@ -722,9 +736,10 @@ components:
         updated_at: { type: string, format: date-time }
     Job:
       type: object
+      required: [id, kind, payload, status, attempts, max_attempts, run_after, last_error, created_at]
       properties:
         id: { type: string, format: uuid }
-        kind: { type: string, enum: [compute_route, generate_narration] }
+        kind: { type: string, enum: [compute_route, generate_narration, import_source, draft_candidate, fetch_media] }
         payload: { type: object }
         status: { type: string, enum: [queued, running, done, failed] }
         attempts: { type: integer }
@@ -940,6 +955,7 @@ components:
         limit: { type: integer, maximum: 100 }
     Stats:
       type: object
+      required: [pending_candidates, jobs, published, user_routes, accounts]
       properties:
         pending_candidates: { type: object, additionalProperties: { type: integer } }
         jobs: { type: object, additionalProperties: { type: integer } }
@@ -948,6 +964,7 @@ components:
         accounts: { type: integer }
     Suggestion:
       type: object
+      required: [moment, reason]
       properties:
         moment: { $ref: "#/components/schemas/MomentSummary" }
         reason: { type: string }
