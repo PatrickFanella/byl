@@ -1,0 +1,34 @@
+{
+  "results": [
+    {
+      "id": "http://www.loc.gov/item/2017760345/",
+      "title": "Main Street, Downers Grove, Ill.",
+      "date": "1910",
+      "description": ["Photograph shows the business district along Main Street."],
+      "original_format": ["photo, print, drawing"],
+      "image_url": ["https://tile.loc.gov/storage-services/service/pnp/pan/6a12000/6a12345r.jpg#h=500&w=1200"],
+      "rights": "No known restrictions on publication.",
+      "url": "https://www.loc.gov/item/2017760345/",
+      "contributor": ["Detroit Publishing Co."]
+    },
+    {
+      "id": "http://www.loc.gov/item/sn83045487/",
+      "title": "The Downers Grove reporter",
+      "date": "1883",
+      "description": ["Weekly newspaper published in Downers Grove, Du Page County, Illinois."],
+      "original_format": ["newspaper"],
+      "url": "https://www.loc.gov/item/sn83045487/",
+      "rights": "Rights assessment is your responsibility."
+    },
+    {
+      "id": "http://www.loc.gov/item/2017760346/",
+      "title": "Tivoli Theatre marquee",
+      "date": "1935",
+      "original_format": ["photo, print, drawing"],
+      "image_url": ["https://tile.loc.gov/storage-services/service/pnp/x.jpg"],
+      "rights": "Publication may be restricted. For information see Rights and Restrictions.",
+      "url": "https://www.loc.gov/item/2017760346/"
+    }
+  ],
+  "pagination": {"of": 3}
+}
