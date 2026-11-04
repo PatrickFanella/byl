@@ -98,3 +98,83 @@ paths:
       description: Only served when DEV_AUTH_ENABLED=true; returns 404 otherwise.
       requestBody: { required: true, content: { application/json: { schema: { type: object, required: [email], properties: { email: { type: string }, display_name: { type: string } } } } } }
       responses: { "200": { description: Session }, "404": { description: Disabled }, "422": { description: Validation failed } }
+  /api/v1/auth/apple:
+    post:
+      summary: Exchange a Sign in with Apple identity token for a session
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [identity_token], properties: { identity_token: { type: string }, display_name: { type: string } } } } } }
+      responses: { "200": { description: Session }, "401": { description: Token rejected }, "503": { description: Provider not configured } }
+  /api/v1/auth/google:
+    post:
+      summary: Exchange a Google ID token for a session
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [id_token], properties: { id_token: { type: string } } } } } }
+      responses: { "200": { description: Session }, "401": { description: Token rejected }, "503": { description: Provider not configured } }
+  /api/v1/auth/session:
+    delete:
+      summary: Revoke the current session
+      security: [{ bearer: [] }]
+      responses: { "204": { description: Revoked }, "401": { description: Unauthorized } }
+  /api/v1/me:
+    get:
+      summary: Current account
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "401": { description: Unauthorized } }
+  /api/v1/me/tours:
+    get:
+      summary: List my routes
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK } }
+    post:
+      summary: Create a route from 2 to 30 published places in one city
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateUserTourRequest" } } } }
+      responses: { "201": { description: Created, unlisted by default }, "404": { description: Unknown city }, "422": { description: Validation failed } }
+  /api/v1/me/tours/{id}:
+    get:
+      summary: Get one of my routes
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not mine or not found } }
+    patch:
+      summary: Update title, summary, modes, visibility, or stops
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateUserTourRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not mine or not found }, "422": { description: Validation failed } }
+    delete:
+      summary: Delete one of my routes
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "204": { description: Deleted }, "404": { description: Not mine or not found } }
+  /api/v1/me/saved:
+    get:
+      summary: List saved tours
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK } }
+  /api/v1/me/saved/{tour}:
+    put:
+      summary: Save a tour
+      security: [{ bearer: [] }]
+      parameters: [{ name: tour, in: path, required: true, schema: { type: string } }]
+      responses: { "204": { description: Saved }, "404": { description: Not found } }
+    delete:
+      summary: Unsave a tour
+      security: [{ bearer: [] }]
+      parameters: [{ name: tour, in: path, required: true, schema: { type: string } }]
+      responses: { "204": { description: Removed }, "404": { description: Not found } }
+  /api/v1/me/progress:
+    get:
+      summary: List my progress on every tour
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK } }
+  /api/v1/me/progress/{tour}:
+    get:
+      summary: Get my progress on a tour
+      security: [{ bearer: [] }]
+      parameters: [{ name: tour, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+    put:
+      summary: Record my progress on a tour
+      security: [{ bearer: [] }]
+      parameters: [{ name: tour, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ProgressRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed } }

@@ -72,6 +72,25 @@ func NewRouter(d Deps) http.Handler {
 		r.Get("/tours/{tour}/route", d.getTourRoute)
 		r.Get("/media/{id}", d.getMedia)
 		r.Post("/auth/dev", d.devSignIn)
+		r.Post("/auth/apple", d.appleSignIn)
+		r.Post("/auth/google", d.googleSignIn)
+
+		r.Group(func(r chi.Router) {
+			r.Use(d.requireAuth)
+			r.Get("/me", d.me)
+			r.Delete("/auth/session", d.logout)
+			r.Get("/me/tours", d.listMyTours)
+			r.Post("/me/tours", d.createMyTour)
+			r.Get("/me/tours/{id}", d.getMyTour)
+			r.Patch("/me/tours/{id}", d.updateMyTour)
+			r.Delete("/me/tours/{id}", d.deleteMyTour)
+			r.Get("/me/saved", d.listSaved)
+			r.Put("/me/saved/{tour}", d.saveTour)
+			r.Delete("/me/saved/{tour}", d.unsaveTour)
+			r.Get("/me/progress", d.listProgress)
+			r.Get("/me/progress/{tour}", d.getProgress)
+			r.Put("/me/progress/{tour}", d.putProgress)
+		})
 	})
 	return r
 }

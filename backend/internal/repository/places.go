@@ -231,3 +231,22 @@ func (s *Store) SetPrimaryMoment(ctx context.Context, placeID string, momentID *
 	}
 	return nil
 }
+
+// UnpublishedOrForeign returns the 1-based stop positions whose place is not published or not in cityID.
+func (s *Store) UnpublishedOrForeign(ctx context.Context, cityID string, placeIDs []string) ([]int, error) {
+	var bad []int
+	for i, id := range placeIDs {
+		if !isUUID(id) {
+			bad = append(bad, i+1)
+			continue
+		}
+		var ok bool
+		if err := s.pool.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM places WHERE id = $1 AND city_id = $2 AND status = 'published')`, id, cityID).Scan(&ok); err != nil {
+			return nil, mapErr(err)
+		}
+		if !ok {
+			bad = append(bad, i+1)
+		}
+	}
+	return bad, nil
+}
