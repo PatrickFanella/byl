@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Module path stays `invisible-museum/backend`; `go.mod` moves to `go 1.24`.
+- Module path stays `invisible-museum/backend`; `go.mod` moved to `go 1.24` in cycle 1 and to `go 1.25` in cycle 2 (Anthropic SDK requirement).
 - API base path stays `/api/v1`. No v2.
 - Every error body is `{"error":{"code","message"}}`, validation errors add `fields` and use 422.
 - UUID primary keys via `gen_random_uuid()`; slugs accepted anywhere an ID is for cities, places, topics, tours.
