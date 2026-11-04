@@ -1,6 +1,8 @@
 import CoreLocation
 import Observation
 
+/// Thin CLLocationManager wrapper: authorization state, the latest fix, and a callback the
+/// active tour feeds into its ArrivalMonitor. Heading is not tracked; the map rotates itself.
 @MainActor
 @Observable
 final class MuseumLocationService: NSObject, CLLocationManagerDelegate {
@@ -14,46 +16,45 @@ final class MuseumLocationService: NSObject, CLLocationManagerDelegate {
 
     var authorizationState: AuthorizationState = .unknown
     var currentLocation: CLLocation?
-    var currentHeading: CLHeading?
     var lastErrorMessage: String?
+    /// Called on the main actor for every new fix.
+    var onLocation: ((CLLocation) -> Void)?
+
+    private var wantsUpdates = false
 
     override init() {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.distanceFilter = 5
-        if CLLocationManager.headingAvailable() {
-            manager.headingFilter = 5
-        }
+        manager.activityType = .fitness
+        manager.pausesLocationUpdatesAutomatically = true
         updateAuthorizationState(manager.authorizationStatus)
     }
 
     func requestWhenInUseAuthorization() {
+        guard authorizationState == .unknown else { return }
         manager.requestWhenInUseAuthorization()
     }
 
+    /// Starts updates now if allowed, or as soon as the visitor grants access.
     func start() {
+        wantsUpdates = true
         guard authorizationState == .authorized else { return }
         manager.startUpdatingLocation()
-        if CLLocationManager.headingAvailable() {
-            manager.startUpdatingHeading()
-        }
     }
 
     func stop() {
+        wantsUpdates = false
         manager.stopUpdatingLocation()
-        #if os(iOS) || os(tvOS) || os(visionOS)
-        if CLLocationManager.headingAvailable() {
-            manager.stopUpdatingHeading()
-        }
-        #endif
     }
 
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
         Task { @MainActor in
-            updateAuthorizationState(manager.authorizationStatus)
-            if authorizationState == .authorized {
-                start()
+            updateAuthorizationState(status)
+            if authorizationState == .authorized, wantsUpdates {
+                self.manager.startUpdatingLocation()
             }
         }
     }
@@ -62,12 +63,7 @@ final class MuseumLocationService: NSObject, CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         Task { @MainActor in
             currentLocation = location
-        }
-    }
-
-    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        Task { @MainActor in
-            currentHeading = newHeading
+            onLocation?(location)
         }
     }
 
