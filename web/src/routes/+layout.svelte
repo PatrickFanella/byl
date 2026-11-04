@@ -1,10 +1,10 @@
 <script lang="ts">
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '#lib/assets/favicon.svg';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { session, canCurate } from '$lib/auth';
-	import { api } from '$lib/api';
+	import { session, canCurate } from '#lib/auth.ts';
+	import { api } from '#lib/api/index.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -59,14 +59,19 @@
 					{#each nav as item (item.href)}
 						<a
 							href={item.href}
-							class="rounded-md px-3 py-1.5 hover:bg-stone-100 {active(item.href) ? 'bg-stone-900 text-white hover:bg-stone-800' : ''}"
-							>{item.label}</a
+							class="rounded-md px-3 py-1.5 hover:bg-stone-100 {active(item.href)
+								? 'bg-stone-900 text-white hover:bg-stone-800'
+								: ''}">{item.label}</a
 						>
 					{/each}
 				</nav>
 				<div class="flex items-center gap-3 text-sm text-stone-600">
-					<span title={$current.account.email}>{$current.account.display_name || $current.account.email}</span>
-					<span class="rounded bg-stone-100 px-2 py-0.5 text-xs uppercase tracking-wide">{$current.account.role}</span>
+					<span title={$current.account.email}
+						>{$current.account.display_name || $current.account.email}</span
+					>
+					<span class="rounded bg-stone-100 px-2 py-0.5 text-xs tracking-wide uppercase"
+						>{$current.account.role}</span
+					>
 					<button class="text-stone-500 hover:text-stone-900" onclick={signOut}>Sign out</button>
 				</div>
 			</div>
@@ -84,9 +89,13 @@
 				<strong>{$current.account.role}</strong> role. Ask an administrator to grant curator access, then
 				sign in again.
 			</p>
-			<button class="rounded-md bg-stone-900 px-4 py-2 text-white" onclick={signOut}>Sign out</button>
+			<button class="rounded-md bg-stone-900 px-4 py-2 text-white" onclick={signOut}
+				>Sign out</button
+			>
 		</div>
 	</div>
 {:else}
-	<div class="flex min-h-screen items-center justify-center text-stone-500">Redirecting to sign in…</div>
+	<div class="flex min-h-screen items-center justify-center text-stone-500">
+		Redirecting to sign in…
+	</div>
 {/if}

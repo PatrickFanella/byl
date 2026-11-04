@@ -2,9 +2,9 @@
 export const ssr = false;
 export const prerender = false;
 
-import { session } from '$lib/auth';
-import { api, ApiError } from '$lib/api';
-import type { Account } from '$lib/auth';
+import { session } from '#lib/auth.ts';
+import { api, ApiError } from '#lib/api/index.ts';
+import type { Account } from '#lib/auth.ts';
 
 export async function load() {
 	const restored = session.restore();

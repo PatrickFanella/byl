@@ -2,8 +2,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { api, ApiError } from '$lib/api';
-	import { session, type SessionData } from '$lib/auth';
+	import { api, ApiError } from '#lib/api/index.ts';
+	import { session, type SessionData } from '#lib/auth.ts';
 
 	let email = $state('');
 	let displayName = $state('');
@@ -24,7 +24,10 @@
 		busy = true;
 		error = '';
 		try {
-			const data = await api.post<SessionData>('/api/v1/auth/dev', { email, display_name: displayName });
+			const data = await api.post<SessionData>('/api/v1/auth/dev', {
+				email,
+				display_name: displayName
+			});
 			finish(data);
 		} catch (err) {
 			if (err instanceof ApiError && err.status === 404) {
@@ -44,7 +47,9 @@
 		busy = true;
 		error = '';
 		try {
-			const data = await api.post<SessionData>('/api/v1/auth/google', { id_token: response.credential });
+			const data = await api.post<SessionData>('/api/v1/auth/google', {
+				id_token: response.credential
+			});
 			finish(data);
 		} catch (err) {
 			error = err instanceof ApiError ? err.message : 'Google sign-in failed.';
@@ -59,7 +64,18 @@
 		script.src = 'https://accounts.google.com/gsi/client';
 		script.async = true;
 		script.onload = () => {
-			const g = (window as unknown as { google?: { accounts: { id: { initialize: (o: object) => void; renderButton: (el: HTMLElement, o: object) => void } } } }).google;
+			const g = (
+				window as unknown as {
+					google?: {
+						accounts: {
+							id: {
+								initialize: (o: object) => void;
+								renderButton: (el: HTMLElement, o: object) => void;
+							};
+						};
+					};
+				}
+			).google;
 			const el = document.getElementById('google-button');
 			if (!g || !el) return;
 			g.accounts.id.initialize({ client_id: googleClientId, callback: googleCredential });
@@ -78,23 +94,43 @@
 
 		{#if googleClientId}
 			<div id="google-button" class="flex justify-center"></div>
-			<div class="flex items-center gap-3 text-xs text-stone-400"><span class="h-px flex-1 bg-stone-200"></span>or<span class="h-px flex-1 bg-stone-200"></span></div>
+			<div class="flex items-center gap-3 text-xs text-stone-400">
+				<span class="h-px flex-1 bg-stone-200"></span>or<span class="h-px flex-1 bg-stone-200"
+				></span>
+			</div>
 		{/if}
 
 		{#if !devDisabled}
 			<form class="space-y-3" onsubmit={devSignIn}>
 				<label class="block text-sm">
 					<span class="text-stone-700">Email</span>
-					<input class="mt-1 w-full rounded-md border-stone-300" type="email" bind:value={email} required autocomplete="email" />
+					<input
+						class="mt-1 w-full rounded-md border-stone-300"
+						type="email"
+						bind:value={email}
+						required
+						autocomplete="email"
+					/>
 				</label>
 				<label class="block text-sm">
 					<span class="text-stone-700">Display name</span>
-					<input class="mt-1 w-full rounded-md border-stone-300" type="text" bind:value={displayName} autocomplete="name" />
+					<input
+						class="mt-1 w-full rounded-md border-stone-300"
+						type="text"
+						bind:value={displayName}
+						autocomplete="name"
+					/>
 				</label>
-				<button class="w-full rounded-md bg-stone-900 px-4 py-2 text-white disabled:opacity-50" disabled={busy} type="submit">
+				<button
+					class="w-full rounded-md bg-stone-900 px-4 py-2 text-white disabled:opacity-50"
+					disabled={busy}
+					type="submit"
+				>
 					{busy ? 'Signing in…' : 'Sign in (development)'}
 				</button>
-				<p class="text-xs text-stone-500">Development sign-in works only when the API runs with DEV_AUTH_ENABLED.</p>
+				<p class="text-xs text-stone-500">
+					Development sign-in works only when the API runs with DEV_AUTH_ENABLED.
+				</p>
 			</form>
 		{/if}
 
