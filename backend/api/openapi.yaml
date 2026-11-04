@@ -17,3 +17,84 @@ paths:
           description: OK
         "503":
           description: Database unreachable
+  /api/v1/cities:
+    get:
+      summary: List cities
+      responses: { "200": { description: OK } }
+  /api/v1/cities/{city}:
+    get:
+      summary: Get a city with its topics
+      parameters: [{ name: city, in: path, required: true, schema: { type: string }, description: City id or slug }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/cities/{city}/places:
+    get:
+      summary: List published places in a city
+      parameters:
+        - { name: city, in: path, required: true, schema: { type: string } }
+        - { name: near, in: query, schema: { type: string }, description: "lat,lng; sorts by distance and adds distance_m" }
+        - { name: radius_m, in: query, schema: { type: integer, default: 2000, maximum: 50000 } }
+        - { name: bbox, in: query, schema: { type: string }, description: "minLng,minLat,maxLng,maxLat" }
+        - { name: topic, in: query, schema: { type: string }, description: Topic id or slug }
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed } }
+  /api/v1/cities/{city}/tours:
+    get:
+      summary: List public published tours in a city
+      parameters:
+        - { name: city, in: path, required: true, schema: { type: string } }
+        - { name: topic, in: query, schema: { type: string } }
+        - { name: mode, in: query, schema: { type: string, enum: [walk, bike] } }
+        - { name: limit, in: query, schema: { type: integer } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed } }
+  /api/v1/places/{place}:
+    get:
+      summary: Get a published place with its published moments
+      parameters:
+        - { name: place, in: path, required: true, schema: { type: string }, description: "Place id, or slug with ?city=" }
+        - { name: city, in: query, schema: { type: string } }
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/places/{place}/moments:
+    get:
+      summary: List a place's published moments in date order
+      parameters:
+        - { name: place, in: path, required: true, schema: { type: string } }
+        - { name: city, in: query, schema: { type: string } }
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/moments/{id}:
+    get:
+      summary: Get a published moment with body, media, sources, topics, and narration
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/topics/{id}:
+    get:
+      summary: Get a topic
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, description: "Topic id, or slug with ?city=" }
+        - { name: city, in: query, schema: { type: string } }
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/tours/{tour}:
+    get:
+      summary: Get a tour with stops, featured moments, and route summaries
+      description: Public and unlisted published tours are visible to everyone; private tours only to their owner; unpublished tours to their owner and curators.
+      parameters: [{ name: tour, in: path, required: true, schema: { type: string }, description: Tour id or slug }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/tours/{tour}/route:
+    get:
+      summary: Get the full route geometry for a mode
+      parameters:
+        - { name: tour, in: path, required: true, schema: { type: string } }
+        - { name: mode, in: query, schema: { type: string, enum: [walk, bike], default: walk } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed } }
+  /api/v1/media/{id}:
+    get:
+      summary: Get media asset metadata
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/auth/dev:
+    post:
+      summary: Development-only email sign-in
+      description: Only served when DEV_AUTH_ENABLED=true; returns 404 otherwise.
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [email], properties: { email: { type: string }, display_name: { type: string } } } } } }
+      responses: { "200": { description: Session }, "404": { description: Disabled }, "422": { description: Validation failed } }
