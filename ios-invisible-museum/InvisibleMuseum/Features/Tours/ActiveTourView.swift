@@ -39,7 +39,7 @@ struct ActiveTourView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        active.audioEnabled.toggle()
+                        model.setAudioGuide(!active.audioEnabled)
                     } label: {
                         Image(systemName: active.audioEnabled ? "speaker.wave.2.fill" : "speaker.slash")
                     }
@@ -120,6 +120,11 @@ struct ActiveTourView: View {
                             .buttonStyle(.museum(.primary, size: .small))
                         Button { active.openNextStopInMaps() } label: { Label("Open in Maps", systemImage: "map") }
                             .buttonStyle(.museum(.secondary, size: .small))
+                        if model.narration.isPlaying {
+                            Button { model.narration.stop() } label: { Image(systemName: "stop.fill").frame(width: 36, height: 36) }
+                                .buttonStyle(.museum(.secondary, size: .icon))
+                                .accessibilityLabel("Stop narration")
+                        }
                     }
                 }
             }

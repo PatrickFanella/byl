@@ -29,10 +29,18 @@ struct StopMomentSheet: View {
                 if let featured = stop.featuredMoment {
                     NavigationLink(value: MomentRoute(id: featured.id)) { MomentCard(moment: featured, prominent: true) }
                         .buttonStyle(.plain)
-                    NavigationLink(value: MomentRoute(id: featured.id)) {
-                        Label("Read the full story", systemImage: "book")
+                    HStack(spacing: 10) {
+                        NavigationLink(value: MomentRoute(id: featured.id)) {
+                            Label("Read the full story", systemImage: "book")
+                        }
+                        .buttonStyle(.museum(.secondary))
+                        Button {
+                            if model.narration.isPlaying { model.narration.stop() } else { Task { await model.playNarration(for: stop) } }
+                        } label: {
+                            Label(model.narration.isPlaying ? "Stop" : "Listen", systemImage: model.narration.isPlaying ? "stop.fill" : "waveform")
+                        }
+                        .buttonStyle(.museum(.secondary))
                     }
-                    .buttonStyle(.museum(.secondary))
                 } else {
                     MuseumEmptyView(title: "No moment featured here", message: "This stop is a waypoint; look around and carry on.", symbol: "mappin")
                 }

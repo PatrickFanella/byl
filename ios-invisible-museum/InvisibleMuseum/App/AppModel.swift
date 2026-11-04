@@ -16,6 +16,13 @@ final class AppModel {
     let location = MuseumLocationService()
     /// Application Support cache for the last city, tours, and the active tour's detail and route.
     let cache: DiskCache
+    /// The audio guide: recorded narration or the body read aloud.
+    let narration = NarrationPlayer(session: SpokenAudioSession(), synthesizer: SystemSpeechSynthesizer())
+    /// Remembered across tours.
+    var audioGuideEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "InvisibleMuseum.audioGuide") }
+        set { UserDefaults.standard.set(newValue, forKey: "InvisibleMuseum.audioGuide") }
+    }
 
     var account: Account?
     var cities: [City] = []
@@ -135,6 +142,11 @@ final class AppModel {
     /// Makes a tour the active one; RootView presents ActiveTourView over everything.
     func startTour(_ tour: TourDetail, mode: String) {
         let model = ActiveTourModel(api: api, tour: tour, mode: mode, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn ?? false })
+        model.audioEnabled = audioGuideEnabled
+        model.onArrive = { [weak self, weak model] stop in
+            guard let self, let model, model.audioEnabled else { return }
+            Task { await self.playNarration(for: stop) }
+        }
         location.onLocation = { [weak model] location in model?.handle(location: location) }
         if let here = location.currentLocation { model.handle(location: here) }
         active = model
@@ -142,8 +154,30 @@ final class AppModel {
 
     func endTour(resetProgress: Bool) {
         if resetProgress { active?.resetProgress() }
+        narration.stop()
         location.onLocation = nil
         active = nil
+    }
+
+    /// Plays the featured moment at a stop: its recorded narration, else the body read aloud.
+    /// The summary already says whether narration exists; the detail carries the URL and body.
+    func playNarration(for stop: TourStop) async {
+        guard let featured = stop.featuredMoment else { return }
+        let cacheKey = "moment.\(featured.id)"
+        var detail = try? await api.moment(featured.id)
+        if let detail { cache.save(detail, key: cacheKey) } else { detail = cache.load(MomentDetail.self, key: cacheKey) }
+        let source = NarrationPlayer.plan(narrationURL: detail?.narration?.url, body: detail?.body ?? featured.excerpt)
+        narration.play(source)
+    }
+
+    func setAudioGuide(_ on: Bool) {
+        audioGuideEnabled = on
+        active?.audioEnabled = on
+        if !on {
+            narration.stop()
+        } else if let stop = active?.arrivedStop {
+            Task { await playNarration(for: stop) }
+        }
     }
 
     func setBaseURL(_ value: String) {
