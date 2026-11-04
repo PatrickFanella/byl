@@ -3,7 +3,8 @@
 	migrate migrate-status migrate-down migrate-reset db-shell db-reset \
 	api-health api-cities api-places api-tour backend-test \
 	nuc-up nuc-down nuc-logs nuc-smoke nuc-rollback \
-	ios-build ios-run ios-simulators
+	ios-build ios-run ios-simulators \
+	web-install web-dev web-check web-build web-e2e
 
 BACKEND_DIR := backend
 IOS_DIR := ios-invisible-museum
@@ -46,6 +47,12 @@ help:
 	@printf "  make nuc-logs             Follow deployment logs\n"
 	@printf "  make nuc-smoke            Health + cities smoke checks\n"
 	@printf "  make nuc-rollback         Goose rollback one migration\n\n"
+	@printf "Web admin:\n"
+	@printf "  make web-install          Install web dependencies (npm 11)\n"
+	@printf "  make web-dev              Run the admin app against localhost:8080\n"
+	@printf "  make web-check            Type-check, lint, and unit-test the web app\n"
+	@printf "  make web-build            Build the static admin app\n"
+	@printf "  make web-e2e              Playwright against E2E_API_URL (default localhost:8080)\n\n"
 	@printf "iOS:\n"
 	@printf "  make ios-build            Build iOS app for simulator\n"
 	@printf "  make ios-run              Boot/install/launch on SIMULATOR_ID\n"
@@ -133,3 +140,21 @@ ios-run: ios-build
 
 ios-simulators:
 	xcrun simctl list devices available
+
+WEB_DIR := web
+E2E_API_URL ?= http://localhost:8080
+
+web-install:
+	cd $(WEB_DIR) && npx -y npm@11 install --legacy-peer-deps
+
+web-dev:
+	cd $(WEB_DIR) && npm run dev
+
+web-check:
+	cd $(WEB_DIR) && npm run gen:api && npm run check && npm run lint && npm run test:unit -- --run
+
+web-build:
+	cd $(WEB_DIR) && npm run build
+
+web-e2e:
+	cd $(WEB_DIR) && E2E_API_URL=$(E2E_API_URL) npm run test:e2e

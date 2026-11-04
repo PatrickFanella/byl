@@ -51,3 +51,25 @@ jobs:
       shell: bash
       run: go build ./...
       working-directory: backend
+  web:
+    name: Web quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+    - name: Install
+      shell: bash
+      run: npm install -g npm@11 && npm ci --legacy-peer-deps
+      working-directory: web
+    - name: Check, lint, unit test, build
+      shell: bash
+      run: |-
+        npm run gen:api
+        npm run check
+        npm run lint
+        npm run test:unit -- --run
+        npm run build
+      working-directory: web

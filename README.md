@@ -8,6 +8,7 @@ Walking and biking tours of your city as if it were one giant museum. SwiftUI iO
 
 - `ios-invisible-museum/` — SwiftUI app.
 - `backend/` — Go REST API, PostgreSQL, and Goose migrations.
+- `web/` — SvelteKit admin app for curators.
 - `docs/superpowers/plans/` — implementation planning notes.
 - `docs/deployment/nuc-almaz.md` — NUC/Almaz deployment notes.
 - `Makefile` — root commands for backend, migrations, API smoke tests, and Simulator runs.
@@ -146,6 +147,23 @@ make backend-test
 
 That starts a throwaway Postgres in Docker and runs the full suite against it.
 Without `TEST_DATABASE_URL`, `go test ./...` runs only the pure unit tests.
+
+## Web admin app
+
+`web/` is a SvelteKit single-page app for curators: dashboard, review queue with
+AI drafting, imports, places, moments, media, tours with a map and stops editor,
+and jobs. It talks to the API on the same origin; nginx proxies `/api` and
+`/media` in the compose stack (`web` service on port 3000), and `vite dev`
+proxies them in development.
+
+```bash
+make web-install
+make web-dev        # http://localhost:5173, sign in with any email while DEV_AUTH_ENABLED=true
+make web-check
+make web-e2e        # needs a running API with DEV_AUTH_ENABLED and ADMIN_BOOTSTRAP_EMAILS=admin@example.com
+```
+
+Set `VITE_GOOGLE_CLIENT_ID` at build time to show Google sign-in.
 
 ## iOS app
 

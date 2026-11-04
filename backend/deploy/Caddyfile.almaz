@@ -15,3 +15,9 @@ museum-media.example.com {
 	# MinIO bucket with anonymous download enabled; see docs/deployment/nuc-almaz.md.
 	reverse_proxy http://nuc.lan:9000
 }
+
+museum-admin.example.com {
+	encode zstd gzip
+	# Curator admin app (nginx serving the SvelteKit build; proxies /api to the API itself).
+	reverse_proxy http://nuc.lan:3000
+}

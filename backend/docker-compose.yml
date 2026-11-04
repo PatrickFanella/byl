@@ -81,6 +81,21 @@ services:
       migrate:
         condition: service_completed_successfully
 
+  web:
+    build:
+      context: ..
+      dockerfile: web/Dockerfile
+      args:
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    environment:
+      API_UPSTREAM: http://api:8080
+    networks:
+      - museum_net
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
   minio:
     image: minio/minio:latest
     profiles: ["media"]
