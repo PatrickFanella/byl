@@ -8,12 +8,12 @@
 	function apply(e: SubmitEvent) {
 		e.preventDefault();
 		const form = new FormData(e.currentTarget as HTMLFormElement);
-		const p = new URLSearchParams();
+		const parts: string[] = [];
 		for (const k of ['status', 'kind', 'origin', 'source']) {
 			const v = String(form.get(k) ?? '');
-			if (v) p.set(k, v);
+			if (v) parts.push(`${k}=${encodeURIComponent(v)}`);
 		}
-		goto(`/queue?${p.toString()}`);
+		goto(`/queue?${parts.join('&')}`);
 	}
 
 	function title(c: (typeof data.candidates)[number]): string {

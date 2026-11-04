@@ -52,7 +52,7 @@ test('an admin can approve a candidate with an edited title', async ({ page, req
 	await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 	await page.goto(`/queue/${candidate.id}`);
 	await expect(page.getByText('A fire damaged the depot in 1910.')).toBeVisible();
-	await page.getByLabel('Title').fill('Station Fire of 1910');
+	await page.getByLabel('Title', { exact: true }).fill('Station Fire of 1910');
 	await page.getByRole('button', { name: /approve/i }).click();
 	await expect(page.getByText(/approved/i).first()).toBeVisible();
 

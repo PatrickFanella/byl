@@ -19,10 +19,7 @@
 	let { data }: PageProps = $props();
 	let candidate = $derived(data.candidate);
 	let payload = $derived((candidate.payload ?? {}) as Record<string, unknown>);
-	let fields: Field[] = $state([]);
-	$effect(() => {
-		fields = fieldsFor(candidate.kind, payload);
-	});
+	let fields: Field[] = $derived(fieldsFor(candidate.kind, payload));
 
 	let busy = $state('');
 	let notice = $state({ kind: 'info' as 'info' | 'error' | 'success', message: '' });

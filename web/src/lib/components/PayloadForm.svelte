@@ -6,9 +6,9 @@
 </script>
 
 <div class="grid gap-4 md:grid-cols-2">
-	{#each fields as _, i (fields[i].key)}
-		<div class={fields[i].kind === 'textarea' ? 'md:col-span-2' : ''}>
-			<FieldInput bind:field={fields[i]} error={errors[fields[i].key] ?? ''} />
+	{#each fields as field, i (field.key)}
+		<div class={field.kind === 'textarea' ? 'md:col-span-2' : ''}>
+			<FieldInput bind:field={fields[i]} error={errors[field.key] ?? ''} />
 		</div>
 	{/each}
 </div>
