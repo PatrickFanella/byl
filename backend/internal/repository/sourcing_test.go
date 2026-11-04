@@ -70,3 +70,15 @@ func TestUpdateMediaFileAndCandidatePayload(t *testing.T) {
 		t.Fatalf("note on missing job: %v", err)
 	}
 }
+
+func TestTopicsBySlugs(t *testing.T) {
+	s, ctx := newStore(t)
+	topics, err := s.TopicsBySlugs(ctx, testdb.SeedCityID, []string{"rail-and-the-commuter-town", "nope", "parks-and-public-life"})
+	if err != nil || len(topics) != 2 {
+		t.Fatalf("%v %+v", err, topics)
+	}
+	none, err := s.TopicsBySlugs(ctx, testdb.SeedCityID, nil)
+	if err != nil || len(none) != 0 {
+		t.Fatalf("empty input: %v %+v", err, none)
+	}
+}

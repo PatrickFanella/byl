@@ -81,3 +81,24 @@ func (s *Store) UpdateTopic(ctx context.Context, id string, req models.UpdateTop
 	}
 	return s.GetTopic(ctx, id, "")
 }
+
+// TopicsBySlugs returns the city's topics matching any of slugs, in name order. Unknown slugs are ignored.
+func (s *Store) TopicsBySlugs(ctx context.Context, cityID string, slugs []string) ([]models.Topic, error) {
+	if len(slugs) == 0 {
+		return []models.Topic{}, nil
+	}
+	rows, err := s.pool.Query(ctx, topicSelect+` WHERE t.city_id = $1 AND t.slug = ANY($2) ORDER BY t.name`, cityID, slugs)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	defer rows.Close()
+	out := []models.Topic{}
+	for rows.Next() {
+		t, err := scanTopic(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, t)
+	}
+	return out, rows.Err()
+}
