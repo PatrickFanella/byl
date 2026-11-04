@@ -12,8 +12,11 @@ import (
 
 func (d Deps) adminListCandidates(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	f := repository.CandidateFilter{Status: models.CandidateStatus(q.Get("status")), Kind: models.CandidateKind(q.Get("kind")), Limit: queryInt(r, "limit", 50), Cursor: q.Get("cursor")}
+	f := repository.CandidateFilter{Status: models.CandidateStatus(q.Get("status")), Kind: models.CandidateKind(q.Get("kind")), Origin: models.CandidateOrigin(q.Get("origin")), Source: q.Get("source"), Limit: queryInt(r, "limit", 50), Cursor: q.Get("cursor")}
 	fields := map[string]string{}
+	if f.Origin != "" && !f.Origin.Valid() {
+		fields["origin"] = "must be import, draft, or user"
+	}
 	if f.Status != "" && !f.Status.Valid() {
 		fields["status"] = "must be pending, approved, or rejected"
 	}
@@ -157,11 +160,24 @@ func (d Deps) createFromCandidate(r *http.Request, c *models.Candidate, payload 
 		if err := json.Unmarshal(payload, &asset); err != nil || !asset.Kind.Valid() {
 			return "", map[string]string{"payload": "does not match a media asset with a valid kind"}, nil
 		}
+		var extra struct {
+			MediaURL string `json:"media_url"`
+		}
+		_ = json.Unmarshal(payload, &extra)
+		if extra.MediaURL == "" && asset.PublicURL == "" {
+			return "", map[string]string{"payload": "needs media_url"}, nil
+		}
 		asset.ID = ""
+		asset.StorageKey = ""
 		asset.Status = models.EntityStatusDraft
 		m, err := d.Store.CreateMedia(r.Context(), asset)
 		if err != nil {
 			return "", nil, err
+		}
+		if extra.MediaURL != "" {
+			if err := d.Store.Enqueue(r.Context(), models.JobKindFetchMedia, models.FetchMediaPayload{CandidateID: c.ID, AssetID: m.ID}); err != nil {
+				return "", nil, err
+			}
 		}
 		if c.TargetMomentID != nil {
 			existing, err := d.Store.GetMoment(r.Context(), *c.TargetMomentID, true)
@@ -170,7 +186,9 @@ func (d Deps) createFromCandidate(r *http.Request, c *models.Candidate, payload 
 				for _, em := range existing.Media {
 					ids = append(ids, em.ID)
 				}
-				_ = d.Store.ReplaceMomentMedia(r.Context(), existing.ID, append(ids, m.ID))
+				if err := d.Store.ReplaceMomentMedia(r.Context(), existing.ID, append(ids, m.ID)); err != nil {
+					return "", nil, err
+				}
 			}
 		}
 		return m.ID, nil, nil

@@ -14,8 +14,10 @@ import (
 
 	"invisible-museum/backend/internal/auth"
 	"invisible-museum/backend/internal/blob"
+	"invisible-museum/backend/internal/llm"
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/repository"
+	"invisible-museum/backend/internal/sources"
 )
 
 // SessionManager issues and revokes sessions in addition to resolving them.
@@ -36,8 +38,19 @@ type Deps struct {
 	IsBootstrap    func(email string) bool
 	Blob           blob.Store
 	MediaFSDir     string
+	Sources        *sources.Registry
+	Drafter        llm.Drafter
 	Log            *slog.Logger
 	Ready          func(ctx context.Context) error
+}
+
+// drafterAvailable reports whether an LLM provider is configured.
+func (d Deps) drafterAvailable() bool {
+	if d.Drafter == nil {
+		return false
+	}
+	_, none := d.Drafter.(llm.None)
+	return !none
 }
 
 func (d Deps) logger() *slog.Logger {
@@ -137,6 +150,11 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/candidates/{id}/reject", d.adminRejectCandidate)
 			r.Get("/jobs", d.adminListJobs)
 			r.Post("/jobs/{id}/retry", d.adminRetryJob)
+			r.Get("/sources", d.adminListSources)
+			r.Post("/imports", d.adminCreateImport)
+			r.Post("/candidates/{id}/draft", d.adminDraftCandidate)
+			r.Post("/tours/{id}/stops/{position}/suggest", d.adminSuggestFeatured)
+			r.Get("/stats", d.adminStats)
 			r.Group(func(r chi.Router) {
 				r.Use(requireRole(models.AccountRoleAdmin))
 				r.Get("/accounts", d.adminListAccounts)

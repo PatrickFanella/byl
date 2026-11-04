@@ -382,7 +382,7 @@ paths:
       responses: { "202": { description: Accepted }, "404": { description: Not found }, "401": { description: Unauthorized } }
   /api/v1/admin/candidates:
     get:
-      summary: "List review-queue entries (?status=, ?kind=, ?limit=, ?cursor=)"
+      summary: "List review-queue entries (?status=, ?kind=, ?origin=, ?source=, ?limit=, ?cursor=)"
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
     post:
@@ -433,6 +433,36 @@ paths:
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RoleRequest" } } } }
       responses: { "200": { description: OK }, "403": { description: Forbidden }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/sources:
+    get:
+      summary: "List source adapters with their capabilities"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "401": { description: Unauthorized } }
+  /api/v1/admin/imports:
+    post:
+      summary: "Queue an import from a source around a city, a place, or a point"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ImportRequest" } } } }
+      responses: { "202": { description: Job queued }, "404": { description: Unknown city or place }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/candidates/{id}/draft:
+    post:
+      summary: "Queue an LLM draft for a pending moment candidate"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "202": { description: Job queued }, "404": { description: Not found }, "409": { description: Not a pending moment candidate }, "503": { description: No LLM provider configured }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours/{id}/stops/{position}/suggest:
+    post:
+      summary: "Rank a stop's published moments against the tour topic"
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: position, in: path, required: true, schema: { type: integer } }
+      responses: { "200": { description: Ordered suggestions }, "404": { description: Not found }, "409": { description: Tour has no topic }, "502": { description: LLM failed }, "503": { description: No LLM provider configured }, "401": { description: Unauthorized } }
+  /api/v1/admin/stats:
+    get:
+      summary: "Dashboard counts"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "401": { description: Unauthorized } }
 components:
   securitySchemes:
     bearer:
@@ -897,3 +927,27 @@ components:
       required: [role]
       properties:
         role: { type: string, enum: [visitor, curator, admin] }
+    ImportRequest:
+      type: object
+      required: [source, city]
+      properties:
+        source: { type: string, description: Adapter name from /admin/sources }
+        city: { type: string, description: City id or slug }
+        place: { type: string, description: Place id or slug; centres the search and targets moment candidates }
+        near: { type: string, description: "lat,lng; centres the search when no place is given" }
+        radius_m: { type: number, maximum: 20000 }
+        query: { type: string, description: Free text for query-based adapters }
+        limit: { type: integer, maximum: 100 }
+    Stats:
+      type: object
+      properties:
+        pending_candidates: { type: object, additionalProperties: { type: integer } }
+        jobs: { type: object, additionalProperties: { type: integer } }
+        published: { type: object, properties: { places: { type: integer }, moments: { type: integer }, tours: { type: integer } } }
+        user_routes: { type: integer }
+        accounts: { type: integer }
+    Suggestion:
+      type: object
+      properties:
+        moment: { $ref: "#/components/schemas/MomentSummary" }
+        reason: { type: string }

@@ -82,3 +82,27 @@ type ComputeRoutePayload struct {
 type GenerateNarrationPayload struct {
 	MomentID string `json:"moment_id"`
 }
+
+// Stats are the admin dashboard counts.
+type Stats struct {
+	PendingCandidates map[string]int `json:"pending_candidates"`
+	Jobs              map[string]int `json:"jobs"`
+	Published         struct {
+		Places  int `json:"places"`
+		Moments int `json:"moments"`
+		Tours   int `json:"tours"`
+	} `json:"published"`
+	UserRoutes int `json:"user_routes"`
+	Accounts   int `json:"accounts"`
+}
+
+// ImportRequest triggers a source import from the admin API.
+type ImportRequest struct {
+	Source  string  `json:"source"`
+	City    string  `json:"city"`
+	Place   string  `json:"place"`
+	Near    string  `json:"near"`
+	RadiusM float64 `json:"radius_m"`
+	Query   string  `json:"query"`
+	Limit   int     `json:"limit"`
+}

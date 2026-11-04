@@ -127,3 +127,59 @@ func (s *Store) SetJobNote(ctx context.Context, id, note string) error {
 	}
 	return nil
 }
+
+// EnqueueReturning adds a job and returns the row.
+func (s *Store) EnqueueReturning(ctx context.Context, kind string, payload any) (*models.Job, error) {
+	raw, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	j, err := scanJob(s.pool.QueryRow(ctx, `INSERT INTO jobs (kind, payload) VALUES ($1, $2) RETURNING `+jobCols, kind, raw))
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	return &j, nil
+}
+
+// Stats returns the dashboard counts.
+func (s *Store) Stats(ctx context.Context) (*models.Stats, error) {
+	st := &models.Stats{PendingCandidates: map[string]int{}, Jobs: map[string]int{}}
+	rows, err := s.pool.Query(ctx, `SELECT kind::text, count(*) FROM candidates WHERE status = 'pending' GROUP BY kind`)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	for rows.Next() {
+		var k string
+		var n int
+		if err := rows.Scan(&k, &n); err != nil {
+			rows.Close()
+			return nil, err
+		}
+		st.PendingCandidates[k] = n
+	}
+	rows.Close()
+	jrows, err := s.pool.Query(ctx, `SELECT status::text, count(*) FROM jobs GROUP BY status`)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	for jrows.Next() {
+		var k string
+		var n int
+		if err := jrows.Scan(&k, &n); err != nil {
+			jrows.Close()
+			return nil, err
+		}
+		st.Jobs[k] = n
+	}
+	jrows.Close()
+	err = s.pool.QueryRow(ctx, `SELECT
+		(SELECT count(*) FROM places WHERE status = 'published'),
+		(SELECT count(*) FROM moments WHERE status = 'published'),
+		(SELECT count(*) FROM tours WHERE status = 'published' AND visibility = 'public' AND owner_account_id IS NULL),
+		(SELECT count(*) FROM tours WHERE owner_account_id IS NOT NULL),
+		(SELECT count(*) FROM accounts)`).Scan(&st.Published.Places, &st.Published.Moments, &st.Published.Tours, &st.UserRoutes, &st.Accounts)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	return st, nil
+}

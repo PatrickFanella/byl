@@ -19,6 +19,7 @@ import (
 	"invisible-museum/backend/internal/narration"
 	"invisible-museum/backend/internal/repository"
 	"invisible-museum/backend/internal/routing"
+	"invisible-museum/backend/internal/sources"
 	"invisible-museum/backend/internal/testdb"
 )
 
@@ -30,7 +31,9 @@ type testEnv struct {
 	fsDir  string
 }
 
-func newTestEnv(t *testing.T) *testEnv {
+func newTestEnv(t *testing.T) *testEnv { return newTestEnvWith(t) }
+
+func newTestEnvWith(t *testing.T, opts ...func(*Deps)) *testEnv {
 	t.Helper()
 	store := repository.New(testdb.Open(t))
 	dir := t.TempDir()
@@ -48,7 +51,11 @@ func newTestEnv(t *testing.T) *testEnv {
 		IsBootstrap:    func(email string) bool { return email == "admin@example.com" },
 		Blob:           fs,
 		MediaFSDir:     dir,
+		Sources:        sources.NewRegistry(sources.NewHTTPClient("InvisibleMuseum/test"), nil),
 		Log:            quiet,
+	}
+	for _, opt := range opts {
+		opt(&deps)
 	}
 	srv := httptest.NewServer(NewRouter(deps))
 	t.Cleanup(srv.Close)
