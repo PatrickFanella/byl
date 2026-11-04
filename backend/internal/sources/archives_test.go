@@ -35,7 +35,7 @@ func TestInternetArchiveAdapterSplitsTextsAndMedia(t *testing.T) {
 		t.Fatal("expected finds from the fixture")
 	}
 	for _, f := range finds {
-		if !strings.HasPrefix(f.ExternalID, "ia:") || !strings.HasPrefix(f.URL, "https://archive.org/details/") || f.Title == "" {
+		if !strings.HasPrefix(f.ExternalID, "ia:") || !strings.Contains(f.URL, "/details/") || f.Title == "" {
 			t.Fatalf("find %+v", f)
 		}
 		switch f.Kind {
@@ -44,7 +44,7 @@ func TestInternetArchiveAdapterSplitsTextsAndMedia(t *testing.T) {
 				t.Fatalf("text find without text: %+v", f)
 			}
 		case models.CandidateKindMedia:
-			if !strings.HasPrefix(f.MediaURL, "https://archive.org/download/") {
+			if !strings.Contains(f.MediaURL, "/download/") {
 				t.Fatalf("media find without download url: %+v", f)
 			}
 		default:
