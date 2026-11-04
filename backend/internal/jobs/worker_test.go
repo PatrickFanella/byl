@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"strings"
 	"testing"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"invisible-museum/backend/internal/narration"
 	"invisible-museum/backend/internal/repository"
 	"invisible-museum/backend/internal/routing"
+	"invisible-museum/backend/internal/sources"
 	"invisible-museum/backend/internal/testdb"
 )
 
@@ -205,9 +207,48 @@ func TestCompletionSurvivesCancelledContext(t *testing.T) {
 		t.Fatal(err)
 	}
 	cancel()
-	w.finish(cctx, job, errors.New("interrupted"))
+	_ = w.finish(cctx, job, "", errors.New("interrupted"))
 	got, _ := store.GetJob(ctx, job.ID)
 	if got.Status != models.JobStatusQueued {
 		t.Fatalf("interrupted job should be requeued, got %+v", got)
+	}
+}
+
+// Review fix: the import job's completion note must travel with its own job. A note parked
+// on the worker could be picked up by whichever job finished next on another goroutine.
+func TestImportNoteStaysWithItsJob(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	reg := sources.NewRegistry(sources.NewHTTPClient("ua"), nil)
+	reg.Register(&fakeAdapter{finds: fakeFinds()}, sources.Info{SupportsNear: true})
+	w.Sources = reg
+	if err := store.Enqueue(ctx, models.JobKindImportSource, models.ImportSourcePayload{Source: "fake", CityID: testdb.SeedCityID}); err != nil {
+		t.Fatal(err)
+	}
+	imp, err := store.ClaimJob(ctx, w.now())
+	if err != nil || imp == nil {
+		t.Fatalf("claim import: %v %v", imp, err)
+	}
+	note, err := w.dispatch(ctx, imp)
+	if err != nil || !strings.Contains(note, "imported 3") {
+		t.Fatalf("dispatch should return the note: %q %v", note, err)
+	}
+	// Another job completes on a sibling worker before the import job is finished.
+	_ = store.Enqueue(ctx, models.JobKindComputeRoute, models.ComputeRoutePayload{TourID: testdb.SeedTourID, Mode: models.TravelModeWalk})
+	if n := drain(t, w, ctx); n != 1 {
+		t.Fatalf("processed %d", n)
+	}
+	done, _ := store.ListJobs(ctx, models.JobStatusDone, 10, 0)
+	for _, j := range done {
+		if j.Kind == models.JobKindComputeRoute && j.LastError != "" {
+			t.Fatalf("route job carries the import note: %q", j.LastError)
+		}
+	}
+	if err := w.finish(ctx, imp, note, nil); err != nil {
+		t.Fatal(err)
+	}
+	got, _ := store.GetJob(ctx, imp.ID)
+	if got.Status != models.JobStatusDone || got.LastError != note {
+		t.Fatalf("import job after finish: %+v", got)
 	}
 }

@@ -66,3 +66,50 @@ test('an admin can approve a candidate with an edited title', async ({ page, req
 	});
 	expect((await moment.json()).title).toBe('Station Fire of 1910');
 });
+
+// Review fix: typing a place id must not throw away edits made to the other fields.
+test('setting the place id keeps the edited title', async ({ page, request }) => {
+	const token = await devToken(request, 'admin@example.com');
+	const stationId = '00000000-0000-4000-8000-00000000b0b1';
+	const created = await request.post(`${apiUrl}/api/v1/admin/candidates`, {
+		headers: { Authorization: `Bearer ${token}` },
+		data: {
+			kind: 'moment',
+			origin: 'import',
+			source_name: 'e2e',
+			external_id: `e2e-noplace-${Date.now()}`,
+			payload: {
+				title: 'Depot Dedication',
+				raw_text: 'The new depot opened to the public in 1908.',
+				source_url: 'https://example.org/depot',
+				source_title: 'Example archive'
+			}
+		}
+	});
+	expect(created.ok()).toBeTruthy();
+	const candidate = await created.json();
+
+	await signIn(page, 'admin@example.com');
+	await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+	await page.goto(`/queue/${candidate.id}`);
+	await expect(page.getByText(/this moment has no place/i)).toBeVisible();
+	await page.getByLabel('Title', { exact: true }).fill('Depot Dedication of 1908');
+	await page.getByLabel('Place id').fill(stationId);
+	await page.getByLabel('Place id').blur();
+	await expect(page.getByLabel('Title', { exact: true })).toHaveValue('Depot Dedication of 1908');
+	await expect(page.getByText(/this moment has no place/i)).toHaveCount(0);
+	await page.getByRole('button', { name: /approve/i }).click();
+	await expect(page.getByText(/approved/i).first()).toBeVisible();
+
+	const approved = await request.get(`${apiUrl}/api/v1/admin/candidates/${candidate.id}`, {
+		headers: { Authorization: `Bearer ${token}` }
+	});
+	const body = await approved.json();
+	expect(body.status).toBe('approved');
+	const moment = await request.get(`${apiUrl}/api/v1/admin/moments/${body.approved_entity_id}`, {
+		headers: { Authorization: `Bearer ${token}` }
+	});
+	const m = await moment.json();
+	expect(m.title).toBe('Depot Dedication of 1908');
+	expect(m.place_id).toBe(stationId);
+});

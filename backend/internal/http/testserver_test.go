@@ -80,6 +80,7 @@ type resp struct {
 	status int
 	body   map[string]any
 	raw    []byte
+	header http.Header
 }
 
 func (e *testEnv) do(t *testing.T, method, path, token string, payload any) resp {
@@ -102,7 +103,7 @@ func (e *testEnv) do(t *testing.T, method, path, token string, payload any) resp
 	}
 	defer res.Body.Close()
 	raw, _ := io.ReadAll(res.Body)
-	out := resp{status: res.StatusCode, raw: raw}
+	out := resp{status: res.StatusCode, raw: raw, header: res.Header}
 	if len(raw) > 0 && strings.HasPrefix(res.Header.Get("Content-Type"), "application/json") {
 		_ = json.Unmarshal(raw, &out.body)
 	}

@@ -45,6 +45,8 @@ type Config struct {
 
 	LocalArchiveURLs []string
 	SourcesUserAgent string
+	// SourcesAllowPrivateHosts lets media downloads reach private networks (development only).
+	SourcesAllowPrivateHosts bool
 
 	JobWorkers int
 }
@@ -86,6 +88,8 @@ func Load() (Config, error) {
 		LLMModel:           strings.TrimSpace(os.Getenv("LLM_MODEL")),
 		LocalArchiveURLs:   envList("LOCAL_ARCHIVE_URLS"),
 		SourcesUserAgent:   envOr("SOURCES_USER_AGENT", "InvisibleMuseum/0.2 (+https://github.com/PatrickFanella/invisible-museum)"),
+
+		SourcesAllowPrivateHosts: envBool("SOURCES_ALLOW_PRIVATE_HOSTS"),
 	}
 	for _, e := range envList("ADMIN_BOOTSTRAP_EMAILS") {
 		cfg.AdminBootstrapEmails = append(cfg.AdminBootstrapEmails, strings.ToLower(e))

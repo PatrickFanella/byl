@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 
 	"invisible-museum/backend/internal/models"
@@ -162,5 +163,99 @@ func TestURLAdapterCapsText(t *testing.T) {
 	}
 	if len(finds[0].Text) > 20000 {
 		t.Fatalf("text should be capped at 20000 chars, got %d", len(finds[0].Text))
+	}
+}
+
+// Review fix: an Internet Archive media find must point at a real file, not the item's
+// download directory (which answers with an HTML listing).
+func TestInternetArchiveMediaFindsResolveToFiles(t *testing.T) {
+	var metadataCalls []string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch {
+		case r.URL.Path == "/advancedsearch.php":
+			_, _ = w.Write(fixture(t, "ia_search_media.json"))
+		case strings.HasPrefix(r.URL.Path, "/metadata/") && strings.HasSuffix(r.URL.Path, "/files"):
+			id := strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/metadata/"), "/files")
+			metadataCalls = append(metadataCalls, id)
+			switch id {
+			case "cbq4959-1", "npctv-Framing_John_DeLorean_Gets_Special_Screening":
+				_, _ = w.Write(fixture(t, "ia_files_"+id+".json"))
+			default:
+				_, _ = w.Write([]byte(`{"result":[]}`))
+			}
+		default:
+			w.WriteHeader(404)
+		}
+	}))
+	defer srv.Close()
+	c := NewHTTPClient("ua")
+	c.MinInterval = 0
+	finds, err := NewInternetArchive(c, srv.URL).Discover(context.Background(), Request{Query: "downers grove", Limit: 10})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(metadataCalls) != 4 {
+		t.Fatalf("expected one file listing per media item, got %v", metadataCalls)
+	}
+	if len(finds) != 2 {
+		t.Fatalf("items without a usable file must be dropped; got %d finds: %+v", len(finds), finds)
+	}
+	byID := map[string]Found{}
+	for _, f := range finds {
+		byID[f.ExternalID] = f
+	}
+	img := byID["ia:cbq4959-1"]
+	if img.Kind != models.CandidateKindMedia || img.MediaURL != srv.URL+"/download/cbq4959-1/cbq4959-1.jpg" || img.MimeType != "image/jpeg" {
+		t.Fatalf("image find %+v", img)
+	}
+	mov := byID["ia:npctv-Framing_John_DeLorean_Gets_Special_Screening"]
+	if mov.Kind != models.CandidateKindMedia || !strings.HasSuffix(mov.MediaURL, "/download/npctv-Framing_John_DeLorean_Gets_Special_Screening/Framing_John_DeLorean_Gets_Special_Screening.mp4") || mov.MimeType != "video/mp4" {
+		t.Fatalf("movie find should prefer the mp4 derivative: %+v", mov)
+	}
+}
+
+// Review fix: the url adapter must not swap the registry-wide HTTP client to install its
+// redirect check; another adapter fetching concurrently would inherit it.
+func TestURLAdapterLeavesSharedClientUntouchedDuringFetch(t *testing.T) {
+	inFetch := make(chan struct{})
+	release := make(chan struct{})
+	var once sync.Once
+	page := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/page" {
+			once.Do(func() { close(inFetch) })
+			<-release
+			_, _ = w.Write([]byte("<html><head><title>Local</title></head><body><article><p>" + strings.Repeat("history words ", 30) + "</p></article></body></html>"))
+			return
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer page.Close()
+	// A second host that redirects to the first: the kind of cross-host hop archive downloads do.
+	redirector := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, page.URL+"/target", http.StatusFound)
+	}))
+	defer redirector.Close()
+
+	c := NewHTTPClient("ua")
+	c.MinInterval = 0
+	adapter := NewURL(c, []string{page.URL + "/page"})
+	done := make(chan error, 1)
+	go func() {
+		_, err := adapter.Discover(context.Background(), Request{})
+		done <- err
+	}()
+	<-inFetch
+	resp, err := c.Get(context.Background(), redirector.URL+"/go")
+	close(release)
+	if err != nil {
+		t.Fatalf("a concurrent cross-host redirect through the shared client failed: %v", err)
+	}
+	resp.Body.Close()
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+	if c.HTTP.CheckRedirect != nil {
+		t.Fatal("shared client was mutated")
 	}
 }

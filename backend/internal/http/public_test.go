@@ -205,4 +205,8 @@ func TestMediaFilesServed(t *testing.T) {
 	if r := env.get(t, "/media/files/../go.mod", ""); r.status == 200 && len(r.raw) > 0 && string(r.raw[:6]) == "module" {
 		t.Fatal("traversal served a repo file")
 	}
+	// Review fix: stored files are served on the admin origin; never let the browser sniff them.
+	if r.header.Get("X-Content-Type-Options") != "nosniff" {
+		t.Fatalf("missing nosniff header: %v", r.header)
+	}
 }

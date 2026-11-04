@@ -37,18 +37,6 @@ type Worker struct {
 	poll     time.Duration
 	now      func() time.Time
 	backoff  func(attempts int) time.Duration
-
-	noteMu    sync.Mutex
-	noteAfter string
-}
-
-// takeNote returns and clears the note the last job left for its completion line.
-func (w *Worker) takeNote() string {
-	w.noteMu.Lock()
-	defer w.noteMu.Unlock()
-	n := w.noteAfter
-	w.noteAfter = ""
-	return n
 }
 
 // New builds a worker. workers is the number of concurrent goroutines Run starts.
@@ -114,20 +102,21 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 	if job == nil {
 		return false, nil
 	}
-	runErr := w.dispatch(ctx, job)
-	return true, w.finish(ctx, job, runErr)
+	note, runErr := w.dispatch(ctx, job)
+	return true, w.finish(ctx, job, note, runErr)
 }
 
-// finish records the outcome. It uses a context that survives cancellation so a shutdown
-// mid-job still leaves the row queued or done rather than stuck in running.
-func (w *Worker) finish(ctx context.Context, job *models.Job, runErr error) error {
+// finish records the outcome, with the job's own completion note when it produced one. It
+// uses a context that survives cancellation so a shutdown mid-job still leaves the row queued
+// or done rather than stuck in running.
+func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runErr error) error {
 	wctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 15*time.Second)
 	defer cancel()
 	if runErr == nil {
 		if err := w.store.CompleteJob(wctx, job.ID); err != nil {
 			return err
 		}
-		if note := w.takeNote(); note != "" {
+		if note != "" {
 			return w.store.SetJobNote(wctx, job.ID, note)
 		}
 		return nil
@@ -148,45 +137,41 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, runErr error) erro
 	return w.store.FailJob(wctx, job.ID, runErr.Error(), &retry)
 }
 
-func (w *Worker) dispatch(ctx context.Context, job *models.Job) error {
+// dispatch runs the job and returns its completion note (empty for most kinds) or error.
+func (w *Worker) dispatch(ctx context.Context, job *models.Job) (string, error) {
 	switch job.Kind {
 	case models.JobKindComputeRoute:
 		var p models.ComputeRoutePayload
 		if err := json.Unmarshal(job.Payload, &p); err != nil {
-			return fmt.Errorf("decode payload: %w", err)
+			return "", fmt.Errorf("decode payload: %w", err)
 		}
-		return w.computeRoute(ctx, p)
+		return "", w.computeRoute(ctx, p)
 	case models.JobKindGenerateNarration:
 		var p models.GenerateNarrationPayload
 		if err := json.Unmarshal(job.Payload, &p); err != nil {
-			return fmt.Errorf("decode payload: %w", err)
+			return "", fmt.Errorf("decode payload: %w", err)
 		}
-		return w.generateNarration(ctx, p)
+		return "", w.generateNarration(ctx, p)
 	case models.JobKindImportSource:
 		var p models.ImportSourcePayload
 		if err := json.Unmarshal(job.Payload, &p); err != nil {
-			return fmt.Errorf("decode payload: %w", err)
+			return "", fmt.Errorf("decode payload: %w", err)
 		}
-		note, err := w.importSource(ctx, p)
-		if err != nil {
-			return err
-		}
-		w.noteAfter = note
-		return nil
+		return w.importSource(ctx, p)
 	case models.JobKindFetchMedia:
 		var p models.FetchMediaPayload
 		if err := json.Unmarshal(job.Payload, &p); err != nil {
-			return fmt.Errorf("decode payload: %w", err)
+			return "", fmt.Errorf("decode payload: %w", err)
 		}
-		return w.fetchMedia(ctx, p)
+		return "", w.fetchMedia(ctx, p)
 	case models.JobKindDraftCandidate:
 		var p models.DraftCandidatePayload
 		if err := json.Unmarshal(job.Payload, &p); err != nil {
-			return fmt.Errorf("decode payload: %w", err)
+			return "", fmt.Errorf("decode payload: %w", err)
 		}
-		return w.draftCandidate(ctx, p)
+		return "", w.draftCandidate(ctx, p)
 	default:
-		return fmt.Errorf("unknown job kind %q", job.Kind)
+		return "", fmt.Errorf("unknown job kind %q", job.Kind)
 	}
 }
 

@@ -1,0 +1,13 @@
+# Build context for web/Dockerfile is the repository root. Keep host build output and
+# platform-specific node_modules out of the image (review fix: a macOS node_modules copied over
+# the Linux install breaks vite build).
+.git
+web/node_modules
+web/build
+web/.svelte-kit
+web/test-results
+web/playwright-report
+web/src/lib/api/types.ts
+ios-invisible-museum
+docs
+backend/data

@@ -20,6 +20,9 @@
 	let candidate = $derived(data.candidate);
 	let payload = $derived((candidate.payload ?? {}) as Record<string, unknown>);
 	let fields: Field[] = $derived(fieldsFor(candidate.kind, payload));
+	// Held apart from payload so typing a place id never recomputes (and discards) the field edits.
+	// Writable derived: it follows the candidate until the curator overrides it.
+	let placeId = $derived(String(payload.place_id ?? candidate.target_place_id ?? ''));
 
 	let busy = $state('');
 	let notice = $state({ kind: 'info' as 'info' | 'error' | 'success', message: '' });
@@ -48,7 +51,7 @@
 		notice = { kind: 'info', message: '' };
 		fieldErrors = {};
 		try {
-			const edited = applyFields(payload, fields);
+			const edited = applyFields(placeId ? { ...payload, place_id: placeId } : payload, fields);
 			const result = await approveCandidate(candidate.id, edited);
 			approvedId = result.approved_entity_id ?? null;
 			notice = {
@@ -152,7 +155,7 @@
 
 <div class="mt-6 grid gap-6 lg:grid-cols-3">
 	<div class="space-y-4 lg:col-span-2">
-		{#if candidate.kind === 'moment' && !candidate.target_place_id && !payload.place_id}
+		{#if candidate.kind === 'moment' && !placeId}
 			<Notice
 				kind="error"
 				message="This moment has no place. Set place_id below (a published place id) before approving, or approve the matching place candidate first."
@@ -163,9 +166,7 @@
 				<span class="text-stone-700">Place id</span>
 				<input
 					class="mt-1 w-full rounded-md border-stone-300 font-mono text-xs"
-					value={String(payload.place_id ?? candidate.target_place_id ?? '')}
-					onchange={(e) =>
-						(payload = { ...payload, place_id: (e.currentTarget as HTMLInputElement).value })}
+					bind:value={placeId}
 				/>
 			</label>
 		{/if}

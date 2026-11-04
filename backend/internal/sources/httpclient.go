@@ -3,8 +3,10 @@ package sources
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strconv"
 	"sync"
@@ -17,6 +19,9 @@ type Client struct {
 	UserAgent   string
 	MinInterval time.Duration
 	HTTP        *http.Client
+	// AllowPrivateHosts lets GetPublic reach loopback, private, link-local and ULA addresses.
+	// Off by default; turn it on only for development or a trusted LAN archive.
+	AllowPrivateHosts bool
 
 	mu   sync.Mutex
 	last map[string]time.Time
@@ -52,6 +57,95 @@ func (c *Client) wait(ctx context.Context, host string) error {
 
 // Get fetches url, retrying once on 429 or 5xx. Callers must close the body.
 func (c *Client) Get(ctx context.Context, url string) (*http.Response, error) {
+	return c.do(ctx, c.HTTP, url)
+}
+
+// GetWithRedirectCheck is Get with a per-call redirect policy. The shared client is copied,
+// never modified, so concurrent callers keep the default policy.
+func (c *Client) GetWithRedirectCheck(ctx context.Context, url string, check func(*http.Request, []*http.Request) error) (*http.Response, error) {
+	hc := *c.HTTP
+	hc.CheckRedirect = check
+	return c.do(ctx, &hc, url)
+}
+
+// ErrPrivateHost reports a URL that resolves to a non-public address.
+var ErrPrivateHost = errors.New("sources: host resolves to a private address")
+
+// GetPublic is Get for URLs supplied by users: every connection, including those made after a
+// redirect, is dialled only when the host resolves to public addresses (unless
+// AllowPrivateHosts is set), which closes the SSRF path through a crafted media_url.
+func (c *Client) GetPublic(ctx context.Context, url string) (*http.Response, error) {
+	if c.AllowPrivateHosts {
+		return c.Get(ctx, url)
+	}
+	hc := *c.HTTP
+	hc.Transport = publicOnlyTransport(c.HTTP.Transport)
+	hc.CheckRedirect = func(r *http.Request, via []*http.Request) error {
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
+		if r.URL.Scheme != "http" && r.URL.Scheme != "https" {
+			return fmt.Errorf("redirect to %s scheme refused", r.URL.Scheme)
+		}
+		return nil
+	}
+	return c.do(ctx, &hc, url)
+}
+
+// publicOnlyTransport clones base (or the default transport) with a dialer that resolves the
+// host itself and refuses non-public addresses, so DNS answers are checked at connect time.
+func publicOnlyTransport(base http.RoundTripper) http.RoundTripper {
+	var t *http.Transport
+	if bt, ok := base.(*http.Transport); ok && bt != nil {
+		t = bt.Clone()
+	} else {
+		t = http.DefaultTransport.(*http.Transport).Clone()
+	}
+	dialer := &net.Dialer{Timeout: 10 * time.Second}
+	t.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		host, port, err := net.SplitHostPort(addr)
+		if err != nil {
+			return nil, err
+		}
+		ips, err := net.DefaultResolver.LookupIPAddr(ctx, host)
+		if err != nil {
+			return nil, err
+		}
+		var lastErr error = fmt.Errorf("%w: %s", ErrPrivateHost, host)
+		for _, ip := range ips {
+			if !publicIP(ip.IP) {
+				continue
+			}
+			conn, err := dialer.DialContext(ctx, network, net.JoinHostPort(ip.IP.String(), port))
+			if err == nil {
+				return conn, nil
+			}
+			lastErr = err
+		}
+		return nil, lastErr
+	}
+	return t
+}
+
+// publicIP reports whether ip is a globally routable unicast address.
+func publicIP(ip net.IP) bool {
+	if ip == nil || ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() ||
+		ip.IsMulticast() || ip.IsUnspecified() || ip.IsInterfaceLocalMulticast() {
+		return false
+	}
+	if v4 := ip.To4(); v4 != nil {
+		// Carrier-grade NAT (100.64.0.0/10) and the broadcast address.
+		if v4[0] == 100 && v4[1]&0xc0 == 64 {
+			return false
+		}
+		if v4.Equal(net.IPv4bcast) {
+			return false
+		}
+	}
+	return true
+}
+
+func (c *Client) do(ctx context.Context, hc *http.Client, url string) (*http.Response, error) {
 	var lastErr error
 	for attempt := 0; attempt < 2; attempt++ {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -63,7 +157,7 @@ func (c *Client) Get(ctx context.Context, url string) (*http.Response, error) {
 		if err := c.wait(ctx, req.URL.Host); err != nil {
 			return nil, err
 		}
-		resp, err := c.HTTP.Do(req)
+		resp, err := hc.Do(req)
 		if err != nil {
 			lastErr = err
 			continue

@@ -226,6 +226,7 @@ func noDirListing(root http.FileSystem) http.Handler {
 			http.NotFound(w, r)
 			return
 		}
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 		fs.ServeHTTP(w, r)
 	})
 }

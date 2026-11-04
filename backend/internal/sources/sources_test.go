@@ -2,6 +2,8 @@ package sources
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -194,4 +196,47 @@ func keys(m map[string]Found) []string {
 		out = append(out, k)
 	}
 	return out
+}
+
+// Review fix: media downloads must not reach loopback, private, link-local or ULA addresses
+// (SSRF through a curator-supplied media_url) unless the operator opts in.
+func TestPublicIPClassification(t *testing.T) {
+	blocked := []string{"127.0.0.1", "10.0.0.1", "172.16.5.5", "192.168.1.1", "169.254.169.254", "0.0.0.0", "100.64.0.1", "::1", "fd00::1", "fe80::1", "::ffff:10.0.0.1", "::"}
+	for _, s := range blocked {
+		if publicIP(net.ParseIP(s)) {
+			t.Errorf("%s should be blocked", s)
+		}
+	}
+	for _, s := range []string{"8.8.8.8", "207.241.224.2", "2001:4860:4860::8888"} {
+		if !publicIP(net.ParseIP(s)) {
+			t.Errorf("%s should be allowed", s)
+		}
+	}
+}
+
+func TestGetPublicRefusesPrivateHostsUnlessAllowed(t *testing.T) {
+	hits := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { hits++; _, _ = w.Write([]byte("ok")) }))
+	defer srv.Close()
+	c := NewHTTPClient("ua")
+	c.MinInterval = 0
+	ctx := context.Background()
+	if _, err := c.GetPublic(ctx, srv.URL+"/x"); err == nil || !strings.Contains(err.Error(), "private") {
+		t.Fatalf("loopback by IP should be refused, got %v", err)
+	}
+	if _, err := c.GetPublic(ctx, "http://localhost:"+fmt.Sprint(srv.Listener.Addr().(*net.TCPAddr).Port)+"/x"); err == nil || !strings.Contains(err.Error(), "private") {
+		t.Fatalf("loopback by name should be refused, got %v", err)
+	}
+	if hits != 0 {
+		t.Fatalf("server was reached %d times", hits)
+	}
+	c.AllowPrivateHosts = true
+	resp, err := c.GetPublic(ctx, srv.URL+"/x")
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if hits != 1 {
+		t.Fatalf("hits %d", hits)
+	}
 }

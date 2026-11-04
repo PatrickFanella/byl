@@ -145,6 +145,7 @@ func TestFetchMediaJobDownloadsIntoBlob(t *testing.T) {
 	}))
 	defer srv.Close()
 	w.Sources = sources.NewRegistry(sources.NewHTTPClient("ua"), nil)
+	w.Sources.Client().AllowPrivateHosts = true // the test server is on loopback
 	payload, _ := json.Marshal(map[string]any{"kind": "image", "media_url": srv.URL + "/depot.png", "caption": "The depot", "license": "CC-BY-2.0"})
 	cand, err := store.CreateCandidate(ctx, models.Candidate{Kind: models.CandidateKindMedia, Origin: models.CandidateOriginImport, Payload: payload})
 	if err != nil {
@@ -166,4 +167,115 @@ func TestFetchMediaJobDownloadsIntoBlob(t *testing.T) {
 		t.Fatalf("file not stored: %v", err)
 	}
 	_ = geo.Point{}
+}
+
+// mediaFetchFixture enqueues a fetch_media job for an image asset whose media_url is served by handler.
+func mediaFetchFixture(t *testing.T, w *Worker, store *repository.Store, ctx context.Context, path string, handler http.HandlerFunc, allowPrivate bool) (*httptest.Server, string, string) {
+	t.Helper()
+	srv := httptest.NewServer(handler)
+	t.Cleanup(srv.Close)
+	w.Sources = sources.NewRegistry(sources.NewHTTPClient("ua"), nil)
+	w.Sources.Client().AllowPrivateHosts = allowPrivate
+	payload, _ := json.Marshal(map[string]any{"kind": "image", "media_url": srv.URL + path, "caption": "x", "license": "CC0-1.0"})
+	cand, err := store.CreateCandidate(ctx, models.Candidate{Kind: models.CandidateKindMedia, Origin: models.CandidateOriginImport, Payload: payload})
+	if err != nil {
+		t.Fatal(err)
+	}
+	asset, err := store.CreateMedia(ctx, models.MediaAsset{Kind: models.MediaKindImage, Caption: "x", License: "CC0-1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Enqueue(ctx, models.JobKindFetchMedia, models.FetchMediaPayload{CandidateID: cand.ID, AssetID: asset.ID}); err != nil {
+		t.Fatal(err)
+	}
+	return srv, cand.ID, asset.ID
+}
+
+func onlyJob(t *testing.T, store *repository.Store, ctx context.Context, status models.JobStatus) models.Job {
+	t.Helper()
+	jobs, err := store.ListJobs(ctx, status, 10, 0)
+	if err != nil || len(jobs) != 1 {
+		t.Fatalf("expected one %s job, got %d (%v)", status, len(jobs), err)
+	}
+	return jobs[0]
+}
+
+// Review fix: media_url comes from the candidate payload, which any curator controls; the
+// download must not reach private networks.
+func TestFetchMediaJobRefusesPrivateHosts(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	hits := 0
+	_, _, assetID := mediaFetchFixture(t, w, store, ctx, "/latest/meta-data", func(rw http.ResponseWriter, _ *http.Request) {
+		hits++
+		rw.Header().Set("Content-Type", "image/png")
+		_, _ = rw.Write([]byte("secret"))
+	}, false)
+	drain(t, w, ctx)
+	if hits != 0 {
+		t.Fatal("the private host was contacted")
+	}
+	job := onlyJob(t, store, ctx, models.JobStatusFailed)
+	if job.Attempts != 1 || !strings.Contains(job.LastError, "private") {
+		t.Fatalf("should fail once without retry: %+v", job)
+	}
+	if got, _ := store.GetMedia(ctx, assetID); got.StorageKey != "" {
+		t.Fatalf("asset must stay unfetched: %+v", got)
+	}
+}
+
+// Review fix: a response that is not an image/video/audio matching the asset kind must be
+// refused; an HTML body stored under /media/files would run on the admin origin.
+func TestFetchMediaJobRefusesNonMediaContent(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	_, _, assetID := mediaFetchFixture(t, w, store, ctx, "/x-image.jpg", func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = rw.Write([]byte("<script>alert(1)</script>"))
+	}, true)
+	drain(t, w, ctx)
+	job := onlyJob(t, store, ctx, models.JobStatusFailed)
+	if job.Attempts != 1 || !strings.Contains(job.LastError, "text/html") {
+		t.Fatalf("should fail once naming the content type: %+v", job)
+	}
+	if got, _ := store.GetMedia(ctx, assetID); got.StorageKey != "" {
+		t.Fatalf("asset must stay unfetched: %+v", got)
+	}
+	entries, _ := os.ReadDir(w.blob.(*blob.FS).Dir())
+	if len(entries) != 0 {
+		t.Fatalf("nothing should be stored, found %v", entries)
+	}
+}
+
+func TestFetchMediaJobRefusesKindMismatch(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	mediaFetchFixture(t, w, store, ctx, "/clip.mp4", func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Set("Content-Type", "video/mp4")
+		_, _ = rw.Write([]byte("mp4"))
+	}, true)
+	drain(t, w, ctx)
+	job := onlyJob(t, store, ctx, models.JobStatusFailed)
+	if job.Attempts != 1 || !strings.Contains(job.LastError, "video/mp4") {
+		t.Fatalf("an image asset must not accept video: %+v", job)
+	}
+}
+
+// Review fix: the stored key carries an extension from the media type so the file server
+// never has to sniff.
+func TestFetchMediaJobForcesExtensionFromContentType(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	_, _, assetID := mediaFetchFixture(t, w, store, ctx, "/download/item", func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Set("Content-Type", "image/jpeg")
+		_, _ = rw.Write([]byte("ÿØÿ"))
+	}, true)
+	drain(t, w, ctx)
+	got, _ := store.GetMedia(ctx, assetID)
+	if !strings.HasSuffix(got.StorageKey, ".jpg") || got.MimeType != "image/jpeg" {
+		t.Fatalf("asset after fetch: %+v", got)
+	}
+	if _, err := os.Stat(filepath.Join(w.blob.(*blob.FS).Dir(), filepath.FromSlash(got.StorageKey))); err != nil {
+		t.Fatalf("file not stored: %v", err)
+	}
 }

@@ -76,17 +76,12 @@ func (a *URL) fetch(ctx context.Context, page string) (Found, error) {
 	if err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") {
 		return Found{}, fmt.Errorf("not an http(s) url")
 	}
-	client := *a.client.HTTP
-	client.CheckRedirect = func(r *http.Request, _ []*http.Request) error {
+	resp, err := a.client.GetWithRedirectCheck(ctx, page, func(r *http.Request, _ []*http.Request) error {
 		if r.URL.Host != parsed.Host {
 			return fmt.Errorf("redirects off-site to %s", r.URL.Host)
 		}
 		return nil
-	}
-	saved := a.client.HTTP
-	a.client.HTTP = &client
-	resp, err := a.client.Get(ctx, page)
-	a.client.HTTP = saved
+	})
 	if err != nil {
 		return Found{}, err
 	}

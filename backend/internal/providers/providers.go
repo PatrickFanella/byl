@@ -49,7 +49,9 @@ func Build(cfg config.Config) (Providers, error) {
 	default:
 		p.Drafter = llm.None{}
 	}
-	p.Sources = sources.NewRegistry(sources.NewHTTPClient(cfg.SourcesUserAgent), cfg.LocalArchiveURLs)
+	httpClient := sources.NewHTTPClient(cfg.SourcesUserAgent)
+	httpClient.AllowPrivateHosts = cfg.SourcesAllowPrivateHosts
+	p.Sources = sources.NewRegistry(httpClient, cfg.LocalArchiveURLs)
 	switch cfg.MediaStore {
 	case "s3":
 		s, err := blob.NewS3(blob.S3Config{Endpoint: cfg.S3Endpoint, Bucket: cfg.S3Bucket, AccessKey: cfg.S3AccessKey, SecretKey: cfg.S3SecretKey, UseSSL: cfg.S3UseSSL, PublicBase: cfg.MediaPublicBaseURL})

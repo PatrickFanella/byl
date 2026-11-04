@@ -133,6 +133,10 @@ with a `source` from `GET /api/v1/admin/sources`:
 | `loc` | Library of Congress items for a query | `query` |
 | `url` | pages listed in `LOCAL_ARCHIVE_URLS` as moments | optional `query` filter |
 
+Approved media candidates are downloaded by the `fetch_media` job, which only accepts
+image, video or audio responses matching the asset kind and refuses private, loopback and
+link-local addresses (`SOURCES_ALLOW_PRIVATE_HOSTS=true` lifts that for development).
+
 `POST /api/v1/admin/candidates/{id}/draft` asks the configured LLM to write a moment
 from a candidate's source text; `POST /api/v1/admin/tours/{id}/stops/{position}/suggest`
 ranks a stop's moments against the tour topic. Both need `LLM_PROVIDER`.
