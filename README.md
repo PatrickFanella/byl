@@ -1,12 +1,13 @@
 # Invisible Museum
 
-SwiftUI iOS prototype plus a Dockerized Go/PostgreSQL backend for local, place-based museum exhibits.
+Walking and biking tours of your city as if it were one giant museum. SwiftUI iOS prototype plus a Dockerized Go/PostgreSQL backend.
+
+> **Rebuild in progress.** The app is being refocused from AR exhibits to topic-based walking/biking tours with sourced history and media, plus user-created routes, across native iOS, Android, and web clients. See `docs/superpowers/specs/` for the current design.
 
 ## What is here
 
 - `ios-invisible-museum/` — SwiftUI app.
 - `backend/` — Go REST API, PostgreSQL, and Goose migrations.
-- `Augmented Reality Museum App/` — imported TypeScript mockup used as the visual reference.
 - `docs/superpowers/plans/` — implementation planning notes.
 - `docs/deployment/nuc-almaz.md` — NUC/Almaz deployment notes.
 - `Makefile` — root commands for backend, migrations, API smoke tests, and Simulator runs.
@@ -108,12 +109,10 @@ The app uses a SwiftUI design system built around semantic tokens and reusable p
 
 If the backend is unavailable, the app falls back to bundled sample data and shows the fallback state in Explore/Profile.
 
-### AR behavior
+### Directions behavior
 
-- Real geo-AR requires a physical iPhone or iPad with ARKit support.
-- The Simulator still builds and shows the guidance/fallback UI, but it does not validate real camera tracking.
-- When a selected space is too far away, the app shows distance/bearing guidance and opens Apple Maps walking directions.
-- When the user is nearby, the app attempts geo-AR first and falls back to approximate world-tracking AR if geo tracking is unavailable.
+- A place detail screen offers in-app walking directions (Map tab) and an Apple Maps handoff.
+- Arrival at a place is detected within roughly 50m.
 
 ## API URL configuration
 
@@ -139,7 +138,6 @@ iOS app
 
 ## Notes
 
-- Real ARKit/RealityKit behavior is still stubbed/simulated.
 - Contribution moderation is available in the Profile screen; set an admin token first.
 - Use HTTPS for any non-local admin access.
 - Rotate the admin token by updating the env var and restarting the backend.

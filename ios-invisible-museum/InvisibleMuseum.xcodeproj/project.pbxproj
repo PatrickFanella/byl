@@ -18,14 +18,8 @@
 		A00100000000000000000009 /* ContributeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000009 /* ContributeView.swift */; };
 		A00100000000000000000010 /* MuseumDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000010 /* MuseumDetailView.swift */; };
 		A00100000000000000000011 /* ExhibitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000011 /* ExhibitDetailView.swift */; };
-		A00100000000000000000012 /* ARMuseumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000012 /* ARMuseumView.swift */; };
-		A00100000000000000000013 /* ARHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000013 /* ARHUD.swift */; };
-		A00100000000000000000014 /* ARMuseumSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000014 /* ARMuseumSession.swift */; };
-		A00100000000000000000015 /* ExhibitEntityFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000015 /* ExhibitEntityFactory.swift */; };
 		A00100000000000000000030 /* GeoMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000031 /* GeoMath.swift */; };
 		A00100000000000000000031 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000032 /* LocationService.swift */; };
-		A00100000000000000000032 /* ARCapabilityResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000033 /* ARCapabilityResolver.swift */; };
-		A00100000000000000000033 /* ARCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000034 /* ARCameraView.swift */; };
 		A00100000000000000000034 /* WalkingRouteModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000035 /* WalkingRouteModels.swift */; };
 		A00100000000000000000035 /* WalkingRouteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000036 /* WalkingRouteService.swift */; };
 		A00100000000000000000036 /* SampleTours.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00200000000000000000037 /* SampleTours.swift */; };
@@ -57,14 +51,8 @@
 		A00200000000000000000009 /* ContributeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributeView.swift; sourceTree = "<group>"; };
 		A00200000000000000000010 /* MuseumDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseumDetailView.swift; sourceTree = "<group>"; };
 		A00200000000000000000011 /* ExhibitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExhibitDetailView.swift; sourceTree = "<group>"; };
-		A00200000000000000000012 /* ARMuseumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMuseumView.swift; sourceTree = "<group>"; };
-		A00200000000000000000013 /* ARHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARHUD.swift; sourceTree = "<group>"; };
-		A00200000000000000000014 /* ARMuseumSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMuseumSession.swift; sourceTree = "<group>"; };
-		A00200000000000000000015 /* ExhibitEntityFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExhibitEntityFactory.swift; sourceTree = "<group>"; };
 		A00200000000000000000031 /* GeoMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMath.swift; sourceTree = "<group>"; };
 		A00200000000000000000032 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
-		A00200000000000000000033 /* ARCapabilityResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARCapabilityResolver.swift; sourceTree = "<group>"; };
-		A00200000000000000000034 /* ARCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARCameraView.swift; sourceTree = "<group>"; };
 		A00200000000000000000035 /* WalkingRouteModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkingRouteModels.swift; sourceTree = "<group>"; };
 		A00200000000000000000036 /* WalkingRouteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkingRouteService.swift; sourceTree = "<group>"; };
 		A00200000000000000000037 /* SampleTours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleTours.swift; sourceTree = "<group>"; };
@@ -118,17 +106,11 @@
 				A00200000000000000000009 /* ContributeView.swift */,
 				A00200000000000000000010 /* MuseumDetailView.swift */,
 				A00200000000000000000011 /* ExhibitDetailView.swift */,
-				A00200000000000000000012 /* ARMuseumView.swift */,
-				A00200000000000000000013 /* ARHUD.swift */,
-				A00200000000000000000014 /* ARMuseumSession.swift */,
 				A00200000000000000000031 /* GeoMath.swift */,
 				A00200000000000000000032 /* LocationService.swift */,
-				A00200000000000000000033 /* ARCapabilityResolver.swift */,
-				A00200000000000000000034 /* ARCameraView.swift */,
 				A00200000000000000000035 /* WalkingRouteModels.swift */,
 				A00200000000000000000036 /* WalkingRouteService.swift */,
 				A00200000000000000000037 /* SampleTours.swift */,
-				A00200000000000000000015 /* ExhibitEntityFactory.swift */,
 				A00200000000000000000018 /* APIClient.swift */,
 				A00200000000000000000019 /* MuseumRepository.swift */,
 				A00200000000000000000020 /* MuseumScreen.swift */,
@@ -235,17 +217,11 @@
 				A00100000000000000000009 /* ContributeView.swift in Sources */,
 				A00100000000000000000010 /* MuseumDetailView.swift in Sources */,
 				A00100000000000000000011 /* ExhibitDetailView.swift in Sources */,
-				A00100000000000000000012 /* ARMuseumView.swift in Sources */,
-				A00100000000000000000013 /* ARHUD.swift in Sources */,
-				A00100000000000000000014 /* ARMuseumSession.swift in Sources */,
 				A00100000000000000000030 /* GeoMath.swift in Sources */,
 				A00100000000000000000031 /* LocationService.swift in Sources */,
-				A00100000000000000000032 /* ARCapabilityResolver.swift in Sources */,
-				A00100000000000000000033 /* ARCameraView.swift in Sources */,
 				A00100000000000000000034 /* WalkingRouteModels.swift in Sources */,
 				A00100000000000000000035 /* WalkingRouteService.swift in Sources */,
 				A00100000000000000000036 /* SampleTours.swift in Sources */,
-				A00100000000000000000015 /* ExhibitEntityFactory.swift in Sources */,
 				A00100000000000000000017 /* APIClient.swift in Sources */,
 				A00100000000000000000018 /* MuseumRepository.swift in Sources */,
 				A00100000000000000000019 /* MuseumScreen.swift in Sources */,
@@ -371,7 +347,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Invisible Museum";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Invisible Museum uses the camera to place exhibit markers in AR.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Invisible Museum uses your location to guide you to nearby museum spaces and unlock location-based AR.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Invisible Museum uses device motion to orient AR exhibit markers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -398,7 +373,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Invisible Museum";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Invisible Museum uses the camera to place exhibit markers in AR.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Invisible Museum uses your location to guide you to nearby museum spaces and unlock location-based AR.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Invisible Museum uses device motion to orient AR exhibit markers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

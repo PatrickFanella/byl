@@ -2,6 +2,8 @@
 
 Updated: 2026-06-15
 
+> **Historical note (2026-11-04):** this audit describes the pre-rebuild AR prototype. AR has since been removed and the product is being rebuilt around walking/biking tours. Stories 3 and 5 no longer apply. See `docs/superpowers/specs/` for the current direction.
+
 ## Purpose
 
 This document captures the product behavior the app should support, checks what is currently fulfilled, and identifies what needs work. It is intentionally user-facing: each story describes what someone expects to happen, not only what the code currently does.

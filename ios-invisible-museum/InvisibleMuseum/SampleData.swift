@@ -31,7 +31,7 @@ enum SampleData {
             id: "sp-library",
             name: "The First Library",
             tagline: "A civic room remembered by readers",
-            summary: "A quiet AR gallery tracing the first lending library, from handwritten cards to oral histories from people who learned to read here.",
+            summary: "A quiet gallery tracing the first lending library, from handwritten cards to oral histories from people who learned to read here.",
             latitude: 40.7308, longitude: -73.9975, radiusMeters: 50, distanceMeters: 720,
             kind: .hall, exhibitCount: 4, contributorCount: 17, accentHue: 0.62, isDownloaded: false,
             exhibits: [

@@ -619,18 +619,6 @@ struct MapListView: View {
                     .buttonStyle(.museum(.secondary, size: .regular))
                 }
 
-                HStack(spacing: 10) {
-                    if shouldOfferARTryButton(for: destination) {
-                        Button {
-                            openSpaceDetail(destination)
-                        } label: {
-                            Label("Try AR when close", systemImage: "sparkles")
-                        }
-                        .buttonStyle(.museum(.secondary, size: .regular))
-                    }
-
-                    Spacer(minLength: 0)
-                }
             }
         }
         .padding(.horizontal, 12)
@@ -806,10 +794,6 @@ struct MapListView: View {
         routeService.cancel()
         walkingRouteState = .idle
         updateCameraPosition()
-    }
-
-    private func shouldOfferARTryButton(for space: MuseumSpace) -> Bool {
-        destinationProximityMeters(for: space).map { $0 <= 50 } == true
     }
 
     private func openSpaceDetail(_ space: MuseumSpace) {
