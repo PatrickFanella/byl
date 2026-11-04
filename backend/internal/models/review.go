@@ -44,7 +44,33 @@ type Job struct {
 const (
 	JobKindComputeRoute      = "compute_route"
 	JobKindGenerateNarration = "generate_narration"
+	JobKindImportSource      = "import_source"
+	JobKindDraftCandidate    = "draft_candidate"
+	JobKindFetchMedia        = "fetch_media"
 )
+
+// ImportSourcePayload asks a source adapter to fill the review queue.
+type ImportSourcePayload struct {
+	Source  string   `json:"source"`
+	CityID  string   `json:"city_id"`
+	PlaceID *string  `json:"place_id,omitempty"`
+	Lat     *float64 `json:"lat,omitempty"`
+	Lng     *float64 `json:"lng,omitempty"`
+	RadiusM float64  `json:"radius_m,omitempty"`
+	Query   string   `json:"query,omitempty"`
+	Limit   int      `json:"limit,omitempty"`
+}
+
+// DraftCandidatePayload asks the LLM to draft a moment from a candidate's source text.
+type DraftCandidatePayload struct {
+	CandidateID string `json:"candidate_id"`
+}
+
+// FetchMediaPayload downloads an approved media candidate's file into blob storage.
+type FetchMediaPayload struct {
+	CandidateID string `json:"candidate_id"`
+	AssetID     string `json:"asset_id"`
+}
 
 // ComputeRoutePayload is the payload of a compute_route job.
 type ComputeRoutePayload struct {

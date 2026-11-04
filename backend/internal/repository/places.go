@@ -250,3 +250,17 @@ func (s *Store) UnpublishedOrForeign(ctx context.Context, cityID string, placeID
 	}
 	return bad, nil
 }
+
+// NearestPublishedPlace returns the closest published place in the city within maxM metres.
+func (s *Store) NearestPublishedPlace(ctx context.Context, cityID string, pt geo.Point, maxM float64) (*models.PlaceSummary, error) {
+	box := geo.BoundingBox(pt.Lat, pt.Lng, maxM)
+	dist := distanceExpr(2, 3, "p.latitude", "p.longitude")
+	q := `SELECT ` + placeCols + `, ` + dist + ` AS distance_m FROM places p
+		WHERE p.city_id = $1 AND p.status = 'published' AND p.latitude BETWEEN $4 AND $5 AND p.longitude BETWEEN $6 AND $7 AND ` + dist + ` <= $8
+		ORDER BY distance_m LIMIT 1`
+	p, err := scanPlace(s.pool.QueryRow(ctx, q, cityID, pt.Lat, pt.Lng, box.MinLat, box.MaxLat, box.MinLng, box.MaxLng, maxM), true)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	return &p, nil
+}

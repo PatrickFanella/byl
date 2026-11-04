@@ -106,3 +106,16 @@ func (s *Store) mediaByIDs(ctx context.Context, q dbtx, ids []string) (map[strin
 	}
 	return out, rows.Err()
 }
+
+// UpdateMediaFile records where an asset's file landed.
+func (s *Store) UpdateMediaFile(ctx context.Context, id, storageKey, publicURL, mimeType string, width, height *int) error {
+	tag, err := s.pool.Exec(ctx, `UPDATE media_assets SET storage_key = $2, public_url = $3, mime_type = $4, width = COALESCE($5, width), height = COALESCE($6, height), updated_at = now() WHERE id = $1`,
+		id, storageKey, publicURL, mimeType, width, height)
+	if err != nil {
+		return mapErr(err)
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}

@@ -112,3 +112,18 @@ func (s *Store) ReclaimStaleJobs(ctx context.Context, olderThan time.Duration) (
 	}
 	return tag.RowsAffected(), nil
 }
+
+// SetJobNote stores an informational note on a job (the last_error column doubles as the result line).
+func (s *Store) SetJobNote(ctx context.Context, id, note string) error {
+	if !isUUID(id) {
+		return ErrNotFound
+	}
+	tag, err := s.pool.Exec(ctx, `UPDATE jobs SET last_error = $2, updated_at = now() WHERE id = $1`, id, note)
+	if err != nil {
+		return mapErr(err)
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}

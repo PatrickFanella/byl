@@ -11,14 +11,23 @@ import (
 	"time"
 
 	"invisible-museum/backend/internal/blob"
+	"invisible-museum/backend/internal/llm"
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/narration"
 	"invisible-museum/backend/internal/repository"
 	"invisible-museum/backend/internal/routing"
+	"invisible-museum/backend/internal/sources"
 )
+
+// ErrNoRetry marks a job failure that retrying cannot fix; finish records it as final at once.
+var ErrNoRetry = errors.New("no retry")
 
 // Worker claims and runs jobs.
 type Worker struct {
+	// Sources and Drafter are optional; jobs that need them fail without retry when unset.
+	Sources *sources.Registry
+	Drafter llm.Drafter
+
 	store    *repository.Store
 	router   routing.Router
 	narrator narration.Narrator
@@ -28,6 +37,18 @@ type Worker struct {
 	poll     time.Duration
 	now      func() time.Time
 	backoff  func(attempts int) time.Duration
+
+	noteMu    sync.Mutex
+	noteAfter string
+}
+
+// takeNote returns and clears the note the last job left for its completion line.
+func (w *Worker) takeNote() string {
+	w.noteMu.Lock()
+	defer w.noteMu.Unlock()
+	n := w.noteAfter
+	w.noteAfter = ""
+	return n
 }
 
 // New builds a worker. workers is the number of concurrent goroutines Run starts.
@@ -103,10 +124,16 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, runErr error) erro
 	wctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 15*time.Second)
 	defer cancel()
 	if runErr == nil {
-		return w.store.CompleteJob(wctx, job.ID)
+		if err := w.store.CompleteJob(wctx, job.ID); err != nil {
+			return err
+		}
+		if note := w.takeNote(); note != "" {
+			return w.store.SetJobNote(wctx, job.ID, note)
+		}
+		return nil
 	}
 	interrupted := ctx.Err() != nil
-	final := job.Attempts >= job.MaxAttempts && !interrupted
+	final := (job.Attempts >= job.MaxAttempts || errors.Is(runErr, ErrNoRetry)) && !interrupted
 	w.log.Warn("job failed", "id", job.ID, "kind", job.Kind, "attempt", job.Attempts, "final", final, "interrupted", interrupted, "error", runErr)
 	if final {
 		if err := w.onFinalFailure(wctx, job, runErr); err != nil {
@@ -135,6 +162,29 @@ func (w *Worker) dispatch(ctx context.Context, job *models.Job) error {
 			return fmt.Errorf("decode payload: %w", err)
 		}
 		return w.generateNarration(ctx, p)
+	case models.JobKindImportSource:
+		var p models.ImportSourcePayload
+		if err := json.Unmarshal(job.Payload, &p); err != nil {
+			return fmt.Errorf("decode payload: %w", err)
+		}
+		note, err := w.importSource(ctx, p)
+		if err != nil {
+			return err
+		}
+		w.noteAfter = note
+		return nil
+	case models.JobKindFetchMedia:
+		var p models.FetchMediaPayload
+		if err := json.Unmarshal(job.Payload, &p); err != nil {
+			return fmt.Errorf("decode payload: %w", err)
+		}
+		return w.fetchMedia(ctx, p)
+	case models.JobKindDraftCandidate:
+		var p models.DraftCandidatePayload
+		if err := json.Unmarshal(job.Payload, &p); err != nil {
+			return fmt.Errorf("decode payload: %w", err)
+		}
+		return w.draftCandidate(ctx, p)
 	default:
 		return fmt.Errorf("unknown job kind %q", job.Kind)
 	}
