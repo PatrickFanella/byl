@@ -13,12 +13,18 @@ final class AppModel {
     let client: APIClient
     let api: Endpoints
     let session: SessionController
+    let location = MuseumLocationService()
 
     var account: Account?
     var cities: [City] = []
     var selectedCity: City?
-    var activeTourID: String?
+    /// The tour being walked or ridden, if any, and the mode chosen for it.
+    var activeTour: TourDetail?
+    var activeMode: String?
+    var activeTourID: String? { activeTour?.tour.id }
     var pendingTourSlug: String?
+    /// Ids and slugs of the tours the signed-in account saved; refreshed on sign-in.
+    var savedTourIDs: Set<String> = []
     var presentSignIn = false
     var bootstrapError: String?
     var devSignInAvailable = false
@@ -55,6 +61,7 @@ final class AppModel {
             if let me = try? await api.me() {
                 session.update(account: me)
             }
+            await refreshSaved()
         }
         await loadCities()
         #if DEBUG
@@ -86,12 +93,14 @@ final class AppModel {
         self.session.set(session: session)
         account = session.account
         presentSignIn = false
+        Task { await refreshSaved() }
     }
 
     func signOut() async {
         try? await api.signOut()
         session.clear()
         account = nil
+        savedTourIDs = []
     }
 
     /// A 401 clears the session but never the tour being walked.
@@ -99,6 +108,22 @@ final class AppModel {
         guard session.isSignedIn else { return }
         session.clear()
         account = nil
+        savedTourIDs = []
+    }
+
+    func refreshSaved() async {
+        guard session.isSignedIn, let saved = try? await api.saved() else { return }
+        savedTourIDs = Set(saved.flatMap { [$0.id, $0.slug] })
+    }
+
+    func setSaved(_ tourID: String, _ saved: Bool) {
+        if saved { savedTourIDs.insert(tourID) } else { savedTourIDs.remove(tourID) }
+    }
+
+    /// Makes a tour the active one; the active tour screen (Task 5) presents it.
+    func startTour(_ tour: TourDetail, mode: String) {
+        activeTour = tour
+        activeMode = mode
     }
 
     func setBaseURL(_ value: String) {

@@ -48,8 +48,6 @@ struct PlaceholderScreen: View {
     }
 }
 
-struct HomeView: View { var body: some View { PlaceholderScreen(title: "Home") } }
-struct TourListView: View { var body: some View { PlaceholderScreen(title: "Tours") } }
 struct MyRoutesView: View { var body: some View { PlaceholderScreen(title: "Your routes") } }
 struct SavedView: View { var body: some View { PlaceholderScreen(title: "Saved") } }
 struct ProfileView: View { var body: some View { PlaceholderScreen(title: "Profile") } }
