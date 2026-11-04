@@ -14,14 +14,17 @@ final class AppModel {
     let api: Endpoints
     let session: SessionController
     let location = MuseumLocationService()
+    /// Application Support cache for the last city, tours, and the active tour's detail and route.
+    let cache: DiskCache
 
     var account: Account?
     var cities: [City] = []
     var selectedCity: City?
-    /// The tour being walked or ridden, if any, and the mode chosen for it.
-    var activeTour: TourDetail?
-    var activeMode: String?
-    var activeTourID: String? { activeTour?.tour.id }
+    /// The tour being walked or ridden, if any.
+    var active: ActiveTourModel?
+    var activeTour: TourDetail? { active?.tour }
+    var activeMode: String? { active?.mode }
+    var activeTourID: String? { active?.tour.tour.id }
     var pendingTourSlug: String?
     /// Ids and slugs of the tours the signed-in account saved; refreshed on sign-in.
     var savedTourIDs: Set<String> = []
@@ -29,13 +32,15 @@ final class AppModel {
     var bootstrapError: String?
     var devSignInAvailable = false
 
-    init(storage: TokenStorage = KeychainTokenStorage()) {
+    init(storage: TokenStorage = KeychainTokenStorage(), cache: DiskCache? = nil) {
         let base = URL(string: Self.resolveBaseURL()) ?? URL(string: Self.defaultBaseURL)!
         let session = SessionController(storage: storage)
         let client = APIClient(baseURL: base, tokenProvider: { [session] in session.token })
         self.client = client
         self.api = Endpoints(client: client)
         self.session = session
+        self.cache = cache ?? (try? DiskCache.applicationSupport())
+            ?? (try! DiskCache(directory: FileManager.default.temporaryDirectory.appendingPathComponent("InvisibleMuseum")))
         self.account = nil
         session.onChange = { [weak self] in
             Task { @MainActor [weak self] in self?.account = self?.session.account }
@@ -72,6 +77,7 @@ final class AppModel {
     func loadCities() async {
         do {
             cities = try await api.cities()
+            cache.save(cities, key: "cities")
             bootstrapError = nil
             let remembered = UserDefaults.standard.string(forKey: Self.citySlugDefaultsKey)
             if let remembered, let match = cities.first(where: { $0.slug == remembered }) {
@@ -80,6 +86,12 @@ final class AppModel {
                 selectedCity = cities.first
             }
         } catch {
+            // Offline: fall back to the last cities seen so an active tour can still be resumed.
+            if cities.isEmpty, let cached = cache.load([City].self, key: "cities"), !cached.isEmpty {
+                cities = cached
+                let remembered = UserDefaults.standard.string(forKey: Self.citySlugDefaultsKey)
+                selectedCity = cities.first { $0.slug == remembered } ?? cities.first
+            }
             bootstrapError = (error as? APIError)?.message ?? error.localizedDescription
         }
     }
@@ -120,10 +132,18 @@ final class AppModel {
         if saved { savedTourIDs.insert(tourID) } else { savedTourIDs.remove(tourID) }
     }
 
-    /// Makes a tour the active one; the active tour screen (Task 5) presents it.
+    /// Makes a tour the active one; RootView presents ActiveTourView over everything.
     func startTour(_ tour: TourDetail, mode: String) {
-        activeTour = tour
-        activeMode = mode
+        let model = ActiveTourModel(api: api, tour: tour, mode: mode, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn ?? false })
+        location.onLocation = { [weak model] location in model?.handle(location: location) }
+        if let here = location.currentLocation { model.handle(location: here) }
+        active = model
+    }
+
+    func endTour(resetProgress: Bool) {
+        if resetProgress { active?.resetProgress() }
+        location.onLocation = nil
+        active = nil
     }
 
     func setBaseURL(_ value: String) {

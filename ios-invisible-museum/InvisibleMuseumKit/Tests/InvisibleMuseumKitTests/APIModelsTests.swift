@@ -104,3 +104,16 @@ final class APIModelsTests: XCTestCase {
         XCTAssertTrue(progress.contains("\"visited_positions\":[1]"))
     }
 }
+
+extension APIModelsTests {
+    /// The active tour's detail and route are cached as JSON, so decode → encode → decode must be lossless.
+    func testTourAndRouteRoundTripThroughJSON() throws {
+        let tour = try decoder.decode(TourDetail.self, from: fixture("tour"))
+        let again = try decoder.decode(TourDetail.self, from: JSONEncoder().encode(tour))
+        XCTAssertEqual(again, tour)
+        let route = try decoder.decode(TourRoute.self, from: fixture("route"))
+        XCTAssertEqual(try decoder.decode(TourRoute.self, from: JSONEncoder().encode(route)), route)
+        let moment = try decoder.decode(MomentDetail.self, from: fixture("moment"))
+        XCTAssertEqual(try decoder.decode(MomentDetail.self, from: JSONEncoder().encode(moment)), moment)
+    }
+}

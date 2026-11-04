@@ -21,6 +21,10 @@ struct RootView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             MuseumBottomBar(selection: $tab)
         }
+        .fullScreenCover(item: Binding(get: { model.active }, set: { if $0 == nil { model.endTour(resetProgress: false) } })) { active in
+            ActiveTourView(active: active)
+                .environment(model)
+        }
         .sheet(isPresented: $model.presentSignIn) {
             SignInView()
                 .environment(model)

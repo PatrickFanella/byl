@@ -1,7 +1,8 @@
 import Foundation
 
 // Data transfer objects for the Invisible Museum API. Field names follow
-// backend/api/openapi.yaml exactly through explicit CodingKeys.
+// backend/api/openapi.yaml exactly through explicit CodingKeys. They are Codable (not just
+// Decodable) so the active tour's detail and route can be cached on disk as JSON.
 
 public struct ListPage<T: Decodable>: Decodable {
     public let items: [T]
@@ -22,7 +23,7 @@ public struct APIErrorBody: Decodable, Equatable {
     public let error: Detail
 }
 
-public struct BoundingBox: Decodable, Equatable {
+public struct BoundingBox: Codable, Equatable {
     public let minLat: Double
     public let minLng: Double
     public let maxLat: Double
@@ -36,7 +37,7 @@ public struct BoundingBox: Decodable, Equatable {
     }
 }
 
-public struct City: Decodable, Identifiable, Equatable {
+public struct City: Codable, Identifiable, Equatable {
     public let id: String
     public let slug: String
     public let name: String
@@ -56,7 +57,7 @@ public struct City: Decodable, Identifiable, Equatable {
     }
 }
 
-public struct Topic: Decodable, Identifiable, Equatable {
+public struct Topic: Codable, Identifiable, Equatable {
     public let id: String
     public let cityID: String
     public let slug: String
@@ -71,7 +72,7 @@ public struct Topic: Decodable, Identifiable, Equatable {
     }
 }
 
-public struct MediaAsset: Decodable, Identifiable, Equatable {
+public struct MediaAsset: Codable, Identifiable, Equatable {
     public let id: String
     public let kind: String
     public let publicURL: String
@@ -97,7 +98,7 @@ public struct MediaAsset: Decodable, Identifiable, Equatable {
     public var url: URL? { URL(string: publicURL) }
 }
 
-public struct PlaceSummary: Decodable, Identifiable, Equatable {
+public struct PlaceSummary: Codable, Identifiable, Equatable {
     public let id: String
     public let cityID: String
     public let slug: String
@@ -123,7 +124,7 @@ public struct PlaceSummary: Decodable, Identifiable, Equatable {
     }
 }
 
-public struct PlaceDetail: Decodable, Identifiable, Equatable {
+public struct PlaceDetail: Codable, Identifiable, Equatable {
     public let place: PlaceSummary
     public let primaryMoment: MomentSummary?
     public let moments: [MomentSummary]
@@ -141,9 +142,16 @@ public struct PlaceDetail: Decodable, Identifiable, Equatable {
         primaryMoment = try container.decodeIfPresent(MomentSummary.self, forKey: .primaryMoment)
         moments = try container.decodeIfPresent([MomentSummary].self, forKey: .moments) ?? []
     }
+
+    public func encode(to encoder: Encoder) throws {
+        try place.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(primaryMoment, forKey: .primaryMoment)
+        try container.encode(moments, forKey: .moments)
+    }
 }
 
-public struct Source: Decodable, Equatable {
+public struct Source: Codable, Equatable {
     public let title: String
     public let url: String
     public let publisher: String
@@ -157,7 +165,7 @@ public struct Source: Decodable, Equatable {
     }
 }
 
-public struct MomentSummary: Decodable, Identifiable, Equatable {
+public struct MomentSummary: Codable, Identifiable, Equatable {
     public let id: String
     public let placeID: String
     public let slug: String
@@ -185,7 +193,7 @@ public struct MomentSummary: Decodable, Identifiable, Equatable {
     }
 }
 
-public struct MomentDetail: Decodable, Identifiable, Equatable {
+public struct MomentDetail: Codable, Identifiable, Equatable {
     public let summary: MomentSummary
     public let body: String
     public let media: [MediaAsset]
@@ -208,9 +216,19 @@ public struct MomentDetail: Decodable, Identifiable, Equatable {
         topics = try container.decodeIfPresent([Topic].self, forKey: .topics) ?? []
         narration = try container.decodeIfPresent(MediaAsset.self, forKey: .narration)
     }
+
+    public func encode(to encoder: Encoder) throws {
+        try summary.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(body, forKey: .body)
+        try container.encode(media, forKey: .media)
+        try container.encode(sources, forKey: .sources)
+        try container.encode(topics, forKey: .topics)
+        try container.encodeIfPresent(narration, forKey: .narration)
+    }
 }
 
-public struct RouteSummary: Decodable, Equatable {
+public struct RouteSummary: Codable, Equatable {
     public let mode: String
     public let status: String
     public let distanceM: Double
@@ -226,7 +244,7 @@ public struct RouteSummary: Decodable, Equatable {
     }
 }
 
-public struct RouteLeg: Decodable, Equatable {
+public struct RouteLeg: Codable, Equatable {
     public let fromPosition: Int
     public let toPosition: Int
     public let distanceM: Double
@@ -242,12 +260,12 @@ public struct RouteLeg: Decodable, Equatable {
     }
 }
 
-public struct LineString: Decodable, Equatable {
+public struct LineString: Codable, Equatable {
     public let type: String
     public let coordinates: [[Double]]
 }
 
-public struct TourRoute: Decodable, Equatable {
+public struct TourRoute: Codable, Equatable {
     public let id: String
     public let tourID: String
     public let mode: String
@@ -267,7 +285,7 @@ public struct TourRoute: Decodable, Equatable {
     }
 }
 
-public struct TourSummary: Decodable, Identifiable, Equatable {
+public struct TourSummary: Codable, Identifiable, Equatable {
     public let id: String
     public let cityID: String
     public let slug: String
@@ -295,7 +313,7 @@ public struct TourSummary: Decodable, Identifiable, Equatable {
     public var isUserRoute: Bool { ownerAccountID != nil }
 }
 
-public struct TourStop: Decodable, Identifiable, Equatable {
+public struct TourStop: Codable, Identifiable, Equatable {
     public let id: String
     public let position: Int
     public let place: PlaceSummary
@@ -310,7 +328,7 @@ public struct TourStop: Decodable, Identifiable, Equatable {
     }
 }
 
-public struct TourDetail: Decodable, Identifiable, Equatable {
+public struct TourDetail: Codable, Identifiable, Equatable {
     public let tour: TourSummary
     public let stops: [TourStop]
 
@@ -325,9 +343,15 @@ public struct TourDetail: Decodable, Identifiable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         stops = try container.decodeIfPresent([TourStop].self, forKey: .stops) ?? []
     }
+
+    public func encode(to encoder: Encoder) throws {
+        try tour.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(stops, forKey: .stops)
+    }
 }
 
-public struct TourProgress: Decodable, Equatable {
+public struct TourProgress: Codable, Equatable {
     public let accountID: String
     public let tourID: String
     public let mode: String
@@ -366,7 +390,7 @@ public struct Account: Codable, Identifiable, Equatable {
     }
 }
 
-public struct Session: Decodable, Equatable {
+public struct Session: Codable, Equatable {
     public let token: String
     public let expiresAt: String
     public let account: Account

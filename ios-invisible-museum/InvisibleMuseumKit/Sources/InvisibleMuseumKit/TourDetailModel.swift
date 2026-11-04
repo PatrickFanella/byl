@@ -1,16 +1,19 @@
 import Foundation
 import Observation
 
+/// Shared async load state for the view models.
+public enum LoadState: Equatable {
+    case idle
+    case loading
+    case loaded
+    case failed(String)
+}
+
 /// Loads one tour and owns the save toggle, so the detail view body stays free of network code.
 @MainActor
 @Observable
 public final class TourDetailModel {
-    public enum State: Equatable {
-        case idle
-        case loading
-        case loaded
-        case failed(String)
-    }
+    public typealias State = LoadState
 
     public let api: Endpoints
     public let ref: String
