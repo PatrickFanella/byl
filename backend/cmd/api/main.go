@@ -59,6 +59,8 @@ func main() {
 		IsBootstrap:    cfg.IsBootstrapAdmin,
 		Blob:           prov.Blob,
 		MediaFSDir:     prov.MediaFSDir,
+		Sources:        prov.Sources,
+		Drafter:        prov.Drafter,
 		Log:            log,
 		Ready:          pool.Ping,
 	}
@@ -73,6 +75,8 @@ func main() {
 	}
 
 	worker := jobs.New(store, prov.Router, prov.Narrator, prov.Blob, cfg.JobWorkers, log)
+	worker.Sources = prov.Sources
+	worker.Drafter = prov.Drafter
 	workerDone := make(chan struct{})
 	go func() {
 		defer close(workerDone)
@@ -89,7 +93,11 @@ func main() {
 	}
 	serverErr := make(chan error, 1)
 	go func() {
-		log.Info("starting api", "addr", cfg.APIAddr, "routing", cfg.RoutingProvider, "narration", cfg.NarrationProvider, "media", cfg.MediaStore, "workers", cfg.JobWorkers)
+		llmName := cfg.LLMProvider
+		if llmName == "" {
+			llmName = "none"
+		}
+		log.Info("starting api", "addr", cfg.APIAddr, "routing", cfg.RoutingProvider, "narration", cfg.NarrationProvider, "media", cfg.MediaStore, "llm", llmName, "workers", cfg.JobWorkers)
 		serverErr <- server.ListenAndServe()
 	}()
 

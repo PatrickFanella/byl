@@ -43,6 +43,9 @@ type Config struct {
 	LLMAPIKey   string
 	LLMModel    string
 
+	LocalArchiveURLs []string
+	SourcesUserAgent string
+
 	JobWorkers int
 }
 
@@ -81,6 +84,8 @@ func Load() (Config, error) {
 		LLMBaseURL:         strings.TrimRight(strings.TrimSpace(os.Getenv("LLM_BASE_URL")), "/"),
 		LLMAPIKey:          strings.TrimSpace(os.Getenv("LLM_API_KEY")),
 		LLMModel:           strings.TrimSpace(os.Getenv("LLM_MODEL")),
+		LocalArchiveURLs:   envList("LOCAL_ARCHIVE_URLS"),
+		SourcesUserAgent:   envOr("SOURCES_USER_AGENT", "InvisibleMuseum/0.2 (+https://github.com/PatrickFanella/invisible-museum)"),
 	}
 	for _, e := range envList("ADMIN_BOOTSTRAP_EMAILS") {
 		cfg.AdminBootstrapEmails = append(cfg.AdminBootstrapEmails, strings.ToLower(e))

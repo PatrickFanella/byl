@@ -117,7 +117,24 @@ Every error is `{"error": {"code", "message", "fields"?}}`. Lists are
 | Routing | `straightline` | `valhalla` (self-hosted, `--profile routing`) |
 | Narration | `none` (on-device speech) | `openai` (any OpenAI-compatible speech endpoint) |
 | Media | `fs` (served at `/media/files/`) | `s3` (MinIO, R2, S3) |
-| LLM drafting | unset | `anthropic` or `openai` (next cycle) |
+| LLM drafting | unset (draft and suggest return 503) | `anthropic` (Claude API) or `openai` (any OpenAI-compatible endpoint) |
+
+### Sourcing
+
+Curators fill the review queue from open archives through `POST /api/v1/admin/imports`
+with a `source` from `GET /api/v1/admin/sources`:
+
+| Source | Finds | Centre |
+| --- | --- | --- |
+| `wikipedia` | a place and a moment per article near a point | city, place, or `near` |
+| `wikimedia_commons` | images near a point with licence metadata | city, place, or `near` |
+| `internet_archive` | texts as moments, images and films as media | `query` |
+| `loc` | Library of Congress items for a query | `query` |
+| `url` | pages listed in `LOCAL_ARCHIVE_URLS` as moments | optional `query` filter |
+
+`POST /api/v1/admin/candidates/{id}/draft` asks the configured LLM to write a moment
+from a candidate's source text; `POST /api/v1/admin/tours/{id}/stops/{position}/suggest`
+ranks a stop's moments against the tour topic. Both need `LLM_PROVIDER`.
 
 See `backend/.env.example` for every variable. `go run ./cmd/migrate up` applies migrations without Docker.
 

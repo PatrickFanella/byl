@@ -6,8 +6,10 @@ import (
 
 	"invisible-museum/backend/internal/blob"
 	"invisible-museum/backend/internal/config"
+	"invisible-museum/backend/internal/llm"
 	"invisible-museum/backend/internal/narration"
 	"invisible-museum/backend/internal/routing"
+	"invisible-museum/backend/internal/sources"
 )
 
 // Providers are the external dependencies the API and worker use.
@@ -17,6 +19,8 @@ type Providers struct {
 	Blob     blob.Store
 	// MediaFSDir is set when the fs store is in use so the API can serve files.
 	MediaFSDir string
+	Sources    *sources.Registry
+	Drafter    llm.Drafter
 }
 
 // Build constructs providers from config.
@@ -34,6 +38,18 @@ func Build(cfg config.Config) (Providers, error) {
 	default:
 		p.Narrator = narration.None{}
 	}
+	switch cfg.LLMProvider {
+	case "anthropic":
+		if cfg.LLMAPIKey == "" {
+			return p, fmt.Errorf("LLM_PROVIDER=anthropic requires LLM_API_KEY")
+		}
+		p.Drafter = llm.NewAnthropic(cfg.LLMAPIKey, cfg.LLMBaseURL, cfg.LLMModel)
+	case "openai":
+		p.Drafter = llm.NewOpenAI(cfg.LLMBaseURL, cfg.LLMAPIKey, cfg.LLMModel, nil)
+	default:
+		p.Drafter = llm.None{}
+	}
+	p.Sources = sources.NewRegistry(sources.NewHTTPClient(cfg.SourcesUserAgent), cfg.LocalArchiveURLs)
 	switch cfg.MediaStore {
 	case "s3":
 		s, err := blob.NewS3(blob.S3Config{Endpoint: cfg.S3Endpoint, Bucket: cfg.S3Bucket, AccessKey: cfg.S3AccessKey, SecretKey: cfg.S3SecretKey, UseSSL: cfg.S3UseSSL, PublicBase: cfg.MediaPublicBaseURL})

@@ -65,3 +65,19 @@ func TestLoadParsesLists(t *testing.T) {
 		t.Fatalf("flags %+v", cfg)
 	}
 }
+
+func TestLoadSourcesSettings(t *testing.T) {
+	setEnv(t, map[string]string{"DATABASE_URL": "postgres://x"})
+	t.Setenv("LOCAL_ARCHIVE_URLS", "https://a.example/one, https://b.example/two")
+	t.Setenv("SOURCES_USER_AGENT", "")
+	cfg, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cfg.LocalArchiveURLs) != 2 || cfg.LocalArchiveURLs[1] != "https://b.example/two" {
+		t.Fatalf("urls %v", cfg.LocalArchiveURLs)
+	}
+	if !strings.HasPrefix(cfg.SourcesUserAgent, "InvisibleMuseum/") {
+		t.Fatalf("ua %q", cfg.SourcesUserAgent)
+	}
+}

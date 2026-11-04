@@ -34,6 +34,27 @@ S3_BUCKET=museum-media
 MEDIA_PUBLIC_BASE_URL=https://museum-media.subcult.tv/museum-media
 ```
 
+To enable drafting, add one of:
+
+```bash
+LLM_PROVIDER=anthropic
+LLM_API_KEY=sk-ant-...
+LLM_MODEL=claude-opus-5-5
+```
+
+```bash
+LLM_PROVIDER=openai
+LLM_BASE_URL=http://ollama.lan:11434   # or https://openrouter.ai/api, or leave empty for OpenAI
+LLM_API_KEY=...
+LLM_MODEL=llama3.1:70b
+```
+
+and list the local archive pages the `url` source should read:
+
+```bash
+LOCAL_ARCHIVE_URLS=https://www.dghistory.org/blodgett-house,https://www.dgparks.org/downers-grove-museum
+```
+
 `DEV_AUTH_ENABLED` is hard-coded to `false` in the deployment compose file. Never enable it outside local development: it lets anyone sign in as any email.
 
 Do not publish the Postgres port. The deployment compose file does not expose it.
