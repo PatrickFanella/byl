@@ -35,23 +35,3 @@ struct RootView: View {
         }
     }
 }
-
-/// Placeholder used until a feature screen exists; replaced in later tasks.
-struct PlaceholderScreen: View {
-    let title: String
-
-    var body: some View {
-        MuseumScreen {
-            Text(title)
-                .font(Museum.title(28))
-                .foregroundStyle(Museum.text)
-            Text("Coming up in this rebuild.")
-                .font(Museum.bodyFont())
-                .foregroundStyle(Museum.muted)
-        }
-    }
-}
-
-struct MyRoutesView: View { var body: some View { PlaceholderScreen(title: "Your routes") } }
-struct SavedView: View { var body: some View { PlaceholderScreen(title: "Saved") } }
-struct ProfileView: View { var body: some View { PlaceholderScreen(title: "Profile") } }
