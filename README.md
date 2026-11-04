@@ -171,32 +171,30 @@ Set `VITE_GOOGLE_CLIENT_ID` at build time to show Google sign-in.
 
 ## iOS app
 
-> The iOS app still targets the previous API and does not run against this backend yet. It is rebuilt in the next cycle.
+`ios-invisible-museum/` is the SwiftUI visitor app (iOS 17+), rebuilt in cycle 3 against this
+backend's `/api/v1`. It is an Xcode project plus a local Swift package:
 
-Current tabs:
+- `InvisibleMuseumKit/` — API client, DTOs matching `backend/api/openapi.yaml`, session
+  controller, and the view models (`TourDetailModel`, `ActiveTourModel`, `RouteBuilderModel`,
+  `ArrivalMonitor`, `NarrationPlayer`, `DiskCache`) with XCTest coverage against recorded
+  fixtures and a `URLProtocol` stub. Runs on a Mac with `swift test`.
+- `InvisibleMuseum/` — the app: `App/` (model, root tabs), `Features/` (Home, Tours incl. the
+  active walking/riding mode with map, Places and Moments, Routes builder, Saved, Profile),
+  `Location/`, `Audio/`, `Session/`, `Design/`.
 
-- Explore
-- Contribute
-- Collection
-- Profile
+What it does: browse a city's tours by topic, open a tour and its stops, walk or ride it with a
+route line, arrival detection (65 m accuracy floor, "I'm here" fallback) and an Apple Maps
+handoff, hear each stop's story (recorded narration or on-device speech), build and share your
+own routes (`/t/{slug}` links and the `invisiblemuseum://tour/{slug}` scheme), save tours and
+keep progress when signed in with Apple. An active tour keeps working offline from the cached
+route and progress.
 
-The app uses a SwiftUI design system built around semantic tokens and reusable primitives:
+> Built without a Swift toolchain in the authoring environment. The first step on a Mac is
+> `make ios-test && make ios-build`; expect to fix compiler nits before the first run.
 
-- `Theme.swift`
-- `MuseumScreen.swift`
-- `MuseumCard.swift`
-- `MuseumButton.swift`
-- `MuseumChip.swift`
-- `MuseumField.swift`
-- `MuseumSection.swift`
-- `MuseumBottomBar.swift`
-
-If the backend is unavailable, the app falls back to bundled sample data and shows the fallback state in Explore/Profile.
-
-### Directions behavior
-
-- A place detail screen offers in-app walking directions (Map tab) and an Apple Maps handoff.
-- Arrival at a place is detected within roughly 50m.
+Point the app at a local API from the Profile tab (API base URL), or launch with the
+environment variable `InvisibleMuseum.apiBaseURL=http://localhost:8080`. Debug builds show the
+developer email sign-in when the API runs with `DEV_AUTH_ENABLED=true`.
 
 ## API URL configuration
 

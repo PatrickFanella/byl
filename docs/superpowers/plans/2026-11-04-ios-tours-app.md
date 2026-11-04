@@ -32,63 +32,63 @@
 
 **Files:** delete `Models.swift`, `SampleData.swift`, `SampleTours.swift`, `MuseumStore.swift`, `MuseumRepository.swift`, `MuseumLocalPersistence.swift`, `WalkingRouteModels.swift`, `WalkingRouteService.swift`, `ExploreView.swift`, `MapListView.swift`, `ContributeView.swift`, `CollectionView.swift`, `SavedView.swift`, `ProfileView.swift`, `MuseumDetailView.swift`, `ExhibitDetailView.swift`, `ContributionModerationView.swift`, `ContentView.swift`, `APIClient.swift`. Create `API/APIModels.swift`, `API/APIClient.swift`, `API/Endpoints.swift`; tests `InvisibleMuseumTests/APIModelsTests.swift` with fixtures recorded from the API.
 
-- [ ] Record fixtures from the running API: city detail, tour detail, route, moment detail, place detail, session.
-- [ ] Write `APIModelsTests` decoding each fixture and asserting key fields (tour has 4 stops; stop 3 featured moment falls back; route geometry count).
-- [ ] Implement DTOs (`City`, `Topic`, `PlaceSummary`, `PlaceDetail`, `MomentSummary`, `MomentDetail`, `MediaAsset`, `Source`, `TourSummary`, `TourDetail`, `TourStop`, `RouteSummary`, `TourRoute`, `RouteLeg`, `TourProgress`, `Account`, `Session`, `ListPage<T>`, `APIErrorBody`), `APIClient` (base URL, token provider, `get/post/put/patch/delete`, `APIError` with status/code/message/fields, 401 hook), `Endpoints` (typed functions for every public, auth, and `/me` route).
-- [ ] Commit: `feat(ios): API layer for the tours contract; remove the old model`.
+- [x] Record fixtures from the running API: city detail, tour detail, route, moment detail, place detail, session.
+- [x] Write `APIModelsTests` decoding each fixture and asserting key fields (tour has 4 stops; stop 3 featured moment falls back; route geometry count).
+- [x] Implement DTOs (`City`, `Topic`, `PlaceSummary`, `PlaceDetail`, `MomentSummary`, `MomentDetail`, `MediaAsset`, `Source`, `TourSummary`, `TourDetail`, `TourStop`, `RouteSummary`, `TourRoute`, `RouteLeg`, `TourProgress`, `Account`, `Session`, `ListPage<T>`, `APIErrorBody`), `APIClient` (base URL, token provider, `get/post/put/patch/delete`, `APIError` with status/code/message/fields, 401 hook), `Endpoints` (typed functions for every public, auth, and `/me` route).
+- [x] Commit: `feat(ios): API layer for the tours contract; remove the old model`.
 
 ### Task 2: App model, session, sign-in, root tabs
 
 **Files:** `App/AppModel.swift`, `App/RootView.swift`, `Session/SessionStore.swift` (Keychain), `Session/SignInView.swift`, modify `InvisibleMuseumApp.swift`, `Info.plist` keys (`NSLocationWhenInUseUsageDescription`, URL scheme `invisiblemuseum`), entitlements for Sign in with Apple.
 
-- [ ] Tests: `SessionStoreTests` (set/clear/restore with an in-memory keychain shim), `AppModelTests` (401 clears session and keeps `activeTour`).
-- [ ] Implement; tabs: Home, Tours, Routes, Saved, Profile using `MuseumBottomBar`.
-- [ ] Commit: `feat(ios): app model, Keychain session, Sign in with Apple, tabs`.
+- [x] Tests: `SessionStoreTests` (set/clear/restore with an in-memory keychain shim), `AppModelTests` (401 clears session and keeps `activeTour`).
+- [x] Implement; tabs: Home, Tours, Routes, Saved, Profile using `MuseumBottomBar`.
+- [x] Commit: `feat(ios): app model, Keychain session, Sign in with Apple, tabs`.
 
 ### Task 3: Home, tour list, tour detail, place and moment views
 
 **Files:** `Features/Home/HomeView.swift`, `Features/Tours/TourListView.swift`, `Features/Tours/TourDetailView.swift`, `Features/Tours/TourDetailModel.swift`, `Features/Places/PlaceDetailView.swift`, `Features/Places/MomentView.swift`, `Features/Places/MediaGalleryView.swift`.
 
-- [ ] Tests: `TourDetailModelTests` with a stubbed client: loads tour, exposes per-mode estimate text ("24 min walk"), save toggles call the right endpoints.
-- [ ] Implement with loading/empty/error states.
-- [ ] Commit: `feat(ios): browse cities, tours, places, and moments`.
+- [x] Tests: `TourDetailModelTests` with a stubbed client: loads tour, exposes per-mode estimate text ("24 min walk"), save toggles call the right endpoints.
+- [x] Implement with loading/empty/error states.
+- [x] Commit: `feat(ios): browse cities, tours, places, and moments`.
 
 ### Task 4: Location and arrival
 
 **Files:** `Location/LocationService.swift` (trim), `Location/ArrivalMonitor.swift`, tests `ArrivalMonitorTests`.
 
-- [ ] Tests: inside radius with 10 m accuracy → arrived; inside radius with 200 m accuracy → not arrived; outside radius → not; arrival fires once per stop until the stop changes (Review Focus 1).
-- [ ] Implement `ArrivalMonitor(stop: coordinate, radius: Double)` with `evaluate(location: CLLocation) -> Bool` pure function plus a Combine-free callback wrapper.
-- [ ] Commit: `feat(ios): location service and arrival monitor`.
+- [x] Tests: inside radius with 10 m accuracy → arrived; inside radius with 200 m accuracy → not arrived; outside radius → not; arrival fires once per stop until the stop changes (Review Focus 1).
+- [x] Implement `ArrivalMonitor(stop: coordinate, radius: Double)` with `evaluate(location: CLLocation) -> Bool` pure function plus a Combine-free callback wrapper.
+- [x] Commit: `feat(ios): location service and arrival monitor`.
 
 ### Task 5: Active tour with map, route, progress, cache
 
 **Files:** `Features/Tours/TourMapView.swift`, `Features/Tours/ActiveTourView.swift`, `Features/Tours/ActiveTourModel.swift`, `Features/Tours/StopMomentSheet.swift`, `Storage/DiskCache.swift`, tests `ActiveTourModelTests`, `DiskCacheTests`.
 
-- [ ] Tests: next stop advances on arrival; visited positions persist to `DiskCache` and are posted to `/me/progress` when signed in (stubbed client records the PUT); route legs split active/future; `openInMaps` builds walking vs cycling launch options (Review Focus 2).
-- [ ] Implement; `Map` with `MapPolyline` for active (accent) and future (muted) legs, `Annotation` per stop numbered, `UserAnnotation`.
-- [ ] Commit: `feat(ios): walk or ride a tour with route, arrival, and progress`.
+- [x] Tests: next stop advances on arrival; visited positions persist to `DiskCache` and are posted to `/me/progress` when signed in (stubbed client records the PUT); route legs split active/future; `openInMaps` builds walking vs cycling launch options (Review Focus 2).
+- [x] Implement; `Map` with `MapPolyline` for active (accent) and future (muted) legs, `Annotation` per stop numbered, `UserAnnotation`.
+- [x] Commit: `feat(ios): walk or ride a tour with route, arrival, and progress`.
 
 ### Task 6: Audio guide
 
 **Files:** `Audio/NarrationPlayer.swift`, tests `NarrationPlayerTests` (fallback selection: narration URL present → player; absent → synthesizer; audio session category set before play).
 
-- [ ] Implement with `AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])`, `AVPlayer`, `AVSpeechSynthesizer` with `AVSpeechUtterance(string:)` from the moment body with Markdown stripped (reuse a small `plainText`).
-- [ ] Wire the audio toggle in `ActiveTourView`; on arrival auto-play when enabled.
-- [ ] Commit: `feat(ios): audio guide with narration and on-device fallback`.
+- [x] Implement with `AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])`, `AVPlayer`, `AVSpeechSynthesizer` with `AVSpeechUtterance(string:)` from the moment body with Markdown stripped (reuse a small `plainText`).
+- [x] Wire the audio toggle in `ActiveTourView`; on arrival auto-play when enabled.
+- [x] Commit: `feat(ios): audio guide with narration and on-device fallback`.
 
 ### Task 7: Routes, saved, profile
 
 **Files:** `Features/Routes/MyRoutesView.swift`, `Features/Routes/RouteBuilderView.swift`, `Features/Routes/RouteBuilderModel.swift`, `Features/Saved/SavedView.swift`, `Features/Profile/ProfileView.swift`, tests `RouteBuilderModelTests` (create disabled under 2 stops; 422 fields surface on `stops`; share URL built from slug) (Review Focus 5).
 
-- [ ] Implement; share via `ShareLink`.
-- [ ] Commit: `feat(ios): build and share routes, saved tours, profile`.
+- [x] Implement; share via `ShareLink`.
+- [x] Commit: `feat(ios): build and share routes, saved tours, profile`.
 
 ### Task 8: Project file, docs, handoff
 
 **Files:** `project.pbxproj`, `README.md` (iOS section), `Makefile` (`ios-test`), `docs/superpowers/plans/...` checkboxes.
 
-- [ ] Register all files; remove deleted ones; add a unit test target if absent.
-- [ ] README: state that the app targets the new API, how to point at a local API, and that the cycle's first Mac step is `make ios-build && make ios-test`.
-- [ ] Commit: `chore(ios): register sources and document the build`.
+- [x] Register all files; remove deleted ones; add a unit test target if absent.
+- [x] README: state that the app targets the new API, how to point at a local API, and that the cycle's first Mac step is `make ios-build && make ios-test`.
+- [x] Commit: `chore(ios): register sources and document the build`.
 - [ ] Not run here: `xcodebuild` build and test on a Mac.

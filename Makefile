@@ -3,7 +3,7 @@
 	migrate migrate-status migrate-down migrate-reset db-shell db-reset \
 	api-health api-cities api-places api-tour backend-test \
 	nuc-up nuc-down nuc-logs nuc-smoke nuc-rollback \
-	ios-build ios-run ios-simulators \
+	ios-build ios-run ios-test ios-simulators \
 	web-install web-dev web-check web-build web-e2e
 
 BACKEND_DIR := backend
@@ -55,6 +55,7 @@ help:
 	@printf "  make web-e2e              Playwright against E2E_API_URL (default localhost:8080)\n\n"
 	@printf "iOS:\n"
 	@printf "  make ios-build            Build iOS app for simulator\n"
+	@printf "  make ios-test             Run InvisibleMuseumKit unit tests (swift test)\n"
 	@printf "  make ios-run              Boot/install/launch on SIMULATOR_ID\n"
 	@printf "  make ios-simulators       List available simulators\n"
 
@@ -137,6 +138,9 @@ ios-run: ios-build
 	open -a Simulator
 	xcrun simctl install "$(SIMULATOR_ID)" "$(IOS_DIR)/$(IOS_BUILD_DIR)/Debug-iphonesimulator/InvisibleMuseum.app"
 	xcrun simctl launch "$(SIMULATOR_ID)" "$(IOS_BUNDLE_ID)"
+
+ios-test:
+	cd $(IOS_DIR)/InvisibleMuseumKit && swift test
 
 ios-simulators:
 	xcrun simctl list devices available
