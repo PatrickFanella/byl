@@ -1,28 +1,37 @@
+// Package httpapi serves the Invisible Museum HTTP API.
 package httpapi
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-// NewRouter wires all API routes.
-func NewRouter(h *Handlers, adminBearerToken string) http.Handler {
+// Deps holds everything the handlers need. Later tasks add fields.
+type Deps struct {
+	Sessions SessionResolver
+	Ready    func(ctx context.Context) error
+}
+
+// NewRouter wires every route.
+func NewRouter(d Deps) http.Handler {
 	r := chi.NewRouter()
-	r.Get("/healthz", h.Healthz)
-	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/spaces", h.ListSpaces)
-		r.Get("/spaces/nearby", h.NearbySpaces)
-		r.Get("/spaces/{space_id}", h.GetSpace)
-		r.Get("/exhibits/{exhibit_id}", h.GetExhibit)
-		r.Get("/tours", h.ListTours)
-		r.Get("/tours/{tour_id}", h.GetTour)
-		r.Post("/contributions", h.CreateContribution)
-		r.Route("/admin", func(r chi.Router) {
-			r.Use(adminAuthMiddleware(adminBearerToken))
-			r.Get("/contributions", h.ListContributions)
-			r.Patch("/contributions/{id}/status", h.UpdateContributionStatus)
-		})
-	})
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.StripSlashes)
+
+	r.Get("/healthz", d.healthz)
 	return r
+}
+
+func (d Deps) healthz(w http.ResponseWriter, r *http.Request) {
+	if d.Ready != nil {
+		if err := d.Ready(r.Context()); err != nil {
+			writeError(w, http.StatusServiceUnavailable, "unavailable", "database is not reachable")
+			return
+		}
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }

@@ -1,0 +1,19 @@
+openapi: 3.1.0
+info:
+  title: Invisible Museum API
+  version: "1.0.0"
+  description: >
+    Walking and biking tours of a city as if it were one museum. One API for the
+    iOS, Android, and web clients.
+servers:
+  - url: https://museum-api.subcult.tv
+  - url: http://localhost:8080
+paths:
+  /healthz:
+    get:
+      summary: Liveness and database check
+      responses:
+        "200":
+          description: OK
+        "503":
+          description: Database unreachable

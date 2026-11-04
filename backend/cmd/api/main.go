@@ -11,7 +11,6 @@ import (
 	"invisible-museum/backend/internal/config"
 	"invisible-museum/backend/internal/db"
 	httpapi "invisible-museum/backend/internal/http"
-	"invisible-museum/backend/internal/repository"
 )
 
 func main() {
@@ -31,16 +30,9 @@ func main() {
 	}
 	defer pool.Close()
 
-	repo := repository.New(pool)
-	handlers := httpapi.NewHandlers(repo)
-	router := httpapi.NewRouter(handlers, cfg.AdminBearerToken)
+	router := httpapi.NewRouter(httpapi.Deps{Ready: pool.Ping})
 
-	server := &http.Server{
-		Addr:              cfg.APIAddr,
-		Handler:           router,
-		ReadHeaderTimeout: 5 * time.Second,
-	}
-
+	server := &http.Server{Addr: cfg.APIAddr, Handler: router, ReadHeaderTimeout: 5 * time.Second}
 	slog.Info("starting api", "addr", cfg.APIAddr)
 	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("api stopped", "error", err)
