@@ -420,8 +420,9 @@ backend/
 - **Unit:** geo math, slug generation, config parsing, provider clients
   against `httptest` servers, JWT verification against a locally generated
   RSA key and fake JWKS.
-- **Handler:** every endpoint through the chi router with a fake repository,
-  following the existing pattern. Covers auth gating, role gating, validation
+- **Handler:** every endpoint through the chi router against the real repository
+  on the integration database (the fake-repository pattern is retired because the
+  surface is now too wide to fake honestly). Covers auth gating, role gating, validation
   errors, ownership checks on `/me/tours`.
 - **Repository integration:** real Postgres when `TEST_DATABASE_URL` is set,
   skipped otherwise. Runs the migrations with goose (as a library) into a
