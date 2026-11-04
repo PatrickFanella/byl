@@ -96,6 +96,10 @@ INSERT INTO tour_stops (tour_id, position, place_id, featured_moment_id, note) V
   ('00000000-0000-4000-8000-00000000e0e1', 3, '00000000-0000-4000-8000-00000000b0b3', NULL, 'A breather on the lawn before the longer leg north.'),
   ('00000000-0000-4000-8000-00000000e0e1', 4, '00000000-0000-4000-8000-00000000b0b4', '00000000-0000-4000-8000-00000000d0d5', 'End a generation before the railroad, in the blacksmith''s house.');
 
+INSERT INTO tour_routes (tour_id, mode, status) VALUES
+  ('00000000-0000-4000-8000-00000000e0e1', 'walk', 'pending'),
+  ('00000000-0000-4000-8000-00000000e0e1', 'bike', 'pending');
+
 INSERT INTO jobs (kind, payload) VALUES
   ('compute_route', '{"tour_id":"00000000-0000-4000-8000-00000000e0e1","mode":"walk"}'),
   ('compute_route', '{"tour_id":"00000000-0000-4000-8000-00000000e0e1","mode":"bike"}');
