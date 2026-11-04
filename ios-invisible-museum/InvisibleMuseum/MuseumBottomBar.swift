@@ -1,15 +1,31 @@
 import SwiftUI
 
+enum MuseumTab: String, CaseIterable {
+    case home = "Home"
+    case tours = "Tours"
+    case routes = "Routes"
+    case saved = "Saved"
+    case profile = "Profile"
+
+    var iconName: String {
+        switch self {
+        case .home: "building.columns.fill"
+        case .tours: "figure.walk"
+        case .routes: "point.topleft.down.to.point.bottomright.curvepath.fill"
+        case .saved: "heart.fill"
+        case .profile: "person.crop.circle.fill"
+        }
+    }
+}
+
 struct MuseumBottomBar: View {
     @Binding var selection: MuseumTab
 
     var body: some View {
         HStack(spacing: 8) {
-            tabButton(.explore, icon: "sparkles")
-            tabButton(.map, icon: "map.fill")
-            tabButton(.contribute, icon: "plus.bubble.fill")
-            tabButton(.saved, icon: "heart.fill")
-            tabButton(.profile, icon: "person.crop.circle.fill")
+            ForEach(MuseumTab.allCases, id: \.self) { item in
+                tabButton(item)
+            }
         }
         .padding(8)
         .background(.black.opacity(0.78), in: Capsule())
@@ -19,14 +35,14 @@ struct MuseumBottomBar: View {
         .padding(.vertical, 8)
     }
 
-    private func tabButton(_ item: MuseumTab, icon: String) -> some View {
+    private func tabButton(_ item: MuseumTab) -> some View {
         Button {
             withAnimation(.snappy) {
                 selection = item
             }
         } label: {
             HStack(spacing: 7) {
-                Image(systemName: icon)
+                Image(systemName: item.iconName)
                 if selection == item {
                     Text(item.rawValue)
                         .lineLimit(1)
@@ -41,17 +57,6 @@ struct MuseumBottomBar: View {
             .background(selection == item ? Museum.blue : Color.clear, in: Capsule())
         }
         .buttonStyle(.plain)
-    }
-}
-
-extension MuseumTab {
-    var iconName: String {
-        switch self {
-        case .explore: "sparkles"
-        case .map: "map.fill"
-        case .contribute: "plus.bubble.fill"
-        case .saved: "heart.fill"
-        case .profile: "person.crop.circle.fill"
-        }
+        .accessibilityLabel(item.rawValue)
     }
 }

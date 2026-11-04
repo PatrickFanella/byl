@@ -1,0 +1,115 @@
+import Foundation
+import Observation
+import InvisibleMuseumKit
+
+/// App-wide state: API access, the session, the selected city, and the tour being walked.
+@MainActor
+@Observable
+final class AppModel {
+    static let defaultBaseURL = "https://museum-api.subcult.tv"
+    static let baseURLDefaultsKey = "InvisibleMuseum.apiBaseURL"
+    static let citySlugDefaultsKey = "InvisibleMuseum.citySlug"
+
+    let client: APIClient
+    let api: Endpoints
+    let session: SessionController
+
+    var account: Account?
+    var cities: [City] = []
+    var selectedCity: City?
+    var activeTourID: String?
+    var pendingTourSlug: String?
+    var presentSignIn = false
+    var bootstrapError: String?
+    var devSignInAvailable = false
+
+    init(storage: TokenStorage = KeychainTokenStorage()) {
+        let base = URL(string: Self.resolveBaseURL()) ?? URL(string: Self.defaultBaseURL)!
+        let session = SessionController(storage: storage)
+        let client = APIClient(baseURL: base, tokenProvider: { [session] in session.token })
+        self.client = client
+        self.api = Endpoints(client: client)
+        self.session = session
+        self.account = nil
+        session.onChange = { [weak self] in
+            Task { @MainActor [weak self] in self?.account = self?.session.account }
+        }
+        client.onUnauthorized = { [weak self] in
+            Task { @MainActor [weak self] in self?.handleUnauthorized() }
+        }
+    }
+
+    static func resolveBaseURL() -> String {
+        if let override = UserDefaults.standard.string(forKey: baseURLDefaultsKey), !override.isEmpty { return override }
+        if let env = ProcessInfo.processInfo.environment[baseURLDefaultsKey], !env.isEmpty { return env }
+        if let plist = Bundle.main.object(forInfoDictionaryKey: baseURLDefaultsKey) as? String, !plist.isEmpty { return plist }
+        return defaultBaseURL
+    }
+
+    var isSignedIn: Bool { session.isSignedIn }
+
+    func bootstrap() async {
+        session.restore()
+        account = session.account
+        if session.isSignedIn {
+            if let me = try? await api.me() {
+                session.update(account: me)
+            }
+        }
+        await loadCities()
+        #if DEBUG
+        devSignInAvailable = true
+        #endif
+    }
+
+    func loadCities() async {
+        do {
+            cities = try await api.cities()
+            bootstrapError = nil
+            let remembered = UserDefaults.standard.string(forKey: Self.citySlugDefaultsKey)
+            if let remembered, let match = cities.first(where: { $0.slug == remembered }) {
+                selectedCity = match
+            } else if selectedCity == nil {
+                selectedCity = cities.first
+            }
+        } catch {
+            bootstrapError = (error as? APIError)?.message ?? error.localizedDescription
+        }
+    }
+
+    func select(city: City) {
+        selectedCity = city
+        UserDefaults.standard.set(city.slug, forKey: Self.citySlugDefaultsKey)
+    }
+
+    func signIn(with session: Session) {
+        self.session.set(session: session)
+        account = session.account
+        presentSignIn = false
+    }
+
+    func signOut() async {
+        try? await api.signOut()
+        session.clear()
+        account = nil
+    }
+
+    /// A 401 clears the session but never the tour being walked.
+    func handleUnauthorized() {
+        guard session.isSignedIn else { return }
+        session.clear()
+        account = nil
+    }
+
+    func setBaseURL(_ value: String) {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            UserDefaults.standard.removeObject(forKey: Self.baseURLDefaultsKey)
+        } else {
+            UserDefaults.standard.set(trimmed, forKey: Self.baseURLDefaultsKey)
+        }
+        if let url = URL(string: Self.resolveBaseURL()) {
+            client.baseURL = url
+        }
+    }
+}
