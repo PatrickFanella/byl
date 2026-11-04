@@ -178,3 +178,258 @@ paths:
       parameters: [{ name: tour, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ProgressRequest" } } } }
       responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed } }
+  /api/v1/admin/cities:
+    get:
+      summary: "List cities (any status)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "401": { description: Unauthorized } }
+    post:
+      summary: "Create a city"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateCityRequest" } } } }
+      responses: { "201": { description: Created }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/cities/{id}:
+    patch:
+      summary: "Update a city"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateCityRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/topics:
+    get:
+      summary: "List a city's topics (?city= required)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+    post:
+      summary: "Create a topic"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateTopicRequest" } } } }
+      responses: { "201": { description: Created }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/topics/{id}:
+    patch:
+      summary: "Update a topic"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateTopicRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/places:
+    get:
+      summary: "List places in any status (?city=, ?limit=, ?cursor=)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "401": { description: Unauthorized } }
+    post:
+      summary: "Create a draft place"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreatePlaceRequest" } } } }
+      responses: { "201": { description: Created }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/places/{id}:
+    get:
+      summary: "Get a place with all its moments"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+    patch:
+      summary: "Update a place, including its primary moment"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdatePlaceRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+    delete:
+      summary: "Archive a place"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/places/{id}/publish:
+    post:
+      summary: "Publish a place"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/places/{id}/unpublish:
+    post:
+      summary: "Return a place to draft"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/moments:
+    get:
+      summary: "List a place's moments in any status (?place= required, ?city=)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+    post:
+      summary: "Create a draft moment with sources and topics"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMomentRequest" } } } }
+      responses: { "201": { description: Created }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/moments/{id}:
+    get:
+      summary: "Get a moment in any status"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+    patch:
+      summary: "Update a moment's text and dates"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateMomentRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+    delete:
+      summary: "Archive a moment"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/moments/{id}/publish:
+    post:
+      summary: "Publish a moment; refuses while any attached media lacks a licence; enqueues narration"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: Conflict }, "401": { description: Unauthorized } }
+  /api/v1/admin/moments/{id}/unpublish:
+    post:
+      summary: "Return a moment to draft"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/moments/{id}/media:
+    put:
+      summary: "Replace the ordered media list"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MediaListRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/moments/{id}/sources:
+    put:
+      summary: "Replace the ordered sources"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/SourcesRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/moments/{id}/topics:
+    put:
+      summary: "Replace the topic set"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TopicsRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/media:
+    get:
+      summary: "List media assets newest first (?limit=, ?offset=)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "401": { description: Unauthorized } }
+    post:
+      summary: "Upload a media file (multipart: file, caption, credit, license, license_url, source_url)"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [file], properties: { file: { type: string, format: binary }, caption: { type: string }, credit: { type: string }, license: { type: string }, license_url: { type: string }, source_url: { type: string } } } } } }
+      responses: { "201": { description: Created }, "400": { description: Bad request }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/media/{id}:
+    patch:
+      summary: "Update asset metadata and licence"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MediaMetadataRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours:
+    get:
+      summary: "List tours in any status and visibility (?city=)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "401": { description: Unauthorized } }
+    post:
+      summary: "Create a draft curated tour, optionally with stops"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateTourRequest" } } } }
+      responses: { "201": { description: Created }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours/{id}:
+    get:
+      summary: "Get a tour in any status"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+    patch:
+      summary: "Update a tour; changing modes adds or drops routes"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateTourRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+    delete:
+      summary: "Delete a tour"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "204": { description: No content }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours/{id}/stops:
+    put:
+      summary: "Replace the stop list and requeue routes"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/StopsRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours/{id}/publish:
+    post:
+      summary: "Publish a tour; refuses unless every place is published and every route is ready"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: Conflict }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours/{id}/unpublish:
+    post:
+      summary: "Return a tour to draft"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours/{id}/routes/recompute:
+    post:
+      summary: "Mark routes pending and enqueue route jobs"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "202": { description: Accepted }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/candidates:
+    get:
+      summary: "List review-queue entries (?status=, ?kind=, ?limit=, ?cursor=)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+    post:
+      summary: "Add a review-queue entry by hand"
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateCandidateRequest" } } } }
+      responses: { "201": { description: Created }, "409": { description: Conflict }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/candidates/{id}:
+    get:
+      summary: "Get a review-queue entry"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/candidates/{id}/approve:
+    post:
+      summary: "Approve: creates the draft entity from the payload (optionally overridden) and records its id"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ReviewRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: Conflict }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/candidates/{id}/reject:
+    post:
+      summary: "Reject with a note"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ReviewRequest" } } } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: Conflict }, "401": { description: Unauthorized } }
+  /api/v1/admin/jobs:
+    get:
+      summary: "List background jobs (?status=, ?limit=, ?offset=)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/jobs/{id}/retry:
+    post:
+      summary: "Requeue a failed job"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/accounts:
+    get:
+      summary: "List accounts (admin only)"
+      security: [{ bearer: [] }]
+      responses: { "200": { description: OK }, "403": { description: Forbidden }, "401": { description: Unauthorized } }
+  /api/v1/admin/accounts/{id}/role:
+    patch:
+      summary: "Change an account's role (admin only)"
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RoleRequest" } } } }
+      responses: { "200": { description: OK }, "403": { description: Forbidden }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }

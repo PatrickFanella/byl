@@ -626,3 +626,14 @@ func (s *Store) TourStopPoints(ctx context.Context, tourID string) ([]geo.Point,
 	}
 	return out, rows.Err()
 }
+
+// RecomputeRoutes marks every route pending and enqueues a job per mode.
+func (s *Store) RecomputeRoutes(ctx context.Context, tourID string) error {
+	return mapErr(s.withTx(ctx, func(tx pgx.Tx) error {
+		var modes []string
+		if err := tx.QueryRow(ctx, `SELECT modes::text[] FROM tours WHERE id = $1`, tourID).Scan(&modes); err != nil {
+			return err
+		}
+		return syncRoutesTx(ctx, tx, tourID, modes, true)
+	}))
+}

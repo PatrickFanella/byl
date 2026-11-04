@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"encoding/json"
 	"io"
 	"strings"
 
@@ -18,3 +19,5 @@ func repository_CreateTourInput(vis models.TourVisibility, status models.EntityS
 		Stops: []models.StopInput{{PlaceID: testdb.SeedPlaceStationID}, {PlaceID: testdb.SeedPlaceTivoliID}},
 	}
 }
+
+func jsonUnmarshal(b []byte, v any) error { return json.Unmarshal(b, v) }
