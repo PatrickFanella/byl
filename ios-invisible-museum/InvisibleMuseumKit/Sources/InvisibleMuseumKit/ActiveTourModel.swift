@@ -256,12 +256,27 @@ public final class ActiveTourModel: Identifiable {
         await pendingSync?.value
     }
 
-    /// Forgets local progress so the tour starts from stop 1 next time.
+    /// Forgets local progress so the tour starts from stop 1 next time; when signed in the
+    /// server record is cleared too, otherwise the next start would merge the old stops back.
     public func resetProgress() {
         visited = []
         progress = LocalTourProgress(tourID: tour.tour.id, mode: mode, visitedPositions: [], startedAt: Date())
         cache.remove(LocalTourProgress.key(tourID: tour.tour.id, mode: mode))
         advance()
+        guard isSignedIn() else { return }
+        let tourID = tour.tour.id
+        let body = ProgressRequest(mode: mode, visitedPositions: [], completed: false)
+        let previous = pendingSync
+        pendingSync = Task { [weak self] in
+            await previous?.value
+            guard let self else { return }
+            do {
+                _ = try await self.api.putProgress(tour: tourID, body)
+                self.syncError = nil
+            } catch {
+                self.syncError = (error as? APIError)?.message ?? error.localizedDescription
+            }
+        }
     }
 
     // MARK: Maps handoff

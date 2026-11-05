@@ -129,6 +129,11 @@ class ActiveTour(
         if (arrived != null) arrive(arrived)
     }
 
+    /** The UI showed the arrival sheet for `arrivedStop`; clear it so rotation does not replay it. */
+    fun acknowledgeArrival() {
+        _state.update { it.copy(arrivedStop = null) }
+    }
+
     /** "I'm here": arrival by hand when GPS cannot confirm it. */
     fun markArrived() {
         _state.value.nextStop?.let { arrive(it) }
@@ -218,9 +223,22 @@ class ActiveTour(
     /** PUTs progress one request at a time, in order, each carrying every stop known when it leaves. */
     private fun sync() {
         if (!signedIn()) return
-        val previous = chain
-        chain = scope.launch {
-            previous?.join()
+        enqueue { snapshotAndPut() }
+    }
+
+    /** Chains a job after the previous one; the swap happens under the lock. */
+    private fun enqueue(block: suspend () -> Unit) {
+        synchronized(lock) {
+            val previous = chain
+            chain = scope.launch {
+                previous?.join()
+                block()
+            }
+        }
+    }
+
+    private suspend fun snapshotAndPut() {
+        run {
             val snapshot = synchronized(lock) { progress }
             val body = ProgressRequest(mode, snapshot.visitedPositions, snapshot.completedAt != null)
             try {
@@ -241,9 +259,10 @@ class ActiveTour(
         chain?.join()
     }
 
-    /** Ends the walk: the tour is no longer resumed on launch. Progress stays. */
+    /** Ends the walk: the tour is no longer resumed on launch (only if the record still names this walk). Progress stays. */
     fun end() {
-        store.remove(ActiveTourRecord.KEY)
+        val record = store.getJson<ActiveTourRecord>(ActiveTourRecord.KEY)
+        if (record == null || (record.tourId == tour.id && record.mode == mode)) store.remove(ActiveTourRecord.KEY)
     }
 
     /** Forgets local progress and, when signed in, clears the server record too. */
@@ -255,9 +274,7 @@ class ActiveTour(
             advance()
         }
         if (signedIn()) {
-            val previous = chain
-            chain = scope.launch {
-                previous?.join()
+            enqueue {
                 try {
                     api.putProgress(tour.id, ProgressRequest(mode, emptyList(), false))
                     synchronized(lock) { progress = progress.copy(syncedAt = progress.updatedAt) }

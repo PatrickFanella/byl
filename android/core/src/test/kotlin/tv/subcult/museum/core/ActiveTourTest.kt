@@ -251,4 +251,16 @@ class ActiveTourTest {
         val m = model(false)
         assertEquals("google.navigation:q=${tour.stops[0].place.latitude},${tour.stops[0].place.longitude}&mode=w", m.navigationUri())
     }
+
+    @Test
+    fun `an arrival is announced once and acknowledged by the UI`() = runTest {
+        val m = model(false)
+        m.markArrived()
+        assertEquals(1, m.state.value.arrivedStop?.position)
+        m.acknowledgeArrival()
+        assertNull(m.state.value.arrivedStop)
+        assertEquals(2, m.state.value.nextStop?.position, "acknowledging does not move the walk")
+        m.markArrived()
+        assertEquals(2, m.state.value.arrivedStop?.position)
+    }
 }

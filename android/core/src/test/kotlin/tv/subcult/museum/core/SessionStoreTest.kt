@@ -60,4 +60,17 @@ class SessionStoreTest {
         kv.remove("a")
         assertNull(kv.get("a"))
     }
+
+    @Test
+    fun `clearIfToken clears only when the rejected token is still current`() {
+        val store = SessionStore(MemoryTokenStorage())
+        store.set(session())
+        assertFalse(store.clearIfToken("stale-token"), "a stale token must not sign the new session out")
+        assertEquals("tok-1", store.token)
+        assertFalse(store.clearIfToken(null), "a request without a token says nothing about the session")
+        assertEquals("tok-1", store.token)
+        assertTrue(store.clearIfToken("tok-1"))
+        assertNull(store.token)
+        assertFalse(store.clearIfToken("tok-1"), "already signed out")
+    }
 }

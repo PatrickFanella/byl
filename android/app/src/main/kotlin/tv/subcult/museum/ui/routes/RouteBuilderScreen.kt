@@ -22,21 +22,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
-import tv.subcult.museum.core.ApiException
-import tv.subcult.museum.core.LoadStatus
-import tv.subcult.museum.core.PlaceSummary
 import tv.subcult.museum.core.Point
 import tv.subcult.museum.core.RouteBuilder
-import tv.subcult.museum.core.TourDetail
 import tv.subcult.museum.core.distanceM
 import tv.subcult.museum.core.shareUrl
 import tv.subcult.museum.ui.AppViewModel
@@ -47,7 +43,6 @@ import tv.subcult.museum.ui.components.LoadState
 import tv.subcult.museum.ui.components.LoadingRow
 import tv.subcult.museum.ui.components.Overline
 import tv.subcult.museum.ui.components.SignInPrompt
-import tv.subcult.museum.ui.components.UiState
 import tv.subcult.museum.ui.theme.Museum
 
 /** Pick published places, order them, name the route, choose modes and visibility, then share. */
@@ -55,34 +50,18 @@ import tv.subcult.museum.ui.theme.Museum
 fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Unit) {
     val app by model.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val fix by model.container.location.fixes.collectAsStateWithLifecycle()
-    var editing by remember { mutableStateOf<TourDetail?>(null) }
-    var editingError by remember { mutableStateOf<String?>(null) }
-    var builder by remember { mutableStateOf<RouteBuilder?>(null) }
-    var places by remember { mutableStateOf(UiState<List<PlaceSummary>>()) }
-    var search by remember { mutableStateOf("") }
-    var created by remember { mutableStateOf<TourDetail?>(null) }
+    // The draft lives in a ViewModel so rotation and tab switches keep the title and stops.
+    val vm: RouteBuilderViewModel = viewModel(key = "builder:${editingId ?: "new"}", factory = RouteBuilderViewModel.Factory(model.api, editingId))
+    val ui by vm.ui.collectAsStateWithLifecycle()
+    val editing = ui.editing
+    val editingError = ui.editingError
+    val builder = ui.builder
+    val places = ui.places
+    val created = ui.created
+    var search by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(editingId) {
-        if (editingId != null && editing == null) {
-            try { editing = model.api.tour(editingId) } catch (e: Exception) { editingError = (e as? ApiException)?.message ?: "Could not load the route." }
-        }
-    }
-    LaunchedEffect(app.city?.id, editing?.id, app.cities.size) {
-        if (builder != null || (editingId != null && editing == null)) return@LaunchedEffect
-        val owning = editing?.let { e -> app.cities.firstOrNull { it.id == e.cityId } }
-        val city = owning ?: app.city ?: return@LaunchedEffect
-        val b = RouteBuilder(city, editing)
-        builder = b
-        places = UiState(LoadStatus.LOADING)
-        places = try {
-            val items = model.api.places(city.slug)
-            UiState(LoadStatus.READY, items, empty = items.isEmpty())
-        } catch (e: Exception) {
-            UiState(LoadStatus.ERROR, message = (e as? ApiException)?.message ?: "Could not load places.")
-        }
-    }
+    LaunchedEffect(app.city?.id, editing?.id, app.cities.size) { vm.ensureBuilder(app.cities, app.city) }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TextButton(onClick = onDone) { Text("← Your routes", color = Museum.muted) }
@@ -151,7 +130,7 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
 
                 if (s.error != null && s.stopsError == null) Text(s.error!!, color = Museum.danger, style = MaterialTheme.typography.bodyMedium)
                 Button(
-                    onClick = { scope.launch { b.submit(model.api)?.let { created = it } } },
+                    onClick = { vm.submit() },
                     enabled = s.canSubmit, modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
                 ) { Text(if (s.busy) "Saving…" else if (b.isEditing) "Save changes" else "Create route") }

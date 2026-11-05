@@ -7,7 +7,16 @@ import tv.subcult.museum.core.TokenStorage
 
 /** Token and account in EncryptedSharedPreferences (the Keychain equivalent). */
 class EncryptedTokenStorage(context: Context) : TokenStorage {
-    private val prefs = EncryptedSharedPreferences.create(
+    private val prefs = try {
+        open(context)
+    } catch (_: Exception) {
+        // The master key is gone (restored to a new device, Keystore reset): the stored session
+        // is unreadable anyway, so start over instead of crashing every launch.
+        context.deleteSharedPreferences("museum-session")
+        open(context)
+    }
+
+    private fun open(context: Context) = EncryptedSharedPreferences.create(
         context,
         "museum-session",
         MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),

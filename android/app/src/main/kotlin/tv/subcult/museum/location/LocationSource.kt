@@ -19,8 +19,16 @@ class LocationSource(private val context: Context) {
     val fixes: StateFlow<Fix?> = _fixes
     private var listening = false
 
-    private val listener = LocationListener { location: Location ->
-        _fixes.value = Fix(location.latitude, location.longitude, if (location.hasAccuracy()) location.accuracy.toDouble() else -1.0)
+    // All four callbacks: on API 26–29 the status/provider methods are abstract and a SAM lambda
+    // would throw AbstractMethodError when location is toggled.
+    private val listener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            _fixes.value = Fix(location.latitude, location.longitude, if (location.hasAccuracy()) location.accuracy.toDouble() else -1.0)
+        }
+        @Deprecated("Deprecated in Java")
+        override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
     }
 
     fun hasPermission(): Boolean =

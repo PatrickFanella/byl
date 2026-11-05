@@ -231,7 +231,8 @@ developer email sign-in when the API runs with `DEV_AUTH_ENABLED=true`.
 > tested here; `:app` is not compiled. First steps on a machine with the SDK:
 > `cd android && gradle wrapper && ./gradlew :core:test :app:assembleDebug`.
 > Put `museum.googleServerClientId=<web client id>` and optionally
-> `museum.apiBaseUrl=http://10.0.2.2:8080` in `android/local.properties`.
+> `museum.apiBaseUrl=http://10.0.2.2:8080` in `android/local.properties` (plain HTTP to
+> the emulator host is allowed in debug builds only, through the debug network security config).
 
 ## API URL configuration
 

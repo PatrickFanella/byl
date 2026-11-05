@@ -254,4 +254,19 @@ final class ActiveTourModelTests: XCTestCase {
         first.end()
         XCTAssertNil(ActiveTourModel.restore(api: Endpoints(client: stubbedClient()), cache: cache, isSignedIn: { false }))
     }
+
+    func testResettingASignedInWalkClearsTheServerRecord() async throws {
+        stubRouteAndProgress()
+        let m = model(signedIn: true)
+        m.markArrivedAtNextStop()
+        await m.flush()
+        m.resetProgress()
+        await m.flush()
+        let last = try XCTUnwrap(StubURLProtocol.requests.last { $0.method == "PUT" })
+        let body = try JSONSerialization.jsonObject(with: XCTUnwrap(last.body)) as? [String: Any]
+        XCTAssertEqual(body?["visited_positions"] as? [Int], [])
+        XCTAssertEqual(body?["completed"] as? Bool, false)
+        XCTAssertTrue(m.visited.isEmpty)
+        XCTAssertEqual(m.nextStop?.position, 1)
+    }
 }

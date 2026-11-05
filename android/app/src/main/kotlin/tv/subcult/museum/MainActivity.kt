@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package tv.subcult.museum
 
 import android.content.Intent
@@ -57,7 +59,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        handleLink(intent)
+        // Only on a fresh start: after a rotation the same intent would push the tour again.
+        if (savedInstanceState == null) handleLink(intent)
         setContent { InvisibleMuseumTheme { MuseumNavHost(model) } }
     }
 
@@ -71,6 +74,11 @@ class MainActivity : ComponentActivity() {
         model.onResume()
     }
 
+    override fun onStop() {
+        super.onStop()
+        model.onStop()
+    }
+
     /** invisiblemuseum://tour/{slug} and https://host/t/{slug}. */
     private fun handleLink(intent: Intent?) {
         val uri = intent?.data ?: return
@@ -80,9 +88,12 @@ class MainActivity : ComponentActivity() {
             segments.size >= 2 && segments[0] == "t" -> segments[1]
             else -> null
         }
-        if (slug != null) model.openTourLink(slug)
+        // Anything a web page can put in a BROWSABLE link reaches here; accept only slug characters.
+        if (slug != null && SLUG.matches(slug)) model.openTourLink(slug)
     }
 }
+
+private val SLUG = Regex("[A-Za-z0-9_-]{1,64}")
 
 private data class Tab(val route: String, val label: String, val icon: ImageVector)
 
@@ -108,7 +119,7 @@ fun MuseumNavHost(model: AppViewModel) {
         model.consumeTourLink()
     }
     // The active tour takes the whole screen until it ends.
-    LaunchedEffect(state.active?.tour?.id) {
+    LaunchedEffect(state.active?.let { System.identityHashCode(it) }) {
         val active = state.active ?: return@LaunchedEffect
         if (!isWalk) nav.navigate("walk/${active.tour.slug}?mode=${active.mode}") { launchSingleTop = true }
     }

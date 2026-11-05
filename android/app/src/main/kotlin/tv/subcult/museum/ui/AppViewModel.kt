@@ -44,17 +44,19 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     init {
         container.client.onUnauthorized = { token -> handleUnauthorized(token) }
         viewModelScope.launch { container.session.state.collect { s -> _state.update { it.copy(session = s) } } }
+        // Disk only, before any network: an interrupted walk is back before the first frame.
+        container.session.restore()
+        resumeActiveTour()
         bootstrap()
     }
 
     private fun bootstrap() {
         viewModelScope.launch {
-            if (container.session.restore()) {
+            if (container.session.isSignedIn) {
                 runCatching { api.me() }.onSuccess { container.session.update(it) }
                 refreshSaved()
             }
             loadCities()
-            resumeActiveTour()
         }
     }
 
@@ -103,13 +105,17 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         }
     }
 
-    /** A 401 clears the session only when the rejected token is still current; sign-in is shown now or after the tour. */
+    /**
+     * Runs on OkHttp's thread. The session store decides atomically whether the rejected token is
+     * still the current one (a stale 401 after a fresh sign-in changes nothing); UI state moves
+     * to the main thread. Sign-in is shown now, or after the active tour closes.
+     */
     private fun handleUnauthorized(token: String?) {
-        if (!container.session.isSignedIn) return
-        if (token != null && token != container.session.token) return
-        container.session.clear()
-        _state.update { it.copy(savedTourIds = emptySet()) }
-        if (_state.value.active == null) _state.update { it.copy(showSignIn = true) } else signInAfterTour = true
+        if (!container.session.clearIfToken(token)) return
+        viewModelScope.launch {
+            _state.update { it.copy(savedTourIds = emptySet()) }
+            if (_state.value.active == null) _state.update { it.copy(showSignIn = true) } else signInAfterTour = true
+        }
     }
 
     suspend fun refreshSaved() {
@@ -143,23 +149,28 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         }
     }
 
+    /** Ends the walk now (state and resume record first) and lets any pending PUT finish behind it. */
     fun endTour(reset: Boolean) {
         val tour = _state.value.active ?: return
-        viewModelScope.launch {
-            if (reset) tour.resetProgress()
-            tour.flush()
-            tour.end()
-            container.narration.stop()
-            _state.update { it.copy(active = null) }
-            if (signInAfterTour) {
-                signInAfterTour = false
-                _state.update { it.copy(showSignIn = true) }
-            }
+        if (reset) tour.resetProgress()
+        tour.end()
+        container.narration.stop()
+        _state.update { if (it.active === tour) it.copy(active = null) else it }
+        if (signInAfterTour) {
+            signInAfterTour = false
+            _state.update { it.copy(showSignIn = true) }
         }
+        container.scope.launch { tour.flush() }
     }
 
     fun onResume() {
         _state.value.active?.let { tour -> viewModelScope.launch { tour.syncIfNeeded() } }
+    }
+
+    /** The activity left the foreground: no narration and no GPS until it is back. */
+    fun onStop() {
+        container.narration.stop()
+        container.location.stop()
     }
 
     // Audio guide

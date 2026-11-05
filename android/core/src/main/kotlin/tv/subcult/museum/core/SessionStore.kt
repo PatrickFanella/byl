@@ -44,6 +44,7 @@ class SessionStore(private val storage: TokenStorage) {
         return true
     }
 
+    @Synchronized
     fun set(session: Session) {
         storage.write(TOKEN_KEY, session.token)
         storage.write(ACCOUNT_KEY, MuseumJson.encodeToString(session.account))
@@ -60,6 +61,19 @@ class SessionStore(private val storage: TokenStorage) {
         storage.remove(TOKEN_KEY)
         storage.remove(ACCOUNT_KEY)
         _state.value = null
+    }
+
+    /**
+     * Signs out only when `rejected` is the token still in use: a 401 for a stale token that
+     * lands after a fresh sign-in, or for a request that carried no token, changes nothing.
+     * Atomic with respect to set(), so the check and the clear cannot straddle a sign-in.
+     */
+    @Synchronized
+    fun clearIfToken(rejected: String?): Boolean {
+        val current = _state.value?.token ?: return false
+        if (rejected == null || rejected != current) return false
+        clear()
+        return true
     }
 
     companion object {

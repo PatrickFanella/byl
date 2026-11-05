@@ -6,7 +6,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -52,14 +52,14 @@ fun TourMap(stops: List<TourStop>, state: ActiveTourState, fix: Fix?, modifier: 
                 Lifecycle.Event.ON_RESUME -> holder.view.onResume()
                 Lifecycle.Event.ON_PAUSE -> holder.view.onPause()
                 Lifecycle.Event.ON_STOP -> holder.view.onStop()
-                Lifecycle.Event.ON_DESTROY -> holder.view.onDestroy()
+                Lifecycle.Event.ON_DESTROY -> holder.destroy()
                 else -> Unit
             }
         }
         lifecycle.addObserver(observer)
         onDispose {
             lifecycle.removeObserver(observer)
-            holder.view.onDestroy()
+            holder.destroy()
         }
     }
 
@@ -72,6 +72,14 @@ private class MapHolder(context: android.content.Context) {
     private var style: Style? = null
     private var pending: (() -> Unit)? = null
     private var fitted = ""
+    private var destroyed = false
+
+    /** Winds the view down once, through pause and stop, whichever path gets here first. */
+    fun destroy() {
+        if (destroyed) return
+        destroyed = true
+        runCatching { view.onPause(); view.onStop(); view.onDestroy() }
+    }
 
     init {
         MapLibre.getInstance(context)

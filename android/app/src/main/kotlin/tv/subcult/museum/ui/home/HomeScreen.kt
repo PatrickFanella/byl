@@ -55,7 +55,6 @@ fun HomeScreen(model: AppViewModel, onOpenTour: (slug: String) -> Unit, onOpenPl
     val scope = rememberCoroutineScope()
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         granted = result.values.any { it }
-        if (granted) model.container.location.start()
     }
 
     suspend fun loadTours() {
@@ -71,8 +70,8 @@ fun HomeScreen(model: AppViewModel, onOpenTour: (slug: String) -> Unit, onOpenPl
     LaunchedEffect(app.city?.id) { loadTours() }
     LaunchedEffect(Unit) {
         if (!granted) permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-        else model.container.location.start()
     }
+    tv.subcult.museum.ui.tours.LocationWhileStarted(model, granted)
     LaunchedEffect(app.city?.id, fix?.let { "${(it.lat * 1000).toInt()},${(it.lng * 1000).toInt()}" }) {
         val city = app.city ?: return@LaunchedEffect
         val f = fix ?: return@LaunchedEffect

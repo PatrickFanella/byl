@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package tv.subcult.museum.ui.tours
 
 import android.Manifest
@@ -69,22 +71,20 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     val context = LocalContext.current
     var granted by remember { mutableStateOf(model.container.location.hasPermission()) }
     var showEnd by remember { mutableStateOf(false) }
-    var arrivalShown by remember { mutableStateOf<TourStop?>(null) }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { r ->
         granted = r.values.any { it }
         if (granted) model.container.location.start()
     }
 
     LaunchedEffect(Unit) {
-        if (granted) model.container.location.start()
-        else permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+        if (!granted) permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
     }
-    DisposableEffect(Unit) { onDispose { model.container.location.stop() } }
+    LocationWhileStarted(model, granted)
     LaunchedEffect(fix) { fix?.let { active.handleFix(it) } }
-    // Arrival: show the sheet and, with the guide on, play the featured moment once.
+    // Arrival: with the guide on, play the featured moment once per announcement. The sheet is
+    // driven by state.arrivedStop and cleared through acknowledgeArrival, so rotation does not replay it.
     LaunchedEffect(state.arrivedStop?.id) {
         val stop = state.arrivedStop ?: return@LaunchedEffect
-        arrivalShown = stop
         if (app.audioEnabled) model.playNarration(stop)
     }
 
@@ -149,12 +149,10 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         }
     }
 
-    arrivalShown?.let { stop ->
-        ModalBottomSheet(onDismissRequest = { arrivalShown = null; model.container.narration.stop() }, containerColor = Museum.background) {
-            ArrivalSheet(model, stop, isLast = state.isComplete, playing = playing, onOpenMoment = onOpenMoment) {
-                arrivalShown = null
-                model.container.narration.stop()
-            }
+    state.arrivedStop?.let { stop ->
+        val dismiss = { active.acknowledgeArrival(); model.container.narration.stop() }
+        ModalBottomSheet(onDismissRequest = dismiss, containerColor = Museum.background) {
+            ArrivalSheet(model, stop, isLast = state.isComplete, playing = playing, onOpenMoment = { active.acknowledgeArrival(); onOpenMoment(it) }, onContinue = dismiss)
         }
     }
 
@@ -171,6 +169,27 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                 }
             }
         )
+    }
+}
+
+/** Starts location updates while the screen is started and stops them when it is not. */
+@Composable
+fun LocationWhileStarted(model: AppViewModel, granted: Boolean) {
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle, granted) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_START -> if (granted) model.container.location.start()
+                androidx.lifecycle.Lifecycle.Event.ON_STOP -> model.container.location.stop()
+                else -> Unit
+            }
+        }
+        if (granted && lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) model.container.location.start()
+        lifecycle.addObserver(observer)
+        onDispose {
+            lifecycle.removeObserver(observer)
+            model.container.location.stop()
+        }
     }
 }
 
