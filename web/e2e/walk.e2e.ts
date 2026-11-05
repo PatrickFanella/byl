@@ -30,3 +30,19 @@ test('with location denied the walk still works through "I\'m here"', async ({ b
 	await expect(page.getByText(/next · stop 2/i)).toBeVisible();
 	await context.close();
 });
+
+test('the audio guide plays the featured moment once on arrival', async ({ browser }) => {
+	// Review fix: the auto-play effect must not loop (fetch → play → stop → fetch …).
+	const context = await browser.newContext({ geolocation: station, permissions: ['geolocation'] });
+	await context.addInitScript(() => localStorage.setItem('invisible-museum.audio', '1'));
+	const page = await context.newPage();
+	let momentFetches = 0;
+	page.on('request', (r) => {
+		if (/\/api\/v1\/moments\//.test(r.url())) momentFetches++;
+	});
+	await page.goto('/tours/downtown-memory-loop/walk?mode=walk');
+	await expect(page.getByText(/you have arrived/i)).toBeVisible({ timeout: 15_000 });
+	await page.waitForTimeout(3000);
+	expect(momentFetches).toBe(1);
+	await context.close();
+});

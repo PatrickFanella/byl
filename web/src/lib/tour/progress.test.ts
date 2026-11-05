@@ -118,13 +118,16 @@ describe('ProgressStore', () => {
 		expect(f.puts).toHaveLength(1);
 	});
 
-	it('sends PUTs in order', async () => {
+	it('sends PUTs in order, each carrying every stop known when it leaves', async () => {
 		const f = fakeApi();
 		const s = make(true, f);
 		s.markVisited(1);
 		s.markVisited(2);
 		await s.flush();
-		expect(f.puts.map((p) => p.visited_positions)).toEqual([[1], [1, 2]]);
+		const bodies = f.puts.map((p) => p.visited_positions);
+		expect(bodies).toHaveLength(2);
+		expect(bodies.at(-1)).toEqual([1, 2]);
+		expect(bodies[0].every((p) => bodies[1].includes(p))).toBe(true);
 	});
 
 	it('marks completion when every stop is visited', async () => {
@@ -143,5 +146,34 @@ describe('ProgressStore', () => {
 		again.reset();
 		expect(again.visited.size).toBe(0);
 		expect(make(false).visited.size).toBe(0);
+	});
+
+	it('unions with another tab writing the same storage key (Review Focus 3)', async () => {
+		const fa = fakeApi();
+		const a = make(true, fa);
+		const b = make(true, fakeApi());
+		a.markVisited(1);
+		b.markVisited(2);
+		a.markVisited(3);
+		await a.flush();
+		await b.flush();
+		expect([...a.visited].sort()).toEqual([1, 2, 3]);
+		expect(JSON.parse(storage.getItem(`invisible-museum.progress.${TOUR}.walk`)!).visited).toEqual([
+			1, 2, 3
+		]);
+		expect(fa.puts.at(-1)?.visited_positions).toEqual([1, 2, 3]);
+		b.reload();
+		expect([...b.visited].sort()).toEqual([1, 2, 3]);
+	});
+
+	it('resetting a signed-in walk also clears the server record', async () => {
+		const f = fakeApi();
+		const s = make(true, f);
+		s.markVisited(1);
+		await s.flush();
+		s.reset();
+		await s.flush();
+		expect(f.puts.at(-1)).toEqual({ mode: 'walk', visited_positions: [], completed: false });
+		expect(s.visited.size).toBe(0);
 	});
 });

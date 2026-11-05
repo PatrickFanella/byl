@@ -17,6 +17,7 @@ async function signIn(page: Page, email: string) {
 	await page.goto('/signin');
 	await page.getByLabel('Email').fill(email);
 	await page.getByRole('button', { name: /sign in/i }).click();
+	await expect(page).not.toHaveURL(/\/signin/);
 }
 
 test('a visitor account sees the curator-role notice, never a blank page', async ({ page }) => {

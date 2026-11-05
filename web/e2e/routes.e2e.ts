@@ -47,3 +47,11 @@ test('saving a tour lists it under Saved', async ({ page }) => {
 	await page.goto('/saved');
 	await expect(page.getByRole('link', { name: /downtown memory loop/i })).toBeVisible();
 });
+
+test('the builder asks a signed-out visitor to sign in instead of failing on Create', async ({
+	page
+}) => {
+	await page.goto('/routes/new');
+	await expect(page.getByText(/sign in to build routes/i)).toBeVisible();
+	await expect(page.getByRole('button', { name: /create route/i })).toHaveCount(0);
+});

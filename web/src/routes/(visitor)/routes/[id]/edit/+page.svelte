@@ -5,6 +5,10 @@
 	import { getTour, type TourDetail } from '#lib/visitor.ts';
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
 	import RouteBuilderForm from '#lib/components/visitor/RouteBuilderForm.svelte';
+	import SignInPrompt from '#lib/components/visitor/SignInPrompt.svelte';
+	import { session } from '#lib/auth.ts';
+
+	const current = session.store;
 
 	const id = $derived(page.params.id ?? '');
 	const tour = new Loader<TourDetail>(() => getTour(id));
@@ -19,7 +23,11 @@
 <a href="/routes" class="text-sm text-white/50 hover:underline">← Your routes</a>
 <h1 class="mt-2 text-3xl font-semibold">Edit route</h1>
 <div class="mt-5">
-	<LoadState status={tour.status} message={tour.message} onretry={() => tour.run()}>
-		{#if tour.data}<RouteBuilderForm editing={tour.data} ondone={() => goto('/routes')} />{/if}
-	</LoadState>
+	{#if !$current}
+		<SignInPrompt reason="Sign in to build routes that follow you to every device." />
+	{:else}
+		<LoadState status={tour.status} message={tour.message} onretry={() => tour.run()}>
+			{#if tour.data}<RouteBuilderForm editing={tour.data} ondone={() => goto('/routes')} />{/if}
+		</LoadState>
+	{/if}
 </div>

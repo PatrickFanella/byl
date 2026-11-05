@@ -16,6 +16,7 @@ test('a curator builds a tour, waits for routes, and publishes it', async ({ pag
 	await page.goto('/signin');
 	await page.getByLabel('Email').fill('admin@example.com');
 	await page.getByRole('button', { name: /sign in/i }).click();
+	await expect(page).not.toHaveURL(/\/signin/);
 	await page.goto('/admin');
 	await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 

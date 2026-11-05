@@ -41,6 +41,7 @@
 	let markerHandles: import('maplibre-gl').Marker[] = [];
 	let userHandle: import('maplibre-gl').Marker | null = null;
 	let fitted = '';
+	let ready = false;
 
 	const colors = { past: '#71717a', active: '#3b82f6', future: '#a1a1aa' };
 
@@ -150,7 +151,10 @@
 				attributionControl: { compact: true }
 			});
 			map.addControl(new lib.NavigationControl({ showCompass: false }));
-			map.on('load', render);
+			map.on('load', () => {
+				ready = true;
+				render();
+			});
 		})();
 		return () => {
 			cancelled = true;
@@ -164,7 +168,7 @@
 		void line;
 		void legs;
 		void user;
-		if (map && map.loaded()) render();
+		if (map && ready) render();
 	});
 </script>
 

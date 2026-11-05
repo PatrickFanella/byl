@@ -7,6 +7,7 @@ async function signIn(page: Page, email: string) {
 	await page.goto('/signin');
 	await page.getByLabel('Email').fill(email);
 	await page.getByRole('button', { name: /sign in/i }).click();
+	await expect(page).not.toHaveURL(/\/signin/);
 }
 
 // Review Focus 5: after the move every admin link must resolve under /admin.

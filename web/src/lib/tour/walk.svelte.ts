@@ -164,6 +164,13 @@ export class ActiveWalk {
 		if (this.nextStop) this.arrive(this.nextStop);
 	}
 
+	/** Another tab visited stops: pick them up (storage event). */
+	refreshFromStorage(): void {
+		if (!this.progress) return;
+		this.progress.reload();
+		this.refreshFromProgress();
+	}
+
 	async syncIfNeeded(): Promise<void> {
 		await this.progress?.syncIfNeeded();
 		this.syncError = this.progress?.syncError ?? null;

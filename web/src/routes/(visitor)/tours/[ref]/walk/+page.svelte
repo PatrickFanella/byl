@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { get } from 'svelte/store';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
@@ -17,6 +17,7 @@
 	const ref = page.params.ref ?? '';
 	const mode = page.url.searchParams.get('mode') === 'bike' ? 'bike' : 'walk';
 	const AUDIO_KEY = 'invisible-museum.audio';
+	const current = session.store;
 
 	const walk: ActiveWalk = new ActiveWalk(ref, mode, {
 		fetchTour: getTour,
@@ -64,26 +65,40 @@
 		const onVisible = () => {
 			if (document.visibilityState === 'visible') walk.syncIfNeeded();
 		};
+		const onOnline = () => walk.syncIfNeeded();
+		const onStorage = (e: StorageEvent) => {
+			if (e.key?.startsWith('invisible-museum.progress.')) walk.refreshFromStorage();
+		};
 		document.addEventListener('visibilitychange', onVisible);
+		window.addEventListener('online', onOnline);
+		window.addEventListener('storage', onStorage);
 		return () => {
 			navigator.geolocation.clearWatch(watch);
 			document.removeEventListener('visibilitychange', onVisible);
+			window.removeEventListener('online', onOnline);
+			window.removeEventListener('storage', onStorage);
 			player.stop();
 		};
 	});
 
-	// Auto-play the featured moment on arrival when the guide is on.
+	// Auto-play the featured moment on arrival when the guide is on. Only the arrived stop and
+	// the toggle are dependencies; `playing` is read untracked so playback cannot re-run this.
 	$effect(() => {
 		const stop = walk.arrivedStop;
-		if (stop && audioEnabled) void listen(stop);
+		const on = audioEnabled;
+		if (stop && on) untrack(() => void play(stop));
 	});
 
-	async function listen(stop: TourStop) {
+	function toggleListen(stop: TourStop) {
 		if (playing) {
 			player.stop();
 			playing = false;
-			return;
+		} else {
+			void play(stop);
 		}
+	}
+
+	async function play(stop: TourStop) {
 		const featured = stop.featured_moment;
 		if (!featured) return;
 		let narrationURL: string | null = null;
@@ -220,10 +235,16 @@
 							<div class="text-[10px] text-white/50">{walk.progressText}</div>
 						</div>
 					</div>
-					{#if geoState === 'denied' || geoState === 'unavailable'}
+					{#if geoState === 'denied'}
 						<p class="mt-2 text-xs text-white/60">
 							Location is off. Tap I'm here at each stop, or allow location in your browser.
 						</p>
+					{:else if geoState === 'unavailable'}
+						<p class="mt-2 text-xs text-white/60">
+							Your location is unavailable right now. Tap I'm here at each stop.
+						</p>
+					{:else if geoState === 'waiting'}
+						<p class="mt-2 text-xs text-white/60">Waiting for your location…</p>
 					{/if}
 					{#if walk.syncError}
 						<p class="mt-2 text-xs text-amber-200">
@@ -249,7 +270,7 @@
 						Tour complete
 					</div>
 					<div class="text-lg font-semibold">You walked every stop of {walk.tour?.title}.</div>
-					{#if !get(session.store)}
+					{#if !$current}
 						<p class="mt-1 text-sm text-white/60">Sign in to keep this on your account.</p>
 					{/if}
 					<button
@@ -266,7 +287,7 @@
 			stop={walk.arrivedStop}
 			isLast={walk.isComplete}
 			{playing}
-			onlisten={() => listen(walk.arrivedStop!)}
+			onlisten={() => toggleListen(walk.arrivedStop!)}
 			oncontinue={() => {
 				player.stop();
 				playing = false;

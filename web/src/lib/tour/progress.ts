@@ -76,6 +76,16 @@ export class ProgressStore {
 		this.sync();
 	}
 
+	/** Re-reads storage: another tab may have visited stops since this one loaded. */
+	reload(): void {
+		const stored = this.load();
+		if (!stored) return;
+		for (const p of stored.visited) this.visited.add(p);
+		if (stored.updatedAt > this.record.updatedAt) {
+			this.record = { ...stored, visited: [...this.visited].sort((a, b) => a - b) };
+		}
+	}
+
 	/** Union with the account's record for this tour (any mode); pushes when local is ahead. */
 	async mergeRemote(): Promise<void> {
 		if (!this.opts.signedIn()) return;
@@ -111,11 +121,12 @@ export class ProgressStore {
 		return this.chain;
 	}
 
+	/** Forgets local progress and, when signed in, clears the server record too. */
 	reset(): void {
 		this.visited = new Set();
 		this.record = {
 			visited: [],
-			updatedAt: 0,
+			updatedAt: Math.max(Date.now(), this.record.updatedAt + 1),
 			syncedAt: null,
 			completedAt: null,
 			startedAt: new Date().toISOString()
@@ -125,9 +136,25 @@ export class ProgressStore {
 		} catch {
 			// nothing stored
 		}
+		if (this.opts.signedIn()) {
+			const body = { mode: this.mode, visited_positions: [] as number[], completed: false };
+			const changedAt = this.record.updatedAt;
+			this.chain = this.chain.then(async () => {
+				try {
+					await this.opts.api.put(body);
+					this.record.syncedAt = changedAt;
+					this.syncError = null;
+				} catch (e) {
+					this.syncError = e instanceof Error ? e.message : 'Could not save progress.';
+				}
+			});
+		}
 	}
 
 	private commit(): void {
+		// Union with whatever another tab wrote to the same key, so no stop is ever dropped.
+		const stored = this.load();
+		if (stored) for (const p of stored.visited) this.visited.add(p);
 		this.record.visited = [...this.visited].sort((a, b) => a - b);
 		// Strictly after the previous change so needsSync compares correctly within one millisecond.
 		this.record.updatedAt = Math.max(Date.now(), this.record.updatedAt + 1);
@@ -138,13 +165,15 @@ export class ProgressStore {
 
 	private sync(): void {
 		if (!this.opts.signedIn()) return;
-		const body = {
-			mode: this.mode,
-			visited_positions: [...this.record.visited],
-			completed: this.record.completedAt != null
-		};
-		const changedAt = this.record.updatedAt;
 		this.chain = this.chain.then(async () => {
+			// Build the body at send time so a PUT queued behind another carries every stop known now.
+			this.reload();
+			const body = {
+				mode: this.mode,
+				visited_positions: [...this.record.visited],
+				completed: this.record.completedAt != null
+			};
+			const changedAt = this.record.updatedAt;
 			try {
 				await this.opts.api.put(body);
 				this.record.syncedAt = changedAt;

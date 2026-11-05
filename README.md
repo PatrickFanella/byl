@@ -162,8 +162,9 @@ Without `TEST_DATABASE_URL`, `go test ./...` runs only the pure unit tests.
   handoff to Apple or Google Maps, an audio guide (recorded narration or browser
   speech), local progress merged with the account when signed in, place and moment
   pages with sources and credits, saved tours, and a route builder that shares
-  `/t/{slug}` links (which also open in the iOS app). An active walk survives a
-  reload without signal from the cached tour and route.
+  `/t/{slug}` links (which also open in the iOS app). A walk keeps going when the
+  API becomes unreachable, from the cached tour and route (the page itself still
+  needs the network to load: there is no service worker yet).
 - **Curator admin at `/admin`**: dashboard, review queue with AI drafting, imports,
   places, moments, media, tours with a map and stops editor, and jobs. Non-curators
   see a role notice; signed-out visitors are sent to `/signin`.
