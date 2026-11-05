@@ -41,8 +41,8 @@ type Worker struct {
 
 // New builds a worker. workers is the number of concurrent goroutines Run starts.
 func New(store *repository.Store, router routing.Router, narrator narration.Narrator, blobStore blob.Store, workers int, log *slog.Logger) *Worker {
-	if workers < 1 {
-		workers = 1
+	if workers < 0 {
+		workers = 0
 	}
 	if log == nil {
 		log = slog.Default()

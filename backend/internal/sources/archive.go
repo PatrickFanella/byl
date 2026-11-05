@@ -3,7 +3,9 @@ package sources
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"strings"
 
@@ -112,7 +114,11 @@ func (a *InternetArchive) Discover(ctx context.Context, req Request) ([]Found, e
 		case "image", "movies":
 			name, mimeType, err := a.primaryFile(ctx, d.Identifier, d.MediaType)
 			if err != nil {
-				return nil, err
+				if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+					return nil, err
+				}
+				slog.Warn("archive item metadata unavailable", "identifier", d.Identifier, "error", err)
+				continue
 			}
 			if name == "" {
 				continue // no usable image or video file in the item
@@ -143,7 +149,7 @@ func licenseFromURL(u string) string {
 		rest := strings.TrimPrefix(u[strings.Index(u, "/licenses/")+len("/licenses/"):], "")
 		parts := strings.Split(strings.Trim(rest, "/"), "/")
 		if len(parts) >= 2 {
-			return "CC-" + strings.ToUpper(parts[0]) + "-" + parts[1]
+			return MapLicense("CC-" + strings.ToUpper(parts[0]) + "-" + parts[1])
 		}
 	}
 	return ""

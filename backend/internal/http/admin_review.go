@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -97,25 +98,36 @@ func (d Deps) adminApproveCandidate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if c.Status != models.CandidateStatusPending {
-		writeError(w, http.StatusConflict, "conflict", "candidate already reviewed")
-		return
-	}
-	payload, err := mergePayload(c.Payload, req.Payload)
-	if err != nil {
+	var reviewed *models.Candidate
+	var fields map[string]string
+	var payloadErr error
+	err = d.Store.ReviewPendingCandidate(r.Context(), c.ID, func(tx *repository.Store, current *models.Candidate) error {
+		payload, err := mergePayload(current.Payload, req.Payload)
+		if err != nil {
+			payloadErr = err
+			return err
+		}
+		scoped := d
+		scoped.Store = tx
+		entityID, invalid, err := scoped.createFromCandidate(r, current, payload)
+		fields = invalid
+		if len(fields) > 0 {
+			return errors.New("candidate validation failed")
+		}
+		if err != nil {
+			return err
+		}
+		reviewed, err = tx.ReviewCandidate(r.Context(), current.ID, accountFrom(r.Context()).ID, models.CandidateStatusApproved, req.Note, &entityID)
+		return err
+	})
+	if payloadErr != nil {
 		writeError(w, http.StatusBadRequest, "bad_request", "payload must be a JSON object")
 		return
 	}
-	entityID, fields, err := d.createFromCandidate(r, c, payload)
 	if len(fields) > 0 {
 		writeValidation(w, fields)
 		return
 	}
-	if err != nil {
-		d.fail(w, err)
-		return
-	}
-	reviewed, err := d.Store.ReviewCandidate(r.Context(), c.ID, accountFrom(r.Context()).ID, models.CandidateStatusApproved, req.Note, &entityID)
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -181,6 +193,9 @@ func (d Deps) createFromCandidate(r *http.Request, c *models.Candidate, payload 
 		}
 		if c.TargetMomentID != nil {
 			existing, err := d.Store.GetMoment(r.Context(), *c.TargetMomentID, true)
+			if err != nil {
+				return "", nil, err
+			}
 			if err == nil {
 				ids := make([]string, 0, len(existing.Media)+1)
 				for _, em := range existing.Media {

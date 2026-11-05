@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +36,7 @@ func (o *OpenAI) DraftMoment(ctx context.Context, req DraftRequest) (MomentDraft
 	err := withOneRetry(func() error {
 		raw, err := o.complete(ctx, "moment_draft", MomentDraftSchema(), draftSystemPrompt, draftUserPrompt(req))
 		if err != nil {
-			return err
+			return &requestFailure{err}
 		}
 		var d MomentDraft
 		if err := json.Unmarshal([]byte(raw), &d); err != nil {
@@ -55,7 +56,7 @@ func (o *OpenAI) RankMoments(ctx context.Context, req RankRequest) (Ranking, err
 	err := withOneRetry(func() error {
 		raw, err := o.complete(ctx, "moment_ranking", RankingSchema(), rankSystemPrompt, rankUserPrompt(req))
 		if err != nil {
-			return err
+			return &requestFailure{err}
 		}
 		var r Ranking
 		if err := json.Unmarshal([]byte(raw), &r); err != nil {
@@ -94,7 +95,11 @@ func (o *OpenAI) complete(ctx context.Context, schemaName string, schema map[str
 	defer resp.Body.Close()
 	raw, _ := io.ReadAll(io.LimitReader(resp.Body, 4<<20))
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("llm: status %d: %s", resp.StatusCode, strings.TrimSpace(string(raw)))
+		detail := []rune(strings.TrimSpace(string(raw)))
+		if len(detail) > 1024 {
+			detail = detail[:1024]
+		}
+		return "", fmt.Errorf("llm: status %d: %s", resp.StatusCode, string(detail))
 	}
 	var parsed struct {
 		Choices []struct {
@@ -116,9 +121,17 @@ func (o *OpenAI) complete(ctx context.Context, schemaName string, schema map[str
 	return parsed.Choices[0].Message.Content, nil
 }
 
-// withOneRetry runs fn and retries exactly once on error.
+type requestFailure struct{ error }
+
+func (e *requestFailure) Unwrap() error { return e.error }
+
+// withOneRetry retries invalid model output once; requests already have transport policy.
 func withOneRetry(fn func() error) error {
 	if err := fn(); err != nil {
+		var request *requestFailure
+		if errors.As(err, &request) {
+			return request.error
+		}
 		return fn()
 	}
 	return nil

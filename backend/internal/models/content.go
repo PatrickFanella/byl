@@ -173,10 +173,10 @@ func Excerpt(body string) string {
 		first = body[:i]
 	}
 	first = strings.TrimSpace(first)
-	if len(first) <= 240 {
+	if len([]rune(first)) <= 240 {
 		return first
 	}
-	cut := first[:240]
+	cut := string([]rune(first)[:240])
 	if i := strings.LastIndex(cut, " "); i > 120 {
 		cut = cut[:i]
 	}

@@ -209,3 +209,32 @@ func TestSavedAndProgressEndpoints(t *testing.T) {
 		t.Fatalf("unknown tour progress: %d", r.status)
 	}
 }
+
+func TestProgressUpdatesMergeAndReset(t *testing.T) {
+	env := newTestEnv(t)
+	me := env.signIn(t, "walker@example.com", "")
+	path := "/api/v1/me/progress/downtown-memory-loop"
+	put := func(body map[string]any) resp {
+		return env.do(t, http.MethodPut, path, me, body)
+	}
+	first := put(map[string]any{"mode": "walk", "visited_positions": []int{1}, "completed": true})
+	if first.status != 200 {
+		t.Fatalf("first device: %d %s", first.status, first.raw)
+	}
+	second := put(map[string]any{"mode": "bike", "visited_positions": []int{2, 2}})
+	if second.status != 200 || len(second.body["visited_positions"].([]any)) != 2 || second.body["completed_at"] != first.body["completed_at"] {
+		t.Fatalf("second device must union stops and retain completion: %d %s", second.status, second.raw)
+	}
+	bad := put(map[string]any{"mode": "walk", "reset": true, "visited_positions": []int{1}})
+	if bad.status != 422 {
+		t.Fatalf("reset cannot also visit stops: %d %s", bad.status, bad.raw)
+	}
+	reset := put(map[string]any{"mode": "walk", "reset": true})
+	if reset.status != 200 || len(reset.body["visited_positions"].([]any)) != 0 || reset.body["completed_at"] != nil {
+		t.Fatalf("reset must clear stops and completion: %d %s", reset.status, reset.raw)
+	}
+	next := put(map[string]any{"mode": "walk", "visited_positions": []int{3}})
+	if next.status != 200 || len(next.body["visited_positions"].([]any)) != 1 || next.body["completed_at"] != nil {
+		t.Fatalf("new walk must not restore old stops: %d %s", next.status, next.raw)
+	}
+}

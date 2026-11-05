@@ -278,11 +278,13 @@ func (d Deps) adminPublishMoment(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusConflict, "conflict", "cannot publish: "+strings.Join(blockers, "; "))
 		return
 	}
-	if err := d.Store.SetMomentStatus(r.Context(), id, models.EntityStatusPublished); err != nil {
-		d.fail(w, err)
-		return
-	}
-	if err := d.Store.Enqueue(r.Context(), models.JobKindGenerateNarration, models.GenerateNarrationPayload{MomentID: id}); err != nil {
+	err = d.Store.Transaction(r.Context(), func(tx *repository.Store) error {
+		if err := tx.SetMomentStatus(r.Context(), id, models.EntityStatusPublished); err != nil {
+			return err
+		}
+		return tx.Enqueue(r.Context(), models.JobKindGenerateNarration, models.GenerateNarrationPayload{MomentID: id})
+	})
+	if err != nil {
 		d.fail(w, err)
 		return
 	}

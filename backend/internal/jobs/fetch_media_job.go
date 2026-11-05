@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"mime"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
@@ -86,8 +86,15 @@ func (w *Worker) fetchMedia(ctx context.Context, p models.FetchMediaPayload) err
 	}
 	name = withExtension(name, contentType)
 	key := blob.KeyFor(prefix, name)
-	body := io.LimitReader(resp.Body, fetchMediaMaxBytes+1)
+	if resp.ContentLength > fetchMediaMaxBytes {
+		return fmt.Errorf("%w: media exceeds %d bytes", ErrNoRetry, fetchMediaMaxBytes)
+	}
+	body := http.MaxBytesReader(nil, resp.Body, fetchMediaMaxBytes)
 	if err := w.blob.Put(ctx, key, contentType, body, resp.ContentLength); err != nil {
+		var tooLarge *http.MaxBytesError
+		if errors.As(err, &tooLarge) {
+			return fmt.Errorf("%w: media exceeds %d bytes", ErrNoRetry, fetchMediaMaxBytes)
+		}
 		return fmt.Errorf("store media: %w", err)
 	}
 	if width := payload.Width; width != nil && *width <= 0 {

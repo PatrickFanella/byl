@@ -132,6 +132,14 @@ func TestVerifierRefetchesOnUnknownKid(t *testing.T) {
 	if _, err := v.Verify(ctx, f.sign(t, baseClaims("client-a"), "k9")); err == nil {
 		t.Fatal("unknown kid accepted")
 	}
+	for _, kid := range []string{"k10", "k11", "k12"} {
+		if _, err := v.Verify(ctx, f.sign(t, baseClaims("client-a"), kid)); err == nil {
+			t.Fatal("unknown kid accepted")
+		}
+	}
+	if f.hits.Load() != 2 {
+		t.Fatalf("unknown keys must not trigger repeated fetches, got %d", f.hits.Load())
+	}
 }
 
 func TestAppleAndGoogleDefaults(t *testing.T) {

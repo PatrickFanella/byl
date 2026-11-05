@@ -298,3 +298,21 @@ func TestFetchMediaJobRefusesSVG(t *testing.T) {
 		t.Fatalf("asset must stay unfetched: %+v", got)
 	}
 }
+
+func TestFetchMediaJobRefusesOversizedResponse(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	_, _, assetID := mediaFetchFixture(t, w, store, ctx, "/oversized.png", func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Set("Content-Type", "image/png")
+		rw.Header().Set("Content-Length", "67108865")
+		rw.WriteHeader(http.StatusOK)
+	}, true)
+	drain(t, w, ctx)
+	job := onlyJob(t, store, ctx, models.JobStatusFailed)
+	if job.Attempts != 1 || !strings.Contains(job.LastError, "exceeds") {
+		t.Fatalf("oversized media must fail without retry: %+v", job)
+	}
+	if got, _ := store.GetMedia(ctx, assetID); got.StorageKey != "" {
+		t.Fatal("oversized media must not be attached")
+	}
+}

@@ -87,6 +87,9 @@ func NewRouter(d Deps) http.Handler {
 		r.Get("/tours/{tour}/route", d.getTourRoute)
 		r.Get("/media/{id}", d.getMedia)
 		r.Post("/auth/dev", d.devSignIn)
+		r.Get("/auth/dev", func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, http.StatusOK, map[string]bool{"enabled": d.DevAuth})
+		})
 		r.Post("/auth/apple", d.appleSignIn)
 		r.Post("/auth/google", d.googleSignIn)
 
@@ -150,6 +153,7 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/candidates/{id}/approve", d.adminApproveCandidate)
 			r.Post("/candidates/{id}/reject", d.adminRejectCandidate)
 			r.Get("/jobs", d.adminListJobs)
+			r.Get("/jobs/{id}", d.adminGetJob)
 			r.Post("/jobs/{id}/retry", d.adminRetryJob)
 			r.Get("/sources", d.adminListSources)
 			r.Post("/imports", d.adminCreateImport)

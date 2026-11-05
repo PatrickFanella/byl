@@ -106,6 +106,9 @@ paths:
       parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
       responses: { "200": { description: OK }, "404": { description: Not found } }
   /api/v1/auth/dev:
+    get:
+      summary: Check whether development sign-in is enabled
+      responses: { "200": { description: Development authentication availability } }
     post:
       summary: Development-only email sign-in
       description: Only served when DEV_AUTH_ENABLED=true; returns 404 otherwise.
@@ -135,6 +138,9 @@ paths:
     get:
       summary: List my routes
       security: [{ bearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: cursor, in: query, schema: { type: string }, description: Opaque cursor returned by the previous response }
       responses: { "200": { description: OK } }
     post:
       summary: Create a route from 2 to 30 published places in one city
@@ -187,6 +193,7 @@ paths:
       responses: { "200": { description: OK }, "404": { description: Not found } }
     put:
       summary: Record my progress on a tour
+      description: Atomically unions visited positions and preserves completion. Send reset=true without visited positions or completed=true to start over. Progress is shared across travel modes for this account and tour.
       security: [{ bearer: [] }]
       parameters: [{ name: tour, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ProgressRequest" } } } }
@@ -211,6 +218,8 @@ paths:
   /api/v1/admin/topics:
     get:
       summary: "List a city's topics (?city= required)"
+      parameters:
+        - { name: city, in: query, required: true, schema: { type: string } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
     post:
@@ -228,6 +237,10 @@ paths:
   /api/v1/admin/places:
     get:
       summary: "List places in any status (?city=, ?limit=, ?cursor=)"
+      parameters:
+        - { name: city, in: query, required: false, schema: { type: string } }
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: cursor, in: query, required: false, schema: { type: string } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "401": { description: Unauthorized } }
     post:
@@ -267,6 +280,9 @@ paths:
   /api/v1/admin/moments:
     get:
       summary: "List a place's moments in any status (?place= required, ?city=)"
+      parameters:
+        - { name: place, in: query, required: true, schema: { type: string } }
+        - { name: city, in: query, required: false, schema: { type: string } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
     post:
@@ -327,6 +343,9 @@ paths:
   /api/v1/admin/media:
     get:
       summary: "List media assets newest first (?limit=, ?offset=)"
+      parameters:
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: offset, in: query, required: false, schema: { type: integer } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "401": { description: Unauthorized } }
     post:
@@ -344,6 +363,10 @@ paths:
   /api/v1/admin/tours:
     get:
       summary: "List tours in any status and visibility (?city=)"
+      parameters:
+        - { name: city, in: query, required: false, schema: { type: string } }
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: cursor, in: query, required: false, schema: { type: string } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "401": { description: Unauthorized } }
     post:
@@ -396,6 +419,13 @@ paths:
   /api/v1/admin/candidates:
     get:
       summary: "List review-queue entries (?status=, ?kind=, ?origin=, ?source=, ?limit=, ?cursor=)"
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string } }
+        - { name: kind, in: query, required: false, schema: { type: string } }
+        - { name: origin, in: query, required: false, schema: { type: string } }
+        - { name: source, in: query, required: false, schema: { type: string } }
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: cursor, in: query, required: false, schema: { type: string } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
     post:
@@ -426,8 +456,18 @@ paths:
   /api/v1/admin/jobs:
     get:
       summary: "List background jobs (?status=, ?limit=, ?offset=)"
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string } }
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: offset, in: query, required: false, schema: { type: integer } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/jobs/{id}:
+    get:
+      summary: Get one job and its terminal result
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found }, "403": { description: Forbidden } }
   /api/v1/admin/jobs/{id}/retry:
     post:
       summary: "Requeue a failed job"
@@ -437,6 +477,9 @@ paths:
   /api/v1/admin/accounts:
     get:
       summary: "List accounts (admin only)"
+      parameters:
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: offset, in: query, required: false, schema: { type: integer } }
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "403": { description: Forbidden }, "401": { description: Unauthorized } }
   /api/v1/admin/accounts/{id}/role:
@@ -536,6 +579,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         kind: { type: string, enum: [image, video, audio] }
+        storage_key: { type: string, readOnly: true, description: Blob-store key; empty until an imported asset is fetched }
         public_url: { type: string, format: uri }
         mime_type: { type: string }
         width: { type: integer, nullable: true }
@@ -794,6 +838,7 @@ components:
         mode: { $ref: "#/components/schemas/TravelMode" }
         visited_positions: { type: array, items: { type: integer, minimum: 1 } }
         completed: { type: boolean }
+        reset: { type: boolean, default: false, description: Explicitly clears visited positions and completion; cannot be combined with nonempty visited_positions or completed=true. }
     CreateCityRequest:
       type: object
       required: [name, center_lat, center_lng, bbox_min_lat, bbox_min_lng, bbox_max_lat, bbox_max_lng]

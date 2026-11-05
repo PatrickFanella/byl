@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/netip"
 	"strconv"
 	"sync"
 	"time"
@@ -129,18 +130,32 @@ func publicOnlyTransport(base http.RoundTripper) http.RoundTripper {
 	return t
 }
 
-// publicIP reports whether ip is a globally routable unicast address.
+// Exclude special-use and transition ranges as well as private and local addresses.
+var blockedPublicRanges = []netip.Prefix{
+	netip.MustParsePrefix("0.0.0.0/8"), netip.MustParsePrefix("100.64.0.0/10"),
+	netip.MustParsePrefix("192.0.0.0/24"), netip.MustParsePrefix("192.0.2.0/24"),
+	netip.MustParsePrefix("198.18.0.0/15"), netip.MustParsePrefix("198.51.100.0/24"),
+	netip.MustParsePrefix("203.0.113.0/24"), netip.MustParsePrefix("240.0.0.0/4"),
+	netip.MustParsePrefix("2001::/23"), netip.MustParsePrefix("2001:db8::/32"),
+	netip.MustParsePrefix("2002::/16"),
+}
+var globalIPv6Range = netip.MustParsePrefix("2000::/3")
+
+// publicIP accepts ordinary globally routable addresses, without IPv6 translation tunnels.
 func publicIP(ip net.IP) bool {
-	if ip == nil || ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() ||
-		ip.IsMulticast() || ip.IsUnspecified() || ip.IsInterfaceLocalMulticast() {
+	if !ip.IsGlobalUnicast() || ip.IsPrivate() || ip.IsLinkLocalUnicast() {
 		return false
 	}
-	if v4 := ip.To4(); v4 != nil {
-		// Carrier-grade NAT (100.64.0.0/10) and the broadcast address.
-		if v4[0] == 100 && v4[1]&0xc0 == 64 {
-			return false
-		}
-		if v4.Equal(net.IPv4bcast) {
+	addr, ok := netip.AddrFromSlice(ip)
+	if !ok {
+		return false
+	}
+	addr = addr.Unmap()
+	if addr.Is6() && !globalIPv6Range.Contains(addr) {
+		return false
+	}
+	for _, prefix := range blockedPublicRanges {
+		if prefix.Contains(addr) {
 			return false
 		}
 	}

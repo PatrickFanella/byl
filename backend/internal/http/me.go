@@ -223,11 +223,8 @@ func (d Deps) putProgress(w http.ResponseWriter, r *http.Request) {
 	if req.Completed {
 		now := time.Now()
 		in.CompletedAt = &now
-		if existing, err := d.Store.GetProgress(r.Context(), a.ID, tour.ID); err == nil && existing.CompletedAt != nil {
-			in.CompletedAt = existing.CompletedAt
-		}
 	}
-	p, err := d.Store.PutProgress(r.Context(), in)
+	p, err := d.Store.PutProgress(r.Context(), in, req.Reset)
 	if err != nil {
 		d.fail(w, err)
 		return
