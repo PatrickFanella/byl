@@ -1,0 +1,21 @@
+package testdb
+
+// Fixed IDs from migrations/00002_seed_downers_grove.sql.
+const (
+	SeedCityID             = "00000000-0000-4000-8000-0000000000c1"
+	SeedTopicRailID        = "00000000-0000-4000-8000-00000000a0a1"
+	SeedTopicAfterDarkID   = "00000000-0000-4000-8000-00000000a0a2"
+	SeedTopicParksID       = "00000000-0000-4000-8000-00000000a0a3"
+	SeedTopicHousesID      = "00000000-0000-4000-8000-00000000a0a4"
+	SeedPlaceStationID     = "00000000-0000-4000-8000-00000000b0b1"
+	SeedPlaceTivoliID      = "00000000-0000-4000-8000-00000000b0b2"
+	SeedPlaceFishelID      = "00000000-0000-4000-8000-00000000b0b3"
+	SeedPlaceMuseumID      = "00000000-0000-4000-8000-00000000b0b4"
+	SeedMomentBurlingtonID = "00000000-0000-4000-8000-00000000d0d1"
+	SeedMomentPlatformID   = "00000000-0000-4000-8000-00000000d0d2"
+	SeedMomentTalkiesID    = "00000000-0000-4000-8000-00000000d0d3"
+	SeedMomentConcertID    = "00000000-0000-4000-8000-00000000d0d4"
+	SeedMomentBlodgettID   = "00000000-0000-4000-8000-00000000d0d5"
+	SeedMomentDownerID     = "00000000-0000-4000-8000-00000000d0d6"
+	SeedTourID             = "00000000-0000-4000-8000-00000000e0e1"
+)

@@ -1,0 +1,170 @@
+{
+ "result": [
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.HD.mov",
+   "source": "original",
+   "mtime": "1561260320",
+   "size": "17780087",
+   "md5": "91f72382021afa4cf1c2c9d09dc0a095",
+   "crc32": "cc18d00c",
+   "sha1": "10d250a2b922c40240d947707e59a96c5c5da1f2",
+   "format": "h.264 HD",
+   "length": "107.35",
+   "height": "720",
+   "width": "1280"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.asr.js",
+   "source": "original",
+   "format": "ASR",
+   "mtime": "1561613552",
+   "size": "44026",
+   "md5": "a36740da728ffb34502132f585e6e563",
+   "crc32": "2cc1dc8b",
+   "sha1": "6700b6c0118155b32d66200d5ee152614df94e9f"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.asr.srt",
+   "source": "original",
+   "format": "SubRip",
+   "mtime": "1561613551",
+   "size": "2458",
+   "md5": "8377edae31880a40ea36cad20e0eef93",
+   "crc32": "99b753b9",
+   "sha1": "fbf4a7de007c994c5ea7faed6669764cd567c7e3"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.asr.vtt",
+   "source": "original",
+   "format": "Web Video Text Tracks",
+   "mtime": "1561613552",
+   "size": "2516",
+   "md5": "8db25682930548726b75a1112f99151a",
+   "crc32": "8bb6f9e4",
+   "sha1": "4891474e02eb6de10b1c014152aed32ed6977ec3"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.en.vtt",
+   "source": "original",
+   "mtime": "1671051319",
+   "size": "15813",
+   "md5": "14e6b6da0f7e26858c97b33b183827f2",
+   "crc32": "daf2badc",
+   "sha1": "dbbc5b0e68cc2c656b81ea5b5343792a5f54d3b2",
+   "format": "Web Video Text Tracks"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.es.vtt",
+   "source": "original",
+   "mtime": "1671051323",
+   "size": "3361",
+   "md5": "dc135be1ff994d14796ef0bd14941798",
+   "crc32": "8f9d1129",
+   "sha1": "4585099e9c653218eca319e5aef2b21f82918304",
+   "format": "Web Video Text Tracks"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.mp3",
+   "source": "derivative",
+   "bitrate": "96",
+   "length": "01:47",
+   "format": "MP3",
+   "original": "Framing_John_DeLorean_Gets_Special_Screening.HD.mov",
+   "mtime": "1561260347",
+   "size": "1291420",
+   "md5": "bf60745b995edd1947fc408596b8c101",
+   "crc32": "4caffec8",
+   "sha1": "35543f4e15fe6d8f46de77a5683a9a09ec290c7a",
+   "height": "0",
+   "width": "0"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.mp4",
+   "source": "derivative",
+   "format": "h.264",
+   "original": "Framing_John_DeLorean_Gets_Special_Screening.HD.mov",
+   "mtime": "1561260721",
+   "size": "11153782",
+   "md5": "31be39f9dfe0a7455d527f2170e98bbc",
+   "crc32": "da214dc0",
+   "sha1": "592fea02c1d7a64caa56b8ed4c3c1493f653fb78",
+   "length": "107.37",
+   "height": "480",
+   "width": "853"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.ogv",
+   "source": "derivative",
+   "format": "Ogg Video",
+   "original": "Framing_John_DeLorean_Gets_Special_Screening.HD.mov",
+   "mtime": "1561260926",
+   "size": "8180167",
+   "md5": "7d9efc9e615a55efd2ad3346c07ae70d",
+   "crc32": "63ad44c9",
+   "sha1": "44f0c2ce9475f52e895f5f3d8bcd281d5b12ab1c",
+   "length": "107.35",
+   "height": "300",
+   "width": "533"
+  },
+  {
+   "name": "Framing_John_DeLorean_Gets_Special_Screening.png",
+   "source": "derivative",
+   "format": "PNG",
+   "original": "Framing_John_DeLorean_Gets_Special_Screening.mp3",
+   "mtime": "1561260928",
+   "size": "15963",
+   "md5": "e5162eae1315002174ddf8ec4ca8691a",
+   "crc32": "0da3e5ae",
+   "sha1": "2642d555cd6d09797d6dee138b9f4cadee92c15f"
+  },
+  {
+   "name": "__ia_thumb.jpg",
+   "source": "original",
+   "mtime": "1671051359",
+   "size": "9778",
+   "md5": "4c857fe7b938c05f4fe26b7d1d727322",
+   "crc32": "5e5a0852",
+   "sha1": "37d6c460aff0b819e29b878cfbe672a26c32034d",
+   "format": "Item Tile",
+   "rotation": "0"
+  },
+  {
+   "name": "npctv-Framing_John_DeLorean_Gets_Special_Screening_archive.torrent",
+   "source": "metadata",
+   "btih": "de3d38336b8350c5595538eb4e482ef863417fd4",
+   "mtime": "1671051523",
+   "size": "5468",
+   "md5": "347170d1f581f09047a14619083240dc",
+   "crc32": "8939a476",
+   "sha1": "d7dd663b4662bf3c47aaf903e6ba161959cb63c7",
+   "format": "Archive BitTorrent"
+  },
+  {
+   "name": "npctv-Framing_John_DeLorean_Gets_Special_Screening_files.xml",
+   "source": "original",
+   "format": "Metadata",
+   "md5": "7acc086bd1f3ab6791709f9221191554",
+   "summation": "md5"
+  },
+  {
+   "name": "npctv-Framing_John_DeLorean_Gets_Special_Screening_meta.sqlite",
+   "source": "original",
+   "mtime": "1671051324",
+   "size": "24576",
+   "md5": "eb86ce41745ff3b20db32deb4d86bdd6",
+   "crc32": "1e73d141",
+   "sha1": "2b747f2452f32e1731b02d56afce5ecd08b9a42b",
+   "format": "Metadata"
+  },
+  {
+   "name": "npctv-Framing_John_DeLorean_Gets_Special_Screening_meta.xml",
+   "source": "original",
+   "mtime": "1782395846",
+   "size": "4552",
+   "format": "Metadata",
+   "md5": "cfada843396d09429531d04ad6739f52",
+   "crc32": "90ac2813",
+   "sha1": "4ab3ca704edf3d074f4a4b4e02628c9f68b302c9"
+  }
+ ]
+}

@@ -63,3 +63,6 @@ postgres_data/
 
 # Logs
 *.log
+
+# Backend local media and data
+backend/data/

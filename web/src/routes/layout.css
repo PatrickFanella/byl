@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* Visitor site: the dark gallery look shared with the iOS app. */
+.gallery {
+	background:
+		radial-gradient(60rem 30rem at 0% 0%, rgb(59 130 246 / 0.18), transparent 60%),
+		radial-gradient(40rem 24rem at 100% 100%, rgb(168 85 247 / 0.1), transparent 60%), #0a0a0b;
+}

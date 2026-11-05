@@ -1,9 +1,10 @@
 .PHONY: help \
 	backend-up backend-up-detached backend-down backend-restart backend-build backend-logs backend-ps \
 	migrate migrate-status migrate-down migrate-reset db-shell db-reset \
-	api-health api-spaces api-nearby \
+	api-health api-cities api-places api-tour backend-test \
 	nuc-up nuc-down nuc-logs nuc-smoke nuc-rollback \
-	ios-build ios-run ios-simulators
+	ios-build ios-run ios-test ios-simulators android-test \
+	web-install web-dev web-check web-build web-e2e
 
 BACKEND_DIR := backend
 IOS_DIR := ios-invisible-museum
@@ -12,9 +13,11 @@ IOS_SCHEME := InvisibleMuseum
 IOS_BUNDLE_ID := com.rork.InvisibleMuseum
 IOS_BUILD_DIR := build
 SIMULATOR_ID ?= 46977DDD-8007-4137-AA70-C106917A7DB7
-NEARBY_LAT ?= 41.794
-NEARBY_LNG ?= -88.007
-NEARBY_RADIUS_M ?= 5000
+NEARBY_LAT ?= 41.7959
+NEARBY_LNG ?= -88.0092
+NEARBY_RADIUS_M ?= 2000
+CITY ?= downers-grove
+TOUR ?= downtown-memory-loop
 
 help:
 	@printf "Invisible Museum commands\n\n"
@@ -34,16 +37,26 @@ help:
 	@printf "  make db-reset             Delete Postgres volume and recreate stack\n\n"
 	@printf "API smoke tests:\n"
 	@printf "  make api-health           Curl /healthz\n"
-	@printf "  make api-spaces           Curl /api/v1/spaces\n"
-	@printf "  make api-nearby           Curl nearby Downers Grove spaces\n\n"
+	@printf "  make api-cities           Curl /api/v1/cities\n"
+	@printf "  make api-places           Curl places near downtown Downers Grove\n"
+	@printf "  make api-tour             Curl the Downtown Memory Loop tour\n"
+	@printf "  make backend-test         Run Go tests against a throwaway Postgres\n\n"
 	@printf "NUC / Almaz deployment:\n"
 	@printf "  make nuc-up               Start deployment stack\n"
 	@printf "  make nuc-down             Stop deployment stack\n"
 	@printf "  make nuc-logs             Follow deployment logs\n"
-	@printf "  make nuc-smoke            Health + moderation smoke checks\n"
+	@printf "  make nuc-smoke            Health + cities smoke checks\n"
 	@printf "  make nuc-rollback         Goose rollback one migration\n\n"
+	@printf "Web admin:\n"
+	@printf "  make web-install          Install web dependencies (npm 11)\n"
+	@printf "  make web-dev              Run the admin app against localhost:8080\n"
+	@printf "  make web-check            Type-check, lint, and unit-test the web app\n"
+	@printf "  make web-build            Build the static admin app\n"
+	@printf "  make web-e2e              Playwright against E2E_API_URL (default localhost:8080)\n\n"
 	@printf "iOS:\n"
 	@printf "  make ios-build            Build iOS app for simulator\n"
+	@printf "  make ios-test             Run InvisibleMuseumKit unit tests (swift test)\n"
+	@printf "  make android-test         Run the Android :core JUnit tests (gradle)\n"
 	@printf "  make ios-run              Boot/install/launch on SIMULATOR_ID\n"
 	@printf "  make ios-simulators       List available simulators\n"
 
@@ -88,15 +101,20 @@ db-reset:
 api-health:
 	curl http://localhost:8080/healthz
 
-api-spaces:
-	curl http://localhost:8080/api/v1/spaces
+api-cities:
+	curl http://localhost:8080/api/v1/cities
 
-api-nearby:
-	curl "http://localhost:8080/api/v1/spaces/nearby?lat=$(NEARBY_LAT)&lng=$(NEARBY_LNG)&radius_m=$(NEARBY_RADIUS_M)"
+api-places:
+	curl "http://localhost:8080/api/v1/cities/$(CITY)/places?near=$(NEARBY_LAT),$(NEARBY_LNG)&radius_m=$(NEARBY_RADIUS_M)"
+
+api-tour:
+	curl "http://localhost:8080/api/v1/tours/$(TOUR)"
+
+backend-test:
+	cd $(BACKEND_DIR) && $(MAKE) test-db
 
 NUC_COMPOSE := -f backend/docker-compose.nuc.yml
 NUC_API_URL ?= http://localhost:8080
-ADMIN_BEARER_TOKEN ?= dev-admin-token
 
 nuc-up:
 	docker compose $(NUC_COMPOSE) up --build -d
@@ -108,7 +126,7 @@ nuc-logs:
 	docker compose $(NUC_COMPOSE) logs -f
 
 nuc-smoke:
-	curl "$(NUC_API_URL)/healthz" && curl -H "Authorization: Bearer $(ADMIN_BEARER_TOKEN)" "$(NUC_API_URL)/api/v1/admin/contributions?status=pending"
+	curl "$(NUC_API_URL)/healthz" && curl "$(NUC_API_URL)/api/v1/cities"
 
 nuc-rollback:
 	docker compose $(NUC_COMPOSE) run --rm migrate goose -dir /migrations down
@@ -122,5 +140,29 @@ ios-run: ios-build
 	xcrun simctl install "$(SIMULATOR_ID)" "$(IOS_DIR)/$(IOS_BUILD_DIR)/Debug-iphonesimulator/InvisibleMuseum.app"
 	xcrun simctl launch "$(SIMULATOR_ID)" "$(IOS_BUNDLE_ID)"
 
+ios-test:
+	cd $(IOS_DIR)/InvisibleMuseumKit && swift test
+
 ios-simulators:
 	xcrun simctl list devices available
+
+android-test:
+	cd android && gradle :core:test --no-daemon
+
+WEB_DIR := web
+E2E_API_URL ?= http://localhost:8080
+
+web-install:
+	cd $(WEB_DIR) && npx -y npm@11 install --legacy-peer-deps
+
+web-dev:
+	cd $(WEB_DIR) && npm run dev
+
+web-check:
+	cd $(WEB_DIR) && npm run gen:api && npm run check && npm run lint && npm run test:unit -- --run
+
+web-build:
+	cd $(WEB_DIR) && npm run build
+
+web-e2e:
+	cd $(WEB_DIR) && E2E_API_URL=$(E2E_API_URL) npm run test:e2e
