@@ -5,7 +5,7 @@ Cloudflare and Caddy stay on Almaz and reverse-proxy the public hostname to the 
 
 ## Services
 
-- `web` serves the curator admin app (nginx, port `3000` on the NUC) and proxies `/api` and `/media` to the API. Point a second hostname such as `museum-admin.example.com` at it through Caddy.
+- `web` serves the visitor site at `/` and the curator admin at `/admin` (nginx, port `3000` on the NUC) and proxies `/api` and `/media` to the API. Point a public hostname such as `museum.example.com` at it through Caddy; shared route links are `https://<that host>/t/{slug}`.
 - `postgres` stays on the private Docker network only.
 - `api` listens on `:8080` inside Docker and publishes `8080` on the NUC for Almaz to reach. It also runs the background job worker.
 - `minio` stores uploaded media and narration audio. Publish port `9000` to the LAN so Caddy can serve the bucket, or front it with Cloudflare R2 later by changing the `S3_*` variables.

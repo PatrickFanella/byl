@@ -8,7 +8,7 @@ Walking and biking tours of your city as if it were one giant museum. SwiftUI iO
 
 - `ios-invisible-museum/` — SwiftUI app.
 - `backend/` — Go REST API, PostgreSQL, and Goose migrations.
-- `web/` — SvelteKit admin app for curators.
+- `web/` — SvelteKit app: the visitor site at `/` and the curator admin at `/admin`.
 - `docs/superpowers/plans/` — implementation planning notes.
 - `docs/deployment/nuc-almaz.md` — NUC/Almaz deployment notes.
 - `Makefile` — root commands for backend, migrations, API smoke tests, and Simulator runs.
@@ -152,13 +152,26 @@ make backend-test
 That starts a throwaway Postgres in Docker and runs the full suite against it.
 Without `TEST_DATABASE_URL`, `go test ./...` runs only the pure unit tests.
 
-## Web admin app
+## Web app
 
-`web/` is a SvelteKit single-page app for curators: dashboard, review queue with
-AI drafting, imports, places, moments, media, tours with a map and stops editor,
-and jobs. It talks to the API on the same origin; nginx proxies `/api` and
-`/media` in the compose stack (`web` service on port 3000), and `vite dev`
-proxies them in development.
+`web/` is one SvelteKit single-page app with two faces on the same origin:
+
+- **Visitor site at `/`** (cycle 4): browse a city's tours by topic, open a tour with
+  per-mode estimates and a map, walk or ride it in the browser (`/tours/{slug}/walk`)
+  with GPS arrival detection (65 m accuracy floor, "I'm here" fallback), Directions
+  handoff to Apple or Google Maps, an audio guide (recorded narration or browser
+  speech), local progress merged with the account when signed in, place and moment
+  pages with sources and credits, saved tours, and a route builder that shares
+  `/t/{slug}` links (which also open in the iOS app). An active walk survives a
+  reload without signal from the cached tour and route.
+- **Curator admin at `/admin`**: dashboard, review queue with AI drafting, imports,
+  places, moments, media, tours with a map and stops editor, and jobs. Non-curators
+  see a role notice; signed-out visitors are sent to `/signin`.
+
+nginx proxies `/api` and `/media` in the compose stack (`web` service on port 3000),
+and `vite dev` proxies them in development. Logic that matters (arrival, progress
+merge, estimates, narration, route-builder validation) lives in `web/src/lib` with
+Vitest; Playwright covers the visitor flows and the admin smoke against a live API.
 
 ```bash
 make web-install
