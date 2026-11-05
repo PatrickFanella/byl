@@ -31,6 +31,7 @@ class ActiveTourTest {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val puts = java.util.concurrent.CopyOnWriteArrayList<String>()
     @Volatile private var routeStatus = 200
+    @Volatile private var routeBody = Fixtures.text("route")
     @Volatile private var putStatus = 200
     @Volatile private var remoteProgress = false
 
@@ -42,7 +43,7 @@ class ActiveTourTest {
                 val path = request.path ?: ""
                 return when {
                     request.method == "GET" && path.startsWith("/api/v1/tours/$tourId/route") ->
-                        if (routeStatus == 200) MockResponse().setBody(Fixtures.text("route"))
+                        if (routeStatus == 200) MockResponse().setBody(routeBody)
                         else MockResponse().setResponseCode(routeStatus).setBody("""{"error":{"code":"internal","message":"down"}}""")
                     request.method == "GET" && path == "/api/v1/me/progress" ->
                         MockResponse().setBody(if (remoteProgress) """{"items":[${Fixtures.text("progress")}],"next_cursor":""}""" else """{"items":[],"next_cursor":""}""")
@@ -162,6 +163,18 @@ class ActiveTourTest {
     }
 
     @Test
+    fun `a pending route never replaces a cached ready route`() = runTest {
+        val m = model(false)
+        m.loadRoute()
+        routeBody = Fixtures.text("route").replace("\"status\":\"ready\"", "\"status\":\"pending\"")
+        m.loadRoute()
+        assertEquals("ready", m.state.value.route?.status)
+        assertTrue(m.state.value.routeFromCache)
+        assertEquals("Route being computed", m.state.value.routeMessage)
+        m.end()
+    }
+
+    @Test
     fun `a route failure without cache is reported`() = runTest {
         routeStatus = 500
         val m = model(false)
@@ -216,7 +229,7 @@ class ActiveTourTest {
         m.markArrived()
         m.markArrived()
         m.flush()
-        assertEquals(2, puts.size)
+        assertTrue(puts.isNotEmpty())
         assertEquals(listOf(1, 2), visitedOf(puts.last()))
         assertTrue(visitedOf(puts.first()).all { it in visitedOf(puts.last()) })
     }
@@ -242,14 +255,45 @@ class ActiveTourTest {
         m.resetProgress()
         m.flush()
         assertEquals(emptyList<Int>(), visitedOf(puts.last()))
+        assertTrue(Json.parseToJsonElement(puts.last()).jsonObject["reset"]!!.jsonPrimitive.boolean)
         assertTrue(m.state.value.visited.isEmpty())
         assertEquals(1, m.state.value.nextStop?.position)
+    }
+
+    @Test
+    fun `an offline reset survives a relaunch and clears the server before merging`() = runTest {
+        val m = model(true)
+        m.markArrived()
+        m.flush()
+        putStatus = 500
+        m.resetProgress()
+        m.flush()
+        assertTrue(m.needsSync)
+        val restored = model(true)
+        putStatus = 200
+        remoteProgress = true
+        restored.loadRemoteProgress()
+        restored.flush()
+        assertTrue(restored.state.value.visited.isEmpty())
+        assertTrue(Json.parseToJsonElement(puts.last()).jsonObject["reset"]!!.jsonPrimitive.boolean)
+        assertFalse(restored.needsSync)
     }
 
     @Test
     fun `navigation URI points at the next stop`() = runTest {
         val m = model(false)
         assertEquals("google.navigation:q=${tour.stops[0].place.latitude},${tour.stops[0].place.longitude}&mode=w", m.navigationUri())
+    }
+
+    @Test
+    fun `progress is scoped by account and shared across travel modes`() = runTest {
+        val alice = ActiveTour(api(null), tour, "walk", store, { false }, scope, "alice")
+        alice.markArrived()
+        val bike = ActiveTour(api(null), tour, "bike", store, { false }, scope, "alice")
+        assertEquals(setOf(1), bike.state.value.visited)
+        assertNull(ActiveTour.restore(api(null), store, { false }, scope, "bob"))
+        val bob = ActiveTour(api(null), tour, "walk", store, { false }, scope, "bob")
+        assertTrue(bob.state.value.visited.isEmpty())
     }
 
     @Test

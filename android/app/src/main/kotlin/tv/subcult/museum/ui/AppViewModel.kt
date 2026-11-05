@@ -3,11 +3,15 @@ package tv.subcult.museum.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tv.subcult.museum.AppContainer
+import tv.subcult.museum.core.ApiClient
+import tv.subcult.museum.core.Endpoints
 import tv.subcult.museum.core.ActiveTour
 import tv.subcult.museum.core.ApiException
 import tv.subcult.museum.core.City
@@ -40,6 +44,8 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     val state: StateFlow<AppState> = _state
     val api get() = container.api
     private var signInAfterTour = false
+    private var narrationJob: Job? = null
+    private var foreground = true
 
     init {
         container.client.onUnauthorized = { token -> handleUnauthorized(token) }
@@ -98,11 +104,11 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     fun showSignIn(show: Boolean) = _state.update { it.copy(showSignIn = show) }
 
     fun signOut() {
-        viewModelScope.launch {
-            runCatching { api.signOut() }
-            container.session.clear()
-            _state.update { it.copy(savedTourIds = emptySet()) }
-        }
+        val token = container.session.token
+        val previousApi = Endpoints(ApiClient(container.client.baseUrl) { token })
+        container.session.clear()
+        _state.update { it.copy(savedTourIds = emptySet()) }
+        if (token != null) viewModelScope.launch { runCatching { previousApi.signOut() } }
     }
 
     /**
@@ -132,12 +138,22 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     // Active tour
 
     fun startTour(tour: TourDetail, mode: String) {
-        attach(ActiveTour(api, tour, mode, container.store, { container.session.isSignedIn }, container.scope))
+        val owner = container.session.state.value
+        val accountId = owner?.account?.id
+        attach(ActiveTour(activeTourApi(owner), tour, mode, container.store, { container.session.isSignedIn && container.session.state.value?.account?.id == accountId }, container.scope, accountId))
     }
 
     private fun resumeActiveTour() {
         if (_state.value.active != null) return
-        ActiveTour.restore(api, container.store, { container.session.isSignedIn }, container.scope)?.let { attach(it) }
+        val owner = container.session.state.value
+        val accountId = owner?.account?.id
+        ActiveTour.restore(activeTourApi(owner), container.store, { container.session.isSignedIn && container.session.state.value?.account?.id == accountId }, container.scope, accountId)?.let { attach(it) }
+    }
+
+    private fun activeTourApi(owner: Session?): Endpoints {
+        val client = ApiClient(container.client.baseUrl) { owner?.token }
+        client.onUnauthorized = ::handleUnauthorized
+        return Endpoints(client)
     }
 
     private fun attach(tour: ActiveTour) {
@@ -154,6 +170,7 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         val tour = _state.value.active ?: return
         if (reset) tour.resetProgress()
         tour.end()
+        narrationJob?.cancel()
         container.narration.stop()
         _state.update { if (it.active === tour) it.copy(active = null) else it }
         if (signInAfterTour) {
@@ -164,11 +181,14 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     }
 
     fun onResume() {
+        foreground = true
         _state.value.active?.let { tour -> viewModelScope.launch { tour.syncIfNeeded() } }
     }
 
     /** The activity left the foreground: no narration and no GPS until it is back. */
     fun onStop() {
+        foreground = false
+        narrationJob?.cancel()
         container.narration.stop()
         container.location.stop()
     }
@@ -178,16 +198,23 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     fun setAudioGuide(on: Boolean) {
         container.audioGuideEnabled = on
         _state.update { it.copy(audioEnabled = on) }
-        if (!on) container.narration.stop()
+        if (!on) {
+            narrationJob?.cancel()
+            container.narration.stop()
+        }
     }
 
     /** Plays the featured moment at a stop: recorded narration, else the body read aloud. */
-    fun playNarration(stop: TourStop) {
+    fun playNarration(stop: TourStop, requireGuide: Boolean = false) {
+        val expected = _state.value.active ?: return
         val featured = stop.featuredMoment ?: return
-        viewModelScope.launch {
+        narrationJob?.cancel()
+        narrationJob = viewModelScope.launch {
             val key = "moment.${featured.id}"
             val detail = runCatching { api.moment(featured.id) }.getOrNull()?.also { container.store.putJson(key, it) }
                 ?: container.store.getJson(key)
+            coroutineContext.ensureActive()
+            if (!foreground || _state.value.active !== expected || (requireGuide && !_state.value.audioEnabled) || expected.state.value.arrivedStop?.id != stop.id) return@launch
             container.narration.play(planNarration(detail?.narration?.publicUrl, detail?.body ?: featured.excerpt))
         }
     }

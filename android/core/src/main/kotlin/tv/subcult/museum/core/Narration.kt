@@ -23,8 +23,10 @@ private val markdownRules: List<Pair<Regex, String>> = listOf(
     Regex("(?m)^\\s*(?:[-*+]|\\d+\\.)\\s+") to "",
     Regex("(?m)^\\s*>\\s?") to "",
     Regex("`([^`]*)`") to "$1",
-    Regex("(\\*\\*|__)(.*?)\\1") to "$2",
-    Regex("(\\*|_)(.*?)\\1") to "$2"
+    Regex("(\\*\\*)(.*?)\\1") to "$2",
+    Regex("(?<![\\p{L}\\p{N}_])__(.*?)__(?![\\p{L}\\p{N}_])") to "$1",
+    Regex("(\\*)(.*?)\\1") to "$2",
+    Regex("(?<![\\p{L}\\p{N}_])_(.*?)_(?![\\p{L}\\p{N}_])") to "$1"
 )
 
 /** Strips the Markdown a narrator should not read aloud and collapses whitespace. */

@@ -37,6 +37,9 @@ func (d Deps) adminCreateImport(w http.ResponseWriter, r *http.Request) {
 	if strings.TrimSpace(req.City) == "" {
 		fields["city"] = "is required"
 	}
+	if req.Limit < 0 || req.Limit > 100 {
+		fields["limit"] = "must be between 0 and 100"
+	}
 	if req.RadiusM < 0 || req.RadiusM > 20000 {
 		fields["radius_m"] = "must be between 0 and 20000"
 	}

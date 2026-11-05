@@ -10,7 +10,7 @@ import kotlin.math.sqrt
 data class Point(val lat: Double, val lng: Double)
 
 /** A location fix; `accuracyM` below zero means unknown. */
-data class Fix(val lat: Double, val lng: Double, val accuracyM: Double) {
+data class Fix(val lat: Double, val lng: Double, val accuracyM: Double, val timestampMillis: Long = System.currentTimeMillis()) {
     val point: Point get() = Point(lat, lng)
 }
 
@@ -28,6 +28,7 @@ fun distanceM(a: Point, b: Point): Double {
 
 /** True when the fix is usable and within the stop's radius plus the fix's own uncertainty. */
 fun hasArrived(fix: Fix, stop: Point, radiusM: Double): Boolean {
+    if (kotlin.math.abs(System.currentTimeMillis() - fix.timestampMillis) > 30_000) return false
     if (fix.accuracyM < 0 || fix.accuracyM > MAX_ACCURACY_M) return false
     return distanceM(fix.point, stop) <= radiusM + fix.accuracyM
 }

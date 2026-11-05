@@ -298,7 +298,8 @@ data class UpdateUserTourRequest(
 data class ProgressRequest(
     val mode: String,
     @SerialName("visited_positions") val visitedPositions: List<Int>,
-    val completed: Boolean
+    val completed: Boolean,
+    val reset: Boolean = false
 )
 
 @Serializable

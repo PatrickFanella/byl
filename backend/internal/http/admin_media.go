@@ -34,6 +34,7 @@ func (d Deps) adminUploadMedia(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "bad_request", "expected a multipart form with a file field (max 64 MiB)")
 		return
 	}
+	defer r.MultipartForm.RemoveAll()
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		writeValidation(w, map[string]string{"file": "is required"})
@@ -45,11 +46,17 @@ func (d Deps) adminUploadMedia(w http.ResponseWriter, r *http.Request) {
 	head = head[:n]
 	contentType := detectContentType(header.Header.Get("Content-Type"), header.Filename, head)
 	kind, prefix := kindForContentType(contentType)
-	if kind == "" {
+	if kind == "" || strings.Contains(contentType, "svg") || strings.Contains(contentType, "xml") || strings.Contains(contentType, "html") {
 		writeValidation(w, map[string]string{"file": "must be an image, video, or audio file"})
 		return
 	}
-	key := blob.KeyFor(prefix, header.Filename)
+	extensions, _ := mime.ExtensionsByType(contentType)
+	if len(extensions) == 0 {
+		writeValidation(w, map[string]string{"file": "has an unsupported media type"})
+		return
+	}
+	name := strings.TrimSuffix(path.Base(header.Filename), path.Ext(header.Filename)) + extensions[0]
+	key := blob.KeyFor(prefix, name)
 	body := io.MultiReader(bytes.NewReader(head), file)
 	if err := d.Blob.Put(r.Context(), key, contentType, body, header.Size); err != nil {
 		d.fail(w, err)
@@ -103,16 +110,7 @@ func (d Deps) adminUpdateMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 // detectContentType trusts a specific declared type, otherwise sniffs the bytes, then the extension.
-func detectContentType(declared, filename string, head []byte) string {
-	declared = strings.ToLower(strings.TrimSpace(strings.Split(declared, ";")[0]))
-	if declared != "" && declared != "application/octet-stream" {
-		return declared
-	}
-	if sniffed := http.DetectContentType(head); sniffed != "application/octet-stream" && !strings.HasPrefix(sniffed, "text/") {
-		return strings.Split(sniffed, ";")[0]
-	}
-	if byExt := mime.TypeByExtension(strings.ToLower(path.Ext(filename))); byExt != "" {
-		return strings.Split(byExt, ";")[0]
-	}
-	return "application/octet-stream"
+func detectContentType(_, _ string, head []byte) string {
+	// Neither a declared MIME type nor a filename can override the file signature.
+	return strings.Split(http.DetectContentType(head), ";")[0]
 }

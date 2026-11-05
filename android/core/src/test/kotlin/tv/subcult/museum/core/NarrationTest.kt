@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test
 
 class NarrationTest {
     @Test
+    fun `underscores inside words are preserved`() = assertEquals("museum_archive_story and history", plainText("museum_archive_story and _history_"))
+    @Test
     fun `prefers recorded narration`() {
         assertEquals(NarrationPlan.Stream("https://media.test/n.mp3"), planNarration("https://media.test/n.mp3", "Some body"))
     }

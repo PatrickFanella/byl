@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"invisible-museum/backend/internal/geo"
 	"invisible-museum/backend/internal/models"
@@ -46,7 +47,15 @@ func (w *Worker) importSource(ctx context.Context, p models.ImportSourcePayload)
 		req.Center = geo.Point{Lat: *p.Lat, Lng: *p.Lng}
 	}
 
-	finds, err := adapter.Discover(ctx, req)
+	var finds []sources.Found
+	var notes []string
+	if detailed, ok := adapter.(interface {
+		DiscoverWithNotes(context.Context, sources.Request) ([]sources.Found, []string, error)
+	}); ok {
+		finds, notes, err = detailed.DiscoverWithNotes(ctx, req)
+	} else {
+		finds, err = adapter.Discover(ctx, req)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -80,10 +89,8 @@ func (w *Worker) importSource(ctx context.Context, p models.ImportSourcePayload)
 		imported++
 	}
 	note := fmt.Sprintf("imported %d, skipped %d", imported, skipped)
-	if u, ok := adapter.(interface{ LastSkips() []string }); ok {
-		if s := u.LastSkips(); len(s) > 0 {
-			note += fmt.Sprintf("; %d pages unusable", len(s))
-		}
+	if len(notes) > 0 {
+		note += "; pages skipped: " + strings.Join(notes, "; ")
 	}
 	return note, nil
 }

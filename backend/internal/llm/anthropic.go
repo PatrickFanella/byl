@@ -33,7 +33,7 @@ func (a *Anthropic) DraftMoment(ctx context.Context, req DraftRequest) (MomentDr
 	err := withOneRetry(func() error {
 		raw, err := a.complete(ctx, MomentDraftSchema(), draftSystemPrompt, draftUserPrompt(req))
 		if err != nil {
-			return err
+			return &requestFailure{err}
 		}
 		var d MomentDraft
 		if err := json.Unmarshal([]byte(raw), &d); err != nil {
@@ -53,7 +53,7 @@ func (a *Anthropic) RankMoments(ctx context.Context, req RankRequest) (Ranking, 
 	err := withOneRetry(func() error {
 		raw, err := a.complete(ctx, RankingSchema(), rankSystemPrompt, rankUserPrompt(req))
 		if err != nil {
-			return err
+			return &requestFailure{err}
 		}
 		var r Ranking
 		if err := json.Unmarshal([]byte(raw), &r); err != nil {

@@ -7,6 +7,7 @@ struct MyRoutesView: View {
     @State private var routes: Loadable<[TourSummary]> = .idle
     @State private var path = NavigationPath()
     @State private var pendingDelete: TourSummary?
+    @State private var actionError: String?
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -30,6 +31,7 @@ struct MyRoutesView: View {
                     }
                     .buttonStyle(.museum(.primary, size: .large))
                     .disabled(model.selectedCity == nil)
+                    if let actionError { MuseumInlineHint(text: actionError, tint: Museum.muted) }
                     content
                 }
             }
@@ -74,7 +76,9 @@ struct MyRoutesView: View {
                         .buttonStyle(.museum(.secondary, size: .small))
                         Button {
                             Task {
-                                if let detail = try? await model.api.tour(tour.slug) { path.append(BuilderRoute(editing: detail)) }
+                                actionError = nil
+                                do { path.append(BuilderRoute(editing: try await model.api.tour(tour.slug))) }
+                                catch { actionError = error.museumMessage }
                             }
                         } label: { Label("Edit", systemImage: "pencil") }
                             .buttonStyle(.museum(.secondary, size: .small))
@@ -102,11 +106,12 @@ struct MyRoutesView: View {
 
     private func delete(_ tour: TourSummary) async {
         pendingDelete = nil
+        actionError = nil
         do {
             try await model.api.deleteTour(tour.id)
             await load()
         } catch {
-            routes = .failed(error.museumMessage)
+            actionError = error.museumMessage
         }
     }
 }

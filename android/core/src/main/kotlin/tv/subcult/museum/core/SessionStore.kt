@@ -27,6 +27,7 @@ class SessionStore(private val storage: TokenStorage) {
     val isSignedIn: Boolean get() = _state.value != null
 
     /** Loads a saved session; a token without an account restores as signed out. */
+    @Synchronized
     fun restore(): Boolean {
         val token = storage.read(TOKEN_KEY)
         val accountJson = storage.read(ACCOUNT_KEY)
@@ -51,12 +52,14 @@ class SessionStore(private val storage: TokenStorage) {
         _state.value = session
     }
 
+    @Synchronized
     fun update(account: Account) {
         val current = _state.value ?: return
         storage.write(ACCOUNT_KEY, MuseumJson.encodeToString(account))
         _state.value = current.copy(account = account)
     }
 
+    @Synchronized
     fun clear() {
         storage.remove(TOKEN_KEY)
         storage.remove(ACCOUNT_KEY)

@@ -22,8 +22,11 @@ public final class SessionController {
     public static let accountKey = "session.account"
 
     private let storage: TokenStorage
-    public private(set) var token: String?
-    public private(set) var account: Account?
+    private let lock = NSRecursiveLock()
+    private var currentToken: String?
+    private var currentAccount: Account?
+    public var token: String? { lock.withLock { currentToken } }
+    public var account: Account? { lock.withLock { currentAccount } }
     /// Called after any change so observers can refresh.
     public var onChange: (() -> Void)?
 
@@ -36,34 +39,42 @@ public final class SessionController {
     /// Loads a previous session from storage. Returns whether one existed.
     @discardableResult
     public func restore() -> Bool {
-        token = storage.read(Self.tokenKey)
+        lock.lock()
+        defer { lock.unlock() }
+        currentToken = storage.read(Self.tokenKey)
         if let raw = storage.read(Self.accountKey), let data = raw.data(using: .utf8) {
-            account = try? JSONDecoder().decode(Account.self, from: data)
+            currentAccount = try? JSONDecoder().decode(Account.self, from: data)
         } else {
-            account = nil
+            currentAccount = nil
         }
-        if token == nil { account = nil }
+        if currentToken == nil { currentAccount = nil }
         onChange?()
-        return token != nil
+        return currentToken != nil
     }
 
     public func set(session: Session) {
-        token = session.token
-        account = session.account
+        lock.lock()
+        defer { lock.unlock() }
+        currentToken = session.token
+        currentAccount = session.account
         storage.write(Self.tokenKey, value: session.token)
         persistAccount()
         onChange?()
     }
 
     public func update(account: Account) {
-        self.account = account
+        lock.lock()
+        defer { lock.unlock() }
+        self.currentAccount = account
         persistAccount()
         onChange?()
     }
 
     public func clear() {
-        token = nil
-        account = nil
+        lock.lock()
+        defer { lock.unlock() }
+        currentToken = nil
+        currentAccount = nil
         storage.remove(Self.tokenKey)
         storage.remove(Self.accountKey)
         onChange?()

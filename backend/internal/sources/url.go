@@ -44,6 +44,15 @@ func (a *URL) LastSkips() []string {
 }
 
 func (a *URL) Discover(ctx context.Context, req Request) ([]Found, error) {
+	found, skips, err := a.DiscoverWithNotes(ctx, req)
+	a.mu.Lock()
+	a.skips = skips
+	a.mu.Unlock()
+	return found, err
+}
+
+// DiscoverWithNotes returns diagnostics belonging to this run, even during concurrent imports.
+func (a *URL) DiscoverWithNotes(ctx context.Context, req Request) ([]Found, []string, error) {
 	var out []Found
 	var skips []string
 	query := strings.ToLower(strings.TrimSpace(req.Query))
@@ -55,7 +64,7 @@ func (a *URL) Discover(ctx context.Context, req Request) ([]Found, error) {
 		f, err := a.fetch(ctx, page)
 		if err != nil {
 			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-				return out, err
+				return out, skips, err
 			}
 			skips = append(skips, page+": "+err.Error())
 			continue
@@ -65,10 +74,7 @@ func (a *URL) Discover(ctx context.Context, req Request) ([]Found, error) {
 		}
 		out = append(out, f)
 	}
-	a.mu.Lock()
-	a.skips = skips
-	a.mu.Unlock()
-	return out, nil
+	return out, skips, nil
 }
 
 func (a *URL) fetch(ctx context.Context, page string) (Found, error) {
@@ -100,8 +106,8 @@ func (a *URL) fetch(ctx context.Context, page string) (Found, error) {
 	if len(strings.Fields(text)) < 20 {
 		return Found{}, fmt.Errorf("no readable article text")
 	}
-	if len(text) > urlMaxText {
-		text = text[:urlMaxText]
+	if len([]rune(text)) > urlMaxText {
+		text = string([]rune(text)[:urlMaxText])
 	}
 	sum := sha256.Sum256([]byte(page))
 	if title == "" {

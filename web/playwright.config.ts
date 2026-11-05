@@ -8,6 +8,7 @@ export default defineConfig({
 	testDir: 'e2e',
 	testMatch: '**/*.e2e.{ts,js}',
 	timeout: 60_000,
+	workers: 2,
 	use: {
 		baseURL: 'http://localhost:4173',
 		...(executablePath ? { launchOptions: { executablePath } } : {})

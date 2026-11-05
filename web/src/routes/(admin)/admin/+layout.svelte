@@ -20,12 +20,6 @@
 		{ href: '/admin/jobs', label: 'Jobs' }
 	];
 
-	$effect(() => {
-		if (!$current) {
-			goto(`/signin?next=${encodeURIComponent(page.url.pathname)}`, { replaceState: true });
-		}
-	});
-
 	async function signOut() {
 		try {
 			await api.del('/api/v1/auth/session');

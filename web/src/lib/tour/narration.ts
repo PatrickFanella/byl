@@ -20,8 +20,10 @@ export function plainText(markdown: string): string {
 		.replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, '')
 		.replace(/^\s*>\s?/gm, '')
 		.replace(/`([^`]*)`/g, '$1')
-		.replace(/(\*\*|__)(.*?)\1/g, '$2')
-		.replace(/(\*|_)(.*?)\1/g, '$2')
+		.replace(/(\*\*)(.*?)\1/g, '$2')
+		.replace(/(?<![\p{L}\p{N}_])__(.*?)__(?![\p{L}\p{N}_])/gu, '$1')
+		.replace(/(\*)(.*?)\1/g, '$2')
+		.replace(/(?<![\p{L}\p{N}_])_(.*?)_(?![\p{L}\p{N}_])/gu, '$1')
 		.split(/\s+/)
 		.filter(Boolean)
 		.join(' ');

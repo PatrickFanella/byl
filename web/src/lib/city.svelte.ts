@@ -1,5 +1,5 @@
 // The visitor's selected city, remembered per browser.
-import { listCities, type City } from '#lib/visitor.ts';
+import { getCity, listCities, type City } from '#lib/visitor.ts';
 
 const KEY = 'invisible-museum.city';
 
@@ -24,7 +24,8 @@ class CityState {
 			const page = await listCities();
 			this.cities = page.items;
 			const slug = remembered();
-			this.current = this.cities.find((c) => c.slug === slug) ?? this.cities[0] ?? null;
+			const selected = this.cities.find((c) => c.slug === slug) ?? this.cities[0] ?? null;
+			this.current = selected ? await getCity(selected.slug) : null;
 			this.status = 'ready';
 		} catch (e) {
 			this.message = e instanceof Error ? e.message : 'Could not load cities.';
@@ -34,6 +35,13 @@ class CityState {
 
 	select(c: City): void {
 		this.current = c;
+		void getCity(c.slug)
+			.then((detail) => {
+				if (this.current?.id === c.id) this.current = detail;
+			})
+			.catch(() => {
+				this.message = 'Could not load this city’s topics.';
+			});
 		try {
 			localStorage.setItem(KEY, c.slug);
 		} catch {

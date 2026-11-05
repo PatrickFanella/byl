@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { modal } from '#lib/modal.ts';
 	import { session } from '#lib/auth.ts';
 	import { Loader } from '#lib/loader.svelte.ts';
 	import { deleteTour, myTours, type TourSummary } from '#lib/visitor.ts';
@@ -93,6 +94,9 @@
 		<div
 			class="w-full max-w-sm rounded-3xl border border-white/10 bg-[#0a0a0b] p-5"
 			role="dialog"
+			use:modal={() => {
+				pendingDelete = null;
+			}}
 			aria-label="Delete this route?"
 		>
 			<h2 class="text-lg font-semibold">Delete this route?</h2>

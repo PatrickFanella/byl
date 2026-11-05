@@ -41,7 +41,7 @@ class AppContainer(context: Context) {
         client.baseUrl = resolveBaseUrl()
     }
 
-    fun resolveBaseUrl(): String = prefs.getString(KEY_BASE_URL, null)?.takeIf { it.isNotBlank() } ?: BuildConfig.API_BASE_URL
+    fun resolveBaseUrl(): String = if (BuildConfig.DEBUG) prefs.getString(KEY_BASE_URL, null)?.takeIf { it.isNotBlank() } ?: BuildConfig.API_BASE_URL else BuildConfig.API_BASE_URL
 
     companion object {
         private const val KEY_AUDIO = "audioGuide"

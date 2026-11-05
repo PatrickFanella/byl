@@ -52,6 +52,10 @@ func (d Deps) optionalAuth(next http.Handler) http.Handler {
 // requireAuth rejects requests without a valid session.
 func (d Deps) requireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if accountFrom(r.Context()) != nil {
+			next.ServeHTTP(w, r)
+			return
+		}
 		token, ok := bearerToken(r)
 		if !ok {
 			writeError(w, http.StatusUnauthorized, "unauthorized", "a bearer token is required")

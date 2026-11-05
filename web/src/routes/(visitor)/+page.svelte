@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteMap } from 'svelte/reactivity';
 	import { city } from '#lib/city.svelte.ts';
 	import { Loader } from '#lib/loader.svelte.ts';
 	import { listPlacesNear, listTours, type PlaceSummary, type TourSummary } from '#lib/visitor.ts';
@@ -15,6 +16,17 @@
 		async () => (city.current ? (await listTours(city.current.slug)).items : []),
 		(v) => v.length === 0
 	);
+	const groups = $derived.by(() => {
+		const grouped = new SvelteMap<string, { name: string; tours: TourSummary[] }>();
+		for (const tour of tours.data ?? []) {
+			const key = tour.topic?.id ?? 'other';
+			if (!grouped.has(key))
+				grouped.set(key, { name: tour.topic?.name ?? 'Other stories', tours: [] });
+			grouped.get(key)!.tours.push(tour);
+		}
+		return [...grouped.entries()];
+	});
+
 	const nearby = new Loader<PlaceSummary[]>(
 		async () =>
 			city.current && position
@@ -78,8 +90,15 @@
 			emptyMessage="Curated tours for this city are still being written."
 			onretry={() => tours.run()}
 		>
-			<div class="grid gap-4 sm:grid-cols-2">
-				{#each tours.data ?? [] as tour (tour.id)}<TourCard {tour} />{/each}
+			<div class="space-y-6">
+				{#each groups as [key, group] (key)}
+					<section class="space-y-3">
+						<h3 class="text-lg font-semibold">{group.name}</h3>
+						<div class="grid gap-4 sm:grid-cols-2">
+							{#each group.tours as tour (tour.id)}<TourCard {tour} />{/each}
+						</div>
+					</section>
+				{/each}
 			</div>
 		</LoadState>
 	</section>

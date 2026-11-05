@@ -24,14 +24,34 @@ var (
 	ErrInvalidReference = errors.New("invalid reference")
 )
 
-// Store runs queries against a pool.
-type Store struct{ pool *pgxpool.Pool }
+type database interface {
+	dbtx
+	Begin(context.Context) (pgx.Tx, error)
+	Ping(context.Context) error
+}
+
+type transactionDB struct{ pgx.Tx }
+
+func (t transactionDB) Ping(ctx context.Context) error { return t.Conn().Ping(ctx) }
+
+// Store runs queries against a pool or a transaction scoped to one operation.
+type Store struct {
+	pool    database
+	rawPool *pgxpool.Pool
+}
 
 // New wraps a pool.
-func New(pool *pgxpool.Pool) *Store { return &Store{pool: pool} }
+func New(pool *pgxpool.Pool) *Store { return &Store{pool: pool, rawPool: pool} }
 
 // Pool exposes the underlying pool for tests and tooling.
-func (s *Store) Pool() *pgxpool.Pool { return s.pool }
+func (s *Store) Pool() *pgxpool.Pool { return s.rawPool }
+
+// Transaction commits related repository operations together, rolling back all of them on error.
+func (s *Store) Transaction(ctx context.Context, fn func(*Store) error) error {
+	return s.withTx(ctx, func(tx pgx.Tx) error {
+		return fn(&Store{pool: transactionDB{tx}, rawPool: s.rawPool})
+	})
+}
 
 // Ping checks database connectivity.
 func (s *Store) Ping(ctx context.Context) error { return s.pool.Ping(ctx) }
@@ -74,7 +94,7 @@ func mapErr(err error) error {
 		case "23503":
 			return fmt.Errorf("%w: %s", ErrInvalidReference, pgErr.ConstraintName)
 		case "22P02":
-			return ErrNotFound
+			return fmt.Errorf("%w: malformed identifier", ErrInvalidReference)
 		}
 	}
 	return err

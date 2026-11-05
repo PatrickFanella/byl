@@ -84,6 +84,9 @@ func TestMapLicense(t *testing.T) {
 		"GFDL":          "GFDL-1.2",
 		"":              "",
 		"Fair use":      "",
+		"CC BY-NC 4.0":  "",
+		"CC BY-ND 4.0":  "",
+		"GFDL 1.3":      "GFDL-1.3",
 	}
 	for in, want := range cases {
 		if got := MapLicense(in); got != want {
@@ -201,7 +204,7 @@ func keys(m map[string]Found) []string {
 // Review fix: media downloads must not reach loopback, private, link-local or ULA addresses
 // (SSRF through a curator-supplied media_url) unless the operator opts in.
 func TestPublicIPClassification(t *testing.T) {
-	blocked := []string{"127.0.0.1", "10.0.0.1", "172.16.5.5", "192.168.1.1", "169.254.169.254", "0.0.0.0", "100.64.0.1", "::1", "fd00::1", "fe80::1", "::ffff:10.0.0.1", "::"}
+	blocked := []string{"127.0.0.1", "10.0.0.1", "172.16.5.5", "192.168.1.1", "169.254.169.254", "0.0.0.0", "100.64.0.1", "::1", "fd00::1", "fe80::1", "::ffff:10.0.0.1", "::", "198.18.0.1", "240.0.0.1", "192.0.0.8", "64:ff9b::a00:1", "2002:a00:1::1", "2001:db8::1"}
 	for _, s := range blocked {
 		if publicIP(net.ParseIP(s)) {
 			t.Errorf("%s should be blocked", s)

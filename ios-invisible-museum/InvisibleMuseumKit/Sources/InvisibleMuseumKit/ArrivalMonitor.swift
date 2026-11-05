@@ -23,6 +23,7 @@ public final class ArrivalMonitor {
     }
 
     public static func hasArrived(location: CLLocation, stop: CLLocationCoordinate2D, radiusM: Double) -> Bool {
+        guard abs(location.timestamp.timeIntervalSinceNow) <= 30 else { return false }
         let accuracy = location.horizontalAccuracy
         guard accuracy >= 0, accuracy <= maxAccuracyM else { return false }
         let distance = location.distance(from: CLLocation(latitude: stop.latitude, longitude: stop.longitude))

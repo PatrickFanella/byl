@@ -119,7 +119,18 @@ func (s *Store) ResolvePlaceID(ctx context.Context, ref, cityRef string) (string
 	var id string
 	var err error
 	if cityRef == "" {
-		err = s.pool.QueryRow(ctx, `SELECT id FROM places WHERE slug = $1 ORDER BY created_at LIMIT 1`, ref).Scan(&id)
+		var ids []string
+		err = s.pool.QueryRow(ctx, `SELECT array_agg(id::text) FROM places WHERE slug = $1`, ref).Scan(&ids)
+		if err != nil {
+			return "", mapErr(err)
+		}
+		if len(ids) == 0 {
+			return "", ErrNotFound
+		}
+		if len(ids) > 1 {
+			return "", fmt.Errorf("%w: place slug is ambiguous; specify a city", ErrConflict)
+		}
+		id = ids[0]
 	} else {
 		cityID, cerr := s.ResolveCityID(ctx, cityRef)
 		if cerr != nil {

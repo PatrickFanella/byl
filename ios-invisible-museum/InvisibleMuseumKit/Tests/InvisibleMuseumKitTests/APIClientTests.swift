@@ -2,6 +2,23 @@ import XCTest
 @testable import InvisibleMuseumKit
 
 final class APIClientTests: XCTestCase {
+    func testPlaceBrowsingFollowsEveryCursorForTheRouteBuilder() async throws {
+        let data = fixtureData("places_near")
+        var calls = 0
+        StubURLProtocol.handler = { _, _ in
+            calls += 1
+            if calls == 1 {
+                let text = String(decoding: data, as: UTF8.self).replacingOccurrences(of: "\"next_cursor\":\"\"", with: "\"next_cursor\":\"page-2\"")
+                return (200, Data(text.utf8))
+            }
+            return (200, data)
+        }
+        let places = try await Endpoints(client: stubbedClient()).places(city: "downers-grove")
+        let firstPage = try JSONDecoder().decode(ListPage<PlaceSummary>.self, from: data)
+        XCTAssertEqual(places.count, firstPage.items.count * 2)
+        XCTAssertEqual(calls, 2)
+        XCTAssertTrue(StubURLProtocol.requests.last?.query?.contains("cursor=page-2") == true)
+    }
     override func setUp() {
         super.setUp()
         StubURLProtocol.reset()

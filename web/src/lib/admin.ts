@@ -17,6 +17,7 @@ export const listSources = () => api.list<SourceInfo>('/api/v1/admin/sources');
 export const getStats = () => api.get<Stats>('/api/v1/admin/stats');
 export const listJobs = (status = '', limit = 50, offset = 0) =>
 	api.list<Job>(`/api/v1/admin/jobs${qs({ status, limit, offset })}`);
+export const getJob = (id: string) => api.get<Job>(`/api/v1/admin/jobs/${encodeURIComponent(id)}`);
 export const retryJob = (id: string) => api.post<Job>(`/api/v1/admin/jobs/${id}/retry`);
 export const listCandidates = (f: {
 	status?: string;

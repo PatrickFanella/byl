@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { modal } from '#lib/modal.ts';
 	import { onMount, untrack } from 'svelte';
-	import { get } from 'svelte/store';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { session } from '#lib/auth.ts';
@@ -27,13 +27,15 @@
 			get: async () => (await myProgress()).items,
 			put: (body) => putProgress(walk.tour?.id ?? '', body)
 		},
-		signedIn: () => get(session.store) !== null
+		signedIn: () => $current !== null,
+		accountID: () => $current?.account.id ?? null
 	});
 
 	let geoState: 'waiting' | 'ok' | 'denied' | 'unavailable' = $state('waiting');
 	let audioEnabled = $state(false);
 	let playing = $state(false);
 	let showEnd = $state(false);
+	let playVersion = 0;
 	const player = new NarrationPlayer();
 	player.onEnd = () => (playing = false);
 
@@ -77,7 +79,7 @@
 			document.removeEventListener('visibilitychange', onVisible);
 			window.removeEventListener('online', onOnline);
 			window.removeEventListener('storage', onStorage);
-			player.stop();
+			stopAudio();
 		};
 	});
 
@@ -89,16 +91,22 @@
 		if (stop && on) untrack(() => void play(stop));
 	});
 
+	function stopAudio() {
+		playVersion++;
+		player.stop();
+		playing = false;
+	}
+
 	function toggleListen(stop: TourStop) {
 		if (playing) {
-			player.stop();
-			playing = false;
+			stopAudio();
 		} else {
 			void play(stop);
 		}
 	}
 
 	async function play(stop: TourStop) {
+		const version = ++playVersion;
 		const featured = stop.featured_moment;
 		if (!featured) return;
 		let narrationURL: string | null = null;
@@ -110,6 +118,7 @@
 		} catch {
 			// offline: read the excerpt
 		}
+		if (version !== playVersion || walk.arrivedStop?.id !== stop.id) return;
 		const p = plan(narrationURL, body);
 		if (p.kind === 'none') return;
 		playing = true;
@@ -124,13 +133,12 @@
 			// ignore
 		}
 		if (!audioEnabled) {
-			player.stop();
-			playing = false;
+			stopAudio();
 		}
 	}
 
 	async function end(reset: boolean) {
-		player.stop();
+		stopAudio();
 		await walk.flush();
 		walk.end(reset);
 		goto(`/tours/${ref}`);
@@ -289,8 +297,7 @@
 			{playing}
 			onlisten={() => toggleListen(walk.arrivedStop!)}
 			oncontinue={() => {
-				player.stop();
-				playing = false;
+				stopAudio();
 				walk.arrivedStop = null;
 			}}
 		/>
@@ -303,6 +310,9 @@
 			<div
 				class="w-full max-w-sm rounded-3xl border border-white/10 bg-[#0a0a0b] p-5"
 				role="dialog"
+				use:modal={() => {
+					showEnd = false;
+				}}
 				aria-label="End this tour?"
 			>
 				<h2 class="text-lg font-semibold">End this tour?</h2>

@@ -46,3 +46,20 @@ test('the audio guide plays the featured moment once on arrival', async ({ brows
 	expect(momentFetches).toBe(1);
 	await context.close();
 });
+
+test('the end dialog traps focus, closes with Escape, and restores the opener', async ({
+	page
+}) => {
+	await page.goto('/tours/downtown-memory-loop/walk?mode=walk');
+	await expect(page.getByText(/next · stop 1/i)).toBeVisible();
+	const opener = page.getByRole('button', { name: 'End', exact: true });
+	await opener.click();
+	const dialog = page.getByRole('dialog', { name: 'End this tour?' });
+	await expect(dialog).toHaveAttribute('aria-modal', 'true');
+	await expect(dialog.getByRole('button', { name: 'Keep my progress and end' })).toBeFocused();
+	await page.keyboard.press('Shift+Tab');
+	await expect(dialog.getByRole('button', { name: 'Cancel' })).toBeFocused();
+	await page.keyboard.press('Escape');
+	await expect(dialog).not.toBeVisible();
+	await expect(opener).toBeFocused();
+});

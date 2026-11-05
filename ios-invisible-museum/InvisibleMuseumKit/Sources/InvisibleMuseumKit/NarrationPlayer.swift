@@ -19,7 +19,7 @@ public protocol AudioSessionConfiguring: AnyObject {
 }
 
 /// The speech synthesizer, abstracted so tests do not speak.
-public protocol SpeechSynthesizing: AnyObject {
+@MainActor public protocol SpeechSynthesizing: AnyObject {
     func speak(_ text: String)
     func stopSpeaking()
     var isSpeaking: Bool { get }
@@ -51,7 +51,7 @@ public final class NarrationPlayer {
     }
 
     /// Picks the source for a moment: recorded narration first, then the body as speech.
-    public static func plan(narrationURL: URL?, body: String) -> NarrationSource {
+    nonisolated public static func plan(narrationURL: URL?, body: String) -> NarrationSource {
         if let narrationURL { return .stream(narrationURL) }
         let text = plainText(body)
         return text.isEmpty ? .none : .speech(text)
@@ -104,7 +104,7 @@ public final class NarrationPlayer {
     }
 
     /// Strips the Markdown a narrator should not read aloud and collapses whitespace.
-    public static func plainText(_ markdown: String) -> String {
+    nonisolated public static func plainText(_ markdown: String) -> String {
         var text = markdown
         let patterns: [(String, String)] = [
             ("(?s)```.*?```", " "),                         // fenced code
@@ -115,8 +115,10 @@ public final class NarrationPlayer {
             ("(?m)^\\s*(?:[-*+]|\\d+\\.)\\s+", ""),           // list markers
             ("(?m)^\\s*>\\s?", ""),                           // block quotes
             ("`([^`]*)`", "$1"),                              // inline code
-            ("(\\*\\*|__)(.*?)\\1", "$2"),                    // strong
-            ("(\\*|_)(.*?)\\1", "$2")                         // emphasis
+            ("(\\*\\*)(.*?)\\1", "$2"),
+            ("(?<![\\p{L}\\p{N}_])__(.*?)__(?![\\p{L}\\p{N}_])", "$1"),
+            ("(\\*)(.*?)\\1", "$2"),
+            ("(?<![\\p{L}\\p{N}_])_(.*?)_(?![\\p{L}\\p{N}_])", "$1")
         ]
         for (pattern, replacement) in patterns {
             if let re = try? NSRegularExpression(pattern: pattern) {
@@ -128,7 +130,7 @@ public final class NarrationPlayer {
 }
 
 /// The real synthesizer behind SpeechSynthesizing; reports when an utterance ends.
-public final class SystemSpeechSynthesizer: NSObject, SpeechSynthesizing, AVSpeechSynthesizerDelegate {
+@MainActor public final class SystemSpeechSynthesizer: NSObject, SpeechSynthesizing, AVSpeechSynthesizerDelegate {
     private let synthesizer = AVSpeechSynthesizer()
     public var voiceLanguage = "en-US"
     public var rate: Float = AVSpeechUtteranceDefaultSpeechRate
@@ -152,7 +154,7 @@ public final class SystemSpeechSynthesizer: NSObject, SpeechSynthesizing, AVSpee
 
     public var isSpeaking: Bool { synthesizer.isSpeaking }
 
-    public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        onFinish?()
+    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        Task { @MainActor [weak self] in self?.onFinish?() }
     }
 }

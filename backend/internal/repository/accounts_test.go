@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"slices"
 	"testing"
 	"time"
 
@@ -87,12 +88,12 @@ func TestSavedAndProgress(t *testing.T) {
 		t.Fatal("expected empty after unsave")
 	}
 
-	p, err := s.PutProgress(ctx, models.TourProgress{AccountID: a.ID, TourID: testdb.SeedTourID, Mode: models.TravelModeBike, VisitedPositions: []int{1, 2}})
+	p, err := s.PutProgress(ctx, models.TourProgress{AccountID: a.ID, TourID: testdb.SeedTourID, Mode: models.TravelModeBike, VisitedPositions: []int{1, 2}}, false)
 	if err != nil || len(p.VisitedPositions) != 2 || p.CompletedAt != nil {
 		t.Fatalf("progress: %v %+v", err, p)
 	}
 	done := time.Now()
-	p, err = s.PutProgress(ctx, models.TourProgress{AccountID: a.ID, TourID: testdb.SeedTourID, Mode: models.TravelModeBike, VisitedPositions: []int{1, 2, 3, 4}, CompletedAt: &done})
+	p, err = s.PutProgress(ctx, models.TourProgress{AccountID: a.ID, TourID: testdb.SeedTourID, Mode: models.TravelModeBike, VisitedPositions: []int{1, 2, 3, 4}, CompletedAt: &done}, false)
 	if err != nil || p.CompletedAt == nil || len(p.VisitedPositions) != 4 {
 		t.Fatalf("progress update: %v %+v", err, p)
 	}
@@ -102,5 +103,35 @@ func TestSavedAndProgress(t *testing.T) {
 	}
 	if _, err := s.GetProgress(ctx, a.ID, "00000000-0000-4000-8000-00000000ffff"); !errors.Is(err, ErrNotFound) {
 		t.Fatalf("expected ErrNotFound, got %v", err)
+	}
+}
+
+func TestConcurrentProgressUpdatesKeepEveryStop(t *testing.T) {
+	s, ctx := newStore(t)
+	a, err := s.UpsertAccount(ctx, models.AuthProviderDev, "concurrent", "concurrent@example.com", "", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	start := make(chan struct{})
+	results := make(chan error, 4)
+	for position := 1; position <= 4; position++ {
+		go func(p int) {
+			<-start
+			_, err := s.PutProgress(ctx, models.TourProgress{AccountID: a.ID, TourID: testdb.SeedTourID, Mode: models.TravelModeWalk, VisitedPositions: []int{p}}, false)
+			results <- err
+		}(position)
+	}
+	close(start)
+	for range 4 {
+		if err := <-results; err != nil {
+			t.Error(err)
+		}
+	}
+	p, err := s.GetProgress(ctx, a.ID, testdb.SeedTourID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !slices.Equal(p.VisitedPositions, []int{1, 2, 3, 4}) {
+		t.Fatalf("concurrent updates lost stops: %v", p.VisitedPositions)
 	}
 }

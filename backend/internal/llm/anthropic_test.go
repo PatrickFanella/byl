@@ -65,6 +65,24 @@ func TestAnthropicRefusalIsAnError(t *testing.T) {
 	}
 }
 
+func TestAnthropicRetriesSchemaInvalidDraftOnce(t *testing.T) {
+	hits := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		draft := `{}`
+		if hits > 1 {
+			draft = goodDraft
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"msg_retry","type":"message","role":"assistant","model":"test","stop_reason":"end_turn","content":[{"type":"text","text":` + jsonString(draft) + `}],"usage":{"input_tokens":1,"output_tokens":1}}`))
+	}))
+	defer srv.Close()
+	result, err := NewAnthropic("test-key", srv.URL, "test").DraftMoment(context.Background(), draftReq())
+	if err != nil || hits != 2 || result.Title != "Built for the Talkies" {
+		t.Fatalf("hits=%d draft=%+v err=%v", hits, result, err)
+	}
+}
+
 func jsonString(s string) string {
 	b, _ := json.Marshal(s)
 	return string(b)

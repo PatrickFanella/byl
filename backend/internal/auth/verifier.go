@@ -39,9 +39,10 @@ type jwksVerifier struct {
 	cacheTTL  time.Duration
 	client    *http.Client
 
-	mu        sync.Mutex
-	keys      map[string]*rsa.PublicKey
-	fetchedAt time.Time
+	mu                 sync.Mutex
+	keys               map[string]*rsa.PublicKey
+	fetchedAt          time.Time
+	unknownRefreshedAt time.Time
 }
 
 // NewJWKSVerifier verifies RS256 tokens against a JWKS endpoint.
@@ -125,12 +126,19 @@ func (v *jwksVerifier) key(ctx context.Context, kid string) (*rsa.PublicKey, err
 	if k, ok := v.keys[kid]; ok && time.Since(v.fetchedAt) < v.cacheTTL {
 		return k, nil
 	}
+	if _, known := v.keys[kid]; !known && !v.fetchedAt.IsZero() {
+		if time.Since(v.unknownRefreshedAt) < 30*time.Second {
+			return nil, fmt.Errorf("unknown key id %q", kid)
+		}
+		v.unknownRefreshedAt = time.Now()
+	}
 	if err := v.refresh(ctx); err != nil {
 		return nil, err
 	}
 	if k, ok := v.keys[kid]; ok {
 		return k, nil
 	}
+	v.unknownRefreshedAt = time.Now()
 	return nil, fmt.Errorf("unknown key id %q", kid)
 }
 

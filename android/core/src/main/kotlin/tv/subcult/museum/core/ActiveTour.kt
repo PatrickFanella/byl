@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 
 enum class LoadStatus { IDLE, LOADING, READY, ERROR }
@@ -21,19 +22,20 @@ data class LocalProgress(
     /** Strictly increasing per change; compared with syncedAt. */
     val updatedAt: Long = 0,
     /** The updatedAt the server last accepted; null until a PUT succeeds. */
-    val syncedAt: Long? = null
+    val syncedAt: Long? = null,
+    val resetPending: Boolean = false
 ) {
     val needsSync: Boolean
-        get() = visitedPositions.isNotEmpty() && (syncedAt == null || syncedAt < updatedAt)
+        get() = resetPending || (visitedPositions.isNotEmpty() && (syncedAt == null || syncedAt < updatedAt))
 
     companion object {
-        fun key(tourId: String, mode: String) = "progress.$tourId.$mode"
+        fun key(tourId: String, mode: String, accountId: String? = null) = "progress.v2.${accountId ?: "anonymous"}.$tourId"
     }
 }
 
 /** Which tour is being walked, kept on disk so a relaunch can resume it. */
 @Serializable
-data class ActiveTourRecord(val tourId: String, val mode: String) {
+data class ActiveTourRecord(val tourId: String, val mode: String, val accountId: String? = null) {
     companion object {
         const val KEY = "active"
     }
@@ -67,22 +69,27 @@ class ActiveTour(
     val mode: String,
     private val store: KeyValueStore,
     private val signedIn: () -> Boolean,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val accountId: String? = null
 ) {
     private val _state = MutableStateFlow(ActiveTourState())
     val state: StateFlow<ActiveTourState> = _state
 
     private val stops: List<TourStop> = tour.stops.sortedBy { it.position }
+    private val progressKey = LocalProgress.key(tour.id, mode, accountId)
     private var progress: LocalProgress
     private var monitor: ArrivalMonitor? = null
     private val lock = Any()
     @Volatile private var chain: Job? = null
+    private var routePoll: Job? = null
+    private var routePolls = 0
+    private var ended = false
 
     init {
-        progress = store.getJson<LocalProgress>(LocalProgress.key(tour.id, mode))
+        progress = store.getJson<LocalProgress>(progressKey)
             ?: LocalProgress(tour.id, mode)
         store.putJson(tourKey(tour.id), tour)
-        store.putJson(ActiveTourRecord.KEY, ActiveTourRecord(tour.id, mode))
+        store.putJson(ActiveTourRecord.KEY, ActiveTourRecord(tour.id, mode, accountId))
         _state.update { it.copy(visited = progress.visitedPositions.toSet()) }
         advance()
     }
@@ -94,14 +101,17 @@ class ActiveTour(
 
     /** Loads the route from the API, falling back to the cached copy when the request fails. */
     suspend fun loadRoute() {
+        if (ended) return
         _state.update { it.copy(routeStatus = LoadStatus.LOADING) }
         val key = routeKey(tour.id, mode)
         try {
             val fresh = api.route(tour.id, mode)
             if (fresh.status == "ready") store.putJson(key, fresh)
+            val cached = store.getJson<TourRoute>(key)?.takeIf { it.status == "ready" }
+            val useCached = fresh.status != "ready" && cached != null
             _state.update {
                 it.copy(
-                    route = fresh, routeFromCache = false, routeStatus = LoadStatus.READY,
+                    route = if (useCached) cached else fresh, routeFromCache = useCached, routeStatus = LoadStatus.READY,
                     routeMessage = when (fresh.status) { "ready" -> null; "failed" -> "Route unavailable"; else -> "Route being computed" }
                 )
             }
@@ -114,6 +124,11 @@ class ActiveTour(
             }
         }
         recomputeLegs()
+        if (_state.value.routeMessage == "Route being computed" && routePolls < 30 && !ended) {
+            routePolls++
+            routePoll?.cancel()
+            routePoll = scope.launch { delay(2000); loadRoute() }
+        }
     }
 
     // MARK: Stops and arrival
@@ -150,14 +165,18 @@ class ActiveTour(
 
     /** Writes `visited` into the local record and advances to the next stop. Call under lock. */
     private fun recordVisited() {
-        val visited = _state.value.visited.sorted()
-        val complete = visited.size >= stops.size && stops.isNotEmpty()
-        progress = progress.copy(
-            visitedPositions = visited,
-            updatedAt = maxOf(System.currentTimeMillis(), progress.updatedAt + 1),
-            completedAt = if (complete) progress.completedAt ?: System.currentTimeMillis() else progress.completedAt
-        )
-        store.putJson(LocalProgress.key(tour.id, mode), progress)
+        synchronized(store) {
+            val stored = store.getJson<LocalProgress>(progressKey)
+            val visited = (_state.value.visited + (stored?.visitedPositions ?: emptyList())).sorted()
+            _state.update { it.copy(visited = visited.toSet()) }
+            val complete = visited.size >= stops.size && stops.isNotEmpty()
+            progress = progress.copy(
+                visitedPositions = visited,
+                updatedAt = maxOf(System.currentTimeMillis(), progress.updatedAt + 1, stored?.updatedAt ?: 0),
+                completedAt = if (complete) progress.completedAt ?: System.currentTimeMillis() else progress.completedAt
+            )
+            store.putJson(progressKey, progress)
+        }
         advance()
     }
 
@@ -195,7 +214,13 @@ class ActiveTour(
     /** Merges the server's record for this tour (any mode) into the local one by union. */
     suspend fun loadRemoteProgress() {
         if (!signedIn()) return
+        if (progress.resetPending) {
+            syncIfNeeded()
+            return
+        }
+        val generation = progress.startedAt
         val remote = try { api.progress().firstOrNull { it.tourId == tour.id } } catch (_: Exception) { null } ?: return
+        if (!signedIn() || progress.startedAt != generation) return
         var changed = false
         synchronized(lock) {
             val merged = _state.value.visited + remote.visitedPositions
@@ -206,7 +231,7 @@ class ActiveTour(
             }
             if (remote.visitedPositions.toSet() == merged) {
                 progress = progress.copy(syncedAt = progress.updatedAt)
-                store.putJson(LocalProgress.key(tour.id, mode), progress)
+                store.putJson(progressKey, progress)
                 changed = false
             }
         }
@@ -240,12 +265,20 @@ class ActiveTour(
     private suspend fun snapshotAndPut() {
         run {
             val snapshot = synchronized(lock) { progress }
+            if (!signedIn() || !snapshot.needsSync) return
             val body = ProgressRequest(mode, snapshot.visitedPositions, snapshot.completedAt != null)
             try {
-                api.putProgress(tour.id, body)
+                if (snapshot.resetPending) {
+                    api.putProgress(tour.id, ProgressRequest(mode, emptyList(), false, reset = true))
+                    synchronized(lock) {
+                        if (progress.startedAt == snapshot.startedAt) progress = progress.copy(resetPending = false)
+                    }
+                }
+                if (!signedIn() || progress.startedAt != snapshot.startedAt) return
+                if (snapshot.visitedPositions.isNotEmpty()) api.putProgress(tour.id, body)
                 synchronized(lock) {
                     progress = progress.copy(syncedAt = maxOf(snapshot.updatedAt, progress.syncedAt ?: 0))
-                    store.putJson(LocalProgress.key(tour.id, mode), progress)
+                    store.putJson(progressKey, progress)
                 }
                 _state.update { it.copy(syncError = null) }
             } catch (e: Exception) {
@@ -261,29 +294,22 @@ class ActiveTour(
 
     /** Ends the walk: the tour is no longer resumed on launch (only if the record still names this walk). Progress stays. */
     fun end() {
+        ended = true
+        routePoll?.cancel()
         val record = store.getJson<ActiveTourRecord>(ActiveTourRecord.KEY)
-        if (record == null || (record.tourId == tour.id && record.mode == mode)) store.remove(ActiveTourRecord.KEY)
+        if (record == null || (record.tourId == tour.id && record.mode == mode && record.accountId == accountId)) store.remove(ActiveTourRecord.KEY)
     }
 
     /** Forgets local progress and, when signed in, clears the server record too. */
     fun resetProgress() {
         synchronized(lock) {
-            progress = LocalProgress(tour.id, mode, updatedAt = maxOf(System.currentTimeMillis(), progress.updatedAt + 1))
-            store.remove(LocalProgress.key(tour.id, mode))
+            val changedAt = maxOf(System.currentTimeMillis(), progress.updatedAt + 1)
+            progress = LocalProgress(tour.id, mode, startedAt = changedAt, updatedAt = changedAt, resetPending = signedIn())
+            store.putJson(progressKey, progress)
             _state.update { it.copy(visited = emptySet(), arrivedStop = null) }
             advance()
         }
-        if (signedIn()) {
-            enqueue {
-                try {
-                    api.putProgress(tour.id, ProgressRequest(mode, emptyList(), false))
-                    synchronized(lock) { progress = progress.copy(syncedAt = progress.updatedAt) }
-                    _state.update { it.copy(syncError = null) }
-                } catch (e: Exception) {
-                    _state.update { it.copy(syncError = (e as? ApiException)?.message ?: e.message) }
-                }
-            }
-        }
+        sync()
     }
 
     /** Turn-by-turn to the next stop in Google Maps; the app falls back to a geo: URI. */
@@ -296,10 +322,11 @@ class ActiveTour(
         fun routeKey(tourId: String, mode: String) = "route.$tourId.$mode"
 
         /** Rebuilds the tour that was active when the app last ran, from the cached detail alone. */
-        fun restore(api: Endpoints, store: KeyValueStore, signedIn: () -> Boolean, scope: CoroutineScope): ActiveTour? {
+        fun restore(api: Endpoints, store: KeyValueStore, signedIn: () -> Boolean, scope: CoroutineScope, accountId: String? = null): ActiveTour? {
             val record = store.getJson<ActiveTourRecord>(ActiveTourRecord.KEY) ?: return null
+            if (record.accountId != accountId) return null
             val tour = store.getJson<TourDetail>(tourKey(record.tourId)) ?: return null
-            return ActiveTour(api, tour, record.mode, store, signedIn, scope)
+            return ActiveTour(api, tour, record.mode, store, signedIn, scope, accountId)
         }
     }
 }

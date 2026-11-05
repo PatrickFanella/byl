@@ -20,6 +20,11 @@ describe('plan', () => {
 });
 
 describe('plainText', () => {
+	it('preserves underscores inside words', () => {
+		expect(plainText('museum_archive_story and _history_')).toBe(
+			'museum_archive_story and history'
+		);
+	});
 	it('strips Markdown', () => {
 		const md = `# Title
 

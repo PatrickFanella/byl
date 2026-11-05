@@ -19,10 +19,16 @@ func MapLicense(short string) string {
 	case strings.EqualFold(s, "Public domain") || strings.HasPrefix(strings.ToUpper(s), "PD") || strings.EqualFold(s, "No restrictions"):
 		return "PD"
 	case strings.HasPrefix(strings.ToUpper(s), "GFDL"):
+		if strings.Contains(s, "1.3") {
+			return "GFDL-1.3"
+		}
 		return "GFDL-1.2"
 	}
 	if m := ccRe.FindStringSubmatch(s); m != nil {
 		elements := strings.ToUpper(strings.ReplaceAll(m[1], " ", "-"))
+		if strings.Contains(elements, "NC") || strings.Contains(elements, "ND") {
+			return ""
+		}
 		return "CC-" + elements + "-" + m[2]
 	}
 	return ""

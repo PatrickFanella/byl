@@ -15,6 +15,12 @@ class ArrivalMonitorTest {
         Fix(station.lat, station.lng + meters / (111_320 * cos(station.lat * PI / 180)), accuracy)
 
     @Test
+    fun `a stale or future fix never triggers arrival`() {
+        assertFalse(hasArrived(fix(0.0, 10.0).copy(timestampMillis = System.currentTimeMillis() - 60_000), station, 40.0))
+        assertFalse(hasArrived(fix(0.0, 10.0).copy(timestampMillis = System.currentTimeMillis() + 60_000), station, 40.0))
+    }
+
+    @Test
     fun `inside the radius with a good fix arrives`() = assertTrue(hasArrived(fix(20.0, 10.0), station, 40.0))
 
     @Test

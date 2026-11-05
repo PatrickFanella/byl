@@ -90,6 +90,7 @@ fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Uni
     }
 
     pendingDelete?.let { tour ->
+        LaunchedEffect(tour.id) { deleteError = null }
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
             title = { Text("Delete this route?") },

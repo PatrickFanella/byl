@@ -14,6 +14,7 @@ struct MediaGalleryView: View {
                         .frame(width: 300)
                 }
             }
+            .scrollTargetLayout()
         }
         .scrollIndicators(.hidden)
         .scrollTargetBehavior(.viewAligned)
@@ -22,14 +23,15 @@ struct MediaGalleryView: View {
 
 struct MediaTile: View {
     let asset: MediaAsset
+    @State private var player: AVPlayer?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Group {
                 switch asset.kind {
                 case "video":
-                    if let url = asset.url {
-                        VideoPlayer(player: AVPlayer(url: url))
+                    if asset.url != nil {
+                        VideoPlayer(player: player)
                     } else {
                         placeholder("video")
                     }
@@ -67,6 +69,10 @@ struct MediaTile: View {
                 .foregroundStyle(Museum.faint)
                 .lineLimit(2)
         }
+        .task(id: asset.url) {
+            if asset.kind == "video", let url = asset.url { player = AVPlayer(url: url) }
+        }
+        .onDisappear { player?.pause() }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(asset.caption.isEmpty ? "Media" : asset.caption)
     }

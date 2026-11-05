@@ -3,8 +3,10 @@ package llm
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync/atomic"
 	"testing"
 )
@@ -97,5 +99,19 @@ func TestOpenAIRank(t *testing.T) {
 func TestNoneIsUnavailable(t *testing.T) {
 	if _, err := (None{}).DraftMoment(context.Background(), draftReq()); err != ErrUnavailable {
 		t.Fatalf("got %v", err)
+	}
+}
+
+func TestOpenAIRequestFailureIsNotRetriedAndErrorIsBounded(t *testing.T) {
+	var hits atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits.Add(1)
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte(strings.Repeat("error detail ", 1000)))
+	}))
+	defer srv.Close()
+	_, err := NewOpenAI(srv.URL, "test-key", "model", srv.Client()).DraftMoment(context.Background(), draftReq())
+	if err == nil || len(err.Error()) > 1100 || hits.Load() != 1 {
+		t.Fatalf("request error must be bounded and returned without retry: hits=%d length=%d", hits.Load(), len(fmt.Sprint(err)))
 	}
 }

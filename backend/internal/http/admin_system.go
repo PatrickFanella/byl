@@ -22,6 +22,15 @@ func (d Deps) adminListJobs(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, listResponse{Items: jobs})
 }
 
+func (d Deps) adminGetJob(w http.ResponseWriter, r *http.Request) {
+	job, err := d.Store.GetJob(r.Context(), chi.URLParam(r, "id"))
+	if err != nil {
+		d.fail(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, job)
+}
+
 func (d Deps) adminRetryJob(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if err := d.Store.RetryJob(r.Context(), id); err != nil {

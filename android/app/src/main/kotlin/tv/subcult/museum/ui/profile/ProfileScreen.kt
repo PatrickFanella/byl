@@ -70,7 +70,7 @@ fun ProfileScreen(model: AppViewModel) {
             }
         }
 
-        Card {
+        if (BuildConfig.DEBUG) Card {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Overline("Server", Museum.purple)
                 OutlinedTextField(value = baseUrl, onValueChange = { baseUrl = it }, label = { Text("API base URL") }, modifier = Modifier.fillMaxWidth(), singleLine = true, supportingText = { Text("Leave empty for ${BuildConfig.API_BASE_URL}. Changing it signs you out.") })

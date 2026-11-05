@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { modal } from '#lib/modal.ts';
 	import type { TourStop, PlaceDetail } from '#lib/visitor.ts';
 	import { getPlace } from '#lib/visitor.ts';
 	import { Loader } from '#lib/loader.svelte.ts';
@@ -30,6 +31,9 @@
 <div
 	class="fixed inset-x-0 bottom-0 z-20 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-[#0a0a0b] p-5 text-white shadow-2xl sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-[28rem] sm:rounded-3xl sm:border"
 	role="dialog"
+	use:modal={() => {
+		oncontinue();
+	}}
 	aria-label="You have arrived"
 >
 	<div class="text-[11px] font-bold tracking-widest text-emerald-300 uppercase">

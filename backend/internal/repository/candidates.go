@@ -92,6 +92,23 @@ func (s *Store) GetCandidate(ctx context.Context, id string) (*models.Candidate,
 	return &c, nil
 }
 
+// ReviewPendingCandidate locks an entry while its entity and review are written in one transaction.
+func (s *Store) ReviewPendingCandidate(ctx context.Context, id string, fn func(*Store, *models.Candidate) error) error {
+	if !isUUID(id) {
+		return ErrNotFound
+	}
+	return s.Transaction(ctx, func(tx *Store) error {
+		c, err := scanCandidate(tx.pool.QueryRow(ctx, `SELECT `+candidateCols+` FROM candidates WHERE id = $1 FOR UPDATE`, id))
+		if err != nil {
+			return mapErr(err)
+		}
+		if c.Status != models.CandidateStatusPending {
+			return fmt.Errorf("%w: candidate already reviewed", ErrConflict)
+		}
+		return fn(tx, &c)
+	})
+}
+
 // CreateCandidate adds a pending entry.
 func (s *Store) CreateCandidate(ctx context.Context, c models.Candidate) (*models.Candidate, error) {
 	if len(c.Payload) == 0 {

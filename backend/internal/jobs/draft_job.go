@@ -48,8 +48,8 @@ func (w *Worker) draftCandidate(ctx context.Context, p models.DraftCandidatePayl
 	if rawText == "" {
 		return fmt.Errorf("%w: candidate has no raw_text to draft from", ErrNoRetry)
 	}
-	if len(rawText) > draftRawTextCap {
-		rawText = rawText[:draftRawTextCap]
+	if len([]rune(rawText)) > draftRawTextCap {
+		rawText = string([]rune(rawText)[:draftRawTextCap])
 	}
 
 	req := llm.DraftRequest{

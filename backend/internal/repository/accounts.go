@@ -161,16 +161,19 @@ func (s *Store) GetProgress(ctx context.Context, accountID, tourID string) (*mod
 	return &p, nil
 }
 
-// PutProgress creates or replaces progress on a tour.
-func (s *Store) PutProgress(ctx context.Context, in models.TourProgress) (*models.TourProgress, error) {
+// PutProgress atomically merges progress, or explicitly resets it for a new walk.
+func (s *Store) PutProgress(ctx context.Context, in models.TourProgress, reset bool) (*models.TourProgress, error) {
 	if in.VisitedPositions == nil {
 		in.VisitedPositions = []int{}
 	}
 	p, err := scanProgress(s.pool.QueryRow(ctx, `INSERT INTO tour_progress (account_id, tour_id, mode, visited_positions, completed_at)
-		VALUES ($1, $2, $3, $4, $5)
-		ON CONFLICT (account_id, tour_id) DO UPDATE SET mode = EXCLUDED.mode, visited_positions = EXCLUDED.visited_positions,
-			completed_at = EXCLUDED.completed_at, updated_at = now()
-		RETURNING `+progressCols, in.AccountID, in.TourID, in.Mode, in.VisitedPositions, in.CompletedAt))
+		VALUES ($1, $2, $3, ARRAY(SELECT DISTINCT p FROM unnest($4::integer[]) AS p ORDER BY p), $5)
+		ON CONFLICT (account_id, tour_id) DO UPDATE SET mode = EXCLUDED.mode,
+			visited_positions = CASE WHEN $6 THEN EXCLUDED.visited_positions ELSE
+				ARRAY(SELECT DISTINCT p FROM unnest(tour_progress.visited_positions || EXCLUDED.visited_positions) AS p ORDER BY p) END,
+			completed_at = CASE WHEN $6 THEN EXCLUDED.completed_at ELSE COALESCE(tour_progress.completed_at, EXCLUDED.completed_at) END,
+			started_at = CASE WHEN $6 THEN now() ELSE tour_progress.started_at END, updated_at = now()
+		RETURNING `+progressCols, in.AccountID, in.TourID, in.Mode, in.VisitedPositions, in.CompletedAt, reset))
 	if err != nil {
 		return nil, mapErr(err)
 	}

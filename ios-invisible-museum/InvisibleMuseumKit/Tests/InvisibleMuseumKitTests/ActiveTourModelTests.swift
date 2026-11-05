@@ -144,6 +144,18 @@ final class ActiveTourModelTests: XCTestCase {
         XCTAssertEqual(offline.route?.legs.count, 3)
     }
 
+    func testPendingRouteKeepsCachedGeometryUntilReplacementIsReady() async {
+        stubRouteAndProgress()
+        let m = model(signedIn: false)
+        await m.loadRoute()
+        let text = String(decoding: fixtureData("route"), as: UTF8.self).replacingOccurrences(of: "\"status\":\"ready\"", with: "\"status\":\"pending\"")
+        StubURLProtocol.handler = { _, _ in (200, Data(text.utf8)) }
+        await m.loadRoute()
+        XCTAssertEqual(m.route?.status, "ready")
+        XCTAssertTrue(m.routeFromCache)
+        XCTAssertTrue(m.routePending)
+    }
+
     func testRouteFailureWithoutCacheIsReported() async {
         stubRouteAndProgress(routeStatus: 500)
         let m = model(signedIn: false)
@@ -238,7 +250,13 @@ final class ActiveTourModelTests: XCTestCase {
             let body = try JSONSerialization.jsonObject(with: XCTUnwrap(rec.body)) as? [String: Any]
             return body?["visited_positions"] as? [Int] ?? []
         }
-        XCTAssertEqual(bodies, [[1], [1, 2]])
+        var previous: Set<Int> = []
+        for positions in bodies {
+            let current = Set(positions)
+            XCTAssertTrue(previous.isSubset(of: current), "queued updates must not drop stops")
+            previous = current
+        }
+        XCTAssertEqual(previous, [1, 2])
     }
 
     func testActiveTourIsRestoredFromTheCacheAfterARelaunch() {
@@ -266,7 +284,36 @@ final class ActiveTourModelTests: XCTestCase {
         let body = try JSONSerialization.jsonObject(with: XCTUnwrap(last.body)) as? [String: Any]
         XCTAssertEqual(body?["visited_positions"] as? [Int], [])
         XCTAssertEqual(body?["completed"] as? Bool, false)
+        XCTAssertEqual(body?["reset"] as? Bool, true)
         XCTAssertTrue(m.visited.isEmpty)
         XCTAssertEqual(m.nextStop?.position, 1)
+    }
+
+    func testOfflineResetIsRetriedAfterRelaunchBeforeMerging() async throws {
+        stubWithRemoteProgress(putStatus: 500)
+        let m = model(signedIn: true)
+        m.resetProgress()
+        await m.flush()
+        XCTAssertTrue(m.needsSync)
+        let restored = model(signedIn: true)
+        stubWithRemoteProgress(putStatus: 200)
+        await restored.loadRemoteProgress()
+        await restored.flush()
+        XCTAssertTrue(restored.visited.isEmpty)
+        XCTAssertFalse(restored.needsSync)
+        let last = try XCTUnwrap(StubURLProtocol.requests.last { $0.method == "PUT" })
+        let body = try JSONSerialization.jsonObject(with: XCTUnwrap(last.body)) as? [String: Any]
+        XCTAssertEqual(body?["reset"] as? Bool, true)
+    }
+
+    func testProgressIsScopedByAccountAndSharedAcrossTravelModes() {
+        let original = model(signedIn: false)
+        let alice = ActiveTourModel(api: original.api, tour: original.tour, mode: "walk", cache: cache, isSignedIn: { false }, accountID: "alice")
+        alice.markArrivedAtNextStop()
+        let bike = ActiveTourModel(api: original.api, tour: original.tour, mode: "bike", cache: cache, isSignedIn: { false }, accountID: "alice")
+        XCTAssertEqual(bike.visited, [1])
+        XCTAssertNil(ActiveTourModel.restore(api: original.api, cache: cache, isSignedIn: { false }, accountID: "bob"))
+        let bob = ActiveTourModel(api: original.api, tour: original.tour, mode: "walk", cache: cache, isSignedIn: { false }, accountID: "bob")
+        XCTAssertTrue(bob.visited.isEmpty)
     }
 }

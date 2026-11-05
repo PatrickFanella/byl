@@ -332,10 +332,14 @@ type ProgressRequest struct {
 	Mode             TravelMode `json:"mode"`
 	VisitedPositions []int      `json:"visited_positions"`
 	Completed        bool       `json:"completed"`
+	Reset            bool       `json:"reset"`
 }
 
 func (r ProgressRequest) Validate() Fields {
 	f := Fields{}
+	if r.Reset && (r.Completed || len(r.VisitedPositions) > 0) {
+		f.set("reset", "cannot be combined with visited positions or completion")
+	}
 	if !r.Mode.Valid() {
 		f.set("mode", "must be walk or bike")
 	}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { plainText } from '#lib/tour/narration.ts';
 	import { page } from '$app/state';
 	import { Loader } from '#lib/loader.svelte.ts';
 	import { getMoment, type MomentDetail } from '#lib/visitor.ts';
@@ -18,12 +19,7 @@
 	const paragraphs = $derived(
 		(moment.data?.body || moment.data?.excerpt || '')
 			.split(/\n\s*\n/)
-			.map((p) =>
-				p
-					.replace(/^#+\s*/, '')
-					.replace(/[*_`]/g, '')
-					.trim()
-			)
+			.map(plainText)
 			.filter(Boolean)
 	);
 </script>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { modal } from '#lib/modal.ts';
 	import type { Snippet } from 'svelte';
 	let {
 		open = $bindable(false),
@@ -21,6 +22,9 @@
 		<div
 			class="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl"
 			role="dialog"
+			use:modal={() => {
+				open = false;
+			}}
 			aria-modal="true"
 			aria-label={title}
 			tabindex="-1"

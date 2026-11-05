@@ -1,5 +1,7 @@
 # Rebuild report: rulings and deferred minors
 
+Follow-up: [fix dispositions and native build validation](2026-11-05-follow-up-validation.md) records the resolution of these historical deferred entries.
+
 Decisions taken on the partner's behalf during the five rebuild cycles, and reviewer findings graded Minor and deferred. Each cycle's spec and plan live beside this file under `specs/` and `plans/`; the per-cycle fresh reviews were applied as fix passes before each push.
 
 
