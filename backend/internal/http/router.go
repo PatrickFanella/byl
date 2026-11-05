@@ -68,6 +68,7 @@ func NewRouter(d Deps) http.Handler {
 	r.Use(middleware.StripSlashes)
 
 	r.Get("/healthz", d.healthz)
+	r.Get("/t/{slug}", d.shareLanding)
 	if d.MediaFSDir != "" {
 		r.Handle("/media/files/*", http.StripPrefix("/media/files/", noDirListing(http.Dir(d.MediaFSDir))))
 	}

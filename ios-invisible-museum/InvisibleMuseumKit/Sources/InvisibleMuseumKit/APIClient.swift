@@ -23,8 +23,9 @@ public struct APIError: Error, Equatable, LocalizedError {
 public final class APIClient: @unchecked Sendable {
     public var baseURL: URL
     public var tokenProvider: () -> String?
-    /// Called on every 401 so the app can clear its session.
-    public var onUnauthorized: (() -> Void)?
+    /// Called on every 401 with the token the request carried, so the app can clear its
+    /// session only when that token is still the current one.
+    public var onUnauthorized: ((String?) -> Void)?
 
     private let session: URLSession
     private let decoder = JSONDecoder()
@@ -74,7 +75,8 @@ public final class APIClient: @unchecked Sendable {
         var req = URLRequest(url: url)
         req.httpMethod = method
         req.setValue("application/json", forHTTPHeaderField: "Accept")
-        if let token = tokenProvider() {
+        let token = tokenProvider()
+        if let token {
             req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         if let body = body {
@@ -86,7 +88,7 @@ public final class APIClient: @unchecked Sendable {
             throw APIError(status: 0, code: "no_response", message: "No response from the server.")
         }
         if http.statusCode == 401 {
-            onUnauthorized?()
+            onUnauthorized?(token)
         }
         guard (200..<300).contains(http.statusCode) else {
             throw Self.parseError(status: http.statusCode, data: data)

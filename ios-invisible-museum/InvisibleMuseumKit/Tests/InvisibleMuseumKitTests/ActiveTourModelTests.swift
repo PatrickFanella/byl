@@ -168,4 +168,90 @@ final class ActiveTourModelTests: XCTestCase {
         XCTAssertGreaterThan(m.distanceToNextM ?? 0, 50)
         XCTAssertTrue(m.visited.isEmpty, "being at stop 2 must not count as arriving at stop 1")
     }
+
+    // MARK: Review fixes (cycle 3)
+
+    private func stubWithRemoteProgress(putStatus: Int = 200) {
+        StubURLProtocol.handler = { method, path in
+            switch (method, path) {
+            case ("GET", "/api/v1/tours/\(self.tourID)/route"): return (200, fixtureData("route"))
+            case ("GET", "/api/v1/me/progress"):
+                let one = String(decoding: fixtureData("progress"), as: UTF8.self)
+                return (200, Data("{\"items\":[\(one)],\"next_cursor\":\"\"}".utf8))
+            case ("PUT", "/api/v1/me/progress/\(self.tourID)"):
+                return putStatus == 200 ? (200, fixtureData("progress")) : (putStatus, Data("{\"error\":{\"code\":\"internal\",\"message\":\"down\"}}".utf8))
+            default: return (404, fixtureData("error_not_found"))
+            }
+        }
+    }
+
+    func testServerProgressIsMergedWhenTheTourStarts() async {
+        // Review Focus 2: a second device (or the other mode) must not lose stops.
+        stubWithRemoteProgress()
+        let m = model(signedIn: true)
+        await m.loadRemoteProgress()
+        XCTAssertEqual(m.visited, [1, 2])
+        XCTAssertEqual(m.nextStop?.position, 3)
+        XCTAssertFalse(m.needsSync, "nothing local was ahead of the server")
+        XCTAssertTrue(StubURLProtocol.requests.filter { $0.method == "PUT" }.isEmpty)
+    }
+
+    func testLocalStopsAheadOfTheServerArePushedAfterTheMerge() async throws {
+        stubWithRemoteProgress()
+        let m = model(signedIn: true)
+        m.markArrivedAtNextStop() // stop 1 locally
+        await m.flush()
+        m.markArrivedAtNextStop() // stop 2 locally
+        await m.flush()
+        m.markArrivedAtNextStop() // stop 3: ahead of the server's [1, 2]
+        await m.flush()
+        await m.loadRemoteProgress()
+        await m.flush()
+        let last = try XCTUnwrap(StubURLProtocol.requests.last { $0.method == "PUT" })
+        let body = try JSONSerialization.jsonObject(with: XCTUnwrap(last.body)) as? [String: Any]
+        XCTAssertEqual(body?["visited_positions"] as? [Int], [1, 2, 3])
+    }
+
+    func testStaleProgressResyncsWhenTheServerIsBack() async {
+        stubWithRemoteProgress(putStatus: 500)
+        let m = model(signedIn: true)
+        m.markArrivedAtNextStop()
+        await m.flush()
+        XCTAssertEqual(m.syncError, "down")
+        XCTAssertTrue(m.needsSync)
+        stubWithRemoteProgress(putStatus: 200)
+        await m.syncIfNeeded()
+        XCTAssertNil(m.syncError)
+        XCTAssertFalse(m.needsSync)
+        XCTAssertEqual(StubURLProtocol.requests.filter { $0.method == "PUT" }.count, 2)
+        await m.syncIfNeeded()
+        XCTAssertEqual(StubURLProtocol.requests.filter { $0.method == "PUT" }.count, 2, "nothing new to send")
+    }
+
+    func testProgressPutsAreSentInOrder() async throws {
+        stubRouteAndProgress()
+        let m = model(signedIn: true)
+        m.markArrivedAtNextStop()
+        m.markArrivedAtNextStop()
+        await m.flush()
+        let bodies = try StubURLProtocol.requests.filter { $0.method == "PUT" }.map { rec -> [Int] in
+            let body = try JSONSerialization.jsonObject(with: XCTUnwrap(rec.body)) as? [String: Any]
+            return body?["visited_positions"] as? [Int] ?? []
+        }
+        XCTAssertEqual(bodies, [[1], [1, 2]])
+    }
+
+    func testActiveTourIsRestoredFromTheCacheAfterARelaunch() {
+        // Review Focus 2: the walk comes back after the app is killed, even without signal.
+        stubRouteAndProgress()
+        let first = model(signedIn: false)
+        first.markArrivedAtNextStop()
+        let restored = ActiveTourModel.restore(api: Endpoints(client: stubbedClient()), cache: cache, isSignedIn: { false })
+        XCTAssertEqual(restored?.tour.tour.id, tourID)
+        XCTAssertEqual(restored?.mode, "walk")
+        XCTAssertEqual(restored?.visited, [1])
+        XCTAssertEqual(restored?.nextStop?.position, 2)
+        first.end()
+        XCTAssertNil(ActiveTourModel.restore(api: Endpoints(client: stubbedClient()), cache: cache, isSignedIn: { false }))
+    }
 }

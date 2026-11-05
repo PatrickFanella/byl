@@ -101,6 +101,8 @@ func publicOnlyTransport(base http.RoundTripper) http.RoundTripper {
 	} else {
 		t = http.DefaultTransport.(*http.Transport).Clone()
 	}
+	// Dial targets directly: through a proxy only the proxy's address would be checked.
+	t.Proxy = nil
 	dialer := &net.Dialer{Timeout: 10 * time.Second}
 	t.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		host, port, err := net.SplitHostPort(addr)

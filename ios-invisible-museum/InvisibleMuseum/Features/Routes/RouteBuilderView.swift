@@ -26,7 +26,9 @@ struct RouteBuilderView: View {
         .navigationTitle(editing == nil ? "New route" : "Edit route")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            guard builder == nil, let city = model.selectedCity else { return }
+            // A route being edited keeps its own city even if the picker moved on.
+            let owning = editing.flatMap { e in model.cities.first { $0.id == e.tour.cityID } }
+            guard builder == nil, let city = owning ?? model.selectedCity else { return }
             let b = RouteBuilderModel(api: model.api, city: city, editing: editing)
             if let here = model.location.currentLocation { b.sortNear(latitude: here.coordinate.latitude, longitude: here.coordinate.longitude) }
             builder = b

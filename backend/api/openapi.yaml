@@ -17,6 +17,19 @@ paths:
           description: OK
         "503":
           description: Database unreachable
+  /t/{slug}:
+    get:
+      summary: Landing page for a shared route link that hands off to the app's URL scheme
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: "HTML page linking to invisiblemuseum://tour/{slug}"
+          content:
+            text/html:
+              schema: { type: string }
+        "404":
+          description: Malformed slug
   /api/v1/cities:
     get:
       summary: List cities

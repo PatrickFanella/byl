@@ -240,3 +240,15 @@ func TestGetPublicRefusesPrivateHostsUnlessAllowed(t *testing.T) {
 		t.Fatalf("hits %d", hits)
 	}
 }
+
+// Review fix (cycle 3): with HTTP(S)_PROXY set the dialer would only check the proxy's address,
+// so the public-only transport must not honour the proxy environment.
+func TestPublicOnlyTransportIgnoresProxyEnvironment(t *testing.T) {
+	tr, ok := publicOnlyTransport(nil).(*http.Transport)
+	if !ok {
+		t.Fatal("expected an *http.Transport")
+	}
+	if tr.Proxy != nil {
+		t.Fatal("public-only transport must dial targets directly")
+	}
+}

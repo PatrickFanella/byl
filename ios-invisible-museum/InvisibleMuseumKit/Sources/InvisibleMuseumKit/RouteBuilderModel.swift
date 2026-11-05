@@ -66,8 +66,14 @@ public final class RouteBuilderModel {
         stops.insert(item, at: destination)
     }
 
+    /// Stops that belong to another city; the API would reject them with a 422.
+    public var foreignStops: [PlaceSummary] { stops.filter { $0.cityID != city.id } }
+
     /// Guidance under the stops list: how many more are needed, or that the cap is reached.
     public var stopsHint: String? {
+        if !foreignStops.isEmpty {
+            return "Every stop must be in \(city.name)"
+        }
         if stops.count < Self.minStops {
             return "Add at least \(Self.minStops) stops (\(stops.count) so far)"
         }
@@ -89,7 +95,7 @@ public final class RouteBuilderModel {
 
     public var canSubmit: Bool {
         !busy && !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !modes.isEmpty
-            && (Self.minStops...Self.maxStops).contains(stops.count)
+            && (Self.minStops...Self.maxStops).contains(stops.count) && foreignStops.isEmpty
     }
 
     // MARK: Places

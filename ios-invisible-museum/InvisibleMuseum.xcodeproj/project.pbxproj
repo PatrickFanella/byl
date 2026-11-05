@@ -94,7 +94,6 @@
 			isa = PBXGroup;
 			children = (
 				7B98812A3DAB90CBA56EB320 /* InvisibleMuseum */,
-				B591D980E2019119882DDD4F /* Packages */,
 				A5DC16AFAAF7D256BDD9FB3C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -233,14 +232,6 @@
 				37666C0D4CE0893129D417E2 /* InvisibleMuseum.entitlements */,
 			);
 			path = InvisibleMuseum;
-			sourceTree = "<group>";
-		};
-		B591D980E2019119882DDD4F /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				B0711EAC7A777490715397C0 /* InvisibleMuseumKit */,
-			);
-			name = Packages;
 			sourceTree = "<group>";
 		};
 		A5DC16AFAAF7D256BDD9FB3C /* Products */ = {
@@ -541,6 +532,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		914AB1DDEAF75F8C6C4B78B8 /* InvisibleMuseumKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = B0711EAC7A777490715397C0 /* XCLocalSwiftPackageReference "InvisibleMuseumKit" */;
 			productName = InvisibleMuseumKit;
 		};
 /* End XCSwiftPackageProductDependency section */

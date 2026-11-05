@@ -3,6 +3,7 @@ package httpapi
 import (
 	"context"
 	"net/http"
+	"strings"
 	"testing"
 
 	"invisible-museum/backend/internal/models"
@@ -208,5 +209,24 @@ func TestMediaFilesServed(t *testing.T) {
 	// Review fix: stored files are served on the admin origin; never let the browser sniff them.
 	if r.header.Get("X-Content-Type-Options") != "nosniff" {
 		t.Fatalf("missing nosniff header: %v", r.header)
+	}
+}
+
+// Review fix (cycle 3): shared route links are {base}/t/{slug}; the API answers with a landing
+// page that hands off to the app's URL scheme instead of a 404.
+func TestShareLinkLandingPage(t *testing.T) {
+	env := newTestEnv(t)
+	r := env.get(t, "/t/abc123XYZ0", "")
+	if r.status != http.StatusOK || !strings.HasPrefix(r.header.Get("Content-Type"), "text/html") {
+		t.Fatalf("%d %q", r.status, r.header.Get("Content-Type"))
+	}
+	if !strings.Contains(string(r.raw), "invisiblemuseum://tour/abc123XYZ0") {
+		t.Fatalf("landing page must link to the app scheme: %s", r.raw)
+	}
+	if r.header.Get("X-Content-Type-Options") != "nosniff" {
+		t.Fatal("missing nosniff")
+	}
+	if r := env.get(t, "/t/%3Cscript%3E", ""); r.status != http.StatusNotFound {
+		t.Fatalf("invalid slug should be 404, got %d %s", r.status, r.raw)
 	}
 }

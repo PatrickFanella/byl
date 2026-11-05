@@ -4,6 +4,7 @@ import InvisibleMuseumKit
 @main
 struct InvisibleMuseumApp: App {
     @State private var model = AppModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -11,6 +12,9 @@ struct InvisibleMuseumApp: App {
                 .environment(model)
                 .preferredColorScheme(.dark)
                 .task { await model.bootstrap() }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { model.didBecomeActive() }
+                }
                 .onOpenURL { url in
                     // invisiblemuseum://tour/{slug} and https://museum-api.subcult.tv/t/{slug}
                     let parts = url.pathComponents.filter { $0 != "/" }

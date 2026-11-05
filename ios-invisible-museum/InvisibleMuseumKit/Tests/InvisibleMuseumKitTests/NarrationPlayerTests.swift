@@ -5,7 +5,9 @@ import XCTest
 private final class FakeAudio: AudioSessionConfiguring, SpeechSynthesizing {
     var log: [String] = []
     var speaking = false
+    var onFinish: (() -> Void)?
     func configureForSpokenAudio() throws { log.append("configure") }
+    func deactivate() { log.append("deactivate") }
     func speak(_ text: String) { log.append("speak:\(text)"); speaking = true }
     func stopSpeaking() { log.append("stopSpeech"); speaking = false }
     var isSpeaking: Bool { speaking }
@@ -45,14 +47,14 @@ final class NarrationPlayerTests: XCTestCase {
     }
 
     @MainActor
-    func testSpeechConfiguresTheSessionBeforeSpeaking() {
+    func testSpeechConfiguresTheSessionBeforeSpeakingAndReleasesItOnStop() {
         let fake = FakeAudio()
         let player = NarrationPlayer(session: fake, synthesizer: fake)
         player.play(.speech("Hello"))
         XCTAssertEqual(fake.log, ["configure", "speak:Hello"])
         XCTAssertTrue(player.isPlaying)
         player.stop()
-        XCTAssertEqual(fake.log.last, "stopSpeech")
+        XCTAssertEqual(fake.log, ["configure", "speak:Hello", "stopSpeech", "deactivate"])
         XCTAssertFalse(player.isPlaying)
     }
 
@@ -67,6 +69,7 @@ final class NarrationPlayerTests: XCTestCase {
         XCTAssertTrue(player.isPlaying)
         player.stop()
         XCTAssertNil(player.currentPlayer)
+        XCTAssertEqual(fake.log, ["configure", "deactivate"])
     }
 
     @MainActor
@@ -84,7 +87,30 @@ final class NarrationPlayerTests: XCTestCase {
         let player = NarrationPlayer(session: fake, synthesizer: fake)
         player.play(.speech("One"))
         player.play(.stream(URL(string: "https://media.test/n.mp3")!))
-        XCTAssertEqual(fake.log, ["configure", "speak:One", "stopSpeech", "configure"])
+        XCTAssertEqual(fake.log, ["configure", "speak:One", "stopSpeech", "deactivate", "configure"])
         XCTAssertNotNil(player.currentPlayer)
+    }
+
+    @MainActor
+    func testSpeechFinishingReleasesTheSession() async throws {
+        // Review fix: ducked music must come back when the narrator stops talking.
+        let fake = FakeAudio()
+        let player = NarrationPlayer(session: fake, synthesizer: fake)
+        player.play(.speech("Short"))
+        fake.speaking = false
+        fake.onFinish?()
+        try await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertFalse(player.isPlaying)
+        XCTAssertEqual(fake.log.last, "deactivate")
+        XCTAssertEqual(fake.log.filter { $0 == "deactivate" }.count, 1)
+    }
+
+    @MainActor
+    func testStopIsIdempotent() {
+        let fake = FakeAudio()
+        let player = NarrationPlayer(session: fake, synthesizer: fake)
+        player.stop()
+        player.stop()
+        XCTAssertTrue(fake.log.isEmpty, "nothing was playing, so the session is left alone")
     }
 }

@@ -52,8 +52,8 @@ final class AppModel {
         session.onChange = { [weak self] in
             Task { @MainActor [weak self] in self?.account = self?.session.account }
         }
-        client.onUnauthorized = { [weak self] in
-            Task { @MainActor [weak self] in self?.handleUnauthorized() }
+        client.onUnauthorized = { [weak self] token in
+            Task { @MainActor [weak self] in self?.handleUnauthorized(token: token) }
         }
     }
 
@@ -64,7 +64,10 @@ final class AppModel {
         return defaultBaseURL
     }
 
-    var isSignedIn: Bool { session.isSignedIn }
+    /// Tracked through `account`, so views switch between signed-in and signed-out states.
+    var isSignedIn: Bool { account != nil }
+    /// Set when a 401 arrives during an active tour; sign-in is shown once the tour screen closes.
+    private var signInAfterTour = false
 
     func bootstrap() async {
         session.restore()
@@ -76,9 +79,22 @@ final class AppModel {
             await refreshSaved()
         }
         await loadCities()
+        resumeActiveTour()
         #if DEBUG
         devSignInAvailable = true
         #endif
+    }
+
+    /// Brings back the tour that was being walked when the app was last closed (Review Focus 2).
+    func resumeActiveTour() {
+        guard active == nil, let restored = ActiveTourModel.restore(api: api, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn ?? false }) else { return }
+        attach(restored)
+    }
+
+    /// Foreground: push any progress the server has not seen yet.
+    func didBecomeActive() {
+        guard let active else { return }
+        Task { await active.syncIfNeeded() }
     }
 
     func loadCities() async {
@@ -122,12 +138,18 @@ final class AppModel {
         savedTourIDs = []
     }
 
-    /// A 401 clears the session but never the tour being walked.
-    func handleUnauthorized() {
-        guard session.isSignedIn else { return }
+    /// A 401 clears the session (only when the rejected token is still the current one) and
+    /// shows sign-in, but never touches the tour being walked (Review Focus 3).
+    func handleUnauthorized(token: String?) {
+        guard session.isSignedIn, token == nil || token == session.token else { return }
         session.clear()
         account = nil
         savedTourIDs = []
+        if active == nil {
+            presentSignIn = true
+        } else {
+            signInAfterTour = true
+        }
     }
 
     func refreshSaved() async {
@@ -142,6 +164,10 @@ final class AppModel {
     /// Makes a tour the active one; RootView presents ActiveTourView over everything.
     func startTour(_ tour: TourDetail, mode: String) {
         let model = ActiveTourModel(api: api, tour: tour, mode: mode, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn ?? false })
+        attach(model)
+    }
+
+    private func attach(_ model: ActiveTourModel) {
         model.audioEnabled = audioGuideEnabled
         model.onArrive = { [weak self, weak model] stop in
             guard let self, let model, model.audioEnabled else { return }
@@ -150,13 +176,22 @@ final class AppModel {
         location.onLocation = { [weak model] location in model?.handle(location: location) }
         if let here = location.currentLocation { model.handle(location: here) }
         active = model
+        Task {
+            await model.loadRemoteProgress()
+            await model.syncIfNeeded()
+        }
     }
 
     func endTour(resetProgress: Bool) {
         if resetProgress { active?.resetProgress() }
+        active?.end()
         narration.stop()
         location.onLocation = nil
         active = nil
+        if signInAfterTour {
+            signInAfterTour = false
+            presentSignIn = true
+        }
     }
 
     /// Plays the featured moment at a stop: its recorded narration, else the body read aloud.

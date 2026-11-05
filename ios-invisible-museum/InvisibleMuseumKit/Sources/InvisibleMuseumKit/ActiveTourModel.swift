@@ -10,10 +10,25 @@ public struct LocalTourProgress: Codable, Equatable {
     public var visitedPositions: [Int]
     public var startedAt: Date
     public var completedAt: Date?
+    /// Last local change; compared with `syncedAt` to know whether the server is behind.
+    public var updatedAt: Date = Date()
     /// When the server last accepted this progress; nil until a PUT succeeds.
     public var syncedAt: Date?
 
+    public var needsSync: Bool {
+        guard !visitedPositions.isEmpty else { return false }
+        guard let syncedAt else { return true }
+        return syncedAt < updatedAt
+    }
+
     public static func key(tourID: String, mode: String) -> String { "progress.\(tourID).\(mode)" }
+}
+
+/// Which tour is being walked, kept on disk so a relaunch can resume it.
+public struct ActiveTourRecord: Codable, Equatable {
+    public var tourID: String
+    public var mode: String
+    public static let key = "active"
 }
 
 /// Drives a tour being walked or ridden: the route, the next stop, arrival, progress, and the
@@ -21,7 +36,7 @@ public struct LocalTourProgress: Codable, Equatable {
 @MainActor
 @Observable
 public final class ActiveTourModel: Identifiable {
-    public var id: String { "\(tour.tour.id).\(mode)" }
+    nonisolated public let id: String
 
     public static func routeKey(tourID: String, mode: String) -> String { "route.\(tourID).\(mode)" }
     public static func tourKey(tourID: String) -> String { "tour.\(tourID)" }
@@ -56,12 +71,27 @@ public final class ActiveTourModel: Identifiable {
         self.mode = mode
         self.cache = cache
         self.isSignedIn = isSignedIn
+        self.id = "\(tour.tour.id).\(mode)"
         let key = LocalTourProgress.key(tourID: tour.tour.id, mode: mode)
         progress = cache.load(LocalTourProgress.self, key: key)
             ?? LocalTourProgress(tourID: tour.tour.id, mode: mode, visitedPositions: [], startedAt: Date())
         visited = Set(progress.visitedPositions)
         cache.save(tour, key: Self.tourKey(tourID: tour.tour.id))
+        cache.save(ActiveTourRecord(tourID: tour.tour.id, mode: mode), key: ActiveTourRecord.key)
         advance()
+    }
+
+    /// Rebuilds the tour that was active when the app last ran, from the cached detail alone,
+    /// so it comes back even without signal (Review Focus 2). Nil when no tour was active.
+    public static func restore(api: Endpoints, cache: DiskCache, isSignedIn: @escaping () -> Bool) -> ActiveTourModel? {
+        guard let record = cache.load(ActiveTourRecord.self, key: ActiveTourRecord.key),
+              let tour = cache.load(TourDetail.self, key: tourKey(tourID: record.tourID)) else { return nil }
+        return ActiveTourModel(api: api, tour: tour, mode: record.mode, cache: cache, isSignedIn: isSignedIn)
+    }
+
+    /// Ends the walk: the tour is no longer resumed on launch. Progress stays.
+    public func end() {
+        cache.remove(ActiveTourRecord.key)
     }
 
     // MARK: Route
@@ -133,12 +163,18 @@ public final class ActiveTourModel: Identifiable {
         guard !visited.contains(stop.position) else { return }
         visited.insert(stop.position)
         arrivedStop = stop
-        progress.visitedPositions = visited.sorted()
-        advance()
-        if isComplete { progress.completedAt = Date() }
-        cache.save(progress, key: LocalTourProgress.key(tourID: tour.tour.id, mode: mode))
+        recordVisited()
         onArrive?(stop)
         sync()
+    }
+
+    /// Writes `visited` into the local record and advances to the next stop.
+    private func recordVisited() {
+        progress.visitedPositions = visited.sorted()
+        progress.updatedAt = Date()
+        advance()
+        if isComplete { progress.completedAt = progress.completedAt ?? Date() }
+        cache.save(progress, key: LocalTourProgress.key(tourID: tour.tour.id, mode: mode))
     }
 
     /// Points `nextStop` and the monitor at the first unvisited stop.
@@ -165,25 +201,57 @@ public final class ActiveTourModel: Identifiable {
 
     // MARK: Progress sync
 
-    /// PUTs progress when signed in; local progress is already saved. Failures are kept quiet
-    /// (syncError) and retried on the next arrival.
+    /// True when the server has not seen the latest local progress.
+    public var needsSync: Bool { progress.needsSync }
+
+    /// Merges the server's record for this tour into the local one, so a second device or the
+    /// other travel mode never loses stops. The server keeps one record per tour.
+    public func loadRemoteProgress() async {
+        guard isSignedIn(), let records = try? await api.progress(),
+              let remote = records.first(where: { $0.tourID == tour.tour.id }) else { return }
+        let merged = visited.union(remote.visitedPositions)
+        if merged != visited {
+            visited = merged
+            recordVisited()
+        }
+        if Set(remote.visitedPositions) == merged {
+            progress.syncedAt = Date()
+            cache.save(progress, key: LocalTourProgress.key(tourID: tour.tour.id, mode: mode))
+        } else {
+            sync()
+        }
+    }
+
+    /// Sends progress the server is missing (after an offline stretch, on foreground).
+    public func syncIfNeeded() async {
+        guard isSignedIn(), progress.needsSync else { return }
+        sync()
+        await flush()
+    }
+
+    /// PUTs progress when signed in, one request at a time and in order; local progress is
+    /// already saved. Failures are kept in syncError and retried by syncIfNeeded.
     private func sync() {
         guard isSignedIn() else { return }
         let body = ProgressRequest(mode: mode, visitedPositions: progress.visitedPositions, completed: progress.completedAt != nil)
+        let changedAt = progress.updatedAt
         let tourID = tour.tour.id
+        let previous = pendingSync
         pendingSync = Task { [weak self] in
+            await previous?.value
+            guard let self else { return }
             do {
-                _ = try await self?.api.putProgress(tour: tourID, body)
-                self?.progress.syncedAt = Date()
-                self?.syncError = nil
-                if let self { self.cache.save(self.progress, key: LocalTourProgress.key(tourID: tourID, mode: self.mode)) }
+                _ = try await self.api.putProgress(tour: tourID, body)
+                self.progress.syncedAt = max(changedAt, Date())
+                self.syncError = nil
+                self.cache.save(self.progress, key: LocalTourProgress.key(tourID: tourID, mode: self.mode))
             } catch {
-                self?.syncError = (error as? APIError)?.message ?? error.localizedDescription
+                self.syncError = (error as? APIError)?.message ?? error.localizedDescription
             }
         }
     }
 
-    /// Waits for an in-flight progress post (tests, and the end-tour button).
+    /// Waits for in-flight progress posts (tests, and the end-tour button).
     public func flush() async {
         await pendingSync?.value
     }

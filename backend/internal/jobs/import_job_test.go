@@ -279,3 +279,22 @@ func TestFetchMediaJobForcesExtensionFromContentType(t *testing.T) {
 		t.Fatalf("file not stored: %v", err)
 	}
 }
+
+// Review fix (cycle 3): SVG is image/* but can carry script; stored on the admin origin it
+// would run with the curator's token, so it is refused.
+func TestFetchMediaJobRefusesSVG(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	_, _, assetID := mediaFetchFixture(t, w, store, ctx, "/logo.svg", func(rw http.ResponseWriter, _ *http.Request) {
+		rw.Header().Set("Content-Type", "image/svg+xml")
+		_, _ = rw.Write([]byte(`<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>`))
+	}, true)
+	drain(t, w, ctx)
+	job := onlyJob(t, store, ctx, models.JobStatusFailed)
+	if job.Attempts != 1 || !strings.Contains(job.LastError, "svg") {
+		t.Fatalf("svg must be refused without retry: %+v", job)
+	}
+	if got, _ := store.GetMedia(ctx, assetID); got.StorageKey != "" {
+		t.Fatalf("asset must stay unfetched: %+v", got)
+	}
+}

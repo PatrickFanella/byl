@@ -138,13 +138,35 @@ final class RouteBuilderModelTests: XCTestCase {
         await b.loadPlaces()
         XCTAssertEqual(b.placesState, .loaded)
         XCTAssertEqual(b.filteredPlaces.count, places.count)
-        let needle = String(places.last!.name.prefix(4))
-        b.search = needle.lowercased()
-        XCTAssertTrue(b.filteredPlaces.allSatisfy { $0.name.lowercased().contains(needle.lowercased()) })
-        XCTAssertFalse(b.filteredPlaces.isEmpty)
+        // Search matches name or address; the fixture addresses all contain the city name.
+        let target = places.last!
+        b.search = target.name.lowercased()
+        XCTAssertTrue(b.filteredPlaces.contains { $0.id == target.id })
+        XCTAssertTrue(b.filteredPlaces.allSatisfy { $0.name.lowercased().contains(target.name.lowercased()) || $0.address.lowercased().contains(target.name.lowercased()) })
+        b.search = "zzz-no-such-place"
+        XCTAssertTrue(b.filteredPlaces.isEmpty)
         b.search = ""
         let far = places.last!
         b.sortNear(latitude: far.latitude, longitude: far.longitude)
         XCTAssertEqual(b.filteredPlaces.first?.id, far.id)
+    }
+
+    func testStopsFromAnotherCityBlockSubmit() throws {
+        // Review Focus 5: cross-city stops keep Create disabled instead of waiting for the 422.
+        let b = builder()
+        b.title = "Two towns"
+        b.add(places[0])
+        let json = try JSONEncoder().encode(places[1])
+        var dict = try XCTUnwrap(JSONSerialization.jsonObject(with: json) as? [String: Any])
+        dict["id"] = "foreign-1"
+        dict["city_id"] = "00000000-0000-4000-8000-0000000000c2"
+        let foreign = try JSONDecoder().decode(PlaceSummary.self, from: JSONSerialization.data(withJSONObject: dict))
+        b.add(foreign)
+        XCTAssertEqual(b.stops.count, 2)
+        XCTAssertFalse(b.canSubmit)
+        XCTAssertEqual(b.stopsHint, "Every stop must be in \(city.name)")
+        b.remove(foreign.id)
+        b.add(places[1])
+        XCTAssertTrue(b.canSubmit)
     }
 }

@@ -76,6 +76,10 @@ func (w *Worker) fetchMedia(ctx context.Context, p models.FetchMediaPayload) err
 	if !strings.HasPrefix(contentType, want) {
 		return fmt.Errorf("%w: %s asset but the download is %q", ErrNoRetry, asset.Kind, contentType)
 	}
+	if strings.Contains(contentType, "svg") || strings.Contains(contentType, "xml") || strings.Contains(contentType, "html") {
+		// SVG/XML can carry script and would run on the admin origin when opened from /media/files.
+		return fmt.Errorf("%w: %s is not accepted as media", ErrNoRetry, contentType)
+	}
 	name := path.Base(u.Path)
 	if name == "" || name == "/" || name == "." {
 		name = asset.ID
@@ -99,7 +103,7 @@ func (w *Worker) fetchMedia(ctx context.Context, p models.FetchMediaPayload) err
 // mime package's first choice is not always the familiar one (.jpe for image/jpeg).
 var preferredExt = map[string]string{
 	"image/jpeg": ".jpg", "image/png": ".png", "image/gif": ".gif", "image/webp": ".webp", "image/tiff": ".tif",
-	"image/svg+xml": ".svg", "video/mp4": ".mp4", "video/webm": ".webm", "video/quicktime": ".mov", "video/ogg": ".ogv",
+	"video/mp4": ".mp4", "video/webm": ".webm", "video/quicktime": ".mov", "video/ogg": ".ogv",
 	"audio/mpeg": ".mp3", "audio/mp4": ".m4a", "audio/ogg": ".ogg", "audio/wav": ".wav",
 }
 
