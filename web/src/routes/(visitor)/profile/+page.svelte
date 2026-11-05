@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { session } from '#lib/auth.ts';
 	import { api } from '#lib/api/index.ts';
@@ -7,6 +8,32 @@
 	const AUDIO_KEY = 'invisible-museum.audio';
 	let audio = $state(false);
 	let signingOut = $state(false);
+
+	let locationState = $state('not requested');
+	onMount(() => {
+		let permission: PermissionStatus | undefined;
+		void navigator.permissions
+			?.query({ name: 'geolocation' })
+			.then((status) => {
+				permission = status;
+				const update = () => {
+					locationState =
+						status.state === 'granted'
+							? 'allowed'
+							: status.state === 'denied'
+								? 'blocked'
+								: 'not requested';
+				};
+				update();
+				status.onchange = update;
+			})
+			.catch(() => {
+				locationState = 'unavailable';
+			});
+		return () => {
+			if (permission) permission.onchange = null;
+		};
+	});
 
 	$effect(() => {
 		try {
@@ -83,6 +110,7 @@
 				>
 			</span>
 		</label>
+		<p class="mt-3 text-xs text-white/50">Location: {locationState}</p>
 		<p class="mt-3 text-xs text-white/50">
 			Location is requested by your browser when you start a tour; the walk also works with the "I'm
 			here" button.

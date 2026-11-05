@@ -145,7 +145,9 @@
 			if (cancelled) return;
 			map = new lib.Map({
 				container,
-				style: 'https://tiles.openfreemap.org/styles/liberty',
+				style: dark
+					? 'https://tiles.openfreemap.org/styles/dark'
+					: 'https://tiles.openfreemap.org/styles/liberty',
 				center: [-88.0112, 41.8089],
 				zoom: 13,
 				attributionControl: { compact: true }

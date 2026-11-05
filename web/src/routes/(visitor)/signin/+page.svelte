@@ -9,14 +9,14 @@
 	let displayName = $state('');
 	let error = $state('');
 	let busy = $state(false);
-	let devDisabled = $state(false);
+	let devDisabled = $state(true);
 
 	const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 
 	function finish(data: SessionData) {
 		session.set(data);
 		const next = page.url.searchParams.get('next') || '/';
-		goto(next.startsWith('/') ? next : '/');
+		goto(next.startsWith('/') && !next.startsWith('//') && !next.includes('\\') ? next : '/');
 	}
 
 	async function devSignIn(e: SubmitEvent) {
@@ -59,6 +59,14 @@
 	}
 
 	onMount(() => {
+		void api
+			.get<{ enabled: boolean }>('/api/v1/auth/dev')
+			.then((config) => {
+				devDisabled = !config.enabled;
+			})
+			.catch(() => {
+				devDisabled = true;
+			});
 		if (!googleClientId) return;
 		const script = document.createElement('script');
 		script.src = 'https://accounts.google.com/gsi/client';

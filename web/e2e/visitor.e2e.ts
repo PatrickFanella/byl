@@ -27,9 +27,50 @@ test('a visitor browses from home to a tour, a place, and a moment', async ({ pa
 	await expect(page.getByRole('heading', { name: /sources/i })).toBeVisible();
 });
 
-test('the tours page filters by travel mode and topic', async ({ page }) => {
-	await page.goto('/tours');
-	await expect(page.getByRole('link', { name: /downtown memory loop/i })).toBeVisible();
-	await page.getByRole('button', { name: /biking/i }).click();
-	await expect(page.getByRole('link', { name: /downtown memory loop/i })).toBeVisible();
+test('the tours page removes tours that do not match the selected travel mode and topic', async ({
+	page,
+	request
+}) => {
+	const login = await request.post(`${apiUrl}/api/v1/auth/dev`, {
+		data: { email: 'admin@example.com' }
+	});
+	expect(login.ok()).toBeTruthy();
+	const token = (await login.json()).token as string;
+	const headers = { Authorization: `Bearer ${token}` };
+	const title = `Walk-only fixture ${Date.now()}`;
+	const created = await request.post(`${apiUrl}/api/v1/admin/tours`, {
+		headers,
+		data: {
+			city_id: '00000000-0000-4000-8000-0000000000c1',
+			title,
+			topic_id: '00000000-0000-4000-8000-00000000a0a1',
+			modes: ['walk'],
+			stops: [
+				{ place_id: '00000000-0000-4000-8000-00000000b0b1' },
+				{ place_id: '00000000-0000-4000-8000-00000000b0b2' }
+			]
+		}
+	});
+	expect(created.ok()).toBeTruthy();
+	const fixture = (await created.json()) as { id: string };
+	try {
+		await expect(async () => {
+			const published = await request.post(`${apiUrl}/api/v1/admin/tours/${fixture.id}/publish`, {
+				headers
+			});
+			expect(published.ok()).toBeTruthy();
+		}).toPass({ timeout: 30_000, intervals: [1000] });
+		await page.goto('/tours');
+		await expect(page.getByRole('link', { name: new RegExp(title) })).toBeVisible();
+		await page.getByRole('button', { name: /biking/i }).click();
+		await expect(page.getByRole('link', { name: new RegExp(title) })).toHaveCount(0);
+		await expect(page.getByRole('link', { name: /downtown memory loop/i })).toBeVisible();
+		await page.getByRole('button', { name: 'Any', exact: true }).click();
+		await expect(page.getByRole('link', { name: new RegExp(title) })).toBeVisible();
+		await page.getByRole('button', { name: 'Parks and Public Life', exact: true }).click();
+		await expect(page.getByText('No tours match')).toBeVisible();
+		await expect(page.getByRole('link', { name: new RegExp(title) })).toHaveCount(0);
+	} finally {
+		await request.delete(`${apiUrl}/api/v1/admin/tours/${fixture.id}`, { headers });
+	}
 });

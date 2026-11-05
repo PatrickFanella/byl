@@ -11,6 +11,7 @@ export interface WalkDeps {
 	storage: Storage;
 	progressApi: ProgressApi;
 	signedIn: () => boolean;
+	accountID?: () => string | null;
 }
 
 export type Leg = TourRoute['legs'][number];
@@ -103,7 +104,8 @@ export class ActiveWalk {
 		this.progress = new ProgressStore(tour.id, this.mode, tour.stops.length, {
 			storage,
 			api: this.deps.progressApi,
-			signedIn: this.deps.signedIn
+			signedIn: this.deps.signedIn,
+			accountID: this.deps.accountID
 		});
 		this.replaceVisited(this.progress.visited);
 		this.advance();

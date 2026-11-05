@@ -10,6 +10,7 @@
 		rejectCandidate,
 		draftCandidate,
 		getCandidate,
+		getJob,
 		sleep
 	} from '#lib/admin.ts';
 	import { ApiError } from '#lib/api/index.ts';
@@ -84,9 +85,17 @@
 		busy = 'draft';
 		notice = { kind: 'info', message: 'Asking the model for a draft…' };
 		try {
-			await draftCandidate(candidate.id);
+			const queued = await draftCandidate(candidate.id);
 			for (let i = 0; i < 45; i++) {
 				await sleep(2000);
+				const job = await getJob(queued.job.id);
+				if (job.status === 'failed') {
+					notice = {
+						kind: 'error',
+						message: job.last_error || 'Drafting failed. Check Jobs for details.'
+					};
+					return;
+				}
 				const fresh = await getCandidate(candidate.id);
 				if (fresh.origin === 'draft' && fresh.updated_at !== candidate.updated_at) {
 					await invalidateAll();
