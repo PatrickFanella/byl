@@ -22,15 +22,14 @@ struct MuseumBottomBar: View {
     @Binding var selection: MuseumTab
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             ForEach(MuseumTab.allCases, id: \.self) { item in
                 tabButton(item)
             }
         }
         .padding(8)
-        .background(.black.opacity(0.78), in: Capsule())
-        .overlay(Capsule().stroke(Museum.border, lineWidth: 1))
-        .shadow(color: .black.opacity(0.35), radius: 20, x: 0, y: 10)
+        .background(Museum.background)
+        .overlay(alignment: .top) { Rectangle().fill(Museum.border).frame(height: 1) }
         .padding(.horizontal, Museum.Spacing.pageHorizontal)
         .padding(.vertical, 8)
     }
@@ -41,22 +40,21 @@ struct MuseumBottomBar: View {
                 selection = item
             }
         } label: {
-            HStack(spacing: 7) {
+            VStack(spacing: 4) {
                 Image(systemName: item.iconName)
-                if selection == item {
-                    Text(item.rawValue)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.78)
-                }
+                Text(item.rawValue)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .font(.system(size: 12, weight: .bold))
-            .foregroundStyle(selection == item ? .black : Color.white.opacity(0.62))
+            .font(Museum.meta(12))
+            .foregroundStyle(selection == item ? Museum.action : Museum.muted)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 11)
-            .padding(.horizontal, selection == item ? 10 : 8)
-            .background(selection == item ? Museum.blue : Color.clear, in: Capsule())
+            .padding(.horizontal, 4)
+            .frame(minHeight: 44)
+            .background(selection == item ? Museum.surface : Color.clear, in: RoundedRectangle(cornerRadius: 4))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(item.rawValue)
+        .accessibilityAddTraits(selection == item ? [.isSelected] : [])
     }
 }

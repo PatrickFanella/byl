@@ -14,11 +14,12 @@ struct MuseumChip: View {
             Text(title)
         }
         .font(.system(size: 13, weight: .semibold))
-        .foregroundStyle(isSelected ? .black : Museum.text.opacity(0.78))
+        .foregroundStyle(isSelected ? Museum.actionText : Museum.text)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(isSelected ? Color.white : Museum.surfaceElevated, in: Capsule())
-        .overlay(Capsule().stroke(isSelected ? Color.clear : Museum.border, lineWidth: 1))
+        .frame(minHeight: 44)
+        .background(isSelected ? Museum.action : Museum.background, in: RoundedRectangle(cornerRadius: Museum.Radius.sm))
+        .overlay(RoundedRectangle(cornerRadius: Museum.Radius.sm).stroke(isSelected ? Color.clear : Museum.borderStrong, lineWidth: 1))
     }
 }
 

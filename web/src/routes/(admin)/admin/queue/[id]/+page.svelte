@@ -129,7 +129,7 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/admin/queue" class="text-sm text-stone-500 hover:underline">← Queue</a>
+	<a href="/admin/queue" class="text-sm text-byl-muted hover:underline">← Queue</a>
 	<h1 class="text-2xl font-semibold">
 		{String(payload.title ?? payload.name ?? payload.caption ?? 'Candidate')}
 	</h1>
@@ -137,7 +137,7 @@
 	<StatusPill status={candidate.origin} />
 	<StatusPill status={candidate.status} />
 </div>
-<p class="mt-1 text-sm text-stone-500">
+<p class="mt-1 text-sm text-byl-muted">
 	{candidate.source_name ?? 'manual'}{candidate.external_id ? ` · ${candidate.external_id}` : ''} · created
 	{when(candidate.created_at)}
 	{#if candidate.target_place_id}
@@ -159,7 +159,7 @@
 	</p>
 {/if}
 {#if candidate.review_note}
-	<p class="mt-2 rounded-md bg-stone-100 p-3 text-sm">Review note: {candidate.review_note}</p>
+	<p class="mt-2 rounded-md bg-byl-surface p-3 text-sm">Review note: {candidate.review_note}</p>
 {/if}
 
 <div class="mt-6 grid gap-6 lg:grid-cols-3">
@@ -172,20 +172,20 @@
 		{/if}
 		{#if candidate.kind === 'moment'}
 			<label class="block text-sm">
-				<span class="text-stone-700">Place id</span>
+				<span class="text-byl-text">Place id</span>
 				<input
-					class="mt-1 w-full rounded-md border-stone-300 font-mono text-xs"
+					class="mt-1 w-full rounded-md border-byl-border-control font-mono text-xs"
 					bind:value={placeId}
 				/>
 			</label>
 		{/if}
 		<PayloadForm bind:fields errors={fieldErrors} />
 		{#if readOnly.length}
-			<details class="rounded-md border border-stone-200 bg-white p-3 text-sm">
+			<details class="rounded-md border border-byl-border bg-byl-background p-3 text-sm">
 				<summary class="cursor-pointer">Other payload fields</summary>
 				<dl class="mt-2 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 font-mono text-xs">
 					{#each readOnly as [k, v] (k)}
-						<dt class="text-stone-500">{k}</dt>
+						<dt class="text-byl-muted">{k}</dt>
 						<dd class="break-all">{typeof v === 'string' ? v : JSON.stringify(v)}</dd>
 					{/each}
 				</dl>
@@ -193,39 +193,39 @@
 		{/if}
 	</div>
 	<aside class="space-y-3">
-		<div class="rounded-xl border border-stone-200 bg-white p-4">
+		<div class="rounded-lg border border-byl-border bg-byl-background p-4">
 			<div class="flex flex-wrap gap-2">
 				<button
-					class="rounded-md bg-emerald-700 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+					class="rounded-md bg-byl-success-surface px-3 py-1.5 text-sm text-byl-action-text disabled:opacity-50"
 					disabled={!isPending || !!busy}
 					onclick={approve}>{busy === 'approve' ? 'Approving…' : 'Approve'}</button
 				>
 				<button
-					class="rounded-md border border-stone-300 px-3 py-1.5 text-sm disabled:opacity-50"
+					class="rounded-md border border-byl-border-control px-3 py-1.5 text-sm disabled:opacity-50"
 					disabled={!isPending || !!busy}
 					onclick={() => (rejectOpen = true)}>Reject</button
 				>
 				{#if candidate.kind === 'moment'}
 					<button
-						class="rounded-md border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-sm text-indigo-900 disabled:opacity-50"
+						class="rounded-md border border-byl-info bg-byl-info-surface px-3 py-1.5 text-sm text-byl-info disabled:opacity-50"
 						disabled={!isPending || !!busy}
 						onclick={draft}>{busy === 'draft' ? 'Drafting…' : 'Draft with AI'}</button
 					>
 				{/if}
 			</div>
-			<p class="mt-2 text-xs text-stone-500">
+			<p class="mt-2 text-xs text-byl-muted">
 				Approving creates a draft {candidate.kind}; nothing is published until you publish it.
 			</p>
 		</div>
 		{#if rawText}
-			<div class="rounded-xl border border-stone-200 bg-white p-4">
+			<div class="rounded-lg border border-byl-border bg-byl-background p-4">
 				<h2 class="text-sm font-semibold">Source text</h2>
 				<pre
-					class="mt-2 max-h-[32rem] overflow-auto text-xs whitespace-pre-wrap text-stone-700">{rawText}</pre>
+					class="mt-2 max-h-[32rem] overflow-auto text-xs whitespace-pre-wrap text-byl-text">{rawText}</pre>
 			</div>
 		{/if}
 		{#if payload.image_url || payload.media_url}
-			<div class="rounded-xl border border-stone-200 bg-white p-2">
+			<div class="rounded-lg border border-byl-border bg-byl-background p-2">
 				<img
 					src={String(payload.media_url ?? payload.image_url)}
 					alt=""
@@ -238,16 +238,18 @@
 
 <Dialog bind:open={rejectOpen} title="Reject this candidate">
 	<label class="block text-sm"
-		>Note<textarea class="mt-1 w-full rounded-md border-stone-300" rows="3" bind:value={rejectNote}
-		></textarea></label
+		>Note<textarea
+			class="mt-1 w-full rounded-md border-byl-border-control"
+			rows="3"
+			bind:value={rejectNote}></textarea></label
 	>
 	<div class="mt-4 flex justify-end gap-2">
 		<button
-			class="rounded-md border border-stone-300 px-3 py-1.5 text-sm"
+			class="rounded-md border border-byl-border-control px-3 py-1.5 text-sm"
 			onclick={() => (rejectOpen = false)}>Cancel</button
 		>
 		<button
-			class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white"
+			class="rounded-md bg-byl-action px-3 py-1.5 text-sm text-byl-action-text"
 			onclick={reject}
 			disabled={!!busy}>Reject</button
 		>

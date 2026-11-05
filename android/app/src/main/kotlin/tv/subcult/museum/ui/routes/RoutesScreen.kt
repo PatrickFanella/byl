@@ -62,26 +62,26 @@ fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Uni
     }
     LaunchedEffect(app.isSignedIn) { load() }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Overline("Your routes")
         Text("Curate your own gallery", style = MaterialTheme.typography.headlineLarge, color = Museum.text)
         Text("Order the places you love into a walk or ride and share it by link.", color = Museum.muted, style = MaterialTheme.typography.bodyLarge)
         if (!app.isSignedIn) {
             SignInPrompt("Sign in to build routes that follow you to every device.") { model.showSignIn(true) }
         } else {
-            Button(onClick = onNew, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black), enabled = app.city != null) { Text("+ New route") }
+            Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onNew, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText), enabled = app.city != null) { Text("+ New route") }
             LoadState(routes, emptyTitle = "No routes yet", emptyMessage = "Tap New route to pick your first two places.", onRetry = { scope.launch { load() } }) { items ->
                 items.forEach { tour ->
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         TourCard(tour) { onOpenTour(tour.slug) }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = {
+                            OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                                 val url = shareUrl(model.container.resolveBaseUrl(), tour.slug)
                                 val send = Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_SUBJECT, tour.title); putExtra(Intent.EXTRA_TEXT, url) }
                                 context.startActivity(Intent.createChooser(send, "Share route"))
                             }) { Text("Share") }
-                            OutlinedButton(onClick = { onEdit(tour.id) }) { Text("Edit") }
-                            TextButton(onClick = { pendingDelete = tour }) { Text("Delete", color = Museum.danger) }
+                            OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { onEdit(tour.id) }) { Text("Edit") }
+                            TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { pendingDelete = tour }) { Text("Delete", color = Museum.danger) }
                         }
                     }
                 }
@@ -96,7 +96,7 @@ fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Uni
             title = { Text("Delete this route?") },
             text = { Text(deleteError ?: tour.title) },
             confirmButton = {
-                TextButton(onClick = {
+                TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                     scope.launch {
                         try {
                             model.api.deleteTour(tour.id)
@@ -108,7 +108,7 @@ fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Uni
                     }
                 }) { Text("Delete", color = Museum.danger) }
             },
-            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { pendingDelete = null }) { Text("Cancel") } }
         )
     }
 }

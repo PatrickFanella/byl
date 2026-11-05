@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/components/Brand.svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -93,17 +94,19 @@
 	});
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-stone-50 p-6">
-	<div class="w-full max-w-sm space-y-6 rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+<div class="flex min-h-screen items-center justify-center bg-byl-background p-6">
+	<div
+		class="w-full max-w-sm space-y-6 rounded-lg border border-byl-border bg-byl-background p-6 shadow-sm"
+	>
 		<div>
-			<h1 class="text-xl font-semibold">Invisible Museum</h1>
-			<p class="text-sm text-stone-600">Curator sign-in</p>
+			<a href="/" aria-label="Byl home"><Brand /></a>
+			<h1 class="mt-4 text-xl">Sign in to Byl</h1>
 		</div>
 
 		{#if googleClientId}
 			<div id="google-button" class="flex justify-center"></div>
-			<div class="flex items-center gap-3 text-xs text-stone-400">
-				<span class="h-px flex-1 bg-stone-200"></span>or<span class="h-px flex-1 bg-stone-200"
+			<div class="flex items-center gap-3 text-xs text-byl-muted">
+				<span class="h-px flex-1 bg-byl-surface"></span>or<span class="h-px flex-1 bg-byl-surface"
 				></span>
 			</div>
 		{/if}
@@ -111,9 +114,9 @@
 		{#if !devDisabled}
 			<form class="space-y-3" onsubmit={devSignIn}>
 				<label class="block text-sm">
-					<span class="text-stone-700">Email</span>
+					<span class="text-byl-text">Email</span>
 					<input
-						class="mt-1 w-full rounded-md border-stone-300"
+						class="mt-1 w-full rounded-md border-byl-border-control"
 						type="email"
 						bind:value={email}
 						required
@@ -121,29 +124,29 @@
 					/>
 				</label>
 				<label class="block text-sm">
-					<span class="text-stone-700">Display name</span>
+					<span class="text-byl-text">Display name</span>
 					<input
-						class="mt-1 w-full rounded-md border-stone-300"
+						class="mt-1 w-full rounded-md border-byl-border-control"
 						type="text"
 						bind:value={displayName}
 						autocomplete="name"
 					/>
 				</label>
 				<button
-					class="w-full rounded-md bg-stone-900 px-4 py-2 text-white disabled:opacity-50"
+					class="w-full rounded-md bg-byl-action px-4 py-2 text-byl-action-text disabled:opacity-50"
 					disabled={busy}
 					type="submit"
 				>
 					{busy ? 'Signing in…' : 'Sign in (development)'}
 				</button>
-				<p class="text-xs text-stone-500">
+				<p class="text-xs text-byl-muted">
 					Development sign-in works only when the API runs with DEV_AUTH_ENABLED.
 				</p>
 			</form>
 		{/if}
 
 		{#if error}
-			<p class="rounded-md bg-red-50 p-2 text-sm text-red-700">{error}</p>
+			<p class="rounded-md bg-byl-danger-surface p-2 text-sm text-byl-danger">{error}</p>
 		{/if}
 	</div>
 </div>

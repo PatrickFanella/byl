@@ -84,12 +84,12 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/admin/places/{data.place.id}" class="text-sm text-stone-500 hover:underline"
+	<a href="/admin/places/{data.place.id}" class="text-sm text-byl-muted hover:underline"
 		>← {data.place.name}</a
 	>
 	<h1 class="text-2xl font-semibold">{moment.title}</h1>
 	<StatusPill status={moment.status} />
-	{#if moment.has_narration}<span class="text-xs text-stone-500">narrated</span>{/if}
+	{#if moment.has_narration}<span class="text-xs text-byl-muted">narrated</span>{/if}
 </div>
 <div class="mt-3"><Notice kind={notice.kind} message={notice.message} /></div>
 
@@ -102,10 +102,10 @@
 			<div class="mt-2 flex flex-wrap gap-2">
 				{#each data.topics as t (t.id)}
 					<label
-						class="flex items-center gap-1 rounded-md border border-stone-300 px-2 py-1 text-sm {topicIds.includes(
+						class="flex items-center gap-1 rounded-md border border-byl-border-control px-2 py-1 text-sm {topicIds.includes(
 							t.id
 						)
-							? 'bg-stone-900 text-white'
+							? 'bg-byl-action text-byl-action-text'
 							: ''}"
 					>
 						<input
@@ -132,33 +132,37 @@
 			<div class="mt-2 space-y-2">
 				{#each sources as s, i (i)}
 					<div
-						class="grid gap-2 rounded-md border border-stone-200 bg-white p-2 text-sm md:grid-cols-5"
+						class="grid gap-2 rounded-md border border-byl-border bg-byl-background p-2 text-sm md:grid-cols-5"
 					>
-						<input class="rounded-md border-stone-300" placeholder="Title" bind:value={s.title} />
 						<input
-							class="rounded-md border-stone-300 md:col-span-2"
+							class="rounded-md border-byl-border-control"
+							placeholder="Title"
+							bind:value={s.title}
+						/>
+						<input
+							class="rounded-md border-byl-border-control md:col-span-2"
 							placeholder="URL"
 							bind:value={s.url}
 						/>
 						<input
-							class="rounded-md border-stone-300"
+							class="rounded-md border-byl-border-control"
 							placeholder="Publisher"
 							bind:value={s.publisher}
 						/>
 						<div class="flex gap-1">
 							<input
-								class="w-full rounded-md border-stone-300"
+								class="w-full rounded-md border-byl-border-control"
 								placeholder="Licence"
 								bind:value={s.license}
 							/><button
-								class="text-xs text-stone-500"
+								class="text-xs text-byl-muted"
 								title="Remove"
 								onclick={() => (sources = sources.filter((_, j) => j !== i))}>✕</button
 							>
 						</div>
 					</div>
 				{:else}
-					<p class="text-xs text-stone-500">Add at least one source so the claim can be checked.</p>
+					<p class="text-xs text-byl-muted">Add at least one source so the claim can be checked.</p>
 				{/each}
 			</div>
 		</section>
@@ -167,17 +171,17 @@
 			<h2 class="text-sm font-semibold">Media</h2>
 			<ul class="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
 				{#each data.library.filter((m) => mediaIds.includes(m.id)) as m (m.id)}
-					<li class="rounded-md border border-stone-200 bg-white p-1 text-xs">
+					<li class="rounded-md border border-byl-border bg-byl-background p-1 text-xs">
 						{#if m.kind === 'image'}<img
 								src={m.public_url}
 								alt={m.caption}
 								class="h-24 w-full rounded object-cover"
-							/>{:else}<div class="flex h-24 items-center justify-center bg-stone-100">
+							/>{:else}<div class="flex h-24 items-center justify-center bg-byl-surface">
 								{m.kind}
 							</div>{/if}
 						<div class="mt-1 truncate" title={m.caption}>{m.caption || m.id.slice(0, 8)}</div>
 						<div class="flex items-center justify-between">
-							<span class={m.license ? 'text-emerald-700' : 'text-red-700'}
+							<span class={m.license ? 'text-byl-success' : 'text-byl-danger'}
 								>{m.license || 'no licence'}</span
 							>
 							<label class="flex items-center gap-1"
@@ -190,7 +194,7 @@
 								/>hero</label
 							>
 							<button
-								class="text-stone-500"
+								class="text-byl-muted"
 								onclick={() => {
 									mediaIds = mediaIds.filter((x) => x !== m.id);
 									if (heroId === m.id) heroId = '';
@@ -201,7 +205,7 @@
 				{/each}
 			</ul>
 			<div class="mt-2 flex gap-2 text-sm">
-				<select class="rounded-md border-stone-300" bind:value={pick}>
+				<select class="rounded-md border-byl-border-control" bind:value={pick}>
 					<option value="">Attach from library…</option>
 					{#each data.library.filter((m) => !mediaIds.includes(m.id)) as m (m.id)}<option
 							value={m.id}
@@ -209,7 +213,7 @@
 						>{/each}
 				</select>
 				<button
-					class="rounded-md border border-stone-300 px-2"
+					class="rounded-md border border-byl-border-control px-2"
 					disabled={!pick}
 					onclick={() => {
 						if (pick) mediaIds = [...mediaIds, pick];
@@ -222,19 +226,19 @@
 
 		<div class="flex flex-wrap gap-2">
 			<button
-				class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+				class="rounded-md bg-byl-action px-3 py-1.5 text-sm text-byl-action-text disabled:opacity-50"
 				disabled={!!busy}
 				onclick={save}>Save</button
 			>
 			{#if moment.status === 'published'}
 				<button
-					class="rounded-md border border-stone-300 px-3 py-1.5 text-sm disabled:opacity-50"
+					class="rounded-md border border-byl-border-control px-3 py-1.5 text-sm disabled:opacity-50"
 					disabled={!!busy}
 					onclick={() => status('unpublish')}>Unpublish</button
 				>
 			{:else}
 				<button
-					class="rounded-md bg-emerald-700 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+					class="rounded-md bg-byl-success-surface px-3 py-1.5 text-sm text-byl-action-text disabled:opacity-50"
 					disabled={!!busy}
 					onclick={() => status('publish')}>Publish</button
 				>
@@ -242,9 +246,9 @@
 		</div>
 	</div>
 	<aside class="space-y-3 text-sm">
-		<div class="rounded-xl border border-stone-200 bg-white p-4">
+		<div class="rounded-lg border border-byl-border bg-byl-background p-4">
 			<h2 class="font-semibold">Preview</h2>
-			<p class="mt-1 text-xs text-stone-500">{moment.date_display}</p>
+			<p class="mt-1 text-xs text-byl-muted">{moment.date_display}</p>
 			<div class="prose prose-sm mt-2 max-w-none whitespace-pre-wrap">
 				{fields.find((f) => f.key === 'body')?.value}
 			</div>

@@ -5,7 +5,7 @@ test.skip(!apiUrl, 'E2E_API_URL not set');
 
 test('a visitor browses from home to a tour, a place, and a moment', async ({ page }) => {
 	await page.goto('/');
-	await expect(page.getByRole('heading', { name: /downers grove as a museum/i })).toBeVisible();
+	await expect(page.getByRole('heading', { name: /downers grove on foot/i })).toBeVisible();
 	await page
 		.getByRole('link', { name: /downtown memory loop/i })
 		.first()

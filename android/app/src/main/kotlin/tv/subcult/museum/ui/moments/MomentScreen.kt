@@ -47,7 +47,7 @@ fun MomentScreen(model: AppViewModel, id: String) {
     }
     LaunchedEffect(id) { load() }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         LoadState(state, onRetry = { scope.launch { load() } }) { m ->
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (m.dateDisplay.isNotEmpty()) Overline(m.dateDisplay)
@@ -71,7 +71,7 @@ fun MomentScreen(model: AppViewModel, id: String) {
                 m.sources.forEach { s ->
                     Card(onClick = if (s.url.isNotEmpty()) ({ uriHandler.openUri(s.url) }) else null) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(s.title.ifEmpty { s.url }, style = MaterialTheme.typography.titleMedium, color = if (s.url.isNotEmpty()) Museum.blue else Museum.text)
+                            Text(s.title.ifEmpty { s.url }, style = MaterialTheme.typography.titleMedium, color = if (s.url.isNotEmpty()) Museum.action else Museum.text)
                             Text(listOf(s.publisher, s.license, s.retrievedAt?.let { "retrieved $it" } ?: "").filter { it.isNotEmpty() }.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = Museum.muted)
                             if (s.note.isNotEmpty()) Text(s.note, style = MaterialTheme.typography.bodySmall, color = Museum.faint)
                         }

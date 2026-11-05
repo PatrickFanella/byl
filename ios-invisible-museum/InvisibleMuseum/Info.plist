@@ -16,8 +16,15 @@
 		</dict>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Invisible Museum uses your location to show places near you and to tell when you arrive at each stop of a tour.</string>
-	<key>UIBackgroundModes</key>
+	<string>Byl uses your location to show places near you and to tell when you arrive at each stop of a tour.</string>
+	<key>UIAppFonts</key>
+    <array>
+        <string>Fonts/Public-Sans-0.ttf</string>
+        <string>Fonts/Public-Sans-1.ttf</string>
+        <string>Fonts/Libre-Baskerville-0.ttf</string>
+        <string>Fonts/Barlow-Condensed-1.ttf</string>
+    </array>
+    <key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
 	</array>

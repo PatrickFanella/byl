@@ -45,7 +45,7 @@ struct SavedView: View {
                         if let p = progress[tour.id] {
                             HStack(spacing: 8) {
                                 ProgressView(value: Double(p.visitedPositions.count), total: Double(max(tour.stopCount, 1)))
-                                    .tint(p.completedAt == nil ? Museum.blue : Museum.green)
+                                    .tint(p.completedAt == nil ? Museum.action : Museum.success)
                                 Text(p.completedAt == nil ? "\(p.visitedPositions.count) of \(tour.stopCount) stops" : "Completed")
                                     .font(Museum.meta(11))
                                     .foregroundStyle(Museum.muted)

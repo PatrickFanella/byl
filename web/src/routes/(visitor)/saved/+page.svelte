@@ -24,9 +24,9 @@
 	});
 </script>
 
-<svelte:head><title>Saved · Invisible Museum</title></svelte:head>
+<svelte:head><title>Saved · Byl</title></svelte:head>
 
-<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">Saved</div>
+<div class="text-xs font-bold tracking-normal text-byl-action">Saved</div>
 <h1 class="text-3xl font-semibold">Tours to come back to</h1>
 
 <div class="mt-6">
@@ -46,9 +46,9 @@
 					<div class="space-y-2">
 						<TourCard {tour} />
 						{#if p}
-							<div class="flex items-center gap-3 px-1 text-xs text-white/60">
+							<div class="flex items-center gap-3 px-1 text-xs text-byl-muted">
 								<progress
-									class="h-1.5 flex-1 overflow-hidden rounded-full"
+									class="h-1.5 flex-1 overflow-hidden rounded"
 									max={Math.max(tour.stop_count, 1)}
 									value={p.visited_positions.length}
 								></progress>

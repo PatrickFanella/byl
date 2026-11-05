@@ -24,19 +24,20 @@
 
 <div class="space-y-2">
 	<input
-		class="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 font-mono text-xs text-white"
+		class="w-full rounded-lg border border-byl-border bg-byl-background px-3 py-2 font-mono text-xs text-byl-text"
 		readonly
 		value={url}
 		aria-label="Share link"
 		onfocus={(e) => e.currentTarget.select()}
 	/>
 	<div class="flex gap-2">
-		<button class="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black" onclick={copy}
-			>{copied ? 'Copied' : 'Copy link'}</button
+		<button
+			class="rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
+			onclick={copy}>{copied ? 'Copied' : 'Copy link'}</button
 		>
 		{#if canShare}
 			<button
-				class="rounded-xl border border-white/20 px-3 py-2 text-sm hover:bg-white/10"
+				class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
 				onclick={share}>Share…</button
 			>
 		{/if}

@@ -41,7 +41,7 @@ fun PlaceScreen(model: AppViewModel, ref: String, featuredId: String?, onOpenMom
     }
     LaunchedEffect(ref) { load() }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         LoadState(state, onRetry = { scope.launch { load() } }) { p ->
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Overline(p.kind.replace('_', ' '))

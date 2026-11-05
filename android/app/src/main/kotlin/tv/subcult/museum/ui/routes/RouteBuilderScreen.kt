@@ -63,8 +63,8 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
 
     LaunchedEffect(app.city?.id, editing?.id, app.cities.size) { vm.ensureBuilder(app.cities, app.city) }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        TextButton(onClick = onDone) { Text("← Your routes", color = Museum.muted) }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onDone) { Text("← Your routes", color = Museum.muted) }
         Text(if (editingId == null) "New route" else "Edit route", style = MaterialTheme.typography.headlineLarge, color = Museum.text)
 
         val done = created
@@ -75,17 +75,17 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
             done != null -> {
                 Card {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Overline(if (editingId == null) "Route created" else "Route updated", Museum.green)
+                        Overline(if (editingId == null) "Route created" else "Route updated", Museum.success)
                         Text(done.title, style = MaterialTheme.typography.headlineMedium, color = Museum.text)
                         Text(if (done.visibility == "private") "Only you can open it." else "Anyone with the link can open it; it is not listed publicly.", color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
-                Button(onClick = {
+                Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                     val url = shareUrl(model.container.resolveBaseUrl(), done.slug)
                     val send = Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_SUBJECT, done.title); putExtra(Intent.EXTRA_TEXT, url) }
                     context.startActivity(Intent.createChooser(send, "Share route"))
-                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)) { Text("Share the link") }
-                OutlinedButton(onClick = onDone, modifier = Modifier.fillMaxWidth()) { Text("Done") }
+                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("Share the link") }
+                OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onDone, modifier = Modifier.fillMaxWidth()) { Text("Done") }
             }
             b == null -> LoadingRow()
             else -> {
@@ -95,14 +95,14 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Overline("Travel")
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(selected = s.walk, onClick = { b.walk = !s.walk }, label = { Text("Walking") })
-                        FilterChip(selected = s.bike, onClick = { b.bike = !s.bike }, label = { Text("Biking") })
+                        FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = s.walk, onClick = { b.walk = !s.walk }, label = { Text("Walking") })
+                        FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = s.bike, onClick = { b.bike = !s.bike }, label = { Text("Biking") })
                     }
                     if (s.modes.isEmpty()) Text("Pick at least one way to travel.", color = Museum.danger, style = MaterialTheme.typography.bodySmall)
                     Overline("Who can open it")
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(selected = s.visibility == "unlisted", onClick = { b.visibility = "unlisted" }, label = { Text("Anyone with the link") })
-                        FilterChip(selected = s.visibility == "private", onClick = { b.visibility = "private" }, label = { Text("Only me") })
+                        FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = s.visibility == "unlisted", onClick = { b.visibility = "unlisted" }, label = { Text("Anyone with the link") })
+                        FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = s.visibility == "private", onClick = { b.visibility = "private" }, label = { Text("Only me") })
                     }
                 }
 
@@ -115,11 +115,11 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
                     s.stops.forEachIndexed { i, place ->
                         Card {
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text("${i + 1}", color = Museum.blue, style = MaterialTheme.typography.labelSmall)
+                                Text("${i + 1}", color = Museum.action, style = MaterialTheme.typography.labelSmall)
                                 Text(place.name, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, color = Museum.text, maxLines = 1)
-                                TextButton(onClick = { b.move(i, i - 1) }, enabled = i > 0) { Text("↑") }
-                                TextButton(onClick = { b.move(i, i + 1) }, enabled = i < s.stops.size - 1) { Text("↓") }
-                                TextButton(onClick = { b.remove(place.id) }) { Text("✕", color = Museum.danger) }
+                                TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { b.move(i, i - 1) }, enabled = i > 0) { Text("↑") }
+                                TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { b.move(i, i + 1) }, enabled = i < s.stops.size - 1) { Text("↓") }
+                                TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { b.remove(place.id) }) { Text("✕", color = Museum.danger) }
                             }
                         }
                     }
@@ -129,10 +129,10 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
                 }
 
                 if (s.error != null && s.stopsError == null) Text(s.error!!, color = Museum.danger, style = MaterialTheme.typography.bodyMedium)
-                Button(
+                Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                     onClick = { vm.submit() },
                     enabled = s.canSubmit, modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
+                    colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)
                 ) { Text(if (s.busy) "Saving…" else if (b.isEditing) "Save changes" else "Create route") }
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -151,7 +151,7 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
                                         Text(place.name, style = MaterialTheme.typography.titleMedium, color = Museum.text, maxLines = 1)
                                         if (place.address.isNotEmpty()) Text(place.address, style = MaterialTheme.typography.bodySmall, color = Museum.muted, maxLines = 1)
                                     }
-                                    OutlinedButton(onClick = { if (added) b.remove(place.id) else b.add(place) }, enabled = added || s.stops.size < RouteBuilder.MAX_STOPS) { Text(if (added) "Added" else "Add") }
+                                    OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { if (added) b.remove(place.id) else b.add(place) }, enabled = added || s.stops.size < RouteBuilder.MAX_STOPS) { Text(if (added) "Added" else "Add") }
                                 }
                             }
                         }

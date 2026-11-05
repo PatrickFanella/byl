@@ -67,19 +67,20 @@
 	}
 
 	const chip = (on: boolean) =>
-		`rounded-full px-3 py-1.5 text-sm ${on ? 'bg-white text-black' : 'border border-white/20 text-white/80 hover:bg-white/10'}`;
+		`rounded px-3 py-1.5 text-sm ${on ? 'bg-byl-action text-byl-action-text' : 'border border-byl-border text-byl-muted hover:bg-byl-surface'}`;
 	const origin = typeof location === 'undefined' ? '' : location.origin;
-	const field = 'mt-1 w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white';
+	const field =
+		'mt-1 w-full rounded-lg border border-byl-border bg-byl-background px-3 py-2 text-byl-text';
 </script>
 
 {#if created}
 	<div class="space-y-4">
-		<div class="rounded-2xl border border-white/10 bg-white/5 p-5">
-			<div class="text-[11px] font-bold tracking-widest text-emerald-300 uppercase">
+		<div class="rounded-lg border border-byl-border bg-byl-surface p-5">
+			<div class="text-xs font-bold tracking-normal text-byl-success">
 				{editing ? 'Route updated' : 'Route created'}
 			</div>
 			<h2 class="mt-1 text-2xl font-semibold">{created.title}</h2>
-			<p class="mt-1 text-sm text-white/60">
+			<p class="mt-1 text-sm text-byl-muted">
 				{created.visibility === 'private'
 					? 'Only you can open it.'
 					: 'Anyone with the link can open it; it is not listed publicly.'} Distances appear once the
@@ -90,11 +91,11 @@
 		<div class="flex gap-2">
 			<a
 				href="/tours/{created.slug}"
-				class="rounded-xl border border-white/20 px-3 py-2 text-sm hover:bg-white/10"
+				class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
 				>Open the route</a
 			>
 			<button
-				class="rounded-xl border border-white/20 px-3 py-2 text-sm hover:bg-white/10"
+				class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
 				onclick={ondone}>Done</button
 			>
 		</div>
@@ -115,11 +116,11 @@
 	>
 		<div class="space-y-4">
 			<label class="block text-sm">
-				<span class="text-white/70">Name</span>
+				<span class="text-byl-muted">Name</span>
 				<input class={field} bind:value={builder.title} placeholder="e.g. Depot to the river" />
 			</label>
 			<label class="block text-sm">
-				<span class="text-white/70">Summary</span>
+				<span class="text-byl-muted">Summary</span>
 				<textarea
 					class={field}
 					rows="3"
@@ -127,7 +128,7 @@
 					placeholder="Optional: what ties these places together?"></textarea>
 			</label>
 			<div class="space-y-2 text-sm">
-				<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">Travel</div>
+				<div class="text-xs font-bold tracking-normal text-byl-action">Travel</div>
 				<div class="flex gap-2">
 					<button
 						type="button"
@@ -140,12 +141,10 @@
 						onclick={() => (builder!.bike = !builder!.bike)}>Biking</button
 					>
 				</div>
-				{#if builder.modes.length === 0}<p class="text-xs text-red-300">
+				{#if builder.modes.length === 0}<p class="text-xs text-byl-danger">
 						Pick at least one way to travel.
 					</p>{/if}
-				<div class="pt-2 text-[11px] font-bold tracking-widest text-blue-300 uppercase">
-					Who can open it
-				</div>
+				<div class="pt-2 text-xs font-bold tracking-normal text-byl-action">Who can open it</div>
 				<div class="flex gap-2">
 					<button
 						type="button"
@@ -163,7 +162,7 @@
 			<section class="space-y-2">
 				<div class="flex items-baseline justify-between">
 					<h2 class="font-semibold">Stops</h2>
-					<span class="text-xs text-white/50">{builder.stops.length} of {MAX_STOPS}</span>
+					<span class="text-xs text-byl-muted">{builder.stops.length} of {MAX_STOPS}</span>
 				</div>
 				{#if builder.stops.length === 0}
 					<LoadState
@@ -175,30 +174,30 @@
 				<ol class="space-y-2" data-testid="stops">
 					{#each builder.stops as place, i (place.id)}
 						<li
-							class="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+							class="flex items-center gap-2 rounded-lg border border-byl-border bg-byl-surface px-3 py-2 text-sm"
 						>
 							<span
-								class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-black"
+								class="flex h-7 w-7 items-center justify-center rounded bg-byl-action text-xs font-bold text-byl-action-text"
 								>{i + 1}</span
 							>
 							<span class="min-w-0 flex-1 truncate font-semibold">{place.name}</span>
 							<button
 								type="button"
-								class="px-2 text-white/60 hover:text-white disabled:opacity-30"
+								class="px-2 text-byl-muted hover:text-byl-text disabled:opacity-30"
 								aria-label="Move {place.name} up"
 								disabled={i === 0}
 								onclick={() => builder!.move(i, i - 1)}>↑</button
 							>
 							<button
 								type="button"
-								class="px-2 text-white/60 hover:text-white disabled:opacity-30"
+								class="px-2 text-byl-muted hover:text-byl-text disabled:opacity-30"
 								aria-label="Move {place.name} down"
 								disabled={i === builder.stops.length - 1}
 								onclick={() => builder!.move(i, i + 1)}>↓</button
 							>
 							<button
 								type="button"
-								class="px-2 text-red-300 hover:text-red-200"
+								class="px-2 text-byl-danger hover:text-byl-danger"
 								aria-label="Remove {place.name}"
 								onclick={() => builder!.remove(place.id)}>✕</button
 							>
@@ -207,18 +206,18 @@
 				</ol>
 				<!-- Review Focus 5: the API's 422 field message sits next to the stops list. -->
 				{#if builder.stopsError}
-					<p class="text-sm text-red-300" data-testid="stops-error">{builder.stopsError}</p>
+					<p class="text-sm text-byl-danger" data-testid="stops-error">{builder.stopsError}</p>
 				{:else if builder.stopsHint}
-					<p class="text-xs text-white/50">{builder.stopsHint}</p>
+					<p class="text-xs text-byl-muted">{builder.stopsHint}</p>
 				{/if}
 			</section>
 
-			{#if builder.error && !builder.stopsError}<p class="text-sm text-red-300">
+			{#if builder.error && !builder.stopsError}<p class="text-sm text-byl-danger">
 					{builder.error}
 				</p>{/if}
 			<button
 				type="submit"
-				class="w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black disabled:opacity-40"
+				class="w-full rounded-lg bg-byl-action px-4 py-3 text-sm font-semibold text-byl-action-text disabled:opacity-40"
 				disabled={!builder.canSubmit}
 			>
 				{builder.busy ? 'Saving…' : editing ? 'Save changes' : 'Create route'}
@@ -243,19 +242,19 @@
 					{#each filtered as place (place.id)}
 						{@const added = builder.contains(place)}
 						<li
-							class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+							class="flex items-center gap-3 rounded-lg border border-byl-border bg-byl-surface px-3 py-2 text-sm"
 						>
 							<span class="min-w-0 flex-1">
 								<span class="block truncate font-semibold">{place.name}</span>
-								{#if place.address}<span class="block truncate text-xs text-white/50"
+								{#if place.address}<span class="block truncate text-xs text-byl-muted"
 										>{place.address}</span
 									>{/if}
 							</span>
 							<button
 								type="button"
-								class="rounded-full px-3 py-1 text-xs font-semibold {added
-									? 'bg-emerald-400 text-black'
-									: 'bg-blue-500 text-black'} disabled:opacity-40"
+								class="rounded px-3 py-1 text-xs font-semibold {added
+									? 'bg-byl-success-surface text-byl-success'
+									: 'bg-byl-action text-byl-action-text'} disabled:opacity-40"
 								aria-label={added ? `Remove ${place.name}` : `Add ${place.name}`}
 								disabled={!added && builder.stops.length >= MAX_STOPS}
 								onclick={() => (added ? builder!.remove(place.id) : builder!.add(place))}

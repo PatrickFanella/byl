@@ -7,9 +7,9 @@
 	const current = session.store;
 </script>
 
-<svelte:head><title>New route · Invisible Museum</title></svelte:head>
+<svelte:head><title>New route · Byl</title></svelte:head>
 
-<a href="/routes" class="text-sm text-white/50 hover:underline">← Your routes</a>
+<a href="/routes" class="text-sm text-byl-muted hover:underline">← Your routes</a>
 <h1 class="mt-2 text-3xl font-semibold">New route</h1>
 <div class="mt-5">
 	{#if !$current}

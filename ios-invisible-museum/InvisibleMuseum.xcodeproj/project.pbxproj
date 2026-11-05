@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B11000000000000000000001 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = B11000000000000000000002; };
 		6164E378BE85A428B74F556E /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F088E1B0110F20830CDB5228 /* AppModel.swift */; };
 		426B9A32E5413106CAFBA26D /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B482DE4088D34533AC0908D /* RootView.swift */; };
 		F5D56B922B5F11CBA7ED8D8E /* AudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C4767E78A1B498E07A73E /* AudioSession.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B11000000000000000000002 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 		F088E1B0110F20830CDB5228 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		3B482DE4088D34533AC0908D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		E92C4767E78A1B498E07A73E /* AudioSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSession.swift; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 				929B68D89D43D08B1E6F8B77 /* Session */,
 				8C0773FD87371E0359AFFC1F /* InvisibleMuseumApp.swift */,
 				A79EA8DE98CD9BCF76842E3F /* Assets.xcassets */,
+				B11000000000000000000002 /* Fonts */,
 				3AACD762DC22D4FFC888F92C /* Info.plist */,
 				37666C0D4CE0893129D417E2 /* InvisibleMuseum.entitlements */,
 			);
@@ -307,6 +310,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D7368D8AC6904744441CA08 /* Assets.xcassets in Resources */,
+				B11000000000000000000001 /* Fonts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,7 +463,7 @@
 				DEVELOPMENT_TEAM = R5A689LLVY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Invisible Museum";
+				INFOPLIST_KEY_CFBundleDisplayName = "Byl";
 				INFOPLIST_FILE = InvisibleMuseum/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -485,7 +489,7 @@
 				DEVELOPMENT_TEAM = R5A689LLVY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Invisible Museum";
+				INFOPLIST_KEY_CFBundleDisplayName = "Byl";
 				INFOPLIST_FILE = InvisibleMuseum/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

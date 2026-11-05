@@ -1,136 +1,100 @@
 import SwiftUI
 
+/// Semantic roles from Studio's Classic solid / P3 Oxblood specification.
 enum Museum {
-    static let background = Color(red: 0.035, green: 0.035, blue: 0.043)
+    static let background = Color("BylBackground")
     static let ink = background
-    static let surface = Color(red: 0.070, green: 0.070, blue: 0.082)
-    static let surfaceElevated = Color(red: 0.105, green: 0.105, blue: 0.120)
-    static let border = Color.white.opacity(0.09)
-    static let borderStrong = Color.white.opacity(0.18)
-    static let text = Color.white
-    static let muted = Color.white.opacity(0.54)
-    static let faint = Color.white.opacity(0.34)
-    static let blue = Color(red: 0.231, green: 0.510, blue: 0.965)
-    static let purple = Color(red: 0.659, green: 0.333, blue: 0.969)
-    static let green = Color(red: 0.290, green: 0.871, blue: 0.502)
-    static let danger = Color(red: 0.865, green: 0.220, blue: 0.343)
+    static let surface = Color("BylSurface")
+    static let surfaceElevated = surface
+    static let border = Color("BylBorderSubtle")
+    static let borderStrong = Color("BylBorderControl")
+    static let text = Color("BylText")
+    static let muted = Color("BylTextSecondary")
+    static let faint = muted
+    static let action = Color("BylAction")
+    static let actionText = Color("BylActionText")
+    static let success = Color("BylSuccess")
+    static let successSurface = Color("BylSuccessSurface")
+    static let danger = Color("BylDanger")
+    static let dangerSurface = Color("BylDangerSurface")
+    static let info = Color("BylInfo")
+    static let warning = Color("BylWarning")
+    static let routeHalo = Color("BylRouteHalo")
 
     enum Radius {
-        static let sm: CGFloat = 14
-        static let md: CGFloat = 18
-        static let lg: CGFloat = 22
-        static let xl: CGFloat = 28
+        static let sm: CGFloat = 4
+        static let md: CGFloat = 4
+        static let lg: CGFloat = 8
+        static let xl: CGFloat = 0
         static let pill: CGFloat = 999
     }
 
     enum Spacing {
-        static let xs: CGFloat = 6
-        static let sm: CGFloat = 10
-        static let md: CGFloat = 14
-        static let lg: CGFloat = 18
+        static let xs: CGFloat = 4
+        static let sm: CGFloat = 8
+        static let md: CGFloat = 12
+        static let lg: CGFloat = 16
         static let xl: CGFloat = 24
-        static let pageHorizontal: CGFloat = 18
-        static let pageTop: CGFloat = 12
-        static let section: CGFloat = 22
-        static let bottomNavClearance: CGFloat = 124
+        static let pageHorizontal: CGFloat = 16
+        static let pageTop: CGFloat = 16
+        static let section: CGFloat = 24
+        static let bottomNavClearance: CGFloat = 32
     }
 
-    // Back-compat aliases for older views/components.
-    static let slate = surface
-    static let stone = surfaceElevated
-    static let brass = blue
-    static let brassGlow = Color(red: 0.576, green: 0.773, blue: 1.0)
-    static let ghost = blue
-    static let parchment = text
-
-    static var galleryBackground: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.050, green: 0.050, blue: 0.060), background],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            RadialGradient(
-                colors: [blue.opacity(0.18), .clear],
-                center: .topLeading,
-                startRadius: 0,
-                endRadius: 460
-            )
-            RadialGradient(
-                colors: [purple.opacity(0.10), .clear],
-                center: .bottomTrailing,
-                startRadius: 0,
-                endRadius: 380
-            )
-        }
-    }
-
+    static var galleryBackground: some View { background }
+    // Kept as a shape style for existing image placeholders; no decorative gradient.
     static var accentGradient: LinearGradient {
-        LinearGradient(colors: [blue, purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+        LinearGradient(colors: [surface, surface], startPoint: .top, endPoint: .bottom)
     }
 
-    static var brassSheen: LinearGradient { accentGradient }
-
-    static func accent(for hue: Double) -> Color {
-        hue > 0.45 ? purple : blue
-    }
+    static func accent(for hue: Double) -> Color { action }
 
     static func title(_ size: CGFloat, weight: Font.Weight = .bold) -> Font {
-        .system(size: size, weight: weight, design: .default)
+        .custom("LibreBaskerville-Regular", size: size, relativeTo: size >= 28 ? .largeTitle : .title2)
     }
 
-    static func bodyFont(_ size: CGFloat = 15, weight: Font.Weight = .regular) -> Font {
-        .system(size: size, weight: weight, design: .default)
+    static func bodyFont(_ size: CGFloat = 16, weight: Font.Weight = .regular) -> Font {
+        .custom(weight == .regular ? "PublicSans-Regular" : "PublicSans-Bold", size: size, relativeTo: .body)
     }
 
-    static func meta(_ size: CGFloat = 10) -> Font {
-        .system(size: size, weight: .bold, design: .rounded)
+    static func meta(_ size: CGFloat = 12) -> Font {
+        .custom("PublicSans-Bold", size: max(size, 12), relativeTo: .caption)
     }
 
-    static func serifTitle(_ size: CGFloat) -> Font { title(size, weight: .bold) }
-    static let label: Font = .system(size: 11, weight: .bold, design: .rounded)
+    static func serifTitle(_ size: CGFloat) -> Font { title(size) }
+    static let label: Font = .custom("PublicSans-Bold", size: 12, relativeTo: .caption)
+}
+
+enum BylAppearance: String, CaseIterable, Identifiable {
+    case system, light, dark
+    var id: String { rawValue }
+    var label: String { rawValue.capitalized }
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
+    }
 }
 
 struct Overline: View {
     let text: String
-    var color: Color = Museum.blue
-
+    var color: Color = Museum.action
     var body: some View {
-        Text(text.uppercased())
+        Text(text)
             .font(Museum.label)
-            .tracking(1.8)
             .foregroundStyle(color)
     }
 }
 
-struct GlassCardModifier: ViewModifier {
-    var radius: CGFloat = 22
-
-    func body(content: Content) -> some View {
-        content
-            .background(Museum.surface.opacity(0.92), in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Museum.border, lineWidth: 1))
-    }
-}
-
-extension View {
-    func glassCard(radius: CGFloat = 22) -> some View { modifier(GlassCardModifier(radius: radius)) }
-}
-
 extension View {
     func museumSurface(radius: CGFloat = Museum.Radius.lg, fill: Color = Museum.surface) -> some View {
-        background(fill, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Museum.border, lineWidth: 1))
+        background(fill, in: RoundedRectangle(cornerRadius: radius))
+            .overlay(RoundedRectangle(cornerRadius: radius).stroke(Museum.border, lineWidth: 1))
     }
 
-    func museumGlassCard(radius: CGFloat = Museum.Radius.lg, fill: Color = Museum.surface.opacity(0.94)) -> some View {
-        background(fill, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Museum.border, lineWidth: 1))
+    func museumGlassCard(radius: CGFloat = Museum.Radius.lg, fill: Color = Museum.surface) -> some View {
+        museumSurface(radius: radius, fill: fill)
     }
-
-    func blueGlow(_ opacity: Double = 0.35) -> some View {
-        shadow(color: Museum.blue.opacity(opacity), radius: 18, x: 0, y: 8)
-    }
-
-    func brassHalo() -> some View { blueGlow() }
 }

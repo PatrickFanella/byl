@@ -14,13 +14,13 @@
 
 {#if open}
 	<div
-		class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
+		class="byl-scrim fixed inset-0 z-40 flex items-center justify-center p-4"
 		role="presentation"
 		onclick={() => (open = false)}
 		onkeydown={onBackdropKey}
 	>
 		<div
-			class="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl"
+			class="w-full max-w-lg rounded-lg bg-byl-background p-5 shadow-xl"
 			role="dialog"
 			use:modal={() => {
 				open = false;

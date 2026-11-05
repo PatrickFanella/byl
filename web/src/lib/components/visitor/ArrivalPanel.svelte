@@ -29,30 +29,30 @@
 </script>
 
 <div
-	class="fixed inset-x-0 bottom-0 z-20 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-[#0a0a0b] p-5 text-white shadow-2xl sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-[28rem] sm:rounded-3xl sm:border"
+	class="fixed inset-x-0 bottom-0 z-20 max-h-[85vh] overflow-y-auto rounded-t-lg border-t border-byl-border bg-byl-background p-5 text-byl-text shadow-2xl sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-[28rem] sm:rounded-lg sm:border"
 	role="dialog"
 	use:modal={() => {
 		oncontinue();
 	}}
 	aria-label="You have arrived"
 >
-	<div class="text-[11px] font-bold tracking-widest text-emerald-300 uppercase">
+	<div class="text-xs font-bold tracking-normal text-byl-success">
 		You have arrived · stop {stop.position}
 	</div>
 	<h2 class="mt-1 text-2xl font-semibold">{stop.place.name}</h2>
-	{#if stop.note}<p class="mt-1 text-sm text-white/60 italic">{stop.note}</p>{/if}
+	{#if stop.note}<p class="mt-1 text-sm text-byl-muted italic">{stop.note}</p>{/if}
 
 	{#if featured}
 		<div class="mt-4"><MomentCard moment={featured} prominent testid="arrival-moment" /></div>
 		<div class="mt-3 flex gap-2">
 			<a
 				href="/moments/{featured.id}"
-				class="rounded-xl border border-white/20 px-3 py-2 text-sm hover:bg-white/10"
+				class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
 				>Read the full story</a
 			>
 			{#if onlisten}
 				<button
-					class="rounded-xl border border-white/20 px-3 py-2 text-sm hover:bg-white/10"
+					class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
 					onclick={onlisten}>{playing ? '■ Stop' : '▶ Listen'}</button
 				>
 			{/if}
@@ -69,9 +69,7 @@
 
 	{#if stop.place.moment_count > 1}
 		<div class="mt-5 space-y-2">
-			<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">
-				Also at this place
-			</div>
+			<div class="text-xs font-bold tracking-normal text-byl-action">Also at this place</div>
 			<LoadState
 				status={place.status === 'ready' && others.length === 0 ? 'empty' : place.status}
 				message={place.message}
@@ -83,7 +81,7 @@
 	{/if}
 
 	<button
-		class="mt-5 w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black"
+		class="mt-5 w-full rounded-lg bg-byl-action px-4 py-3 text-sm font-semibold text-byl-action-text"
 		onclick={oncontinue}>{isLast ? 'Finish' : 'Continue to the next stop'}</button
 	>
 </div>

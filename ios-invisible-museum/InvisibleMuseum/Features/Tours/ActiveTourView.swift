@@ -81,7 +81,6 @@ struct ActiveTourView: View {
                 model.location.start()
             }
         }
-        .preferredColorScheme(.dark)
     }
 
     private func routeNotice(_ message: String) -> some View {
@@ -101,7 +100,7 @@ struct ActiveTourView: View {
     @ViewBuilder
     private var bottomCard: some View {
         if let next = active.nextStop {
-            MuseumCard(fill: Museum.surface.opacity(0.96)) {
+            MuseumCard(fill: Museum.surface) {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 4) {
@@ -143,9 +142,9 @@ struct ActiveTourView: View {
                 }
             }
         } else {
-            MuseumCard(fill: Museum.surface.opacity(0.96)) {
+            MuseumCard(fill: Museum.surface) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Overline(text: "Tour complete", color: Museum.green)
+                    Overline(text: "Tour complete", color: Museum.success)
                     Text("You walked every stop of \(active.tour.tour.title).")
                         .font(Museum.title(18))
                         .foregroundStyle(Museum.text)

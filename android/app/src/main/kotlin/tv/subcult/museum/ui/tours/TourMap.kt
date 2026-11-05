@@ -1,6 +1,9 @@
 package tv.subcult.museum.ui.tours
 
 import android.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import tv.subcult.museum.ui.theme.Museum
+import tv.subcult.museum.ui.theme.BylPalette
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -36,14 +39,16 @@ private const val STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
 
 /**
  * The route on a map: past legs faint, the active leg in the accent colour, future legs dashed,
- * numbered circles per stop (green once visited, blue for the next one), the visitor's position.
+ * numbered circles per stop (a check once visited, an action fill for the current stop), the visitor's position.
  * Drawn with style layers only, no annotation plugin. Re-fits only when the stops ahead change.
  */
 @Composable
 fun TourMap(stops: List<TourStop>, state: ActiveTourState, fix: Fix?, modifier: Modifier = Modifier) {
+    val palette = Museum.palette
+    val dark = isDarkPalette(palette)
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val holder = remember { MapHolder(context) }
+    val holder = remember { MapHolder(context, palette, dark) }
 
     DisposableEffect(lifecycle) {
         val observer = LifecycleEventObserver { _, event ->
@@ -63,16 +68,19 @@ fun TourMap(stops: List<TourStop>, state: ActiveTourState, fix: Fix?, modifier: 
         }
     }
 
-    AndroidView(factory = { holder.view }, modifier = modifier, update = { holder.render(stops, state, fix) })
+    AndroidView(factory = { holder.view }, modifier = modifier, update = { holder.render(stops, state, fix, palette, dark) })
 }
 
-private class MapHolder(context: android.content.Context) {
+private fun isDarkPalette(p: BylPalette) = p.background == tv.subcult.museum.ui.theme.DarkBylPalette.background
+
+private class MapHolder(context: android.content.Context, initialPalette: BylPalette, initialDark: Boolean) {
     val view: MapView
     private var map: MapLibreMap? = null
     private var style: Style? = null
     private var pending: (() -> Unit)? = null
     private var fitted = ""
     private var destroyed = false
+    private var styleDark = initialDark
 
     /** Winds the view down once, through pause and stop, whichever path gets here first. */
     fun destroy() {
@@ -88,24 +96,26 @@ private class MapHolder(context: android.content.Context) {
         view.getMapAsync { m ->
             map = m
             m.uiSettings.isAttributionEnabled = true
-            m.setStyle(Style.Builder().fromUri(STYLE_URL)) { s ->
+            m.setStyle(Style.Builder().fromUri(if (initialDark) "https://tiles.openfreemap.org/styles/dark" else STYLE_URL)) { s ->
                 style = s
-                addLayers(s)
-                pending?.invoke()
+                addLayers(s, initialPalette)
+                val latest = pending
                 pending = null
+                latest?.invoke()
             }
         }
     }
 
-    private fun addLayers(s: Style) {
+    private fun addLayers(s: Style, p: BylPalette) {
         for (id in listOf("legs-past", "legs-future", "legs-active", "stops", "user")) s.addSource(GeoJsonSource(id))
-        s.addLayer(LineLayer("legs-past", "legs-past").withProperties(PropertyFactory.lineColor(Color.parseColor("#71717a")), PropertyFactory.lineWidth(4f), PropertyFactory.lineOpacity(0.5f), PropertyFactory.lineCap(Property.LINE_CAP_ROUND)))
-        s.addLayer(LineLayer("legs-future", "legs-future").withProperties(PropertyFactory.lineColor(Color.parseColor("#a1a1aa")), PropertyFactory.lineWidth(4f), PropertyFactory.lineDasharray(arrayOf(1.5f, 2f)), PropertyFactory.lineCap(Property.LINE_CAP_ROUND)))
-        s.addLayer(LineLayer("legs-active", "legs-active").withProperties(PropertyFactory.lineColor(Color.parseColor("#3b82f6")), PropertyFactory.lineWidth(6f), PropertyFactory.lineCap(Property.LINE_CAP_ROUND)))
-        s.addLayer(CircleLayer("user", "user").withProperties(PropertyFactory.circleColor(Color.parseColor("#3b82f6")), PropertyFactory.circleRadius(8f), PropertyFactory.circleStrokeColor(Color.WHITE), PropertyFactory.circleStrokeWidth(3f)))
+        s.addLayer(LineLayer("legs-past", "legs-past").withProperties(PropertyFactory.lineColor(p.textSecondary.toArgb()), PropertyFactory.lineWidth(4f), PropertyFactory.lineOpacity(0.5f), PropertyFactory.lineCap(Property.LINE_CAP_ROUND)))
+        s.addLayer(LineLayer("legs-future", "legs-future").withProperties(PropertyFactory.lineColor(p.textSecondary.toArgb()), PropertyFactory.lineWidth(4f), PropertyFactory.lineDasharray(arrayOf(1.5f, 2f)), PropertyFactory.lineCap(Property.LINE_CAP_ROUND)))
+        s.addLayer(LineLayer("legs-active-halo", "legs-active").withProperties(PropertyFactory.lineColor(p.routeHalo.toArgb()), PropertyFactory.lineWidth(8f), PropertyFactory.lineCap(Property.LINE_CAP_ROUND)))
+        s.addLayer(LineLayer("legs-active", "legs-active").withProperties(PropertyFactory.lineColor(p.route.toArgb()), PropertyFactory.lineWidth(4f), PropertyFactory.lineCap(Property.LINE_CAP_ROUND)))
+        s.addLayer(CircleLayer("user", "user").withProperties(PropertyFactory.circleColor(p.route.toArgb()), PropertyFactory.circleRadius(8f), PropertyFactory.circleStrokeColor(p.routeHalo.toArgb()), PropertyFactory.circleStrokeWidth(3f)))
         s.addLayer(CircleLayer("stops-circle", "stops").withProperties(
             PropertyFactory.circleColor(org.maplibre.android.style.expressions.Expression.get("color")),
-            PropertyFactory.circleRadius(14f), PropertyFactory.circleStrokeColor(Color.WHITE), PropertyFactory.circleStrokeWidth(2f)
+            PropertyFactory.circleRadius(14f), PropertyFactory.circleStrokeColor(p.routeHalo.toArgb()), PropertyFactory.circleStrokeWidth(2f)
         ))
         s.addLayer(SymbolLayer("stops-label", "stops").withProperties(
             PropertyFactory.textField(org.maplibre.android.style.expressions.Expression.get("label")),
@@ -114,12 +124,26 @@ private class MapHolder(context: android.content.Context) {
         ))
     }
 
-    fun render(stops: List<TourStop>, state: ActiveTourState, fix: Fix?) {
+    fun render(stops: List<TourStop>, state: ActiveTourState, fix: Fix?, palette: BylPalette, dark: Boolean) {
         val s = style
         if (s == null) {
-            pending = { render(stops, state, fix) }
+            pending = { render(stops, state, fix, palette, dark) }
             return
         }
+        if (styleDark != dark) {
+            styleDark = dark
+            style = null
+            pending = { render(stops, state, fix, palette, dark) }
+            map?.setStyle(Style.Builder().fromUri(if (dark) "https://tiles.openfreemap.org/styles/dark" else STYLE_URL)) { loaded ->
+                style = loaded
+                addLayers(loaded, palette)
+                val latest = pending
+                pending = null
+                latest?.invoke()
+            }
+            return
+        }
+        fun hex(c: androidx.compose.ui.graphics.Color) = String.format("#%06x", c.toArgb() and 0xffffff)
         fun legs(list: List<RouteLeg>) = FeatureCollection.fromFeatures(list.map { l ->
             Feature.fromGeometry(LineString.fromLngLats(l.geometry.filter { it.size >= 2 }.map { Point.fromLngLat(it[0], it[1]) }))
         })
@@ -131,8 +155,8 @@ private class MapHolder(context: android.content.Context) {
             val next = state.nextStop?.id == stop.id
             Feature.fromGeometry(Point.fromLngLat(stop.place.longitude, stop.place.latitude)).apply {
                 addStringProperty("label", if (visited) "✓" else stop.position.toString())
-                addStringProperty("color", if (visited) "#4ade80" else if (next) "#3b82f6" else "#27272a")
-                addStringProperty("textColor", if (visited || next) "#000000" else "#ffffff")
+                addStringProperty("color", hex(if (visited) palette.successSurface else if (next) palette.action else palette.background))
+                addStringProperty("textColor", hex(if (visited) palette.success else if (next) palette.actionText else palette.text))
             }
         }))
         s.getSourceAs<GeoJsonSource>("user")?.setGeoJson(

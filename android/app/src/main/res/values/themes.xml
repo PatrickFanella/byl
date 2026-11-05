@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.InvisibleMuseum" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">#0A0A0B</item>
-        <item name="android:statusBarColor">#0A0A0B</item>
-        <item name="android:navigationBarColor">#0A0A0B</item>
-        <item name="android:windowLightStatusBar">false</item>
+    <style name="Theme.InvisibleMuseum" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#f1edf0</item>
+        <item name="android:statusBarColor">#f1edf0</item>
+        <item name="android:navigationBarColor">#f1edf0</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

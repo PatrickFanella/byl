@@ -15,7 +15,8 @@ struct MuseumTextField: View {
                 .textFieldStyle(.plain)
                 .foregroundStyle(Museum.text)
                 .padding(15)
-                .museumGlassCard(radius: Museum.Radius.md)
+                .museumGlassCard(radius: Museum.Radius.md, fill: Museum.background)
+                .overlay(RoundedRectangle(cornerRadius: Museum.Radius.md).stroke(Museum.borderStrong, lineWidth: 1))
             if let helperText {
                 MuseumInlineHint(text: helperText, tint: helperTint, isError: helperIsError)
             }
@@ -43,14 +44,15 @@ struct MuseumTextEditor: View {
                 .overlay(alignment: .topLeading) {
                     if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         Text(placeholder)
-                            .font(.system(size: 15))
+                            .font(Museum.bodyFont())
                             .foregroundStyle(Museum.faint)
                             .padding(.top, 18)
                             .padding(.leading, 18)
                             .allowsHitTesting(false)
                     }
                 }
-                .museumGlassCard(radius: Museum.Radius.md)
+                .museumGlassCard(radius: Museum.Radius.md, fill: Museum.background)
+                .overlay(RoundedRectangle(cornerRadius: Museum.Radius.md).stroke(Museum.borderStrong, lineWidth: 1))
             if let helperText {
                 MuseumInlineHint(text: helperText, tint: helperTint, isError: helperIsError)
             }
@@ -70,7 +72,7 @@ struct MuseumInlineHint: View {
                 .foregroundStyle(tint)
                 .padding(.top, 1)
             Text(text)
-                .font(.system(size: 11, weight: .medium))
+                .font(Museum.bodyFont(14))
                 .foregroundStyle(tint)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)

@@ -101,7 +101,7 @@ struct SourceRow: View {
                     Link(destination: url) {
                         Label(source.title.isEmpty ? source.url : source.title, systemImage: "arrow.up.right.square")
                             .font(Museum.bodyFont(14, weight: .semibold))
-                            .foregroundStyle(Museum.blue)
+                            .foregroundStyle(Museum.action)
                     }
                 } else {
                     Text(source.title)

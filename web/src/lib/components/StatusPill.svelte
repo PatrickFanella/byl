@@ -1,24 +1,24 @@
 <script lang="ts">
 	let { status }: { status: string } = $props();
 	const tone: Record<string, string> = {
-		pending: 'bg-amber-100 text-amber-800',
-		approved: 'bg-emerald-100 text-emerald-800',
-		rejected: 'bg-stone-200 text-stone-700',
-		published: 'bg-emerald-100 text-emerald-800',
-		draft: 'bg-stone-100 text-stone-700',
-		in_review: 'bg-amber-100 text-amber-800',
-		archived: 'bg-stone-200 text-stone-600',
-		queued: 'bg-sky-100 text-sky-800',
-		running: 'bg-indigo-100 text-indigo-800',
-		done: 'bg-emerald-100 text-emerald-800',
-		failed: 'bg-red-100 text-red-800',
-		ready: 'bg-emerald-100 text-emerald-800',
-		import: 'bg-sky-100 text-sky-800',
-		user: 'bg-violet-100 text-violet-800'
+		pending: 'bg-byl-warning-surface text-byl-warning',
+		approved: 'bg-byl-success-surface text-byl-success',
+		rejected: 'bg-byl-surface text-byl-text',
+		published: 'bg-byl-success-surface text-byl-success',
+		draft: 'bg-byl-surface text-byl-text',
+		in_review: 'bg-byl-warning-surface text-byl-warning',
+		archived: 'bg-byl-surface text-byl-muted',
+		queued: 'bg-byl-info-surface text-byl-info',
+		running: 'bg-byl-info-surface text-byl-info',
+		done: 'bg-byl-success-surface text-byl-success',
+		failed: 'bg-byl-danger-surface text-byl-danger',
+		ready: 'bg-byl-success-surface text-byl-success',
+		import: 'bg-byl-info-surface text-byl-info',
+		user: 'bg-byl-info-surface text-byl-info'
 	};
 </script>
 
 <span
 	class="inline-block rounded px-2 py-0.5 text-xs font-medium {tone[status] ??
-		'bg-stone-100 text-stone-700'}">{status}</span
+		'bg-byl-surface text-byl-text'}">{status}</span
 >

@@ -1,12 +1,22 @@
 <script lang="ts">
-	import '../layout.css';
-	import favicon from '#lib/assets/favicon.svg';
+	import Brand from '#lib/components/Brand.svelte';
 	import { page } from '$app/state';
 	import { session, canCurate } from '#lib/auth.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
 	const current = session.store;
+	let navigation: HTMLElement | undefined = $state();
+	let navHeight = $state(80);
+	$effect(() => {
+		if (!navigation) return;
+		const element = navigation;
+		const observer = new ResizeObserver(() => {
+			navHeight = element.getBoundingClientRect().height;
+		});
+		observer.observe(element);
+		return () => observer.disconnect();
+	});
 
 	const nav = [
 		{ href: '/', label: 'Home' },
@@ -25,37 +35,40 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
-	<title>Invisible Museum</title>
+	<title>Byl</title>
 </svelte:head>
 
 {#if isSignIn}
 	{@render children()}
 {:else}
-	<div class="gallery min-h-screen text-white">
+	<div
+		class="byl-visitor gallery min-h-screen text-byl-text"
+		style:--byl-nav-clearance={`${navHeight}px`}
+	>
 		{#if !isWalk}
-			<header class="border-b border-white/10">
-				<div class="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3">
-					<a href="/" class="font-semibold tracking-tight">Invisible Museum</a>
-					<nav class="flex flex-1 flex-wrap gap-1 text-sm">
+			<header class="border-b border-byl-border">
+				<div class="byl-header">
+					<a href="/" aria-label="Byl home"><Brand /></a>
+					<nav bind:this={navigation} class="byl-nav text-sm" aria-label="Main navigation">
 						{#each nav as item (item.href)}
 							<a
 								href={item.href}
-								class="rounded-full px-3 py-1.5 hover:bg-white/10 {active(item.href)
-									? 'bg-white text-black hover:bg-white'
-									: 'text-white/70'}">{item.label}</a
+								aria-current={active(item.href) ? 'page' : undefined}
+								class="rounded px-3 py-1.5 hover:bg-byl-surface {active(item.href)
+									? 'bg-byl-action text-byl-action-text hover:bg-byl-action'
+									: 'text-byl-muted'}">{item.label}</a
 							>
 						{/each}
 					</nav>
 					{#if $current && canCurate($current.account)}
-						<a href="/admin" class="text-xs tracking-wide text-white/60 uppercase hover:text-white"
+						<a href="/admin" class="text-xs tracking-wide text-byl-muted hover:text-byl-text"
 							>Admin</a
 						>
 					{/if}
 				</div>
 			</header>
 		{/if}
-		<main class={isWalk ? '' : 'mx-auto max-w-5xl px-4 py-6'}>
+		<main class={isWalk ? '' : 'byl-main'}>
 			{@render children()}
 		</main>
 	</div>

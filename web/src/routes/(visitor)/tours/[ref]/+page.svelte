@@ -83,9 +83,9 @@
 	const line = $derived((route?.geometry?.coordinates ?? []) as [number, number][]);
 </script>
 
-<svelte:head><title>{tour.data?.title ?? 'Tour'} · Invisible Museum</title></svelte:head>
+<svelte:head><title>{tour.data?.title ?? 'Tour'} · Byl</title></svelte:head>
 
-<a href="/tours" class="text-sm text-white/50 hover:underline">← Tours</a>
+<a href="/tours" class="text-sm text-byl-muted hover:underline">← Tours</a>
 
 <div class="mt-3">
 	<LoadState status={tour.status} message={tour.message} onretry={() => tour.run()}>
@@ -95,22 +95,20 @@
 				<div class="space-y-5 lg:col-span-2">
 					<TourCard tour={t} href={`/tours/${t.slug}`} />
 					<h1 class="sr-only">{t.title}</h1>
-					{#if t.summary}<p class="text-white/70">{t.summary}</p>{/if}
+					{#if t.summary}<p class="text-byl-muted">{t.summary}</p>{/if}
 
-					<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-						<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">
-							Getting around
-						</div>
+					<div class="rounded-lg border border-byl-border bg-byl-surface p-4">
+						<div class="text-xs font-bold tracking-normal text-byl-action">Getting around</div>
 						<ul class="mt-2 space-y-1 text-sm">
 							{#each t.modes as mode (mode)}
 								{@const r = t.routes?.[mode]}
 								<li class="flex justify-between gap-3">
 									<span class="font-semibold">{modeLabel(mode)}</span>
-									<span class="text-white/60">
+									<span class="text-byl-muted">
 										{#if estimateText(r)}
 											{estimateText(r)} · {distanceText(r?.distance_m ?? 0)}
 										{:else if r?.status === 'failed'}
-											<span class="text-red-300">Route unavailable</span>
+											<span class="text-byl-danger">Route unavailable</span>
 										{:else}
 											Route being computed
 										{/if}
@@ -124,27 +122,27 @@
 						{#each t.modes as mode (mode)}
 							<a
 								href="/tours/{t.slug}/walk?mode={mode}"
-								class="rounded-xl px-4 py-2 text-sm font-semibold {mode === t.modes[0]
-									? 'bg-white text-black'
-									: 'border border-white/20 hover:bg-white/10'}"
+								class="rounded-lg px-4 py-2 text-sm font-semibold {mode === t.modes[0]
+									? 'bg-byl-action text-byl-action-text'
+									: 'border border-byl-border hover:bg-byl-surface'}"
 								>{mode === 'bike' ? 'Start riding' : 'Start walking'}</a
 							>
 						{/each}
 						<button
-							class="rounded-xl border border-white/20 px-4 py-2 text-sm hover:bg-white/10 disabled:opacity-50"
+							class="rounded-lg border border-byl-border px-4 py-2 text-sm hover:bg-byl-surface disabled:opacity-50"
 							onclick={toggleSave}
 							disabled={saveBusy}>{saved ? '♥ Saved' : '♡ Save for later'}</button
 						>
 						<a
 							href="invisiblemuseum://tour/{t.slug}"
-							class="rounded-xl border border-white/20 px-4 py-2 text-sm text-white/70 hover:bg-white/10"
+							class="rounded-lg border border-byl-border px-4 py-2 text-sm text-byl-muted hover:bg-byl-surface"
 							>Open in the app</a
 						>
 					</div>
 					{#if wantSave && !$current}
 						<SignInPrompt reason="Sign in to save tours and keep your progress on every device." />
 					{/if}
-					{#if saveError}<p class="text-sm text-red-300">{saveError}</p>{/if}
+					{#if saveError}<p class="text-sm text-byl-danger">{saveError}</p>{/if}
 
 					<section class="space-y-3">
 						<SectionHeader title="Stops" eyebrow="{t.stops.length} places" />
@@ -159,11 +157,11 @@
 					</section>
 				</div>
 				<aside class="space-y-3">
-					<div class="overflow-hidden rounded-2xl border border-white/10">
+					<div class="overflow-hidden rounded-lg border border-byl-border">
 						<Map markers={stopMarkers} {line} height="24rem" />
 					</div>
 					{#if !route}
-						<p class="text-xs text-white/50">
+						<p class="text-xs text-byl-muted">
 							The route line appears once the route has been computed.
 						</p>
 					{/if}

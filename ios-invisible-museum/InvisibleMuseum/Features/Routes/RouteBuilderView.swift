@@ -40,7 +40,7 @@ struct RouteBuilderView: View {
         VStack(alignment: .leading, spacing: Museum.Spacing.lg) {
             MuseumCard {
                 VStack(alignment: .leading, spacing: 10) {
-                    Overline(text: editing == nil ? "Route created" : "Route updated", color: Museum.green)
+                    Overline(text: editing == nil ? "Route created" : "Route updated", color: Museum.success)
                     Text(tour.tour.title)
                         .font(Museum.title(24))
                         .foregroundStyle(Museum.text)
@@ -116,9 +116,9 @@ private struct BuilderForm: View {
                     HStack(spacing: 10) {
                         Text("\(index + 1)")
                             .font(Museum.meta(12))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(Museum.actionText)
                             .frame(width: 26, height: 26)
-                            .background(Museum.blue, in: Circle())
+                            .background(Museum.action, in: Circle())
                         Text(place.name)
                             .font(Museum.bodyFont(14, weight: .semibold))
                             .foregroundStyle(Museum.text)
@@ -181,7 +181,7 @@ private struct BuilderForm: View {
                             } label: {
                                 Image(systemName: added ? "checkmark.circle.fill" : "plus.circle")
                                     .font(.system(size: 22))
-                                    .foregroundStyle(added ? Museum.green : Museum.blue)
+                                    .foregroundStyle(added ? Museum.success : Museum.action)
                             }
                             .buttonStyle(.plain)
                             .disabled(!added && builder.stops.count >= RouteBuilderModel.maxStops)

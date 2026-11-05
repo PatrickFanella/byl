@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { darkTheme } from '#lib/theme.ts';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 
 	export interface Marker {
@@ -23,8 +24,7 @@
 		legs = [],
 		user = null,
 		fit = 'all',
-		height = '20rem',
-		dark = false
+		height = '20rem'
 	}: {
 		markers?: Marker[];
 		line?: [number, number][];
@@ -32,7 +32,6 @@
 		user?: { lat: number; lng: number } | null;
 		fit?: 'all' | 'ahead';
 		height?: string;
-		dark?: boolean;
 	} = $props();
 
 	let container: HTMLDivElement;
@@ -41,9 +40,14 @@
 	let markerHandles: import('maplibre-gl').Marker[] = [];
 	let userHandle: import('maplibre-gl').Marker | null = null;
 	let fitted = '';
-	let ready = false;
+	let ready = $state(false);
+	let styleDark = false;
 
-	const colors = { past: '#71717a', active: '#3b82f6', future: '#a1a1aa' };
+	function token(role: string) {
+		return getComputedStyle(document.documentElement)
+			.getPropertyValue('--byl-' + role)
+			.trim();
+	}
 
 	function fitTo(points: [number, number][]) {
 		if (!map || !lib || points.length === 0) return;
@@ -53,15 +57,19 @@
 		}
 		const b = new lib.LngLatBounds(points[0], points[0]);
 		for (const p of points) b.extend(p);
-		map.fitBounds(b, { padding: 48, maxZoom: 16, duration: 400 });
+		map.fitBounds(b, {
+			padding: 48,
+			maxZoom: 16,
+			duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180
+		});
 	}
 
 	function pinElement(m: Marker): HTMLElement {
 		const el = document.createElement('div');
-		const bg = m.visited ? '#4ade80' : m.next ? '#3b82f6' : dark ? '#27272a' : '#1c1917';
-		const fg = m.visited || m.next ? '#000' : '#fff';
-		const size = m.next ? 34 : 28;
-		el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:${fg};border:2px solid rgba(255,255,255,.9);box-shadow:0 3px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font:700 13px system-ui`;
+		const bg = token(m.visited ? 'success-surface' : m.next ? 'action' : 'background');
+		const fg = token(m.visited ? 'success' : m.next ? 'action-text' : 'text');
+		const size = m.next ? 36 : 32;
+		el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:${fg};border:2px solid ${token('border-control')};display:flex;align-items:center;justify-content:center;font:700 13px system-ui`;
 		el.textContent = m.visited ? '✓' : m.position != null ? String(m.position) : '';
 		el.setAttribute('aria-label', m.label);
 		return el;
@@ -73,7 +81,7 @@
 		markerHandles = markers.map((m) =>
 			(m.position != null
 				? new lib!.Marker({ element: pinElement(m) })
-				: new lib!.Marker({ color: '#1c1917' })
+				: new lib!.Marker({ color: token('action') })
 			)
 				.setLngLat([m.lng, m.lat])
 				.setPopup(new lib!.Popup({ offset: 24 }).setText(m.label))
@@ -83,8 +91,7 @@
 		userHandle = null;
 		if (user) {
 			const el = document.createElement('div');
-			el.style.cssText =
-				'width:16px;height:16px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 0 0 6px rgba(59,130,246,.3)';
+			el.style.cssText = `width:16px;height:16px;border-radius:50%;background:${token('info')};border:3px solid ${token('info-surface')};`;
 			el.setAttribute('aria-label', 'You are here');
 			userHandle = new lib.Marker({ element: el }).setLngLat([user.lng, user.lat]).addTo(map);
 		}
@@ -106,17 +113,31 @@
 					}))
 			};
 			const src = map.getSource(id) as import('maplibre-gl').GeoJSONSource | undefined;
-			if (src) src.setData(data);
-			else {
+			if (src) {
+				src.setData(data);
+				map.setPaintProperty(
+					id,
+					'line-color',
+					token(state === 'active' ? 'route' : 'text-secondary')
+				);
+				map.setPaintProperty(id + '-halo', 'line-color', token('route-halo'));
+			} else {
 				map.addSource(id, { type: 'geojson', data });
+				map.addLayer({
+					id: id + '-halo',
+					type: 'line',
+					source: id,
+					layout: { 'line-cap': 'round', 'line-join': 'round' },
+					paint: { 'line-color': token('route-halo'), 'line-width': 8 }
+				});
 				map.addLayer({
 					id,
 					type: 'line',
 					source: id,
 					layout: { 'line-cap': 'round', 'line-join': 'round' },
 					paint: {
-						'line-color': colors[state],
-						'line-width': state === 'active' ? 6 : 4,
+						'line-color': token(state === 'active' ? 'route' : 'text-secondary'),
+						'line-width': 4,
 						'line-opacity': state === 'past' ? 0.5 : 0.9,
 						...(state === 'future' ? { 'line-dasharray': [1.5, 2] } : {})
 					}
@@ -145,7 +166,7 @@
 			if (cancelled) return;
 			map = new lib.Map({
 				container,
-				style: dark
+				style: $darkTheme
 					? 'https://tiles.openfreemap.org/styles/dark'
 					: 'https://tiles.openfreemap.org/styles/liberty',
 				center: [-88.0112, 41.8089],
@@ -153,7 +174,8 @@
 				attributionControl: { compact: true }
 			});
 			map.addControl(new lib.NavigationControl({ showCompass: false }));
-			map.on('load', () => {
+			styleDark = $darkTheme;
+			map.on('style.load', () => {
 				ready = true;
 				render();
 			});
@@ -166,6 +188,16 @@
 	});
 
 	$effect(() => {
+		const dark = $darkTheme;
+		if (map && ready && styleDark !== dark) {
+			styleDark = dark;
+			ready = false;
+			map.setStyle(
+				dark
+					? 'https://tiles.openfreemap.org/styles/dark'
+					: 'https://tiles.openfreemap.org/styles/liberty'
+			);
+		}
 		void markers;
 		void line;
 		void legs;
@@ -176,6 +208,6 @@
 
 <div
 	bind:this={container}
-	class="w-full overflow-hidden {dark ? '' : 'rounded-xl border border-stone-200'}"
+	class="w-full overflow-hidden border border-byl-border"
 	style="height: {height}"
 ></div>

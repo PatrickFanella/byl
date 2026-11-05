@@ -4,6 +4,15 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<script>
+			try {
+				const saved = localStorage.getItem('byl.appearance');
+				if (saved === 'light' || saved === 'dark') {
+					document.documentElement.dataset.bylTheme = saved;
+					document.documentElement.style.colorScheme = saved;
+				}
+			} catch {}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

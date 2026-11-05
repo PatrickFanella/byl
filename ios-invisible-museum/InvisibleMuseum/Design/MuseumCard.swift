@@ -62,19 +62,21 @@ struct MuseumMediaCard<Overlay: View>: View {
                     if let symbol {
                         Image(systemName: symbol)
                             .font(.system(size: symbolSize, weight: .ultraLight))
-                            .foregroundStyle(.white.opacity(0.68))
+                            .foregroundStyle(Museum.muted)
                     }
                 }
                 .overlay(alignment: .bottom) {
-                    LinearGradient(colors: [.clear, Museum.background.opacity(0.95)], startPoint: .top, endPoint: .bottom)
+                    Museum.background
                         .frame(height: height * 0.45)
                 }
 
             overlay
                 .padding(Museum.Spacing.lg)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Museum.background)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: height)
+        .frame(minHeight: height)
         .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Museum.border, lineWidth: 1))
     }
@@ -98,32 +100,25 @@ struct MuseumHeroCard<Overlay: View>: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
+        VStack(alignment: .leading, spacing: 0) {
             if let imageURL {
                 AsyncImage(url: imageURL) { phase in
                     if case .success(let image) = phase {
                         image.resizable().scaledToFill()
                     } else {
-                        Museum.accentGradient
+                        Museum.surface
                     }
                 }
                 .frame(height: height)
                 .clipped()
-            } else {
-                Museum.accentGradient
-                    .overlay(alignment: .center) {
-                        Image(systemName: symbol)
-                            .font(.system(size: 62, weight: .ultraLight))
-                            .foregroundStyle(.white.opacity(0.68))
-                    }
             }
-            LinearGradient(colors: [.clear, Museum.background.opacity(0.95)], startPoint: .top, endPoint: .bottom)
-                .frame(height: height * 0.6)
             overlay
                 .padding(Museum.Spacing.lg)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Museum.background)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: height)
+        .frame(minHeight: height)
         .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Museum.border, lineWidth: 1))
     }

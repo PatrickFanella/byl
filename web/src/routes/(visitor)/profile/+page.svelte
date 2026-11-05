@@ -1,4 +1,5 @@
 <script lang="ts">
+	import AppearancePicker from '#lib/components/AppearancePicker.svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { session } from '#lib/auth.ts';
@@ -65,36 +66,37 @@
 	}
 </script>
 
-<svelte:head><title>Profile · Invisible Museum</title></svelte:head>
+<svelte:head><title>Profile · Byl</title></svelte:head>
 
-<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">Profile</div>
+<div class="text-xs font-bold tracking-normal text-byl-action">Profile</div>
+<div class="my-6"><AppearancePicker /></div>
 <h1 class="text-3xl font-semibold">{$current?.account.display_name || 'Visitor'}</h1>
 
 <div class="mt-6 grid gap-4 sm:grid-cols-2">
-	<section class="rounded-2xl border border-white/10 bg-white/5 p-5">
-		<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">Account</div>
+	<section class="rounded-lg border border-byl-border bg-byl-surface p-5">
+		<div class="text-xs font-bold tracking-normal text-byl-action">Account</div>
 		{#if $current}
 			<p class="mt-2 text-sm">{$current.account.email}</p>
-			<p class="text-xs text-white/50">{$current.account.role}</p>
+			<p class="text-xs text-byl-muted">{$current.account.role}</p>
 			<button
-				class="mt-3 rounded-xl border border-white/20 px-3 py-2 text-sm hover:bg-white/10 disabled:opacity-50"
+				class="mt-3 rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface disabled:opacity-50"
 				onclick={signOut}
 				disabled={signingOut}>Sign out</button
 			>
 		{:else}
-			<p class="mt-2 text-sm text-white/60">
+			<p class="mt-2 text-sm text-byl-muted">
 				Sign in to save tours, keep progress, and build routes. Browsing and walking tours work
 				without an account.
 			</p>
 			<a
 				href="/signin?next=/profile"
-				class="mt-3 inline-block rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black"
+				class="mt-3 inline-block rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
 				>Sign in</a
 			>
 		{/if}
 	</section>
-	<section class="rounded-2xl border border-white/10 bg-white/5 p-5">
-		<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">On the tour</div>
+	<section class="rounded-lg border border-byl-border bg-byl-surface p-5">
+		<div class="text-xs font-bold tracking-normal text-byl-action">On the tour</div>
 		<label class="mt-2 flex items-start gap-3 text-sm">
 			<input
 				type="checkbox"
@@ -104,23 +106,23 @@
 			/>
 			<span>
 				<span class="block font-semibold">Audio guide</span>
-				<span class="block text-xs text-white/60"
+				<span class="block text-xs text-byl-muted"
 					>Play each stop's story when you arrive: recorded narration when there is one, otherwise
 					read aloud by your browser.</span
 				>
 			</span>
 		</label>
-		<p class="mt-3 text-xs text-white/50">Location: {locationState}</p>
-		<p class="mt-3 text-xs text-white/50">
+		<p class="mt-3 text-xs text-byl-muted">Location: {locationState}</p>
+		<p class="mt-3 text-xs text-byl-muted">
 			Location is requested by your browser when you start a tour; the walk also works with the "I'm
 			here" button.
 		</p>
 	</section>
-	<section class="rounded-2xl border border-white/10 bg-white/5 p-5 sm:col-span-2">
-		<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">About</div>
-		<p class="mt-2 text-sm text-white/60">
+	<section class="rounded-lg border border-byl-border bg-byl-surface p-5 sm:col-span-2">
+		<div class="text-xs font-bold tracking-normal text-byl-action">About</div>
+		<p class="mt-2 text-sm text-byl-muted">
 			Stories are drawn from open archives and reviewed by curators; each moment lists its sources
-			and media credits. Get the iOS app for arrival alerts with the screen off.
+			and media credits.
 		</p>
 	</section>
 </div>

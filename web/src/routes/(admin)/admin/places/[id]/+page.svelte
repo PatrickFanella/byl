@@ -67,10 +67,10 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/admin/places" class="text-sm text-stone-500 hover:underline">← Places</a>
+	<a href="/admin/places" class="text-sm text-byl-muted hover:underline">← Places</a>
 	<h1 class="text-2xl font-semibold">{place.name}</h1>
 	<StatusPill status={place.status} />
-	<span class="text-xs text-stone-500">{place.slug}</span>
+	<span class="text-xs text-byl-muted">{place.slug}</span>
 </div>
 <div class="mt-3"><Notice kind={notice.kind} message={notice.message} /></div>
 
@@ -78,27 +78,27 @@
 	<div class="space-y-4 lg:col-span-2">
 		<PayloadForm bind:fields {errors} />
 		<label class="block text-sm">
-			<span class="text-stone-700">Primary moment (featured on user routes)</span>
-			<select class="mt-1 w-full rounded-md border-stone-300" bind:value={primary}>
+			<span class="text-byl-text">Primary moment (featured on user routes)</span>
+			<select class="mt-1 w-full rounded-md border-byl-border-control" bind:value={primary}>
 				<option value="">— none —</option>
 				{#each data.moments as m (m.id)}<option value={m.id}>{m.title} ({m.status})</option>{/each}
 			</select>
 		</label>
 		<div class="flex flex-wrap gap-2">
 			<button
-				class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+				class="rounded-md bg-byl-action px-3 py-1.5 text-sm text-byl-action-text disabled:opacity-50"
 				disabled={!!busy}
 				onclick={save}>Save</button
 			>
 			{#if place.status === 'published'}
 				<button
-					class="rounded-md border border-stone-300 px-3 py-1.5 text-sm disabled:opacity-50"
+					class="rounded-md border border-byl-border-control px-3 py-1.5 text-sm disabled:opacity-50"
 					disabled={!!busy}
 					onclick={() => status('unpublish')}>Unpublish</button
 				>
 			{:else}
 				<button
-					class="rounded-md bg-emerald-700 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+					class="rounded-md bg-byl-success-surface px-3 py-1.5 text-sm text-byl-action-text disabled:opacity-50"
 					disabled={!!busy}
 					onclick={() => status('publish')}>Publish</button
 				>
@@ -111,19 +111,19 @@
 				<button class="text-sm underline" disabled={!!busy} onclick={newMoment}>New moment</button>
 			</div>
 			<ul
-				class="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white text-sm"
+				class="mt-2 divide-y divide-byl-border rounded-lg border border-byl-border bg-byl-background text-sm"
 			>
 				{#each data.moments as m (m.id)}
 					<li class="flex items-center gap-3 px-4 py-2">
 						<a class="font-medium hover:underline" href="/admin/moments/{m.id}">{m.title}</a>
-						<span class="text-xs text-stone-500">{m.date_display}</span>
+						<span class="text-xs text-byl-muted">{m.date_display}</span>
 						{#if m.id === place.primary_moment_id}<span
-								class="rounded bg-stone-900 px-1.5 text-xs text-white">primary</span
+								class="rounded bg-byl-action px-1.5 text-xs text-byl-action-text">primary</span
 							>{/if}
 						<span class="ml-auto"><StatusPill status={m.status} /></span>
 					</li>
 				{:else}
-					<li class="px-4 py-3 text-stone-500">No moments yet. Approve a candidate or add one.</li>
+					<li class="px-4 py-3 text-byl-muted">No moments yet. Approve a candidate or add one.</li>
 				{/each}
 			</ul>
 		</section>
@@ -133,6 +133,6 @@
 			markers={[{ lat: place.latitude, lng: place.longitude, label: place.name }]}
 			height="22rem"
 		/>
-		<p class="mt-2 text-xs text-stone-500">Arrival radius {place.arrival_radius_m} m.</p>
+		<p class="mt-2 text-xs text-byl-muted">Arrival radius {place.arrival_radius_m} m.</p>
 	</aside>
 </div>

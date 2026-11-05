@@ -4,6 +4,9 @@ struct MuseumButtonStyle: ButtonStyle {
     enum Variant { case primary, secondary, ghost, destructive }
     enum Size { case small, regular, large, icon }
 
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var variant: Variant = .primary
     var size: Size = .regular
 
@@ -14,22 +17,23 @@ struct MuseumButtonStyle: ButtonStyle {
             .frame(maxWidth: size == .icon ? nil : .infinity)
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
+            .frame(minWidth: 44, minHeight: 44)
             .background(backgroundStyle(configuration.isPressed), in: shape)
             .overlay(shape.stroke(borderStyle, lineWidth: 1))
             .contentShape(shape)
-            .scaleEffect(configuration.isPressed ? 0.985 : 1)
-            .opacity(configuration.isPressed ? 0.92 : 1)
-            .animation(.snappy(duration: 0.18), value: configuration.isPressed)
+
+            .opacity(!isEnabled ? 0.65 : configuration.isPressed ? 0.92 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: configuration.isPressed)
     }
 
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: Museum.Radius.md, style: .continuous) }
 
     private var font: Font {
         switch size {
-        case .small: .system(size: 13, weight: .semibold)
-        case .regular: .system(size: 15, weight: .semibold)
-        case .large: .system(size: 16, weight: .bold)
-        case .icon: .system(size: 15, weight: .bold)
+        case .small: Museum.bodyFont(13, weight: .semibold)
+        case .regular: Museum.bodyFont(15, weight: .semibold)
+        case .large: Museum.bodyFont(16, weight: .bold)
+        case .icon: Museum.bodyFont(15, weight: .bold)
         }
     }
 
@@ -53,22 +57,22 @@ struct MuseumButtonStyle: ButtonStyle {
 
     private var foregroundStyle: Color {
         switch variant {
-        case .primary: .black
+        case .primary: Museum.actionText
         case .secondary, .ghost: Museum.text
-        case .destructive: .white
+        case .destructive: Museum.danger
         }
     }
 
     private func backgroundStyle(_ pressed: Bool) -> AnyShapeStyle {
         switch variant {
         case .primary:
-            return AnyShapeStyle(Color.white.opacity(pressed ? 0.9 : 1))
+            return AnyShapeStyle(Museum.action.opacity(pressed ? 0.9 : 1))
         case .secondary:
             return AnyShapeStyle(Museum.surfaceElevated.opacity(pressed ? 0.92 : 1))
         case .ghost:
             return AnyShapeStyle(Color.clear)
         case .destructive:
-            return AnyShapeStyle(Museum.danger.opacity(pressed ? 0.88 : 1))
+            return AnyShapeStyle(Museum.dangerSurface)
         }
     }
 
