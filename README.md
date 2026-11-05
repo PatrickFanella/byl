@@ -9,6 +9,7 @@ Walking and biking tours of your city as if it were one giant museum. SwiftUI iO
 - `ios-invisible-museum/` — SwiftUI app.
 - `backend/` — Go REST API, PostgreSQL, and Goose migrations.
 - `web/` — SvelteKit app: the visitor site at `/` and the curator admin at `/admin`.
+- `android/` — Kotlin/Compose visitor app with a JVM-tested `:core` module.
 - `docs/superpowers/plans/` — implementation planning notes.
 - `docs/deployment/nuc-almaz.md` — NUC/Almaz deployment notes.
 - `Makefile` — root commands for backend, migrations, API smoke tests, and Simulator runs.
@@ -209,6 +210,28 @@ route and progress.
 Point the app at a local API from the Profile tab (API base URL), or launch with the
 environment variable `InvisibleMuseum.apiBaseURL=http://localhost:8080`. Debug builds show the
 developer email sign-in when the API runs with `DEV_AUTH_ENABLED=true`.
+
+## Android app
+
+`android/` is a two-module Gradle project (cycle 5):
+
+- `:core` — plain Kotlin/JVM: DTOs matching `backend/api/openapi.yaml`, an OkHttp API
+  client with the error envelope and 401 hook, session store, estimates, the arrival
+  rule (65 m accuracy floor, radius plus accuracy, once per stop), `ActiveTour` (route
+  with cached fallback, local progress merged with the server by union, serialised
+  PUTs, resume after the process is killed), `RouteBuilder`, narration planning and
+  navigation URIs. 60 JUnit 5 tests against the recorded fixtures and MockWebServer;
+  they run anywhere with a JDK: `make android-test`.
+- `:app` — Jetpack Compose (Material 3, Navigation, MapLibre with OpenFreeMap tiles,
+  LocationManager, MediaPlayer + TextToSpeech, Credential Manager for Google sign-in,
+  EncryptedSharedPreferences). Included only when an Android SDK is present
+  (`ANDROID_HOME` or `local.properties`).
+
+> Written without an Android SDK in the authoring environment: `:core` is built and
+> tested here; `:app` is not compiled. First steps on a machine with the SDK:
+> `cd android && gradle wrapper && ./gradlew :core:test :app:assembleDebug`.
+> Put `museum.googleServerClientId=<web client id>` and optionally
+> `museum.apiBaseUrl=http://10.0.2.2:8080` in `android/local.properties`.
 
 ## API URL configuration
 

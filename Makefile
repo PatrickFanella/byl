@@ -3,7 +3,7 @@
 	migrate migrate-status migrate-down migrate-reset db-shell db-reset \
 	api-health api-cities api-places api-tour backend-test \
 	nuc-up nuc-down nuc-logs nuc-smoke nuc-rollback \
-	ios-build ios-run ios-test ios-simulators \
+	ios-build ios-run ios-test ios-simulators android-test \
 	web-install web-dev web-check web-build web-e2e
 
 BACKEND_DIR := backend
@@ -56,6 +56,7 @@ help:
 	@printf "iOS:\n"
 	@printf "  make ios-build            Build iOS app for simulator\n"
 	@printf "  make ios-test             Run InvisibleMuseumKit unit tests (swift test)\n"
+	@printf "  make android-test         Run the Android :core JUnit tests (gradle)\n"
 	@printf "  make ios-run              Boot/install/launch on SIMULATOR_ID\n"
 	@printf "  make ios-simulators       List available simulators\n"
 
@@ -144,6 +145,9 @@ ios-test:
 
 ios-simulators:
 	xcrun simctl list devices available
+
+android-test:
+	cd android && gradle :core:test --no-daemon
 
 WEB_DIR := web
 E2E_API_URL ?= http://localhost:8080
