@@ -21,7 +21,7 @@
 				latitude: Number(lat),
 				longitude: Number(lng)
 			});
-			goto(`/places/${p.id}`);
+			goto(`/admin/places/${p.id}`);
 		} catch (e2) {
 			err = errorMessage(e2, 'Could not create the place.');
 		}
@@ -35,7 +35,7 @@
 		<select
 			class="ml-2 rounded-md border-stone-300"
 			value={data.city}
-			onchange={(e) => goto(`/places?city=${(e.currentTarget as HTMLSelectElement).value}`)}
+			onchange={(e) => goto(`/admin/places?city=${(e.currentTarget as HTMLSelectElement).value}`)}
 		>
 			{#each data.cities as c (c.id)}<option value={c.slug}>{c.name}</option>{/each}
 		</select>
@@ -54,7 +54,7 @@
 		{#each data.places as p (p.id)}
 			<tr>
 				<td class="px-3 py-2"
-					><a class="font-medium hover:underline" href="/places/{p.id}">{p.name}</a>
+					><a class="font-medium hover:underline" href="/admin/places/{p.id}">{p.name}</a>
 					<div class="text-xs text-stone-500">{p.address}</div></td
 				>
 				<td class="px-3 py-2">{p.kind}</td>

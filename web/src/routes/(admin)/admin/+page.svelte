@@ -11,7 +11,10 @@
 <h1 class="text-2xl font-semibold">Dashboard</h1>
 
 <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-	<a href="/queue" class="rounded-xl border border-stone-200 bg-white p-4 hover:border-stone-400">
+	<a
+		href="/admin/queue"
+		class="rounded-xl border border-stone-200 bg-white p-4 hover:border-stone-400"
+	>
 		<div class="text-xs tracking-wide text-stone-500 uppercase">Pending review</div>
 		<div class="mt-1 text-3xl font-semibold">{pendingTotal}</div>
 		<div class="mt-1 text-xs text-stone-500">
@@ -28,7 +31,10 @@
 			<div><strong>{data.stats.published?.tours ?? 0}</strong> tours</div>
 		</div>
 	</div>
-	<a href="/jobs" class="rounded-xl border border-stone-200 bg-white p-4 hover:border-stone-400">
+	<a
+		href="/admin/jobs"
+		class="rounded-xl border border-stone-200 bg-white p-4 hover:border-stone-400"
+	>
 		<div class="text-xs tracking-wide text-stone-500 uppercase">Jobs</div>
 		<div class="mt-1 text-sm">
 			{#each ['queued', 'running', 'failed', 'done'] as s (s)}
@@ -54,7 +60,7 @@
 			{#each data.pending as c (c.id)}
 				<li>
 					<a
-						href="/queue/{c.id}"
+						href="/admin/queue/{c.id}"
 						class="flex items-center gap-3 px-4 py-2 text-sm hover:bg-stone-50"
 					>
 						<StatusPill status={c.kind} />
@@ -71,7 +77,7 @@
 				</li>
 			{:else}
 				<li class="px-4 py-3 text-sm text-stone-500">
-					Nothing pending. <a class="underline" href="/imports">Run an import</a>.
+					Nothing pending. <a class="underline" href="/admin/imports">Run an import</a>.
 				</li>
 			{/each}
 		</ul>

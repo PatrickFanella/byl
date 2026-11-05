@@ -57,7 +57,7 @@
 				title: 'Untitled moment',
 				date_precision: 'circa'
 			});
-			goto(`/moments/${m.id}`);
+			goto(`/admin/moments/${m.id}`);
 		} catch (e) {
 			notice = { kind: 'error', message: errorMessage(e, 'Could not create a moment.') };
 		} finally {
@@ -67,7 +67,7 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/places" class="text-sm text-stone-500 hover:underline">← Places</a>
+	<a href="/admin/places" class="text-sm text-stone-500 hover:underline">← Places</a>
 	<h1 class="text-2xl font-semibold">{place.name}</h1>
 	<StatusPill status={place.status} />
 	<span class="text-xs text-stone-500">{place.slug}</span>
@@ -115,7 +115,7 @@
 			>
 				{#each data.moments as m (m.id)}
 					<li class="flex items-center gap-3 px-4 py-2">
-						<a class="font-medium hover:underline" href="/moments/{m.id}">{m.title}</a>
+						<a class="font-medium hover:underline" href="/admin/moments/{m.id}">{m.title}</a>
 						<span class="text-xs text-stone-500">{m.date_display}</span>
 						{#if m.id === place.primary_moment_id}<span
 								class="rounded bg-stone-900 px-1.5 text-xs text-white">primary</span

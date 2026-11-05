@@ -16,10 +16,11 @@ test('a curator builds a tour, waits for routes, and publishes it', async ({ pag
 	await page.goto('/signin');
 	await page.getByLabel('Email').fill('admin@example.com');
 	await page.getByRole('button', { name: /sign in/i }).click();
+	await page.goto('/admin');
 	await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
 	const title = `E2E Night Walk ${Date.now()}`;
-	await page.goto('/tours');
+	await page.goto('/admin/tours');
 	await page.getByLabel('Title').fill(title);
 	await page.getByLabel('Topic').selectOption({ label: 'Downtown After Dark' });
 	await page.getByRole('button', { name: 'Create draft' }).click();

@@ -113,14 +113,14 @@
 	function entityLink(): string {
 		if (!approvedId && !candidate.approved_entity_id) return '';
 		const id = approvedId ?? candidate.approved_entity_id ?? '';
-		if (candidate.kind === 'place') return `/places/${id}`;
-		if (candidate.kind === 'moment') return `/moments/${id}`;
-		return `/media`;
+		if (candidate.kind === 'place') return `/admin/places/${id}`;
+		if (candidate.kind === 'moment') return `/admin/moments/${id}`;
+		return `/admin/media`;
 	}
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/queue" class="text-sm text-stone-500 hover:underline">← Queue</a>
+	<a href="/admin/queue" class="text-sm text-stone-500 hover:underline">← Queue</a>
 	<h1 class="text-2xl font-semibold">
 		{String(payload.title ?? payload.name ?? payload.caption ?? 'Candidate')}
 	</h1>
@@ -132,7 +132,7 @@
 	{candidate.source_name ?? 'manual'}{candidate.external_id ? ` · ${candidate.external_id}` : ''} · created
 	{when(candidate.created_at)}
 	{#if candidate.target_place_id}
-		· target place <a class="underline" href="/places/{candidate.target_place_id}"
+		· target place <a class="underline" href="/admin/places/{candidate.target_place_id}"
 			>{candidate.target_place_id}</a
 		>
 	{/if}

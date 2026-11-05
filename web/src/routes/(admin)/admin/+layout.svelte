@@ -1,5 +1,5 @@
 <script lang="ts">
-	import './layout.css';
+	import '../../layout.css';
 	import favicon from '#lib/assets/favicon.svg';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
@@ -11,19 +11,17 @@
 	const current = session.store;
 
 	const nav = [
-		{ href: '/', label: 'Dashboard' },
-		{ href: '/queue', label: 'Review queue' },
-		{ href: '/imports', label: 'Imports' },
-		{ href: '/places', label: 'Places' },
-		{ href: '/media', label: 'Media' },
-		{ href: '/tours', label: 'Tours' },
-		{ href: '/jobs', label: 'Jobs' }
+		{ href: '/admin', label: 'Dashboard' },
+		{ href: '/admin/queue', label: 'Review queue' },
+		{ href: '/admin/imports', label: 'Imports' },
+		{ href: '/admin/places', label: 'Places' },
+		{ href: '/admin/media', label: 'Media' },
+		{ href: '/admin/tours', label: 'Tours' },
+		{ href: '/admin/jobs', label: 'Jobs' }
 	];
 
-	let isSignIn = $derived(page.url.pathname.startsWith('/signin'));
-
 	$effect(() => {
-		if (!isSignIn && !$current) {
+		if (!$current) {
 			goto(`/signin?next=${encodeURIComponent(page.url.pathname)}`, { replaceState: true });
 		}
 	});
@@ -39,7 +37,7 @@
 	}
 
 	function active(href: string) {
-		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
+		return href === '/admin' ? page.url.pathname === '/admin' : page.url.pathname.startsWith(href);
 	}
 </script>
 
@@ -48,13 +46,11 @@
 	<title>Invisible Museum admin</title>
 </svelte:head>
 
-{#if isSignIn}
-	{@render children()}
-{:else if $current && canCurate($current.account)}
+{#if $current && canCurate($current.account)}
 	<div class="min-h-screen bg-stone-50 text-stone-900">
 		<header class="border-b border-stone-200 bg-white">
 			<div class="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
-				<a href="/" class="font-semibold tracking-tight">Invisible Museum</a>
+				<a href="/admin" class="font-semibold tracking-tight">Invisible Museum</a>
 				<nav class="flex flex-1 flex-wrap gap-1 text-sm">
 					{#each nav as item (item.href)}
 						<a
@@ -66,6 +62,7 @@
 					{/each}
 				</nav>
 				<div class="flex items-center gap-3 text-sm text-stone-600">
+					<a href="/" class="text-stone-500 hover:text-stone-900">Visitor site</a>
 					<span title={$current.account.email}
 						>{$current.account.display_name || $current.account.email}</span
 					>
@@ -89,6 +86,7 @@
 				<strong>{$current.account.role}</strong> role. Ask an administrator to grant curator access, then
 				sign in again.
 			</p>
+			<p><a class="underline" href="/">Back to the visitor site</a></p>
 			<button class="rounded-md bg-stone-900 px-4 py-2 text-white" onclick={signOut}
 				>Sign out</button
 			>

@@ -13,7 +13,7 @@
 			const v = String(form.get(k) ?? '');
 			if (v) parts.push(`${k}=${encodeURIComponent(v)}`);
 		}
-		goto(`/queue?${parts.join('&')}`);
+		goto(`/admin/queue?${parts.join('&')}`);
 	}
 
 	function title(c: (typeof data.candidates)[number]): string {
@@ -28,7 +28,8 @@
 
 <div class="flex items-end justify-between gap-4">
 	<h1 class="text-2xl font-semibold">Review queue</h1>
-	<a href="/imports" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white">Run an import</a
+	<a href="/admin/imports" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white"
+		>Run an import</a
 	>
 </div>
 
@@ -76,7 +77,7 @@
 <ul class="mt-4 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
 	{#each data.candidates as c (c.id)}
 		<li>
-			<a href="/queue/{c.id}" class="block px-4 py-3 hover:bg-stone-50">
+			<a href="/admin/queue/{c.id}" class="block px-4 py-3 hover:bg-stone-50">
 				<div class="flex items-center gap-2 text-sm">
 					<StatusPill status={c.kind} />
 					<StatusPill status={c.origin} />
@@ -97,7 +98,7 @@
 	<div class="mt-3 text-right">
 		<a
 			class="text-sm underline"
-			href="/queue?status={data.filters.status}&kind={data.filters.kind}&origin={data.filters
+			href="/admin/queue?status={data.filters.status}&kind={data.filters.kind}&origin={data.filters
 				.origin}&source={data.filters.source}&cursor={data.nextCursor}">Next page →</a
 		>
 	</div>

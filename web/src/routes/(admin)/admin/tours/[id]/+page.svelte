@@ -118,7 +118,7 @@
 	async function remove() {
 		if (!confirm('Delete this tour? This cannot be undone.')) return;
 		await deleteTour(tour.id);
-		goto('/tours');
+		goto('/admin/tours');
 	}
 
 	async function suggest(i: number) {
@@ -142,7 +142,7 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/tours" class="text-sm text-stone-500 hover:underline">← Tours</a>
+	<a href="/admin/tours" class="text-sm text-stone-500 hover:underline">← Tours</a>
 	<h1 class="text-2xl font-semibold">{tour.title}</h1>
 	<StatusPill status={tour.status} />
 	<StatusPill status={tour.visibility} />
@@ -211,7 +211,9 @@
 					<li class="rounded-md border border-stone-200 p-3">
 						<div class="flex items-center gap-2">
 							<span class="w-6 text-right font-mono text-xs text-stone-500">{i + 1}.</span>
-							<a class="font-medium hover:underline" href="/places/{s.place_id}">{s.place_name}</a>
+							<a class="font-medium hover:underline" href="/admin/places/{s.place_id}"
+								>{s.place_name}</a
+							>
 							<span class="ml-auto flex gap-1 text-xs">
 								<button
 									class="rounded border px-1"

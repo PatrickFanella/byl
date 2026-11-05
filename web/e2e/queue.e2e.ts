@@ -21,6 +21,7 @@ async function signIn(page: Page, email: string) {
 
 test('a visitor account sees the curator-role notice, never a blank page', async ({ page }) => {
 	await signIn(page, `visitor-${Date.now()}@example.com`);
+	await page.goto('/admin');
 	await expect(page.getByRole('heading', { name: /needs the curator role/i })).toBeVisible();
 	await page.getByRole('button', { name: /sign out/i }).click();
 	await expect(page).toHaveURL(/\/signin/);
@@ -49,8 +50,9 @@ test('an admin can approve a candidate with an edited title', async ({ page, req
 	const candidate = await created.json();
 
 	await signIn(page, 'admin@example.com');
+	await page.goto('/admin');
 	await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-	await page.goto(`/queue/${candidate.id}`);
+	await page.goto(`/admin/queue/${candidate.id}`);
 	await expect(page.getByText('A fire damaged the depot in 1910.')).toBeVisible();
 	await page.getByLabel('Title', { exact: true }).fill('Station Fire of 1910');
 	await page.getByRole('button', { name: /approve/i }).click();
@@ -90,8 +92,9 @@ test('setting the place id keeps the edited title', async ({ page, request }) =>
 	const candidate = await created.json();
 
 	await signIn(page, 'admin@example.com');
+	await page.goto('/admin');
 	await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-	await page.goto(`/queue/${candidate.id}`);
+	await page.goto(`/admin/queue/${candidate.id}`);
 	await expect(page.getByText(/this moment has no place/i)).toBeVisible();
 	await page.getByLabel('Title', { exact: true }).fill('Depot Dedication of 1908');
 	await page.getByLabel('Place id').fill(stationId);

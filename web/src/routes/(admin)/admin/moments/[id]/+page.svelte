@@ -84,7 +84,7 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/places/{data.place.id}" class="text-sm text-stone-500 hover:underline"
+	<a href="/admin/places/{data.place.id}" class="text-sm text-stone-500 hover:underline"
 		>← {data.place.name}</a
 	>
 	<h1 class="text-2xl font-semibold">{moment.title}</h1>
@@ -216,7 +216,7 @@
 						pick = '';
 					}}>Attach</button
 				>
-				<a class="self-center text-xs underline" href="/media">Upload new</a>
+				<a class="self-center text-xs underline" href="/admin/media">Upload new</a>
 			</div>
 		</section>
 

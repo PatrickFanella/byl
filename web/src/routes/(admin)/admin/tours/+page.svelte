@@ -14,7 +14,7 @@
 		err = '';
 		try {
 			const t = await createTour({ city_id: data.cityId, title, topic_id: topic || null });
-			goto(`/tours/${t.id}`);
+			goto(`/admin/tours/${t.id}`);
 		} catch (e2) {
 			err = errorMessage(e2, 'Could not create the tour.');
 		}
@@ -28,7 +28,7 @@
 		<select
 			class="ml-2 rounded-md border-stone-300"
 			value={data.city}
-			onchange={(e) => goto(`/tours?city=${(e.currentTarget as HTMLSelectElement).value}`)}
+			onchange={(e) => goto(`/admin/tours?city=${(e.currentTarget as HTMLSelectElement).value}`)}
 		>
 			{#each data.cities as c (c.id)}<option value={c.slug}>{c.name}</option>{/each}
 		</select>
@@ -47,7 +47,7 @@
 		{#each data.tours as t (t.id)}
 			<tr>
 				<td class="px-3 py-2"
-					><a class="font-medium hover:underline" href="/tours/{t.id}">{t.title}</a
+					><a class="font-medium hover:underline" href="/admin/tours/{t.id}">{t.title}</a
 					>{#if t.owner_account_id}<span
 							class="ml-2 rounded bg-violet-100 px-1.5 text-xs text-violet-800">user route</span
 						>{/if}</td

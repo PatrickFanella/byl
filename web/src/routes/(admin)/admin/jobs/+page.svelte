@@ -22,7 +22,7 @@
 	<nav class="flex gap-1 text-sm">
 		{#each ['', 'queued', 'running', 'failed', 'done'] as s (s)}
 			<a
-				href="/jobs{s ? `?status=${s}` : ''}"
+				href="/admin/jobs{s ? `?status=${s}` : ''}"
 				class="rounded-md px-2 py-1 {data.status === s
 					? 'bg-stone-900 text-white'
 					: 'hover:bg-stone-100'}">{s || 'all'}</a
