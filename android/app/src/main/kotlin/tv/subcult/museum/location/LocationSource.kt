@@ -1,0 +1,50 @@
+package tv.subcult.museum.location
+
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.Build
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import tv.subcult.museum.core.Fix
+
+/** LocationManager wrapped as a StateFlow of fixes; started while a screen that needs it is shown. */
+class LocationSource(private val context: Context) {
+    private val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private val _fixes = MutableStateFlow<Fix?>(null)
+    val fixes: StateFlow<Fix?> = _fixes
+    private var listening = false
+
+    private val listener = LocationListener { location: Location ->
+        _fixes.value = Fix(location.latitude, location.longitude, if (location.hasAccuracy()) location.accuracy.toDouble() else -1.0)
+    }
+
+    fun hasPermission(): Boolean =
+        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+    @Suppress("MissingPermission")
+    fun start() {
+        if (listening || !hasPermission()) return
+        val provider = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && manager.isProviderEnabled(LocationManager.FUSED_PROVIDER) -> LocationManager.FUSED_PROVIDER
+            manager.isProviderEnabled(LocationManager.GPS_PROVIDER) -> LocationManager.GPS_PROVIDER
+            else -> LocationManager.NETWORK_PROVIDER
+        }
+        runCatching {
+            manager.getLastKnownLocation(provider)?.let { listener.onLocationChanged(it) }
+            manager.requestLocationUpdates(provider, 2000L, 3f, listener, context.mainLooper)
+            listening = true
+        }
+    }
+
+    fun stop() {
+        if (!listening) return
+        manager.removeUpdates(listener)
+        listening = false
+    }
+}
