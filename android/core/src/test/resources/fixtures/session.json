@@ -1,0 +1,13 @@
+{
+  "token": "fixture-token",
+  "expires_at": "2027-02-02T23:06:39.961300187Z",
+  "account": {
+    "id": "d0a6cb9f-cdbe-47e1-b134-185d63930965",
+    "provider": "dev",
+    "email": "visitor@example.com",
+    "display_name": "Visitor",
+    "role": "visitor",
+    "last_sign_in_at": "2026-11-04T23:06:39.960147Z",
+    "created_at": "2026-11-04T23:06:39.960147Z"
+  }
+}
