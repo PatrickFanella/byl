@@ -78,7 +78,7 @@ struct MomentView: View {
     }
 
     private func markdown(_ text: String) -> AttributedString {
-        (try? AttributedString(markdown: text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(text)
+        (try? AttributedString(markdown: text, options: .init(interpretedSyntax: .full))) ?? AttributedString(text)
     }
 
     private func load() async {

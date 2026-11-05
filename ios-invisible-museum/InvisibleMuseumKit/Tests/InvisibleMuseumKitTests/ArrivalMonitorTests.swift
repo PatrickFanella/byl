@@ -18,6 +18,14 @@ final class ArrivalMonitorTests: XCTestCase {
         XCTAssertTrue(monitor.evaluate(location: fix(eastMeters: 20, accuracy: 10)))
     }
 
+    func testStaleAndFutureLocationsDoNotTriggerArrival() {
+        for age in [-60.0, 60.0] {
+            let location = CLLocation(coordinate: station, altitude: 0, horizontalAccuracy: 10,
+                                      verticalAccuracy: 0, timestamp: Date(timeIntervalSinceNow: age))
+            XCTAssertFalse(ArrivalMonitor.hasArrived(location: location, stop: station, radiusM: 40))
+        }
+    }
+
     func testInsideRadiusWithPoorAccuracyDoesNotArrive() {
         // Review Focus 1: a 200 m fix in a car park must not count as arrived.
         let monitor = ArrivalMonitor(stop: station, radiusM: 40)

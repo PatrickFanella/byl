@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -63,6 +64,8 @@ fun SignInScreen(model: AppViewModel) {
                             val google = GoogleIdTokenCredential.createFrom(result.credential.data)
                             model.signIn(model.api.signInGoogle(google.idToken, google.displayName ?: ""))
                             busy = false
+                        } catch (_: GetCredentialCancellationException) {
+                            error = null
                         } catch (e: Exception) {
                             fail(e)
                         }

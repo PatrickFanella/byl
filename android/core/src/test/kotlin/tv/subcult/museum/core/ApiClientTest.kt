@@ -26,6 +26,16 @@ class ApiClientTest {
     private fun client(token: String? = "tok") = ApiClient(server.url("/").toString().trimEnd('/')) { token }
 
     @Test
+    fun `place browsing follows every cursor for the route builder`() = runTest {
+        server.enqueue(MockResponse().setBody(Fixtures.text("places_near").replace("\"next_cursor\":\"\"", "\"next_cursor\":\"page-2\"")))
+        server.enqueue(MockResponse().setBody(Fixtures.text("places_near")))
+        val places = Endpoints(client()).places("downers-grove")
+        assertEquals(Fixtures.decode<ListPage<PlaceSummary>>("places_near").items.size * 2, places.size)
+        server.takeRequest()
+        assertEquals("page-2", server.takeRequest().requestUrl!!.queryParameter("cursor"))
+    }
+
+    @Test
     fun `sends the bearer token and decodes a page`() = runTest {
         server.enqueue(MockResponse().setBody(Fixtures.text("tours")).setHeader("Content-Type", "application/json"))
         val tours = Endpoints(client()).tours("downers-grove", mode = "walk")
@@ -74,7 +84,7 @@ class ApiClientTest {
         assertEquals(listOf(1, 2), progress.visitedPositions)
         val put = server.takeRequest()
         assertEquals("PUT", put.method)
-        assertEquals("""{"mode":"walk","visited_positions":[1],"completed":false}""", put.body.readUtf8())
+        assertEquals("""{"mode":"walk","visited_positions":[1],"completed":false,"reset":false}""", put.body.readUtf8())
     }
 
     @Test

@@ -33,8 +33,15 @@ public struct Endpoints {
             q["radius_m"] = String(radiusM)
         }
         if let topic { q["topic"] = topic }
-        let page: ListPage<PlaceSummary> = try await client.get("/api/v1/cities/\(city)/places", query: q)
-        return page.items
+        var result: [PlaceSummary] = []
+        var cursor = ""
+        repeat {
+            q["cursor"] = cursor
+            let page: ListPage<PlaceSummary> = try await client.get("/api/v1/cities/\(city)/places", query: q)
+            result.append(contentsOf: page.items)
+            cursor = page.nextCursor
+        } while !cursor.isEmpty && near == nil
+        return result
     }
 
     public func place(_ ref: String, city: String? = nil) async throws -> PlaceDetail {

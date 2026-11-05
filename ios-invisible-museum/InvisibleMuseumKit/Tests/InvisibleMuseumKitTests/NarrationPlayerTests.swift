@@ -14,6 +14,9 @@ private final class FakeAudio: AudioSessionConfiguring, SpeechSynthesizing {
 }
 
 final class NarrationPlayerTests: XCTestCase {
+    func testPlainTextKeepsUnderscoresInsideWords() {
+        XCTAssertEqual(NarrationPlayer.plainText("museum_archive_story and _history_"), "museum_archive_story and history")
+    }
     func testPlanPrefersRecordedNarration() {
         let url = URL(string: "https://media.test/narration/x.mp3")!
         XCTAssertEqual(NarrationPlayer.plan(narrationURL: url, body: "Some body"), .stream(url))

@@ -85,7 +85,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     // driven by state.arrivedStop and cleared through acknowledgeArrival, so rotation does not replay it.
     LaunchedEffect(state.arrivedStop?.id) {
         val stop = state.arrivedStop ?: return@LaunchedEffect
-        if (app.audioEnabled) model.playNarration(stop)
+        if (app.audioEnabled) model.playNarration(stop, requireGuide = true)
     }
 
     val stops = active.tour.stops.sortedBy { it.position }
@@ -103,7 +103,6 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         Column(Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (state.routeFromCache) Pill { Text("Offline: using the saved route", style = MaterialTheme.typography.bodySmall, color = Museum.muted) }
             state.routeMessage?.let { Pill { Text("$it. Stops still work; use Directions.", style = MaterialTheme.typography.bodySmall, color = Color(0xFFFDE68A)) } }
-            if (state.routeStatus == LoadStatus.ERROR) Pill { Text("Route unavailable: ${state.routeMessage}", style = MaterialTheme.typography.bodySmall, color = Color(0xFFFDE68A)) }
 
             Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color.Black.copy(alpha = 0.85f)).padding(16.dp)) {
                 if (next != null) {
@@ -131,7 +130,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                                 try {
                                     if (nav != null) context.startActivity(nav) else throw ActivityNotFoundException()
                                 } catch (_: ActivityNotFoundException) {
-                                    active.geoUri()?.let { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+                                    runCatching { active.geoUri()?.let { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } }
                                 }
                             }) { Text("Directions") }
                             if (playing) OutlinedButton(onClick = { model.container.narration.stop() }) { Text("■") }

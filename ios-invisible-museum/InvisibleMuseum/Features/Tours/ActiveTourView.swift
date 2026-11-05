@@ -24,6 +24,14 @@ struct ActiveTourView: View {
                             .padding(.horizontal, 12).padding(.vertical, 6)
                             .museumGlassCard(radius: Museum.Radius.pill)
                     }
+                    if let message = active.syncError {
+                        Text("Progress saved on this device. Sync failed: \(message)")
+                            .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
+                    }
+                    if active.routePending {
+                        Text("Route being computed. Stops still work.")
+                            .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
+                    }
                     bottomCard
                 }
                 .padding(.horizontal, Museum.Spacing.pageHorizontal)
@@ -61,7 +69,13 @@ struct ActiveTourView: View {
             } message: {
                 Text(active.progressText)
             }
-            .task { await active.loadRoute() }
+            .task {
+                for _ in 0..<30 {
+                    await active.loadRoute()
+                    if !active.routePending || Task.isCancelled { break }
+                    do { try await Task.sleep(for: .seconds(2)) } catch { break }
+                }
+            }
             .onAppear {
                 model.location.requestWhenInUseAuthorization()
                 model.location.start()

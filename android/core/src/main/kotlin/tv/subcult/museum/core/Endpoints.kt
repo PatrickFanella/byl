@@ -24,7 +24,14 @@ class Endpoints(val client: ApiClient) {
             }
             if (topic != null) put("topic", topic)
         }
-        return client.get<ListPage<PlaceSummary>>("/api/v1/cities/$city/places", q).items
+        val result = mutableListOf<PlaceSummary>()
+        var cursor = ""
+        do {
+            val page = client.get<ListPage<PlaceSummary>>("/api/v1/cities/$city/places", q + ("cursor" to cursor))
+            result.addAll(page.items)
+            cursor = page.nextCursor
+        } while (cursor.isNotEmpty() && near == null)
+        return result
     }
 
     suspend fun place(ref: String, city: String? = null): PlaceDetail =

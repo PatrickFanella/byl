@@ -7,6 +7,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +24,9 @@ class LocationSource(private val context: Context) {
     // would throw AbstractMethodError when location is toggled.
     private val listener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
-            _fixes.value = Fix(location.latitude, location.longitude, if (location.hasAccuracy()) location.accuracy.toDouble() else -1.0)
+            val ageMillis = (SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos) / 1_000_000
+            if (ageMillis !in 0..30_000) return
+            _fixes.value = Fix(location.latitude, location.longitude, if (location.hasAccuracy()) location.accuracy.toDouble() else -1.0, System.currentTimeMillis() - ageMillis)
         }
         @Deprecated("Deprecated in Java")
         override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
@@ -38,7 +41,9 @@ class LocationSource(private val context: Context) {
     @Suppress("MissingPermission")
     fun start() {
         if (listening || !hasPermission()) return
+        val precise = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val provider = when {
+            !precise -> LocationManager.NETWORK_PROVIDER
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && manager.isProviderEnabled(LocationManager.FUSED_PROVIDER) -> LocationManager.FUSED_PROVIDER
             manager.isProviderEnabled(LocationManager.GPS_PROVIDER) -> LocationManager.GPS_PROVIDER
             else -> LocationManager.NETWORK_PROVIDER
@@ -54,5 +59,6 @@ class LocationSource(private val context: Context) {
         if (!listening) return
         manager.removeUpdates(listener)
         listening = false
+        _fixes.value = null
     }
 }

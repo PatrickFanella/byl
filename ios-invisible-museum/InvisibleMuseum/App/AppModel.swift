@@ -87,7 +87,8 @@ final class AppModel {
 
     /// Brings back the tour that was being walked when the app was last closed (Review Focus 2).
     func resumeActiveTour() {
-        guard active == nil, let restored = ActiveTourModel.restore(api: api, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn ?? false }) else { return }
+        let accountID = session.account?.id
+        guard active == nil, let restored = ActiveTourModel.restore(api: activeTourAPI(), cache: cache, isSignedIn: { [weak self] in self?.isSignedIn == true && self?.session.account?.id == accountID }, accountID: accountID) else { return }
         attach(restored)
     }
 
@@ -163,15 +164,24 @@ final class AppModel {
 
     /// Makes a tour the active one; RootView presents ActiveTourView over everything.
     func startTour(_ tour: TourDetail, mode: String) {
-        let model = ActiveTourModel(api: api, tour: tour, mode: mode, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn ?? false })
+        let accountID = session.account?.id
+        let model = ActiveTourModel(api: activeTourAPI(), tour: tour, mode: mode, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn == true && self?.session.account?.id == accountID }, accountID: accountID)
         attach(model)
+    }
+
+    // A queued progress request must keep the original account token and server.
+    private func activeTourAPI() -> Endpoints {
+        let token = session.token
+        let scoped = APIClient(baseURL: client.baseURL, tokenProvider: { token })
+        scoped.onUnauthorized = client.onUnauthorized
+        return Endpoints(client: scoped)
     }
 
     private func attach(_ model: ActiveTourModel) {
         model.audioEnabled = audioGuideEnabled
         model.onArrive = { [weak self, weak model] stop in
             guard let self, let model, model.audioEnabled else { return }
-            Task { await self.playNarration(for: stop) }
+            Task { await self.playNarration(for: stop, requireGuide: true) }
         }
         location.onLocation = { [weak model] location in model?.handle(location: location) }
         if let here = location.currentLocation { model.handle(location: here) }
@@ -183,11 +193,14 @@ final class AppModel {
     }
 
     func endTour(resetProgress: Bool) {
+        let ending = active
         if resetProgress { active?.resetProgress() }
         active?.end()
         narration.stop()
         location.onLocation = nil
+        location.stop()
         active = nil
+        Task { await ending?.flush() }
         if signInAfterTour {
             signInAfterTour = false
             presentSignIn = true
@@ -196,11 +209,12 @@ final class AppModel {
 
     /// Plays the featured moment at a stop: its recorded narration, else the body read aloud.
     /// The summary already says whether narration exists; the detail carries the URL and body.
-    func playNarration(for stop: TourStop) async {
-        guard let featured = stop.featuredMoment else { return }
+    func playNarration(for stop: TourStop, requireGuide: Bool = false) async {
+        guard let expected = active, let featured = stop.featuredMoment else { return }
         let cacheKey = "moment.\(featured.id)"
         var detail = try? await api.moment(featured.id)
         if let detail { cache.save(detail, key: cacheKey) } else { detail = cache.load(MomentDetail.self, key: cacheKey) }
+        guard active === expected, (!requireGuide || expected.audioEnabled), expected.arrivedStop?.id == stop.id else { return }
         let source = NarrationPlayer.plan(narrationURL: detail?.narration?.url, body: detail?.body ?? featured.excerpt)
         narration.play(source)
     }
@@ -211,7 +225,7 @@ final class AppModel {
         if !on {
             narration.stop()
         } else if let stop = active?.arrivedStop {
-            Task { await playNarration(for: stop) }
+            Task { await playNarration(for: stop, requireGuide: true) }
         }
     }
 

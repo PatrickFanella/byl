@@ -62,7 +62,7 @@ class NarrationPlayer(context: Context) {
             tts = TextToSpeech(app) { status ->
                 ttsReady = status == TextToSpeech.SUCCESS
                 if (ttsReady) {
-                    tts?.language = Locale.US
+                    tts?.language = Locale.getDefault()
                     tts?.setAudioAttributes(attributes)
                     tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                         override fun onStart(utteranceId: String?) {}

@@ -440,15 +440,17 @@ public struct ProgressRequest: Encodable {
     public var mode: String
     public var visitedPositions: [Int]
     public var completed: Bool
+    public var reset: Bool
 
     enum CodingKeys: String, CodingKey {
-        case mode, completed
+        case mode, completed, reset
         case visitedPositions = "visited_positions"
     }
 
-    public init(mode: String, visitedPositions: [Int], completed: Bool) {
+    public init(mode: String, visitedPositions: [Int], completed: Bool, reset: Bool = false) {
         self.mode = mode
         self.visitedPositions = visitedPositions
         self.completed = completed
+        self.reset = reset
     }
 }
