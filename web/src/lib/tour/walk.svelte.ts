@@ -1,6 +1,7 @@
 // The walk in progress: tour and route (cached for offline), the next stop, arrival by GPS or
 // by hand, progress, and the legs split for the map. Pages render this; it owns no DOM.
 import type { TourDetail, TourRoute, TourStop } from '#lib/visitor.ts';
+import { SvelteSet } from 'svelte/reactivity';
 import { ArrivalMonitor, type Fix } from './arrival';
 import { ProgressStore, type ProgressApi } from './progress';
 
@@ -45,7 +46,7 @@ export class ActiveWalk {
 	route = $state<TourRoute | null>(null);
 	routeMessage = $state('');
 	fromCache = $state(false);
-	visited = $state<Set<number>>(new Set());
+	visited = new SvelteSet<number>();
 	nextStop = $state<TourStop | null>(null);
 	arrivedStop = $state<TourStop | null>(null);
 	distanceToNextM = $state<number | null>(null);
@@ -66,7 +67,7 @@ export class ActiveWalk {
 	async load(): Promise<void> {
 		this.status = 'loading';
 		const { storage } = this.deps;
-		let tour: TourDetail | null = null;
+		let tour: TourDetail | null;
 		let cached = false;
 		try {
 			tour = await this.deps.fetchTour(this.ref);
@@ -104,7 +105,7 @@ export class ActiveWalk {
 			api: this.deps.progressApi,
 			signedIn: this.deps.signedIn
 		});
-		this.visited = new Set(this.progress.visited);
+		this.replaceVisited(this.progress.visited);
 		this.advance();
 		this.status = 'ready';
 		// A fix that came in while loading is evaluated now instead of waiting for the next one.
@@ -176,7 +177,7 @@ export class ActiveWalk {
 	end(reset: boolean): void {
 		if (reset) {
 			this.progress?.reset();
-			this.visited = new Set();
+			this.visited.clear();
 			this.advance();
 		}
 	}
@@ -184,7 +185,7 @@ export class ActiveWalk {
 	private arrive(stop: TourStop): void {
 		if (this.visited.has(stop.position)) return;
 		this.progress?.markVisited(stop.position);
-		this.visited = new Set([...this.visited, stop.position]);
+		this.visited.add(stop.position);
 		this.arrivedStop = stop;
 		this.advance();
 		this.syncError = this.progress?.syncError ?? null;
@@ -193,9 +194,14 @@ export class ActiveWalk {
 	private refreshFromProgress(): void {
 		if (!this.progress) return;
 		if (this.progress.visited.size !== this.visited.size) {
-			this.visited = new Set(this.progress.visited);
+			this.replaceVisited(this.progress.visited);
 			this.advance();
 		}
+	}
+
+	private replaceVisited(positions: Iterable<number>): void {
+		this.visited.clear();
+		for (const p of positions) this.visited.add(p);
 	}
 
 	private advance(): void {
