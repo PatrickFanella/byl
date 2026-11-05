@@ -24,34 +24,34 @@
 	);
 </script>
 
-<svelte:head><title>{moment.data?.title ?? 'Moment'} · Invisible Museum</title></svelte:head>
+<svelte:head><title>{moment.data?.title ?? 'Moment'} · Byl</title></svelte:head>
 
 <LoadState status={moment.status} message={moment.message} onretry={() => moment.run()}>
 	{#if moment.data}
 		{@const m = moment.data}
-		<a href="/places/{m.place_id}" class="text-sm text-white/50 hover:underline">← Place</a>
+		<a href="/places/{m.place_id}" class="text-sm text-byl-muted hover:underline">← Place</a>
 		{#if m.date_display}
-			<div class="mt-3 text-[11px] font-bold tracking-widest text-blue-300 uppercase">
+			<div class="mt-3 text-xs font-bold tracking-normal text-byl-action">
 				{m.date_display}
 			</div>
 		{/if}
 		<h1 class="text-3xl font-semibold">{m.title}</h1>
 		{#if m.has_narration || m.narration}
-			<p class="mt-1 text-xs text-white/50">Audio guide available on the tour</p>
+			<p class="mt-1 text-xs text-byl-muted">Audio guide available on the tour</p>
 		{/if}
 
 		{#if m.media.length}
 			<div class="mt-5"><MediaGallery media={m.media} /></div>
 		{/if}
 
-		<article class="prose mt-5 max-w-2xl prose-invert">
+		<article class="byl-story prose mt-5 max-w-2xl">
 			{#each paragraphs as p, i (i)}<p>{p}</p>{/each}
 		</article>
 
 		{#if m.topics.length}
 			<div class="mt-5 flex flex-wrap gap-2">
 				{#each m.topics as t (t.id)}
-					<span class="rounded-full border border-white/20 px-3 py-1 text-xs">{t.name}</span>
+					<span class="rounded border border-byl-border px-3 py-1 text-xs">{t.name}</span>
 				{/each}
 			</div>
 		{/if}
@@ -66,23 +66,23 @@
 				/>
 			{/if}
 			{#each m.sources as s, i (i)}
-				<div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
+				<div class="rounded-lg border border-byl-border bg-byl-surface p-4 text-sm">
 					{#if s.url}
 						<a
 							href={s.url}
 							target="_blank"
 							rel="noreferrer"
-							class="font-semibold text-blue-300 hover:underline">{s.title || s.url} ↗</a
+							class="font-semibold text-byl-action hover:underline">{s.title || s.url} ↗</a
 						>
 					{:else}
 						<div class="font-semibold">{s.title}</div>
 					{/if}
-					<div class="text-xs text-white/50">
+					<div class="text-xs text-byl-muted">
 						{[s.publisher, s.license, s.retrieved_at ? `retrieved ${s.retrieved_at}` : '']
 							.filter(Boolean)
 							.join(' · ')}
 					</div>
-					{#if s.note}<div class="mt-1 text-xs text-white/40 italic">{s.note}</div>{/if}
+					{#if s.note}<div class="mt-1 text-xs text-byl-muted italic">{s.note}</div>{/if}
 				</div>
 			{/each}
 		</section>

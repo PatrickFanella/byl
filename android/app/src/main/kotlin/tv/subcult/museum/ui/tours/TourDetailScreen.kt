@@ -65,8 +65,8 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
     LaunchedEffect(ref) { load() }
     LaunchedEffect(state.data?.id, app.savedTourIds) { state.data?.let { saved = it.id in app.savedTourIds } }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        TextButton(onClick = onBack) { Text("← Tours", color = Museum.muted) }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onBack) { Text("← Tours", color = Museum.muted) }
         LoadState(state, loadingText = "Opening the gallery…", onRetry = { scope.launch { load() } }) { tour ->
             TourCard(tour.summaryOnly) {}
             if (tour.summary.isNotEmpty()) Text(tour.summary, color = Museum.muted, style = MaterialTheme.typography.bodyLarge)
@@ -96,10 +96,10 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 tour.modes.forEachIndexed { i, mode ->
                     val label = if (mode == "bike") "Start riding" else "Start walking"
-                    if (i == 0) Button(onClick = { model.startTour(tour, mode) }, enabled = tour.stops.isNotEmpty(), modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)) { Text(label) }
-                    else OutlinedButton(onClick = { model.startTour(tour, mode) }, enabled = tour.stops.isNotEmpty(), modifier = Modifier.fillMaxWidth()) { Text(label) }
+                    if (i == 0) Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.startTour(tour, mode) }, enabled = tour.stops.isNotEmpty(), modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text(label) }
+                    else OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.startTour(tour, mode) }, enabled = tour.stops.isNotEmpty(), modifier = Modifier.fillMaxWidth()) { Text(label) }
                 }
-                OutlinedButton(
+                OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                     onClick = {
                         if (!app.isSignedIn) { wantSave = true; return@OutlinedButton }
                         scope.launch {

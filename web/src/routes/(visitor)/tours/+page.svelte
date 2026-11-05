@@ -28,16 +28,16 @@
 	});
 
 	const chip = (on: boolean) =>
-		`rounded-full px-3 py-1.5 text-sm ${on ? 'bg-white text-black' : 'border border-white/20 text-white/80 hover:bg-white/10'}`;
+		`rounded px-3 py-1.5 text-sm ${on ? 'bg-byl-action text-byl-action-text' : 'border border-byl-border text-byl-muted hover:bg-byl-surface'}`;
 </script>
 
-<svelte:head><title>Tours · Invisible Museum</title></svelte:head>
+<svelte:head><title>Tours · Byl</title></svelte:head>
 
-<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">
+<div class="text-xs font-bold tracking-normal text-byl-action">
 	{city.current?.name ?? 'Tours'}
 </div>
 <h1 class="text-3xl font-semibold">Tours</h1>
-<p class="mt-1 max-w-2xl text-white/60">
+<p class="mt-1 max-w-2xl text-byl-muted">
 	Each tour is a gallery: one topic, a handful of places, and the moment at each that belongs to the
 	story.
 </p>

@@ -3,6 +3,7 @@ import InvisibleMuseumKit
 
 @main
 struct InvisibleMuseumApp: App {
+    @AppStorage("byl.appearance") private var appearance: BylAppearance = .system
     @State private var model = AppModel()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -10,7 +11,9 @@ struct InvisibleMuseumApp: App {
         WindowGroup {
             RootView()
                 .environment(model)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(appearance.colorScheme)
+                .tint(Museum.action)
+                .font(Museum.bodyFont())
                 .task { await model.bootstrap() }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { model.didBecomeActive() }

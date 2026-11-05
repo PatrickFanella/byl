@@ -171,101 +171,99 @@
 	const ua = typeof navigator === 'undefined' ? '' : navigator.userAgent;
 </script>
 
-<svelte:head><title>{walk.tour?.title ?? 'Walk'} · Invisible Museum</title></svelte:head>
+<svelte:head><title>{walk.tour?.title ?? 'Walk'} · Byl</title></svelte:head>
 
-<div class="relative h-[100dvh] bg-[#0a0a0b] text-white">
+<div class="byl-walk relative h-[100dvh] bg-byl-background text-byl-text">
 	<div class="absolute inset-0">
-		<Map {markers} {legs} {user} fit="ahead" height="100%" dark />
+		<Map {markers} {legs} {user} fit="ahead" height="100%" />
 	</div>
 
 	<header
 		class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between p-3"
 	>
 		<button
-			class="pointer-events-auto rounded-full bg-black/70 px-3 py-1.5 text-sm backdrop-blur"
+			class="pointer-events-auto rounded bg-byl-background px-3 py-1.5 text-sm"
 			onclick={() => (showEnd = true)}>End</button
 		>
 		<div
-			class="pointer-events-auto truncate rounded-full bg-black/70 px-3 py-1.5 text-sm font-semibold backdrop-blur"
+			class="pointer-events-auto truncate rounded bg-byl-background px-3 py-1.5 text-sm font-semibold"
 		>
 			{walk.tour?.title ?? ''}
 		</div>
 		<button
-			class="pointer-events-auto rounded-full bg-black/70 px-3 py-1.5 text-sm backdrop-blur"
+			class="pointer-events-auto rounded bg-byl-background px-3 py-1.5 text-sm"
 			onclick={toggleAudio}
 			aria-label={audioEnabled ? 'Audio guide on' : 'Audio guide off'}
-			>{audioEnabled ? '🔊' : '🔇'}</button
+			>{audioEnabled ? 'Audio on' : 'Audio off'}</button
 		>
 	</header>
 
-	<div class="absolute inset-x-0 bottom-0 z-10 space-y-2 p-3">
+	<div
+		class="absolute inset-x-0 bottom-0 z-10 max-h-[75dvh] space-y-2 overflow-y-auto p-3 pb-[max(12px,env(safe-area-inset-bottom))]"
+	>
 		{#if walk.status !== 'ready'}
-			<div class="rounded-2xl bg-black/80 p-4 backdrop-blur">
+			<div class="rounded-lg bg-byl-background p-4">
 				<LoadState
 					status={walk.status === 'error' ? 'error' : 'loading'}
 					message={walk.message}
-					loadingText="Opening the gallery…"
+					loadingText="Opening the tour…"
 					onretry={() => walk.load()}
 				/>
 			</div>
 		{:else}
 			{#if walk.fromCache}
-				<div
-					class="inline-block rounded-full bg-black/70 px-3 py-1 text-xs text-white/70 backdrop-blur"
-				>
+				<div class="inline-block rounded bg-byl-background px-3 py-1 text-xs text-byl-muted">
 					Offline: using the saved route
 				</div>
 			{/if}
 			{#if walk.routeMessage}
-				<div
-					class="inline-block rounded-full bg-black/70 px-3 py-1 text-xs text-amber-200 backdrop-blur"
-				>
+				<div class="inline-block rounded bg-byl-background px-3 py-1 text-xs text-byl-warning">
 					{walk.routeMessage}. Stops still work; use Directions.
 				</div>
 			{/if}
 			{#if walk.nextStop}
 				{@const next = walk.nextStop}
-				<div class="rounded-2xl border border-white/10 bg-black/85 p-4 backdrop-blur">
+				<div class="rounded-lg border border-byl-border bg-byl-background p-4">
 					<div class="flex items-start justify-between gap-3">
 						<div class="min-w-0">
-							<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">
+							<div class="text-xs font-bold tracking-normal text-byl-action">
 								Next · stop {next.position} of {walk.stops.length}
 							</div>
 							<div class="text-xl font-semibold">{next.place.name}</div>
 							{#if next.featured_moment}
-								<div class="truncate text-sm text-white/60">{next.featured_moment.title}</div>
+								<div class="truncate text-sm text-byl-muted">{next.featured_moment.title}</div>
 							{/if}
 						</div>
 						<div class="text-right">
 							<div class="text-lg font-semibold">
 								{walk.distanceToNextM != null ? distanceText(walk.distanceToNextM) : '—'}
 							</div>
-							<div class="text-[10px] text-white/50">{walk.progressText}</div>
+							<div class="text-xs text-byl-muted">{walk.progressText}</div>
 						</div>
 					</div>
 					{#if geoState === 'denied'}
-						<p class="mt-2 text-xs text-white/60">
+						<p class="mt-2 text-xs text-byl-muted">
 							Location is off. Tap I'm here at each stop, or allow location in your browser.
 						</p>
 					{:else if geoState === 'unavailable'}
-						<p class="mt-2 text-xs text-white/60">
+						<p class="mt-2 text-xs text-byl-muted">
 							Your location is unavailable right now. Tap I'm here at each stop.
 						</p>
 					{:else if geoState === 'waiting'}
-						<p class="mt-2 text-xs text-white/60">Waiting for your location…</p>
+						<p class="mt-2 text-xs text-byl-muted">Waiting for your location…</p>
 					{/if}
 					{#if walk.syncError}
-						<p class="mt-2 text-xs text-amber-200">
+						<p class="mt-2 text-xs text-byl-warning">
 							Progress saved on this device; the server will catch up later.
 						</p>
 					{/if}
 					<div class="mt-3 flex flex-wrap gap-2">
 						<button
-							class="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black"
+							class="rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
 							onclick={() => walk.markArrived()}>I'm here</button
 						>
 						<a
-							class="rounded-xl border border-white/20 px-3 py-2 text-sm hover:bg-white/10"
+							class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
 							href={mapsURL(next.place.latitude, next.place.longitude, mode, ua)}
 							target="_blank"
 							rel="noreferrer">Directions</a
@@ -273,16 +271,14 @@
 					</div>
 				</div>
 			{:else}
-				<div class="rounded-2xl border border-white/10 bg-black/85 p-4 backdrop-blur">
-					<div class="text-[11px] font-bold tracking-widest text-emerald-300 uppercase">
-						Tour complete
-					</div>
+				<div class="rounded-lg border border-byl-border bg-byl-background p-4">
+					<div class="text-xs font-bold tracking-normal text-byl-success">Tour complete</div>
 					<div class="text-lg font-semibold">You walked every stop of {walk.tour?.title}.</div>
 					{#if !$current}
-						<p class="mt-1 text-sm text-white/60">Sign in to keep this on your account.</p>
+						<p class="mt-1 text-sm text-byl-muted">Sign in to keep this on your account.</p>
 					{/if}
 					<button
-						class="mt-3 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black"
+						class="mt-3 rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
 						onclick={() => end(false)}>Done</button
 					>
 				</div>
@@ -304,11 +300,9 @@
 	{/if}
 
 	{#if showEnd}
-		<div
-			class="absolute inset-0 z-30 flex items-end justify-center bg-black/60 p-4 sm:items-center"
-		>
+		<div class="byl-scrim absolute inset-0 z-30 flex items-end justify-center p-4 sm:items-center">
 			<div
-				class="w-full max-w-sm rounded-3xl border border-white/10 bg-[#0a0a0b] p-5"
+				class="w-full max-w-sm rounded-lg border border-byl-border bg-byl-background p-5"
 				role="dialog"
 				use:modal={() => {
 					showEnd = false;
@@ -316,18 +310,18 @@
 				aria-label="End this tour?"
 			>
 				<h2 class="text-lg font-semibold">End this tour?</h2>
-				<p class="mt-1 text-sm text-white/60">{walk.progressText}</p>
+				<p class="mt-1 text-sm text-byl-muted">{walk.progressText}</p>
 				<div class="mt-4 grid gap-2">
 					<button
-						class="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black"
+						class="rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
 						onclick={() => end(false)}>Keep my progress and end</button
 					>
 					<button
-						class="rounded-xl border border-red-400/50 px-3 py-2 text-sm text-red-200"
+						class="rounded-lg border border-byl-danger px-3 py-2 text-sm text-byl-danger"
 						onclick={() => end(true)}>Start over next time</button
 					>
 					<button
-						class="rounded-xl border border-white/20 px-3 py-2 text-sm"
+						class="rounded-lg border border-byl-border px-3 py-2 text-sm"
 						onclick={() => (showEnd = false)}>Cancel</button
 					>
 				</div>

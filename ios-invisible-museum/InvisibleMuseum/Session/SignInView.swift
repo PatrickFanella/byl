@@ -34,7 +34,7 @@ struct SignInView: View {
             if model.devSignInAvailable {
                 MuseumCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        Overline(text: "Development sign-in", color: Museum.purple)
+                        Overline(text: "Development sign-in", color: Museum.info)
                         MuseumTextField(label: "Email", placeholder: "you@example.com", text: $devEmail)
                         MuseumTextField(label: "Name", placeholder: "Optional", text: $devName)
                         Button {

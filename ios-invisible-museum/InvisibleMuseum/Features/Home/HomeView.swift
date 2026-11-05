@@ -31,8 +31,11 @@ struct HomeView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Overline(text: "Invisible Museum")
-            Text(model.selectedCity.map { "\($0.name) as a museum" } ?? "Your city as a museum")
+            Image("BylLockup")
+                .resizable().scaledToFit().frame(width: 134, height: 48)
+                .padding(6)
+                .accessibilityLabel("Byl")
+            Text(model.selectedCity.map { "\($0.name) on foot" } ?? "Local history, on foot or by bike.")
                 .font(Museum.title(30))
                 .foregroundStyle(Museum.text)
             Text("Walk or ride through the stories that happened right where you are standing.")
@@ -194,7 +197,7 @@ struct PlaceRow: View {
             HStack(spacing: 12) {
                 Image(systemName: "mappin.circle.fill")
                     .font(.system(size: 26))
-                    .foregroundStyle(Museum.blue)
+                    .foregroundStyle(Museum.action)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(place.name)
                         .font(Museum.bodyFont(15, weight: .semibold))

@@ -59,7 +59,7 @@ fun SavedScreen(model: AppViewModel, onOpenTour: (String) -> Unit) {
     }
     LaunchedEffect(app.isSignedIn, app.savedTourIds.size) { load() }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Overline("Saved")
         Text("Tours to come back to", style = MaterialTheme.typography.headlineLarge, color = Museum.text)
         if (!app.isSignedIn) {
@@ -71,7 +71,7 @@ fun SavedScreen(model: AppViewModel, onOpenTour: (String) -> Unit) {
                         TourCard(tour) { onOpenTour(tour.slug) }
                         data.progress[tour.id]?.let { p ->
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                LinearProgressIndicator(progress = { p.visitedPositions.size.toFloat() / maxOf(tour.stopCount, 1) }, modifier = Modifier.weight(1f), color = if (p.completedAt == null) Museum.blue else Museum.green)
+                                LinearProgressIndicator(progress = { p.visitedPositions.size.toFloat() / maxOf(tour.stopCount, 1) }, modifier = Modifier.weight(1f), color = if (p.completedAt == null) Museum.action else Museum.success)
                                 Text(if (p.completedAt == null) "${p.visitedPositions.size} of ${tour.stopCount} stops" else "Completed", style = MaterialTheme.typography.bodySmall, color = Museum.muted)
                             }
                         }

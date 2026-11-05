@@ -135,7 +135,7 @@ fun MuseumNavHost(model: AppViewModel) {
                             onClick = { nav.navigateTab(tab.route) },
                             icon = { Icon(tab.icon, contentDescription = tab.label) },
                             label = { Text(tab.label) },
-                            colors = NavigationBarItemDefaults.colors(selectedIconColor = Museum.background, indicatorColor = Museum.blue, selectedTextColor = Museum.text, unselectedIconColor = Museum.muted, unselectedTextColor = Museum.muted)
+                            colors = NavigationBarItemDefaults.colors(selectedIconColor = Museum.actionText, indicatorColor = Museum.action, selectedTextColor = Museum.text, unselectedIconColor = Museum.muted, unselectedTextColor = Museum.muted)
                         )
                     }
                 }

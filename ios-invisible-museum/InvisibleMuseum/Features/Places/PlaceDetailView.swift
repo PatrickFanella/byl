@@ -109,7 +109,7 @@ struct MomentCard: View {
                     if !moment.dateDisplay.isEmpty {
                         Text(moment.dateDisplay)
                             .font(Museum.meta(11))
-                            .foregroundStyle(Museum.blue)
+                            .foregroundStyle(Museum.action)
                     }
                     Text(moment.title)
                         .font(Museum.bodyFont(16, weight: .semibold))

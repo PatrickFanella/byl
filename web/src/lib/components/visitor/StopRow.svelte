@@ -11,32 +11,32 @@
 <a
 	{href}
 	data-testid="stop-row"
-	class="flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 hover:bg-white/10"
+	class="flex gap-4 rounded-lg border border-byl-border bg-byl-surface p-4 hover:bg-byl-surface"
 >
 	<span
 		class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold {visited
-			? 'bg-emerald-400 text-black'
-			: 'bg-blue-500 text-black'}"
+			? 'bg-byl-success-surface text-byl-success'
+			: 'bg-byl-action text-byl-action-text'}"
 	>
 		{visited ? '✓' : stop.position}
 	</span>
 	<span class="min-w-0 flex-1">
 		<span class="block font-semibold">{stop.place.name}</span>
 		{#if featured}
-			<span class="block text-sm text-white/85">{featured.title}</span>
+			<span class="block text-sm text-byl-muted">{featured.title}</span>
 			{#if featured.date_display}
-				<span class="block text-[11px] font-bold tracking-wide text-blue-300"
+				<span class="block text-xs font-bold tracking-wide text-byl-action"
 					>{featured.date_display}</span
 				>
 			{/if}
 		{:else}
-			<span class="block text-sm text-white/40">No moment published here yet</span>
+			<span class="block text-sm text-byl-muted">No moment published here yet</span>
 		{/if}
 		{#if stop.place.moment_count > 1}
-			<span class="block text-xs text-white/50"
+			<span class="block text-xs text-byl-muted"
 				>+{stop.place.moment_count - 1} more at this place</span
 			>
 		{/if}
-		{#if stop.note}<span class="block text-xs text-white/50 italic">{stop.note}</span>{/if}
+		{#if stop.note}<span class="block text-xs text-byl-muted italic">{stop.note}</span>{/if}
 	</span>
 </a>

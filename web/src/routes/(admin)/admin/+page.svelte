@@ -13,18 +13,18 @@
 <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 	<a
 		href="/admin/queue"
-		class="rounded-xl border border-stone-200 bg-white p-4 hover:border-stone-400"
+		class="rounded-lg border border-byl-border bg-byl-background p-4 hover:border-byl-border-control"
 	>
-		<div class="text-xs tracking-wide text-stone-500 uppercase">Pending review</div>
+		<div class="text-xs tracking-wide text-byl-muted">Pending review</div>
 		<div class="mt-1 text-3xl font-semibold">{pendingTotal}</div>
-		<div class="mt-1 text-xs text-stone-500">
+		<div class="mt-1 text-xs text-byl-muted">
 			{#each Object.entries(data.stats.pending_candidates ?? {}) as [k, v] (k)}<span class="mr-2"
 					>{v} {k}</span
 				>{/each}
 		</div>
 	</a>
-	<div class="rounded-xl border border-stone-200 bg-white p-4">
-		<div class="text-xs tracking-wide text-stone-500 uppercase">Published</div>
+	<div class="rounded-lg border border-byl-border bg-byl-background p-4">
+		<div class="text-xs tracking-wide text-byl-muted">Published</div>
 		<div class="mt-1 text-sm">
 			<div><strong>{data.stats.published?.places ?? 0}</strong> places</div>
 			<div><strong>{data.stats.published?.moments ?? 0}</strong> moments</div>
@@ -33,9 +33,9 @@
 	</div>
 	<a
 		href="/admin/jobs"
-		class="rounded-xl border border-stone-200 bg-white p-4 hover:border-stone-400"
+		class="rounded-lg border border-byl-border bg-byl-background p-4 hover:border-byl-border-control"
 	>
-		<div class="text-xs tracking-wide text-stone-500 uppercase">Jobs</div>
+		<div class="text-xs tracking-wide text-byl-muted">Jobs</div>
 		<div class="mt-1 text-sm">
 			{#each ['queued', 'running', 'failed', 'done'] as s (s)}
 				<div class="flex justify-between">
@@ -44,8 +44,8 @@
 			{/each}
 		</div>
 	</a>
-	<div class="rounded-xl border border-stone-200 bg-white p-4">
-		<div class="text-xs tracking-wide text-stone-500 uppercase">People</div>
+	<div class="rounded-lg border border-byl-border bg-byl-background p-4">
+		<div class="text-xs tracking-wide text-byl-muted">People</div>
 		<div class="mt-1 text-sm">
 			<div><strong>{data.stats.accounts ?? 0}</strong> accounts</div>
 			<div><strong>{data.stats.user_routes ?? 0}</strong> user routes</div>
@@ -56,12 +56,14 @@
 <section class="mt-8 grid gap-6 lg:grid-cols-2">
 	<div>
 		<h2 class="font-semibold">Waiting for review</h2>
-		<ul class="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
+		<ul
+			class="mt-2 divide-y divide-byl-border rounded-lg border border-byl-border bg-byl-background"
+		>
 			{#each data.pending as c (c.id)}
 				<li>
 					<a
 						href="/admin/queue/{c.id}"
-						class="flex items-center gap-3 px-4 py-2 text-sm hover:bg-stone-50"
+						class="flex items-center gap-3 px-4 py-2 text-sm hover:bg-byl-background"
 					>
 						<StatusPill status={c.kind} />
 						<span class="flex-1 truncate"
@@ -70,13 +72,13 @@
 								(c.payload as { caption?: string })?.caption ??
 								c.id}</span
 						>
-						<span class="text-xs text-stone-500"
+						<span class="text-xs text-byl-muted"
 							>{c.source_name ?? c.origin} · {when(c.created_at)}</span
 						>
 					</a>
 				</li>
 			{:else}
-				<li class="px-4 py-3 text-sm text-stone-500">
+				<li class="px-4 py-3 text-sm text-byl-muted">
 					Nothing pending. <a class="underline" href="/admin/imports">Run an import</a>.
 				</li>
 			{/each}
@@ -84,18 +86,20 @@
 	</div>
 	<div>
 		<h2 class="font-semibold">Recent failed jobs</h2>
-		<ul class="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
+		<ul
+			class="mt-2 divide-y divide-byl-border rounded-lg border border-byl-border bg-byl-background"
+		>
 			{#each data.failedJobs as j (j.id)}
 				<li class="px-4 py-2 text-sm">
 					<div class="flex items-center gap-2">
 						<StatusPill status={j.status} /><span class="font-mono text-xs">{j.kind}</span><span
-							class="ml-auto text-xs text-stone-500">{when(j.created_at)}</span
+							class="ml-auto text-xs text-byl-muted">{when(j.created_at)}</span
 						>
 					</div>
-					<div class="mt-1 truncate text-xs text-red-700">{j.last_error}</div>
+					<div class="mt-1 truncate text-xs text-byl-danger">{j.last_error}</div>
 				</li>
 			{:else}
-				<li class="px-4 py-3 text-sm text-stone-500">No failed jobs.</li>
+				<li class="px-4 py-3 text-sm text-byl-muted">No failed jobs.</li>
 			{/each}
 		</ul>
 	</div>

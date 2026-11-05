@@ -53,55 +53,56 @@
 </script>
 
 <h1 class="text-2xl font-semibold">Imports</h1>
-<p class="mt-1 text-sm text-stone-600">
+<p class="mt-1 text-sm text-byl-muted">
 	Pull candidates from an archive into the review queue. Nothing is published automatically.
 </p>
 
 <form
-	class="mt-4 grid max-w-2xl gap-4 rounded-xl border border-stone-200 bg-white p-4 text-sm md:grid-cols-2"
+	class="mt-4 grid max-w-2xl gap-4 rounded-lg border border-byl-border bg-byl-background p-4 text-sm md:grid-cols-2"
 	onsubmit={submit}
 >
 	<label class="block"
 		>Source
-		<select class="mt-1 w-full rounded-md border-stone-300" bind:value={source}>
+		<select class="mt-1 w-full rounded-md border-byl-border-control" bind:value={source}>
 			{#each data.sources as s (s.name)}<option value={s.name}>{s.name}</option>{/each}
 		</select>
-		{#if selected}<span class="mt-1 block text-xs text-stone-500">{selected.description}</span>{/if}
-		{#if errors.source}<span class="text-xs text-red-700">{errors.source}</span>{/if}
+		{#if selected}<span class="mt-1 block text-xs text-byl-muted">{selected.description}</span>{/if}
+		{#if errors.source}<span class="text-xs text-byl-danger">{errors.source}</span>{/if}
 	</label>
 	<label class="block"
 		>City
-		<select class="mt-1 w-full rounded-md border-stone-300" bind:value={city}>
+		<select class="mt-1 w-full rounded-md border-byl-border-control" bind:value={city}>
 			{#each data.cities as c (c.id)}<option value={c.slug}>{c.name}</option>{/each}
 		</select>
 	</label>
 	{#if selected?.supports_near}
 		<label class="block"
 			>Place (id or slug, optional)<input
-				class="mt-1 w-full rounded-md border-stone-300"
+				class="mt-1 w-full rounded-md border-byl-border-control"
 				bind:value={place}
 				placeholder="tivoli-theatre"
 			/></label
 		>
 		<label class="block"
 			>Or a point (lat,lng)<input
-				class="mt-1 w-full rounded-md border-stone-300"
+				class="mt-1 w-full rounded-md border-byl-border-control"
 				bind:value={near}
 				placeholder="41.7959,-88.0092"
-			/>{#if errors.near}<span class="text-xs text-red-700">{errors.near}</span>{/if}</label
+			/>{#if errors.near}<span class="text-xs text-byl-danger">{errors.near}</span>{/if}</label
 		>
 		<label class="block"
 			>Radius (m)<input
-				class="mt-1 w-full rounded-md border-stone-300"
+				class="mt-1 w-full rounded-md border-byl-border-control"
 				type="number"
 				bind:value={radius}
-			/>{#if errors.radius_m}<span class="text-xs text-red-700">{errors.radius_m}</span>{/if}</label
+			/>{#if errors.radius_m}<span class="text-xs text-byl-danger">{errors.radius_m}</span
+				>{/if}</label
 		>
 	{/if}
 	{#if selected?.supports_query}
 		<label class="block md:col-span-2"
 			>Query<input
-				class="mt-1 w-full rounded-md border-stone-300"
+				class="mt-1 w-full rounded-md border-byl-border-control"
 				bind:value={query}
 				placeholder="downers grove"
 			/></label
@@ -109,14 +110,14 @@
 	{/if}
 	<label class="block"
 		>Limit<input
-			class="mt-1 w-full rounded-md border-stone-300"
+			class="mt-1 w-full rounded-md border-byl-border-control"
 			type="number"
 			bind:value={limit}
 		/></label
 	>
 	<div class="md:col-span-2">
 		<button
-			class="rounded-md bg-stone-900 px-4 py-2 text-white disabled:opacity-50"
+			class="rounded-md bg-byl-action px-4 py-2 text-byl-action-text disabled:opacity-50"
 			disabled={busy}
 			type="submit">{busy ? 'Queuing…' : 'Queue import'}</button
 		>
@@ -125,7 +126,9 @@
 </form>
 
 <h2 class="mt-8 font-semibold">Recent imports</h2>
-<ul class="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white text-sm">
+<ul
+	class="mt-2 divide-y divide-byl-border rounded-lg border border-byl-border bg-byl-background text-sm"
+>
 	{#each data.jobs as j (j.id)}
 		<li class="flex items-center gap-3 px-4 py-2">
 			<StatusPill status={j.status} />
@@ -133,14 +136,14 @@
 				>{(j.payload as { source?: string }).source} · {(j.payload as { query?: string }).query ??
 					''}</span
 			>
-			<span class="ml-auto text-xs text-stone-500">{when(j.created_at)}</span>
+			<span class="ml-auto text-xs text-byl-muted">{when(j.created_at)}</span>
 			<span
 				class="max-w-xs truncate text-xs {j.status === 'failed'
-					? 'text-red-700'
-					: 'text-stone-600'}">{j.last_error}</span
+					? 'text-byl-danger'
+					: 'text-byl-muted'}">{j.last_error}</span
 			>
 		</li>
 	{:else}
-		<li class="px-4 py-3 text-stone-500">No imports yet.</li>
+		<li class="px-4 py-3 text-byl-muted">No imports yet.</li>
 	{/each}
 </ul>

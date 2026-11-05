@@ -28,7 +28,6 @@ struct RootView: View {
         .sheet(isPresented: $model.presentSignIn) {
             SignInView()
                 .environment(model)
-                .preferredColorScheme(.dark)
         }
         .onChange(of: model.pendingTourSlug) { _, slug in
             if slug != nil { tab = .tours }

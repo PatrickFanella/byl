@@ -48,13 +48,13 @@ fun SignInScreen(model: AppViewModel) {
         busy = false
     }
 
-    Column(Modifier.padding(horizontal = 18.dp, vertical = 12.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp, vertical = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Overline("Sign in")
         Text("Keep your routes and progress", style = MaterialTheme.typography.headlineMedium, color = Museum.text)
         Text("Sign in to build and share your own routes, save tours, and pick up where you left off on any device.", color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
 
         if (BuildConfig.GOOGLE_SERVER_CLIENT_ID.isNotEmpty()) {
-            Button(
+            Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                 onClick = {
                     busy = true
                     scope.launch {
@@ -73,17 +73,17 @@ fun SignInScreen(model: AppViewModel) {
                 },
                 enabled = !busy,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
+                colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)
             ) { Text("Continue with Google") }
         }
 
         if (BuildConfig.DEBUG) {
             Card {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Overline("Development sign-in", Museum.purple)
+                    Overline("Development sign-in", Museum.info)
                     OutlinedTextField(value = devEmail, onValueChange = { devEmail = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                     OutlinedTextField(value = devName, onValueChange = { devName = it }, label = { Text("Name (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                    OutlinedButton(
+                    OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                         onClick = {
                             busy = true
                             scope.launch {

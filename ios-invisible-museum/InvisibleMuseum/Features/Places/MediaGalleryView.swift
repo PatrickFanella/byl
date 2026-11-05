@@ -85,7 +85,7 @@ struct MediaTile: View {
             if let url = asset.url {
                 Link("Play audio", destination: url)
                     .font(Museum.bodyFont(13, weight: .semibold))
-                    .foregroundStyle(Museum.blue)
+                    .foregroundStyle(Museum.action)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -97,7 +97,7 @@ struct MediaTile: View {
             Museum.accentGradient.opacity(0.6)
             Image(systemName: symbol)
                 .font(.system(size: 38, weight: .ultraLight))
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(Museum.muted)
         }
     }
 

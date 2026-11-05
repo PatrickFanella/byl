@@ -3,10 +3,10 @@
 </script>
 
 {#if city.cities.length > 1}
-	<label class="inline-flex items-center gap-2 text-sm text-white/70">
+	<label class="inline-flex items-center gap-2 text-sm text-byl-muted">
 		City
 		<select
-			class="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-white"
+			class="rounded border border-byl-border bg-byl-background px-3 py-1 text-byl-text"
 			value={city.current?.slug ?? ''}
 			onchange={(e) => {
 				const c = city.cities.find((x) => x.slug === (e.currentTarget as HTMLSelectElement).value);

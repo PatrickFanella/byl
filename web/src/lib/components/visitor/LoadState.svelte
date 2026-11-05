@@ -22,25 +22,25 @@
 </script>
 
 {#if status === 'loading'}
-	<div class="flex items-center gap-3 py-5 text-sm text-white/60" role="status">
-		<span class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+	<div class="flex items-center gap-3 py-5 text-sm text-byl-muted" role="status">
+		<span class="h-4 w-4 animate-spin rounded border-2 border-byl-border border-t-white"></span>
 		{loadingText}
 	</div>
 {:else if status === 'error'}
-	<div class="rounded-2xl border border-red-400/40 bg-white/5 p-4">
-		<div class="text-xs tracking-widest text-red-300 uppercase">Something went wrong</div>
+	<div class="rounded-lg border border-byl-danger bg-byl-surface p-4">
+		<div class="text-xs tracking-normal text-byl-danger">Something went wrong</div>
 		<p class="mt-1 text-sm">{message}</p>
 		{#if onretry}
 			<button
-				class="mt-3 rounded-xl border border-white/20 px-3 py-1.5 text-sm hover:bg-white/10"
+				class="mt-3 rounded-lg border border-byl-border px-3 py-1.5 text-sm hover:bg-byl-surface"
 				onclick={onretry}>Try again</button
 			>
 		{/if}
 	</div>
 {:else if status === 'empty'}
-	<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+	<div class="rounded-lg border border-byl-border bg-byl-surface p-4">
 		<div class="font-semibold">{emptyTitle}</div>
-		{#if emptyMessage}<p class="mt-1 text-sm text-white/60">{emptyMessage}</p>{/if}
+		{#if emptyMessage}<p class="mt-1 text-sm text-byl-muted">{emptyMessage}</p>{/if}
 	</div>
 {:else if children}
 	{@render children()}

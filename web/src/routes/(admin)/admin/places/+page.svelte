@@ -33,7 +33,7 @@
 	<label class="text-sm"
 		>City
 		<select
-			class="ml-2 rounded-md border-stone-300"
+			class="ml-2 rounded-md border-byl-border-control"
 			value={data.city}
 			onchange={(e) => goto(`/admin/places?city=${(e.currentTarget as HTMLSelectElement).value}`)}
 		>
@@ -42,53 +42,59 @@
 	</label>
 </div>
 
-<table class="mt-4 w-full rounded-xl border border-stone-200 bg-white text-sm">
-	<thead class="text-left text-xs tracking-wide text-stone-500 uppercase"
+<table class="mt-4 w-full rounded-lg border border-byl-border bg-byl-background text-sm">
+	<thead class="text-left text-xs tracking-wide text-byl-muted"
 		><tr
 			><th class="px-3 py-2">Name</th><th class="px-3 py-2">Kind</th><th class="px-3 py-2"
 				>Moments</th
 			><th class="px-3 py-2">Status</th></tr
 		></thead
 	>
-	<tbody class="divide-y divide-stone-200">
+	<tbody class="divide-y divide-byl-border">
 		{#each data.places as p (p.id)}
 			<tr>
 				<td class="px-3 py-2"
 					><a class="font-medium hover:underline" href="/admin/places/{p.id}">{p.name}</a>
-					<div class="text-xs text-stone-500">{p.address}</div></td
+					<div class="text-xs text-byl-muted">{p.address}</div></td
 				>
 				<td class="px-3 py-2">{p.kind}</td>
 				<td class="px-3 py-2">{p.moment_count}</td>
 				<td class="px-3 py-2"><StatusPill status={p.status} /></td>
 			</tr>
 		{:else}
-			<tr><td colspan="4" class="px-3 py-4 text-stone-500">No places in this city yet.</td></tr>
+			<tr><td colspan="4" class="px-3 py-4 text-byl-muted">No places in this city yet.</td></tr>
 		{/each}
 	</tbody>
 </table>
 
 <form
-	class="mt-6 flex max-w-2xl flex-wrap items-end gap-3 rounded-xl border border-stone-200 bg-white p-4 text-sm"
+	class="mt-6 flex max-w-2xl flex-wrap items-end gap-3 rounded-lg border border-byl-border bg-byl-background p-4 text-sm"
 	onsubmit={add}
 >
 	<span class="w-full font-semibold">New place</span>
 	<label
-		>Name<input class="mt-1 block rounded-md border-stone-300" bind:value={name} required /></label
+		>Name<input
+			class="mt-1 block rounded-md border-byl-border-control"
+			bind:value={name}
+			required
+		/></label
 	>
 	<label
 		>Latitude<input
-			class="mt-1 block w-32 rounded-md border-stone-300"
+			class="mt-1 block w-32 rounded-md border-byl-border-control"
 			bind:value={lat}
 			required
 		/></label
 	>
 	<label
 		>Longitude<input
-			class="mt-1 block w-32 rounded-md border-stone-300"
+			class="mt-1 block w-32 rounded-md border-byl-border-control"
 			bind:value={lng}
 			required
 		/></label
 	>
-	<button class="rounded-md bg-stone-900 px-3 py-2 text-white" type="submit">Create draft</button>
+	<button class="rounded-md bg-byl-action px-3 py-2 text-byl-action-text" type="submit"
+		>Create draft</button
+	>
 	<div class="w-full"><Notice kind="error" message={err} /></div>
 </form>

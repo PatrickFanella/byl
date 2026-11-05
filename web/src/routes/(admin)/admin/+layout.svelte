@@ -1,6 +1,6 @@
 <script lang="ts">
-	import '../../layout.css';
-	import favicon from '#lib/assets/favicon.svg';
+	import AppearancePicker from '#lib/components/AppearancePicker.svelte';
+	import Brand from '#lib/components/Brand.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { session, canCurate } from '#lib/auth.ts';
@@ -36,58 +36,59 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
-	<title>Invisible Museum admin</title>
+	<title>Byl admin</title>
 </svelte:head>
 
 {#if $current && canCurate($current.account)}
-	<div class="min-h-screen bg-stone-50 text-stone-900">
-		<header class="border-b border-stone-200 bg-white">
-			<div class="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
-				<a href="/admin" class="font-semibold tracking-tight">Invisible Museum</a>
-				<nav class="flex flex-1 flex-wrap gap-1 text-sm">
+	<div class="byl-curator min-h-screen bg-byl-background text-byl-text">
+		<header class="border-b border-byl-border bg-byl-background">
+			<div class="byl-header">
+				<a href="/admin" aria-label="Byl home"><Brand /></a>
+				<nav class="byl-nav text-sm" aria-label="Main navigation">
 					{#each nav as item (item.href)}
 						<a
 							href={item.href}
-							class="rounded-md px-3 py-1.5 hover:bg-stone-100 {active(item.href)
-								? 'bg-stone-900 text-white hover:bg-stone-800'
+							aria-current={active(item.href) ? 'page' : undefined}
+							class="rounded-md px-3 py-1.5 hover:bg-byl-surface {active(item.href)
+								? 'bg-byl-action text-byl-action-text hover:bg-byl-action'
 								: ''}">{item.label}</a
 						>
 					{/each}
 				</nav>
-				<div class="flex items-center gap-3 text-sm text-stone-600">
-					<a href="/" class="text-stone-500 hover:text-stone-900">Visitor site</a>
+				<div class="flex items-center gap-3 text-sm text-byl-muted">
+					<a href="/" class="text-byl-muted hover:text-byl-text">Visitor site</a>
 					<span title={$current.account.email}
 						>{$current.account.display_name || $current.account.email}</span
 					>
-					<span class="rounded bg-stone-100 px-2 py-0.5 text-xs tracking-wide uppercase"
+					<span class="rounded bg-byl-surface px-2 py-0.5 text-xs tracking-wide"
 						>{$current.account.role}</span
 					>
-					<button class="text-stone-500 hover:text-stone-900" onclick={signOut}>Sign out</button>
+					<button class="text-byl-muted hover:text-byl-text" onclick={signOut}>Sign out</button>
 				</div>
 			</div>
 		</header>
-		<main class="mx-auto max-w-6xl px-4 py-6">
+		<main class="byl-main">
+			<div class="mb-6"><AppearancePicker /></div>
 			{@render children()}
 		</main>
 	</div>
 {:else if $current}
-	<div class="flex min-h-screen items-center justify-center bg-stone-50 p-6 text-center">
+	<div class="flex min-h-screen items-center justify-center bg-byl-background p-6 text-center">
 		<div class="max-w-md space-y-4">
 			<h1 class="text-2xl font-semibold">This account needs the curator role</h1>
-			<p class="text-stone-600">
+			<p class="text-byl-muted">
 				You are signed in as <strong>{$current.account.email}</strong> with the
 				<strong>{$current.account.role}</strong> role. Ask an administrator to grant curator access, then
 				sign in again.
 			</p>
 			<p><a class="underline" href="/">Back to the visitor site</a></p>
-			<button class="rounded-md bg-stone-900 px-4 py-2 text-white" onclick={signOut}
+			<button class="rounded-md bg-byl-action px-4 py-2 text-byl-action-text" onclick={signOut}
 				>Sign out</button
 			>
 		</div>
 	</div>
 {:else}
-	<div class="flex min-h-screen items-center justify-center text-stone-500">
+	<div class="flex min-h-screen items-center justify-center text-byl-muted">
 		Redirecting to sign in…
 	</div>
 {/if}

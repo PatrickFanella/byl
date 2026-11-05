@@ -15,7 +15,7 @@ struct StopMomentSheet: View {
         NavigationStack {
             MuseumScreen(bottomInset: 24) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Overline(text: "You have arrived · stop \(stop.position)", color: Museum.green)
+                    Overline(text: "You have arrived · stop \(stop.position)", color: Museum.success)
                     Text(stop.place.name)
                         .font(Museum.title(26))
                         .foregroundStyle(Museum.text)
@@ -51,7 +51,6 @@ struct StopMomentSheet: View {
             .museumDestinations()
             .task { await loadPlace() }
         }
-        .preferredColorScheme(.dark)
     }
 
     @ViewBuilder

@@ -21,7 +21,9 @@ struct TourMapView: View {
             }
             if let leg = model.activeLeg {
                 MapPolyline(coordinates: coordinates(leg))
-                    .stroke(Museum.blue, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
+                    .stroke(Museum.routeHalo, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
+                MapPolyline(coordinates: coordinates(leg))
+                    .stroke(Museum.action, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
             }
             ForEach(model.tour.stops) { stop in
                 Annotation(stop.place.name, coordinate: CLLocationCoordinate2D(latitude: stop.place.latitude, longitude: stop.place.longitude)) {
@@ -74,18 +76,18 @@ struct StopPin: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(visited ? Museum.green : (isNext ? Museum.blue : Museum.surfaceElevated))
-                .frame(width: isNext ? 34 : 28, height: isNext ? 34 : 28)
-                .overlay(Circle().stroke(.white.opacity(0.9), lineWidth: 2))
+                .fill(visited ? Museum.successSurface : (isNext ? Museum.action : Museum.surfaceElevated))
+                .frame(width: isNext ? 36 : 32, height: isNext ? 36 : 32)
+                .overlay(Circle().stroke(Museum.borderStrong, lineWidth: 2))
                 .shadow(color: .black.opacity(0.4), radius: 6, y: 3)
             if visited {
                 Image(systemName: "checkmark")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Museum.success)
             } else {
                 Text("\(number)")
                     .font(Museum.meta(13))
-                    .foregroundStyle(isNext ? .black : Museum.text)
+                    .foregroundStyle(isNext ? Museum.actionText : Museum.text)
             }
         }
         .accessibilityLabel(visited ? "Stop \(number), visited" : "Stop \(number)")

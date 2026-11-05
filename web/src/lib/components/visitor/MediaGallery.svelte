@@ -9,7 +9,7 @@
 <div class="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2">
 	{#each media as asset (asset.id)}
 		<figure class="w-72 shrink-0 snap-start">
-			<div class="h-52 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+			<div class="h-52 overflow-hidden rounded-lg border border-byl-border bg-byl-surface">
 				{#if asset.kind === 'video'}
 					<!-- svelte-ignore a11y_media_has_caption -->
 					<video src={asset.public_url} controls class="h-full w-full object-cover"></video>
@@ -22,8 +22,8 @@
 				{/if}
 			</div>
 			<figcaption class="mt-2 text-sm">
-				{#if asset.caption}<div class="text-white/85">{asset.caption}</div>{/if}
-				<div class="text-xs text-white/40">{credit(asset)}</div>
+				{#if asset.caption}<div class="text-byl-muted">{asset.caption}</div>{/if}
+				<div class="text-xs text-byl-muted">{credit(asset)}</div>
 			</figcaption>
 		</figure>
 	{/each}

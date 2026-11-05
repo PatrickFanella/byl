@@ -53,20 +53,20 @@ fun TourListScreen(model: AppViewModel, onOpenTour: (slug: String) -> Unit) {
     }
     LaunchedEffect(app.city?.id, topic, mode) { load() }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Overline(app.city?.name ?: "Tours")
         Text("Tours", style = MaterialTheme.typography.headlineLarge, color = Museum.text)
         Text("Each tour is a gallery: one topic, a handful of places, and the moment at each that belongs to the story.", color = Museum.muted, style = MaterialTheme.typography.bodyLarge)
         app.city?.topics?.takeIf { it.isNotEmpty() }?.let { topics ->
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = topic == null, onClick = { topic = null }, label = { Text("All topics") })
-                topics.forEach { t -> FilterChip(selected = topic == t.slug, onClick = { topic = if (topic == t.slug) null else t.slug }, label = { Text(t.name) }) }
+                FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = topic == null, onClick = { topic = null }, label = { Text("All topics") })
+                topics.forEach { t -> FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = topic == t.slug, onClick = { topic = if (topic == t.slug) null else t.slug }, label = { Text(t.name) }) }
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = mode == null, onClick = { mode = null }, label = { Text("Any") })
-            FilterChip(selected = mode == "walk", onClick = { mode = if (mode == "walk") null else "walk" }, label = { Text("Walking") })
-            FilterChip(selected = mode == "bike", onClick = { mode = if (mode == "bike") null else "bike" }, label = { Text("Biking") })
+            FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = mode == null, onClick = { mode = null }, label = { Text("Any") })
+            FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = mode == "walk", onClick = { mode = if (mode == "walk") null else "walk" }, label = { Text("Walking") })
+            FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = mode == "bike", onClick = { mode = if (mode == "bike") null else "bike" }, label = { Text("Biking") })
         }
         LoadState(tours, emptyTitle = "No tours match", emptyMessage = if (topic == null && mode == null) "Curated tours for this city are still being written." else "Try another topic or travel mode.", onRetry = { scope.launch { load() } }) { items ->
             items.forEach { t -> TourCard(t) { onOpenTour(t.slug) } }

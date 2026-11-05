@@ -3,6 +3,7 @@ package tv.subcult.museum.ui.home
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -84,14 +85,18 @@ fun HomeScreen(model: AppViewModel, onOpenTour: (slug: String) -> Unit, onOpenPl
         }
     }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(22.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(22.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Overline("Invisible Museum")
-            Text(app.city?.let { "${it.name} as a museum" } ?: "Your city as a museum", style = MaterialTheme.typography.headlineLarge, color = Museum.text)
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(if (Museum.palette == tv.subcult.museum.ui.theme.DarkBylPalette) tv.subcult.museum.R.drawable.byl_lockup_dark else tv.subcult.museum.R.drawable.byl_lockup),
+                contentDescription = "Byl",
+                modifier = Modifier.padding(6.dp).then(Modifier.size(width = 134.dp, height = 48.dp))
+            )
+            Text(app.city?.let { "${it.name} on foot" } ?: "Local history, on foot or by bike.", style = MaterialTheme.typography.headlineLarge, color = Museum.text)
             Text("Walk or ride through the stories that happened right where you are standing.", color = Museum.muted, style = MaterialTheme.typography.bodyLarge)
             if (app.cities.size > 1) {
                 var open by remember { mutableStateOf(false) }
-                OutlinedButton(onClick = { open = true }) { Text(app.city?.name ?: "Choose a city") }
+                OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { open = true }) { Text(app.city?.name ?: "Choose a city") }
                 DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
                     app.cities.forEach { c -> DropdownMenuItem(text = { Text(c.name) }, onClick = { model.selectCity(c); open = false }) }
                 }

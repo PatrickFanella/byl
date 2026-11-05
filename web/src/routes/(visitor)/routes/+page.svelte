@@ -36,11 +36,11 @@
 	const origin = typeof location === 'undefined' ? '' : location.origin;
 </script>
 
-<svelte:head><title>Your routes · Invisible Museum</title></svelte:head>
+<svelte:head><title>Your routes · Byl</title></svelte:head>
 
-<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">Your routes</div>
+<div class="text-xs font-bold tracking-normal text-byl-action">Your routes</div>
 <h1 class="text-3xl font-semibold">Curate your own gallery</h1>
-<p class="mt-1 max-w-2xl text-white/60">
+<p class="mt-1 max-w-2xl text-byl-muted">
 	Order the places you love into a walk or ride and share it by link.
 </p>
 
@@ -50,7 +50,7 @@
 	{:else}
 		<a
 			href="/routes/new"
-			class="inline-block rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black"
+			class="inline-block rounded-lg bg-byl-action px-4 py-2 text-sm font-semibold text-byl-action-text"
 			>+ New route</a
 		>
 		<LoadState
@@ -66,18 +66,18 @@
 						<TourCard {tour} />
 						<div class="flex flex-wrap items-center gap-2 text-sm">
 							<button
-								class="rounded-xl border border-white/20 px-3 py-1.5 hover:bg-white/10"
+								class="rounded-lg border border-byl-border px-3 py-1.5 hover:bg-byl-surface"
 								onclick={() => (sharing = sharing === tour.id ? null : tour.id)}>Share</button
 							>
 							<a
 								href="/routes/{tour.id}/edit"
-								class="rounded-xl border border-white/20 px-3 py-1.5 hover:bg-white/10">Edit</a
+								class="rounded-lg border border-byl-border px-3 py-1.5 hover:bg-byl-surface">Edit</a
 							>
 							<button
-								class="rounded-xl border border-red-400/40 px-3 py-1.5 text-red-200 hover:bg-white/10"
+								class="rounded-lg border border-byl-danger px-3 py-1.5 text-byl-danger hover:bg-byl-surface"
 								onclick={() => (pendingDelete = tour)}>Delete</button
 							>
-							<span class="text-xs text-white/40">{tour.visibility}</span>
+							<span class="text-xs text-byl-muted">{tour.visibility}</span>
 						</div>
 						{#if sharing === tour.id}
 							<ShareLink url={shareURL(origin, tour.slug)} title={tour.title} />
@@ -90,9 +90,9 @@
 </div>
 
 {#if pendingDelete}
-	<div class="fixed inset-0 z-30 flex items-center justify-center bg-black/60 p-4">
+	<div class="fixed inset-0 z-30 flex items-center justify-center bg-byl-background p-4">
 		<div
-			class="w-full max-w-sm rounded-3xl border border-white/10 bg-[#0a0a0b] p-5"
+			class="w-full max-w-sm rounded-lg border border-byl-border bg-byl-background p-5"
 			role="dialog"
 			use:modal={() => {
 				pendingDelete = null;
@@ -100,15 +100,15 @@
 			aria-label="Delete this route?"
 		>
 			<h2 class="text-lg font-semibold">Delete this route?</h2>
-			<p class="mt-1 text-sm text-white/60">{pendingDelete.title}</p>
-			{#if deleteError}<p class="mt-2 text-sm text-red-300">{deleteError}</p>{/if}
+			<p class="mt-1 text-sm text-byl-muted">{pendingDelete.title}</p>
+			{#if deleteError}<p class="mt-2 text-sm text-byl-danger">{deleteError}</p>{/if}
 			<div class="mt-4 flex gap-2">
 				<button
-					class="rounded-xl bg-red-500 px-3 py-2 text-sm font-semibold text-white"
+					class="rounded-lg bg-byl-danger-surface px-3 py-2 text-sm font-semibold text-byl-text"
 					onclick={() => remove(pendingDelete!)}>Delete</button
 				>
 				<button
-					class="rounded-xl border border-white/20 px-3 py-2 text-sm"
+					class="rounded-lg border border-byl-border px-3 py-2 text-sm"
 					onclick={() => (pendingDelete = null)}>Cancel</button
 				>
 			</div>

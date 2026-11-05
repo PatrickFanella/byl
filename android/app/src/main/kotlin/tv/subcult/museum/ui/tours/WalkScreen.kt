@@ -104,7 +104,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
             if (state.routeFromCache) Pill { Text("Offline: using the saved route", style = MaterialTheme.typography.bodySmall, color = Museum.muted) }
             state.routeMessage?.let { Pill { Text("$it. Stops still work; use Directions.", style = MaterialTheme.typography.bodySmall, color = Color(0xFFFDE68A)) } }
 
-            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color.Black.copy(alpha = 0.85f)).padding(16.dp)) {
+            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Museum.background).padding(16.dp)) {
                 if (next != null) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -124,8 +124,8 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                         }
                         state.syncError?.let { Text("Progress saved on this device; the server will catch up later.", style = MaterialTheme.typography.bodySmall, color = Color(0xFFFDE68A)) }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(onClick = { active.markArrived() }, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)) { Text("I'm here") }
-                            OutlinedButton(onClick = {
+                            Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { active.markArrived() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("I'm here") }
+                            OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                                 val nav = active.navigationUri()?.let { Intent(Intent.ACTION_VIEW, Uri.parse(it)) }
                                 try {
                                     if (nav != null) context.startActivity(nav) else throw ActivityNotFoundException()
@@ -133,15 +133,15 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                                     runCatching { active.geoUri()?.let { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } }
                                 }
                             }) { Text("Directions") }
-                            if (playing) OutlinedButton(onClick = { model.container.narration.stop() }) { Text("■") }
+                            if (playing) OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.container.narration.stop() }) { Text("■") }
                         }
                     }
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Overline("Tour complete", Museum.green)
+                        Overline("Tour complete", Museum.success)
                         Text("You walked every stop of ${active.tour.title}.", style = MaterialTheme.typography.titleMedium, color = Museum.text)
                         if (!app.isSignedIn) Text("Sign in to keep this on your account.", style = MaterialTheme.typography.bodySmall, color = Museum.muted)
-                        Button(onClick = { model.endTour(false); onEnded() }, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)) { Text("Done") }
+                        Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.endTour(false); onEnded() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("Done") }
                     }
                 }
             }
@@ -160,11 +160,11 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
             onDismissRequest = { showEnd = false },
             title = { Text("End this tour?") },
             text = { Text(active.progressText) },
-            confirmButton = { TextButton(onClick = { showEnd = false; model.endTour(false); onEnded() }) { Text("Keep my progress and end") } },
+            confirmButton = { TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false; model.endTour(false); onEnded() }) { Text("Keep my progress and end") } },
             dismissButton = {
                 Row {
-                    TextButton(onClick = { showEnd = false; model.endTour(true); onEnded() }) { Text("Start over next time", color = Museum.danger) }
-                    TextButton(onClick = { showEnd = false }) { Text("Cancel") }
+                    TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false; model.endTour(true); onEnded() }) { Text("Start over next time", color = Museum.danger) }
+                    TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false }) { Text("Cancel") }
                 }
             }
         )
@@ -194,8 +194,8 @@ fun LocationWhileStarted(model: AppViewModel, granted: Boolean) {
 
 @Composable
 private fun Pill(onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
-    val m = Modifier.clip(RoundedCornerShape(999.dp)).background(Color.Black.copy(alpha = 0.7f)).padding(horizontal = 12.dp, vertical = 6.dp)
-    if (onClick != null) TextButton(onClick = onClick, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) { Box(m) { content() } } else Box(m) { content() }
+    val m = Modifier.clip(RoundedCornerShape(4.dp)).background(Museum.background).padding(horizontal = 12.dp, vertical = 6.dp)
+    if (onClick != null) TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onClick, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) { Box(m) { content() } } else Box(m) { content() }
 }
 
 /** Shown on arrival: the featured moment with Listen, and the place's other moments. */
@@ -209,15 +209,15 @@ private fun ArrivalSheet(model: AppViewModel, stop: TourStop, isLast: Boolean, p
         }
     }
     Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 18.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Overline("You have arrived · stop ${stop.position}", Museum.green)
+        Overline("You have arrived · stop ${stop.position}", Museum.success)
         Text(stop.place.name, style = MaterialTheme.typography.headlineMedium, color = Museum.text)
         if (stop.note.isNotEmpty()) Text(stop.note, color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
         val featured = stop.featuredMoment
         if (featured != null) {
             MomentCard(featured, prominent = true) { onOpenMoment(featured.id) }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { onOpenMoment(featured.id) }) { Text("Read the full story") }
-                OutlinedButton(onClick = { if (playing) model.container.narration.stop() else model.playNarration(stop) }) { Text(if (playing) "■ Stop" else "▶ Listen") }
+                OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { onOpenMoment(featured.id) }) { Text("Read the full story") }
+                OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { if (playing) model.container.narration.stop() else model.playNarration(stop) }) { Text(if (playing) "■ Stop" else "▶ Listen") }
             }
         } else {
             EmptyCard("No moment featured here", "This stop is a waypoint; look around and carry on.")
@@ -227,7 +227,7 @@ private fun ArrivalSheet(model: AppViewModel, stop: TourStop, isLast: Boolean, p
             Overline("Also at this place")
             others.forEach { m -> MomentCard(m) { onOpenMoment(m.id) } }
         }
-        Button(onClick = onContinue, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)) {
+        Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onContinue, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) {
             Text(if (isLast) "Finish" else "Continue to the next stop")
         }
     }

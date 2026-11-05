@@ -1,0 +1,272 @@
+{
+  "source": "subcult-tv/studio/brands/byl",
+  "studio_revision": "d633a86a4f16b30811a7528eeab1864e389e50c8",
+  "source_state": "uncommitted pack",
+  "selection": "Classic solid / BB1-4A product mark / P3 Oxblood",
+  "assets": [
+    {
+      "source": "tokens.json",
+      "target": "docs/design/byl/tokens.json",
+      "sha256": "19ac1b9441bb80698706777ae4d34ed0742298e2e45c0e92cd88bf5e6ffdc98c",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "tokens.css",
+      "target": "web/static/brand/tokens.css",
+      "sha256": "912527c1624e21ee8b0dd7c990dccba1760cb0b7b9350505fa30ee7dc6a61083",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/lockup-primary-color-outlined.svg",
+      "target": "web/static/brand/lockup-primary-color-outlined.svg",
+      "sha256": "40c774fdd25e87391fc9bbaceacc2c911a2d572e70a8ce0cef962e49498ddf0a",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/lockup-primary-reverse-outlined.svg",
+      "target": "web/static/brand/lockup-primary-reverse-outlined.svg",
+      "sha256": "8d560ba01df5c4feb9b1c4ac02aa7fe8c5cf652a148fb1dc3c7d775ac0c5f136",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/mark-primary-color.svg",
+      "target": "web/static/brand/mark-primary-color.svg",
+      "sha256": "82a887fd12d5bf2920a9c8b2da683bf46a43441aeb25a9d4317858abf38b06be",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/favicon.svg",
+      "target": "web/static/brand/favicon.svg",
+      "sha256": "85c111468ccda233a485813545fcb99b7a8ca946053d847ced0e204ea99e4670",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/favicon-32.png",
+      "target": "web/static/brand/favicon-32.png",
+      "sha256": "1ebd2eb8abe42029d437d4f1bb7aca2b729303cb4142483440ca2faab4c06698",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/apple-touch-icon.png",
+      "target": "web/static/brand/apple-touch-icon.png",
+      "sha256": "7a8bab7f89e727ae9c42dc70ad0a696da8f9460d2abe97a4a0502caa2406f1b0",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/icon-192.png",
+      "target": "web/static/brand/icon-192.png",
+      "sha256": "f0c062a2d1f72357eef595e0d95d7ad7df875b419c458c8322dd7d8aabe36c0e",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/icon-512.png",
+      "target": "web/static/brand/icon-512.png",
+      "sha256": "e71d8b80f851c421ec034e1eb63ec7b23f9c51f278c8e4f96d383bf2f762819c",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/maskable-512.png",
+      "target": "web/static/brand/maskable-512.png",
+      "sha256": "2393d9377f2356503a414f545b78dc07f36ed6689e08690f9baabd909f544af4",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/link-preview.png",
+      "target": "web/static/brand/link-preview.png",
+      "sha256": "b5826dede2ee1c74d54e75b61b4d1f7ee5efda8fa7c4582d9db73c1d180e16a1",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Public-Sans-0.ttf",
+      "target": "web/static/brand/fonts/Public-Sans-0.ttf",
+      "sha256": "d8a092f98db3ae7c7f01e73f8f23aaaec97f16c325765042ae5a052f4d8de546",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Public-Sans-0.ttf",
+      "target": "ios-invisible-museum/InvisibleMuseum/Fonts/Public-Sans-0.ttf",
+      "sha256": "d8a092f98db3ae7c7f01e73f8f23aaaec97f16c325765042ae5a052f4d8de546",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Public-Sans-0.ttf",
+      "target": "android/app/src/main/res/font/public_sans_regular.ttf",
+      "sha256": "d8a092f98db3ae7c7f01e73f8f23aaaec97f16c325765042ae5a052f4d8de546",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Public-Sans-1.ttf",
+      "target": "web/static/brand/fonts/Public-Sans-1.ttf",
+      "sha256": "0daaf804b064cf37990f38ff9ba89fc8029e879f8e64260e7bfa6ef739569c3a",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Public-Sans-1.ttf",
+      "target": "ios-invisible-museum/InvisibleMuseum/Fonts/Public-Sans-1.ttf",
+      "sha256": "0daaf804b064cf37990f38ff9ba89fc8029e879f8e64260e7bfa6ef739569c3a",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Public-Sans-1.ttf",
+      "target": "android/app/src/main/res/font/public_sans_bold.ttf",
+      "sha256": "0daaf804b064cf37990f38ff9ba89fc8029e879f8e64260e7bfa6ef739569c3a",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Libre-Baskerville-0.ttf",
+      "target": "web/static/brand/fonts/Libre-Baskerville-0.ttf",
+      "sha256": "f5bc4341f15de5e877d8d95b6b14b33e9a3da1f8fef4ed0700ed407f096cffb6",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Libre-Baskerville-0.ttf",
+      "target": "ios-invisible-museum/InvisibleMuseum/Fonts/Libre-Baskerville-0.ttf",
+      "sha256": "f5bc4341f15de5e877d8d95b6b14b33e9a3da1f8fef4ed0700ed407f096cffb6",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Libre-Baskerville-0.ttf",
+      "target": "android/app/src/main/res/font/libre_baskerville.ttf",
+      "sha256": "f5bc4341f15de5e877d8d95b6b14b33e9a3da1f8fef4ed0700ed407f096cffb6",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Barlow-Condensed-1.ttf",
+      "target": "web/static/brand/fonts/Barlow-Condensed-1.ttf",
+      "sha256": "7dde307fa887fc65ff5830cfada77a7decc5dae8d3c816c9d39ba3f1af1c4ed7",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Barlow-Condensed-1.ttf",
+      "target": "ios-invisible-museum/InvisibleMuseum/Fonts/Barlow-Condensed-1.ttf",
+      "sha256": "7dde307fa887fc65ff5830cfada77a7decc5dae8d3c816c9d39ba3f1af1c4ed7",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/Barlow-Condensed-1.ttf",
+      "target": "android/app/src/main/res/font/barlow_condensed_bold.ttf",
+      "sha256": "7dde307fa887fc65ff5830cfada77a7decc5dae8d3c816c9d39ba3f1af1c4ed7",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/publicsans-OFL.txt",
+      "target": "web/static/brand/fonts/publicsans-OFL.txt",
+      "sha256": "157a9e77f7580246e97c769490e2e977ae94399f9d30f4556015c41fe8c28bac",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/publicsans-OFL.txt",
+      "target": "ios-invisible-museum/InvisibleMuseum/Fonts/publicsans-OFL.txt",
+      "sha256": "157a9e77f7580246e97c769490e2e977ae94399f9d30f4556015c41fe8c28bac",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/publicsans-OFL.txt",
+      "target": "android/app/src/main/assets/licenses/publicsans-OFL.txt",
+      "sha256": "157a9e77f7580246e97c769490e2e977ae94399f9d30f4556015c41fe8c28bac",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/librebaskerville-OFL.txt",
+      "target": "web/static/brand/fonts/librebaskerville-OFL.txt",
+      "sha256": "3624eddd4c8f8a908130a417ae7cd089c9da69899c4e0ca1a5217d0a6fae16fd",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/librebaskerville-OFL.txt",
+      "target": "ios-invisible-museum/InvisibleMuseum/Fonts/librebaskerville-OFL.txt",
+      "sha256": "3624eddd4c8f8a908130a417ae7cd089c9da69899c4e0ca1a5217d0a6fae16fd",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/librebaskerville-OFL.txt",
+      "target": "android/app/src/main/assets/licenses/librebaskerville-OFL.txt",
+      "sha256": "3624eddd4c8f8a908130a417ae7cd089c9da69899c4e0ca1a5217d0a6fae16fd",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/barlowcondensed-OFL.txt",
+      "target": "web/static/brand/fonts/barlowcondensed-OFL.txt",
+      "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/barlowcondensed-OFL.txt",
+      "target": "ios-invisible-museum/InvisibleMuseum/Fonts/barlowcondensed-OFL.txt",
+      "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "fonts/barlowcondensed-OFL.txt",
+      "target": "android/app/src/main/assets/licenses/barlowcondensed-OFL.txt",
+      "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/app-icon-1024.png",
+      "target": "ios-invisible-museum/InvisibleMuseum/Assets.xcassets/AppIcon.appiconset/icon.png",
+      "sha256": "f212a8a0972a30f186d1cbe608b123c211e6770ec8c5aa4d92d179da8af0280e",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/app-icon-dark-1024.png",
+      "target": "ios-invisible-museum/InvisibleMuseum/Assets.xcassets/AppIcon.appiconset/icon-dark.png",
+      "sha256": "5a9cfaad02fcfa8e8a9a4c86e466670a9434b64cd9f3b0063c6e5aaf6cd64e09",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/mark-primary-color.png",
+      "target": "ios-invisible-museum/InvisibleMuseum/Assets.xcassets/BylMark.imageset/mark.png",
+      "sha256": "67d55884778569f76a6c70ebcab0b067b99e953802f031dca2301ca3b7ded260",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/lockup-primary-color-outlined.png",
+      "target": "ios-invisible-museum/InvisibleMuseum/Assets.xcassets/BylLockup.imageset/lockup.png",
+      "sha256": "98b1fbe3cf9c9f6b19a3cb29afff490138c92bd96951a2bff3f03fd3c1c79e61",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/lockup-primary-reverse-outlined.png",
+      "target": "ios-invisible-museum/InvisibleMuseum/Assets.xcassets/BylLockup.imageset/lockup-dark.png",
+      "sha256": "70033c84420b6d335638f6d35c5522bc178bdb3a22750b0947d32f02159f6b00",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/lockup-primary-color-outlined.png",
+      "target": "android/app/src/main/res/drawable-nodpi/byl_lockup.png",
+      "sha256": "98b1fbe3cf9c9f6b19a3cb29afff490138c92bd96951a2bff3f03fd3c1c79e61",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/lockup-primary-reverse-outlined.png",
+      "target": "android/app/src/main/res/drawable-nodpi/byl_lockup_dark.png",
+      "sha256": "70033c84420b6d335638f6d35c5522bc178bdb3a22750b0947d32f02159f6b00",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/android-adaptive-foreground.png",
+      "target": "android/app/src/main/res/drawable-nodpi/byl_launcher_foreground.png",
+      "sha256": "d02ea5f16523b468ad59f5ceef896e794149040e0a0a95a239e93539f954f5ed",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/android-monochrome.png",
+      "target": "android/app/src/main/res/drawable-nodpi/byl_launcher_monochrome.png",
+      "sha256": "08ec66775ac59312245d94641eee81c80c88bc4c4b79e51d104251e003bbcb0c",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "product/app-icon-1024.png",
+      "target": "android/app/src/main/res/mipmap-nodpi/ic_launcher.png",
+      "sha256": "f212a8a0972a30f186d1cbe608b123c211e6770ec8c5aa4d92d179da8af0280e",
+      "transformation": "unchanged copy"
+    },
+    {
+      "source": "logos/mark-primary-color.png",
+      "target": "android/app/src/main/res/drawable-nodpi/byl_mark.png",
+      "sha256": "67d55884778569f76a6c70ebcab0b067b99e953802f031dca2301ca3b7ded260",
+      "transformation": "unchanged copy"
+    }
+  ]
+}

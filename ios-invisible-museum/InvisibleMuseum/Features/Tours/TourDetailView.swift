@@ -146,9 +146,9 @@ struct StopRow: View {
             HStack(alignment: .top, spacing: 14) {
                 Text("\(stop.position)")
                     .font(Museum.meta(13))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Museum.actionText)
                     .frame(width: 30, height: 30)
-                    .background(Museum.blue, in: Circle())
+                    .background(Museum.action, in: Circle())
                 VStack(alignment: .leading, spacing: 4) {
                     Text(stop.place.name)
                         .font(Museum.bodyFont(16, weight: .semibold))
@@ -160,7 +160,7 @@ struct StopRow: View {
                         if !moment.dateDisplay.isEmpty {
                             Text(moment.dateDisplay)
                                 .font(Museum.meta(11))
-                                .foregroundStyle(Museum.blue)
+                                .foregroundStyle(Museum.action)
                         }
                     } else {
                         Text("No moment published here yet")

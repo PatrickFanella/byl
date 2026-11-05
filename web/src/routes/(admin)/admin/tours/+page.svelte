@@ -26,7 +26,7 @@
 	<label class="text-sm"
 		>City
 		<select
-			class="ml-2 rounded-md border-stone-300"
+			class="ml-2 rounded-md border-byl-border-control"
 			value={data.city}
 			onchange={(e) => goto(`/admin/tours?city=${(e.currentTarget as HTMLSelectElement).value}`)}
 		>
@@ -35,21 +35,21 @@
 	</label>
 </div>
 
-<table class="mt-4 w-full rounded-xl border border-stone-200 bg-white text-sm">
-	<thead class="text-left text-xs tracking-wide text-stone-500 uppercase"
+<table class="mt-4 w-full rounded-lg border border-byl-border bg-byl-background text-sm">
+	<thead class="text-left text-xs tracking-wide text-byl-muted"
 		><tr
 			><th class="px-3 py-2">Title</th><th class="px-3 py-2">Topic</th><th class="px-3 py-2"
 				>Stops</th
 			><th class="px-3 py-2">Routes</th><th class="px-3 py-2">Status</th></tr
 		></thead
 	>
-	<tbody class="divide-y divide-stone-200">
+	<tbody class="divide-y divide-byl-border">
 		{#each data.tours as t (t.id)}
 			<tr>
 				<td class="px-3 py-2"
 					><a class="font-medium hover:underline" href="/admin/tours/{t.id}">{t.title}</a
 					>{#if t.owner_account_id}<span
-							class="ml-2 rounded bg-violet-100 px-1.5 text-xs text-violet-800">user route</span
+							class="ml-2 rounded bg-byl-info-surface px-1.5 text-xs text-byl-info">user route</span
 						>{/if}</td
 				>
 				<td class="px-3 py-2">{t.topic?.name ?? '—'}</td>
@@ -64,30 +64,32 @@
 				>
 			</tr>
 		{:else}
-			<tr><td colspan="5" class="px-3 py-4 text-stone-500">No tours in this city yet.</td></tr>
+			<tr><td colspan="5" class="px-3 py-4 text-byl-muted">No tours in this city yet.</td></tr>
 		{/each}
 	</tbody>
 </table>
 
 <form
-	class="mt-6 flex max-w-2xl flex-wrap items-end gap-3 rounded-xl border border-stone-200 bg-white p-4 text-sm"
+	class="mt-6 flex max-w-2xl flex-wrap items-end gap-3 rounded-lg border border-byl-border bg-byl-background p-4 text-sm"
 	onsubmit={add}
 >
 	<span class="w-full font-semibold">New curated tour</span>
 	<label
 		>Title<input
-			class="mt-1 block rounded-md border-stone-300"
+			class="mt-1 block rounded-md border-byl-border-control"
 			bind:value={title}
 			required
 		/></label
 	>
 	<label
-		>Topic<select class="mt-1 block rounded-md border-stone-300" bind:value={topic}
+		>Topic<select class="mt-1 block rounded-md border-byl-border-control" bind:value={topic}
 			><option value="">— pick later —</option>{#each data.topics as tp (tp.id)}<option
 					value={tp.id}>{tp.name}</option
 				>{/each}</select
 		></label
 	>
-	<button class="rounded-md bg-stone-900 px-3 py-2 text-white" type="submit">Create draft</button>
+	<button class="rounded-md bg-byl-action px-3 py-2 text-byl-action-text" type="submit"
+		>Create draft</button
+	>
 	<div class="w-full"><Notice kind="error" message={err} /></div>
 </form>

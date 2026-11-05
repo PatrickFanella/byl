@@ -62,16 +62,16 @@
 	});
 </script>
 
-<svelte:head><title>Invisible Museum</title></svelte:head>
+<svelte:head><title>Byl</title></svelte:head>
 
 <section class="space-y-3">
-	<div class="text-[11px] font-bold tracking-widest text-blue-300 uppercase">Invisible Museum</div>
+	<div class="text-xs font-bold tracking-normal text-byl-action">Byl</div>
 	<h1 class="text-3xl font-semibold">
-		{city.current ? `${city.current.name} as a museum` : 'Your city as a museum'}
+		{city.current ? `${city.current.name} on foot` : 'Your city on foot'}
 	</h1>
-	<p class="max-w-2xl text-white/60">
-		Walk or ride through the stories that happened right where you are standing. Each tour is a
-		gallery: one topic, a handful of places, and the moment at each that belongs to the story.
+	<p class="max-w-2xl text-byl-muted">
+		Walk or ride through the stories that happened right where you are standing. Each tour follows
+		one topic through a handful of places, with stories and sources at each stop.
 	</p>
 	<CityPicker />
 </section>
@@ -127,23 +127,23 @@
 				emptyMessage="Pick a tour to travel to its first stop."
 				onretry={() => nearby.run()}
 			>
-				<ul class="divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5">
+				<ul class="divide-y divide-byl-border rounded-lg border border-byl-border bg-byl-surface">
 					{#each (nearby.data ?? []).slice(0, 8) as place (place.id)}
 						<li>
 							<a
 								href="/places/{place.id}"
-								class="flex items-center gap-3 px-4 py-3 hover:bg-white/10"
+								class="flex items-center gap-3 px-4 py-3 hover:bg-byl-surface"
 							>
 								<span class="flex-1">
 									<span class="block font-semibold">{place.name}</span>
-									<span class="block text-xs text-white/60">
+									<span class="block text-xs text-byl-muted">
 										{place.distance_m != null
 											? `${distanceText(place.distance_m)} · `
 											: ''}{place.moment_count}
 										{place.moment_count === 1 ? 'moment' : 'moments'}
 									</span>
 								</span>
-								<span class="text-white/40">›</span>
+								<span class="text-byl-muted">›</span>
 							</a>
 						</li>
 					{/each}

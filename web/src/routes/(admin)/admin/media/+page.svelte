@@ -40,7 +40,7 @@
 
 <h1 class="text-2xl font-semibold">Media</h1>
 <form
-	class="mt-4 flex flex-wrap items-end gap-3 rounded-xl border border-stone-200 bg-white p-4 text-sm"
+	class="mt-4 flex flex-wrap items-end gap-3 rounded-lg border border-byl-border bg-byl-background p-4 text-sm"
 	onsubmit={upload}
 	enctype="multipart/form-data"
 >
@@ -53,19 +53,27 @@
 			required
 		/></label
 	>
-	<label>Caption<input class="mt-1 block rounded-md border-stone-300" name="caption" /></label>
-	<label>Credit<input class="mt-1 block rounded-md border-stone-300" name="credit" /></label>
+	<label
+		>Caption<input class="mt-1 block rounded-md border-byl-border-control" name="caption" /></label
+	>
+	<label
+		>Credit<input class="mt-1 block rounded-md border-byl-border-control" name="credit" /></label
+	>
 	<label
 		>Licence<input
-			class="mt-1 block w-36 rounded-md border-stone-300"
+			class="mt-1 block w-36 rounded-md border-byl-border-control"
 			name="license"
 			placeholder="CC-BY-4.0"
 		/></label
 	>
-	<label>Source URL<input class="mt-1 block rounded-md border-stone-300" name="source_url" /></label
+	<label
+		>Source URL<input
+			class="mt-1 block rounded-md border-byl-border-control"
+			name="source_url"
+		/></label
 	>
 	<button
-		class="rounded-md bg-stone-900 px-3 py-2 text-white disabled:opacity-50"
+		class="rounded-md bg-byl-action px-3 py-2 text-byl-action-text disabled:opacity-50"
 		disabled={busy === 'upload'}
 		type="submit">Upload</button
 	>
@@ -74,19 +82,19 @@
 
 <ul class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
 	{#each data.media as m (m.id)}
-		<li class="rounded-xl border border-stone-200 bg-white p-2 text-xs">
+		<li class="rounded-lg border border-byl-border bg-byl-background p-2 text-xs">
 			{#if m.kind === 'image' && m.public_url}
 				<img src={m.public_url} alt={m.caption} class="h-32 w-full rounded object-cover" />
 			{:else if m.kind === 'audio' && m.public_url}
 				<audio controls src={m.public_url} class="w-full"></audio>
 			{:else}
-				<div class="flex h-32 items-center justify-center rounded bg-stone-100 text-stone-500">
+				<div class="flex h-32 items-center justify-center rounded bg-byl-surface text-byl-muted">
 					{m.kind}{m.public_url ? '' : ' (not fetched yet)'}
 				</div>
 			{/if}
 			<div class="mt-1 truncate font-medium" title={m.caption}>{m.caption || '(no caption)'}</div>
 			<div class="flex items-center justify-between">
-				<StatusPill status={m.status} /><span class="text-stone-500">{m.mime_type}</span>
+				<StatusPill status={m.status} /><span class="text-byl-muted">{m.mime_type}</span>
 			</div>
 			<form
 				class="mt-1 flex gap-1"
@@ -97,25 +105,25 @@
 				}}
 			>
 				<input
-					class="w-full rounded-md border-stone-300 px-1 py-0.5 text-xs"
+					class="w-full rounded-md border-byl-border-control px-1 py-0.5 text-xs"
 					name="license"
 					value={m.license}
 					placeholder="licence"
 				/>
 				<input
-					class="w-full rounded-md border-stone-300 px-1 py-0.5 text-xs"
+					class="w-full rounded-md border-byl-border-control px-1 py-0.5 text-xs"
 					name="credit"
 					value={m.credit}
 					placeholder="credit"
 				/>
 				<button
-					class="rounded-md border border-stone-300 px-1"
+					class="rounded-md border border-byl-border-control px-1"
 					disabled={busy === m.id}
 					type="submit">Save</button
 				>
 			</form>
 		</li>
 	{:else}
-		<li class="col-span-full text-sm text-stone-500">No media yet.</li>
+		<li class="col-span-full text-sm text-byl-muted">No media yet.</li>
 	{/each}
 </ul>

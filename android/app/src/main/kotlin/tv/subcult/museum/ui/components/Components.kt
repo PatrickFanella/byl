@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -54,8 +55,8 @@ data class UiState<T>(
 )
 
 @Composable
-fun Overline(text: String, color: Color = Museum.blue) {
-    Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, color = color)
+fun Overline(text: String, color: Color = Museum.action) {
+    Text(text, style = MaterialTheme.typography.labelSmall, color = color)
 }
 
 @Composable
@@ -68,7 +69,7 @@ fun SectionHeader(title: String, eyebrow: String? = null) {
 
 @Composable
 fun Card(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
-    val shape = RoundedCornerShape(20.dp)
+    val shape = RoundedCornerShape(8.dp)
     Box(
         modifier
             .fillMaxWidth()
@@ -105,7 +106,7 @@ fun ErrorCard(message: String, onRetry: (() -> Unit)? = null) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Overline("Something went wrong", Museum.danger)
             Text(message, color = Museum.text, style = MaterialTheme.typography.bodyMedium)
-            if (onRetry != null) OutlinedButton(onClick = onRetry) { Text("Try again") }
+            if (onRetry != null) OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onRetry) { Text("Try again") }
         }
     }
 }
@@ -134,31 +135,19 @@ fun SignInPrompt(reason: String, onSignIn: () -> Unit) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Overline("Sign in")
             Text(reason, color = Museum.text, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onSignIn, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)) { Text("Sign in") }
+            Button(shape = RoundedCornerShape(4.dp), onClick = onSignIn, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("Sign in") }
         }
     }
 }
 
 @Composable
 fun HeroCard(imageUrl: String?, height: Int = 180, content: @Composable () -> Unit) {
-    val shape = RoundedCornerShape(24.dp)
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(height.dp)
-            .clip(shape)
-            .background(Brush.linearGradient(listOf(Museum.blue, Museum.purple)))
-            .border(1.dp, Museum.border, shape)
-    ) {
+    Column(Modifier.fillMaxWidth().background(Museum.background).border(1.dp, Museum.border)) {
         if (imageUrl != null) {
-            AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().height(height.dp))
         }
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(Color.Transparent, Museum.background.copy(alpha = 0.95f)), startY = height * 1.2f))
-        )
-        Box(Modifier.align(Alignment.BottomStart).padding(16.dp)) { content() }
+        Box(Modifier.fillMaxWidth().padding(16.dp)) { content() }
     }
 }
 
@@ -168,13 +157,13 @@ fun TourCard(tour: TourSummary, onClick: () -> Unit) {
         HeroCard(tour.heroMedia?.publicUrl) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 tour.topic?.let { Overline(it.name) }
-                Text(tour.title, style = MaterialTheme.typography.titleLarge, color = Museum.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(tour.title, style = MaterialTheme.typography.titleLarge, color = Museum.text, maxLines = Int.MAX_VALUE, overflow = TextOverflow.Clip)
                 val parts = buildList {
                     add("${tour.stopCount} stops")
                     tour.modes.forEach { m -> estimateText(tour.routes[m])?.let { add(it) } }
                     if (tour.isUserRoute) add("visitor route")
                 }
-                Text(parts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = Museum.text.copy(alpha = 0.8f))
+                Text(parts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = Museum.muted)
             }
         }
     }
@@ -185,18 +174,18 @@ fun StopRow(stop: TourStop, visited: Boolean = false, onClick: () -> Unit) {
     Card(onClick = onClick) {
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.Top) {
             Box(
-                Modifier.size(30.dp).clip(CircleShape).background(if (visited) Museum.green else Museum.blue),
+                Modifier.size(30.dp).clip(CircleShape).background(if (visited) Museum.successSurface else Museum.action),
                 contentAlignment = Alignment.Center
             ) {
-                if (visited) Icon(Icons.Default.Check, contentDescription = "Visited", tint = Color.Black, modifier = Modifier.size(16.dp))
-                else Text("${stop.position}", color = Color.Black, style = MaterialTheme.typography.labelSmall)
+                if (visited) Icon(Icons.Default.Check, contentDescription = "Visited", tint = Museum.success, modifier = Modifier.size(16.dp))
+                else Text("${stop.position}", color = Museum.actionText, style = MaterialTheme.typography.labelSmall)
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(stop.place.name, style = MaterialTheme.typography.titleMedium, color = Museum.text)
                 val m = stop.featuredMoment
                 if (m != null) {
-                    Text(m.title, style = MaterialTheme.typography.bodyMedium, color = Museum.text.copy(alpha = 0.85f))
-                    if (m.dateDisplay.isNotEmpty()) Text(m.dateDisplay, style = MaterialTheme.typography.labelSmall, color = Museum.blue)
+                    Text(m.title, style = MaterialTheme.typography.bodyMedium, color = Museum.text)
+                    if (m.dateDisplay.isNotEmpty()) Text(m.dateDisplay, style = MaterialTheme.typography.labelSmall, color = Museum.action)
                 } else {
                     Text("No moment published here yet", style = MaterialTheme.typography.bodySmall, color = Museum.faint)
                 }
@@ -215,7 +204,7 @@ fun MomentCard(moment: MomentSummary, prominent: Boolean = false, onClick: () ->
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     if (moment.dateDisplay.isNotEmpty()) Overline(moment.dateDisplay)
                     Text(moment.title, style = MaterialTheme.typography.titleLarge, color = Museum.text)
-                    Text(moment.excerpt, style = MaterialTheme.typography.bodySmall, color = Museum.text.copy(alpha = 0.85f), maxLines = 3, overflow = TextOverflow.Ellipsis)
+                    Text(moment.excerpt, style = MaterialTheme.typography.bodySmall, color = Museum.text, maxLines = 3, overflow = TextOverflow.Ellipsis)
                     if (moment.hasNarration) Overline("Audio guide", Museum.text.copy(alpha = 0.75f))
                 }
             }
@@ -223,9 +212,9 @@ fun MomentCard(moment: MomentSummary, prominent: Boolean = false, onClick: () ->
     } else {
         Card(onClick = onClick) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                if (moment.dateDisplay.isNotEmpty()) Text(moment.dateDisplay, style = MaterialTheme.typography.labelSmall, color = Museum.blue)
+                if (moment.dateDisplay.isNotEmpty()) Text(moment.dateDisplay, style = MaterialTheme.typography.labelSmall, color = Museum.action)
                 Text(moment.title, style = MaterialTheme.typography.titleMedium, color = Museum.text)
-                Text(moment.excerpt, style = MaterialTheme.typography.bodyMedium, color = Museum.muted, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(moment.excerpt, style = MaterialTheme.typography.bodyMedium, color = Museum.muted, maxLines = Int.MAX_VALUE, overflow = TextOverflow.Clip)
             }
         }
     }
@@ -236,7 +225,7 @@ fun MediaGallery(media: List<MediaAsset>) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
         items(media, key = { it.id }) { asset ->
             Column(Modifier.width(300.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val shape = RoundedCornerShape(20.dp)
+                val shape = RoundedCornerShape(8.dp)
                 Box(Modifier.fillMaxWidth().height(210.dp).clip(shape).background(Museum.surfaceElevated).border(1.dp, Museum.border, shape), contentAlignment = Alignment.Center) {
                     if (asset.kind == "image") {
                         AsyncImage(model = asset.publicUrl, contentDescription = asset.caption, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
@@ -244,7 +233,7 @@ fun MediaGallery(media: List<MediaAsset>) {
                         Text(if (asset.kind == "video") "Video" else "Audio", color = Museum.muted)
                     }
                 }
-                if (asset.caption.isNotEmpty()) Text(asset.caption, style = MaterialTheme.typography.bodyMedium, color = Museum.text.copy(alpha = 0.85f), maxLines = 3, overflow = TextOverflow.Ellipsis)
+                if (asset.caption.isNotEmpty()) Text(asset.caption, style = MaterialTheme.typography.bodyMedium, color = Museum.text, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 val credit = listOf(asset.credit, asset.license).filter { it.isNotEmpty() }.joinToString(" · ").ifEmpty { "Credit unavailable" }
                 Text(credit, style = MaterialTheme.typography.bodySmall, color = Museum.faint)
             }

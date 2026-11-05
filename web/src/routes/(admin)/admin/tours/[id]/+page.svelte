@@ -142,18 +142,18 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-3">
-	<a href="/admin/tours" class="text-sm text-stone-500 hover:underline">← Tours</a>
+	<a href="/admin/tours" class="text-sm text-byl-muted hover:underline">← Tours</a>
 	<h1 class="text-2xl font-semibold">{tour.title}</h1>
 	<StatusPill status={tour.status} />
 	<StatusPill status={tour.visibility} />
-	{#if tour.owner_account_id}<span class="rounded bg-violet-100 px-1.5 text-xs text-violet-800"
+	{#if tour.owner_account_id}<span class="rounded bg-byl-info-surface px-1.5 text-xs text-byl-info"
 			>user route</span
 		>{/if}
-	<span class="text-xs text-stone-500">/tours/{tour.slug}</span>
+	<span class="text-xs text-byl-muted">/tours/{tour.slug}</span>
 </div>
 <div class="mt-3"><Notice kind={notice.kind} message={notice.message} /></div>
 {#if locked}
-	<p class="mt-2 rounded-md bg-amber-50 p-2 text-sm text-amber-900">
+	<p class="mt-2 rounded-md bg-byl-warning-surface p-2 text-sm text-byl-warning">
 		This tour is published. Unpublish it to change stops, modes, or routes; title and summary can
 		still be edited.
 	</p>
@@ -162,26 +162,31 @@
 <div class="mt-4 grid gap-6 lg:grid-cols-3">
 	<div class="space-y-6 lg:col-span-2">
 		<section
-			class="grid gap-3 rounded-xl border border-stone-200 bg-white p-4 text-sm md:grid-cols-2"
+			class="grid gap-3 rounded-lg border border-byl-border bg-byl-background p-4 text-sm md:grid-cols-2"
 		>
 			<label class="md:col-span-2"
-				>Title<input class="mt-1 w-full rounded-md border-stone-300" bind:value={title} /></label
+				>Title<input
+					class="mt-1 w-full rounded-md border-byl-border-control"
+					bind:value={title}
+				/></label
 			>
 			<label class="md:col-span-2"
 				>Summary<textarea
-					class="mt-1 w-full rounded-md border-stone-300"
+					class="mt-1 w-full rounded-md border-byl-border-control"
 					rows="3"
 					bind:value={summary}></textarea></label
 			>
 			<label
-				>Topic<select class="mt-1 w-full rounded-md border-stone-300" bind:value={topic}
+				>Topic<select class="mt-1 w-full rounded-md border-byl-border-control" bind:value={topic}
 					><option value="">— none —</option>{#each data.topics as tp (tp.id)}<option value={tp.id}
 							>{tp.name}</option
 						>{/each}</select
 				></label
 			>
 			<label
-				>Visibility<select class="mt-1 w-full rounded-md border-stone-300" bind:value={visibility}
+				>Visibility<select
+					class="mt-1 w-full rounded-md border-byl-border-control"
+					bind:value={visibility}
 					><option value="public">public</option><option value="unlisted">unlisted</option><option
 						value="private">private</option
 					></select
@@ -197,20 +202,20 @@
 			</div>
 			<div class="md:col-span-2">
 				<button
-					class="rounded-md bg-stone-900 px-3 py-1.5 text-white disabled:opacity-50"
+					class="rounded-md bg-byl-action px-3 py-1.5 text-byl-action-text disabled:opacity-50"
 					disabled={!!busy}
 					onclick={saveDetails}>Save details</button
 				>
 			</div>
 		</section>
 
-		<section class="rounded-xl border border-stone-200 bg-white p-4 text-sm">
+		<section class="rounded-lg border border-byl-border bg-byl-background p-4 text-sm">
 			<h2 class="font-semibold">Stops</h2>
 			<ol class="mt-2 space-y-3">
 				{#each stops as s, i (s.place_id + i)}
-					<li class="rounded-md border border-stone-200 p-3">
+					<li class="rounded-md border border-byl-border p-3">
 						<div class="flex items-center gap-2">
-							<span class="w-6 text-right font-mono text-xs text-stone-500">{i + 1}.</span>
+							<span class="w-6 text-right font-mono text-xs text-byl-muted">{i + 1}.</span>
 							<a class="font-medium hover:underline" href="/admin/places/{s.place_id}"
 								>{s.place_name}</a
 							>
@@ -226,7 +231,7 @@
 									onclick={() => move(i, 1)}>↓</button
 								>
 								<button
-									class="rounded border px-1 text-red-700"
+									class="rounded border px-1 text-byl-danger"
 									disabled={locked}
 									onclick={() => (stops = stops.filter((_, j) => j !== i))}>✕</button
 								>
@@ -237,7 +242,7 @@
 								>Featured moment
 								<div class="flex gap-1">
 									<select
-										class="mt-1 w-full rounded-md border-stone-300 text-sm"
+										class="mt-1 w-full rounded-md border-byl-border-control text-sm"
 										bind:value={s.featured_moment_id}
 										disabled={locked}
 									>
@@ -247,7 +252,7 @@
 											>{/each}
 									</select>
 									<button
-										class="mt-1 rounded-md border border-indigo-300 bg-indigo-50 px-2 text-xs text-indigo-900 disabled:opacity-50"
+										class="mt-1 rounded-md border border-byl-info bg-byl-info-surface px-2 text-xs text-byl-info disabled:opacity-50"
 										disabled={locked || !!busy}
 										onclick={() => suggest(i)}
 										title="Rank this place's moments against the tour topic">Suggest</button
@@ -256,7 +261,7 @@
 							</label>
 							<label class="text-xs"
 								>Curator note<input
-									class="mt-1 w-full rounded-md border-stone-300 text-sm"
+									class="mt-1 w-full rounded-md border-byl-border-control text-sm"
 									bind:value={s.note}
 									disabled={locked}
 								/></label
@@ -264,21 +269,25 @@
 						</div>
 					</li>
 				{:else}
-					<li class="text-stone-500">No stops yet.</li>
+					<li class="text-byl-muted">No stops yet.</li>
 				{/each}
 			</ol>
 			<div class="mt-3 flex flex-wrap gap-2">
-				<select class="rounded-md border-stone-300" bind:value={addPlace} disabled={locked}>
+				<select
+					class="rounded-md border-byl-border-control"
+					bind:value={addPlace}
+					disabled={locked}
+				>
 					<option value="">Add a published place…</option>
 					{#each data.places as p (p.id)}<option value={p.id}>{p.name}</option>{/each}
 				</select>
 				<button
-					class="rounded-md border border-stone-300 px-2"
+					class="rounded-md border border-byl-border-control px-2"
 					disabled={locked || !addPlace}
 					onclick={addStop}>Add stop</button
 				>
 				<button
-					class="rounded-md bg-stone-900 px-3 py-1.5 text-white disabled:opacity-50"
+					class="rounded-md bg-byl-action px-3 py-1.5 text-byl-action-text disabled:opacity-50"
 					disabled={locked || !!busy}
 					onclick={saveStops}>Save stops</button
 				>
@@ -288,16 +297,16 @@
 
 	<aside class="space-y-3 text-sm">
 		<Map {markers} {line} height="22rem" />
-		<div class="rounded-xl border border-stone-200 bg-white p-4">
+		<div class="rounded-lg border border-byl-border bg-byl-background p-4">
 			<h2 class="font-semibold">Routes</h2>
 			<ul class="mt-1">
 				{#each Object.values(tour.routes ?? {}) as r (r.mode)}
 					<li class="flex items-center gap-2">
 						<span class="w-10">{r.mode}</span><StatusPill
 							status={r.status}
-						/>{#if r.estimated_minutes}<span class="text-xs text-stone-500"
+						/>{#if r.estimated_minutes}<span class="text-xs text-byl-muted"
 								>{r.estimated_minutes} min · {Math.round(r.distance_m / 100) / 10} km</span
-							>{/if}{#if r.error}<span class="truncate text-xs text-red-700" title={r.error}
+							>{/if}{#if r.error}<span class="truncate text-xs text-byl-danger" title={r.error}
 								>{r.error}</span
 							>{/if}
 					</li>
@@ -312,19 +321,19 @@
 		<div class="flex flex-wrap gap-2">
 			{#if tour.status === 'published'}
 				<button
-					class="rounded-md border border-stone-300 px-3 py-1.5 disabled:opacity-50"
+					class="rounded-md border border-byl-border-control px-3 py-1.5 disabled:opacity-50"
 					disabled={!!busy}
 					onclick={unpublish}>Unpublish</button
 				>
 			{:else}
 				<button
-					class="rounded-md bg-emerald-700 px-3 py-1.5 text-white disabled:opacity-50"
+					class="rounded-md bg-byl-success-surface px-3 py-1.5 text-byl-action-text disabled:opacity-50"
 					disabled={!!busy}
 					onclick={publish}>Publish</button
 				>
 			{/if}
 			<button
-				class="rounded-md border border-red-300 px-3 py-1.5 text-red-700"
+				class="rounded-md border border-byl-danger px-3 py-1.5 text-byl-danger"
 				disabled={!!busy}
 				onclick={remove}>Delete</button
 			>
@@ -335,19 +344,19 @@
 <Dialog bind:open={suggestOpen} title="Suggested featured moments">
 	<ol class="space-y-2 text-sm">
 		{#each suggestions as s, i (s.moment.id)}
-			<li class="rounded-md border border-stone-200 p-2">
+			<li class="rounded-md border border-byl-border p-2">
 				<div class="flex items-center gap-2">
-					<span class="font-mono text-xs text-stone-500">{i + 1}.</span><span class="font-medium"
+					<span class="font-mono text-xs text-byl-muted">{i + 1}.</span><span class="font-medium"
 						>{s.moment.title}</span
-					><span class="text-xs text-stone-500">{s.moment.date_display}</span><button
-						class="ml-auto rounded-md bg-stone-900 px-2 py-0.5 text-xs text-white"
+					><span class="text-xs text-byl-muted">{s.moment.date_display}</span><button
+						class="ml-auto rounded-md bg-byl-action px-2 py-0.5 text-xs text-byl-action-text"
 						onclick={() => choose(s.moment.id)}>Use</button
 					>
 				</div>
-				<p class="mt-1 text-xs text-stone-600">{s.reason}</p>
+				<p class="mt-1 text-xs text-byl-muted">{s.reason}</p>
 			</li>
 		{:else}
-			<li class="text-stone-500">No published moments at this place.</li>
+			<li class="text-byl-muted">No published moments at this place.</li>
 		{/each}
 	</ol>
 </Dialog>

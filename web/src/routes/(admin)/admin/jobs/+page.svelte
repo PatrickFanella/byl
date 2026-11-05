@@ -24,21 +24,21 @@
 			<a
 				href="/admin/jobs{s ? `?status=${s}` : ''}"
 				class="rounded-md px-2 py-1 {data.status === s
-					? 'bg-stone-900 text-white'
-					: 'hover:bg-stone-100'}">{s || 'all'}</a
+					? 'bg-byl-action text-byl-action-text'
+					: 'hover:bg-byl-surface'}">{s || 'all'}</a
 			>
 		{/each}
 	</nav>
 </div>
-<table class="mt-4 w-full rounded-xl border border-stone-200 bg-white text-sm">
-	<thead class="text-left text-xs tracking-wide text-stone-500 uppercase"
+<table class="mt-4 w-full rounded-lg border border-byl-border bg-byl-background text-sm">
+	<thead class="text-left text-xs tracking-wide text-byl-muted"
 		><tr
 			><th class="px-3 py-2">Kind</th><th class="px-3 py-2">Status</th><th class="px-3 py-2"
 				>Attempts</th
 			><th class="px-3 py-2">Note</th><th class="px-3 py-2">When</th><th class="px-3 py-2"></th></tr
 		></thead
 	>
-	<tbody class="divide-y divide-stone-200">
+	<tbody class="divide-y divide-byl-border">
 		{#each data.jobs as j (j.id)}
 			<tr>
 				<td class="px-3 py-2 font-mono text-xs">{j.kind}</td>
@@ -46,11 +46,11 @@
 				<td class="px-3 py-2">{j.attempts}/{j.max_attempts}</td>
 				<td
 					class="max-w-md truncate px-3 py-2 text-xs {j.status === 'failed'
-						? 'text-red-700'
-						: 'text-stone-600'}"
+						? 'text-byl-danger'
+						: 'text-byl-muted'}"
 					title={j.last_error}>{j.last_error}</td
 				>
-				<td class="px-3 py-2 text-xs text-stone-500">{when(j.created_at)}</td>
+				<td class="px-3 py-2 text-xs text-byl-muted">{when(j.created_at)}</td>
 				<td class="px-3 py-2 text-right"
 					>{#if j.status === 'failed'}<button
 							class="text-xs underline"
@@ -60,7 +60,7 @@
 				>
 			</tr>
 		{:else}
-			<tr><td colspan="6" class="px-3 py-4 text-stone-500">No jobs.</td></tr>
+			<tr><td colspan="6" class="px-3 py-4 text-byl-muted">No jobs.</td></tr>
 		{/each}
 	</tbody>
 </table>

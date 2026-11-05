@@ -3,6 +3,7 @@ import InvisibleMuseumKit
 
 /// Account, audio guide preference, API base URL override, and sign out.
 struct ProfileView: View {
+    @AppStorage("byl.appearance") private var appearance: BylAppearance = .system
     @Environment(AppModel.self) private var model
     @State private var baseURL = AppModel.resolveBaseURL()
     @State private var audioGuide = false
@@ -18,6 +19,15 @@ struct ProfileView: View {
                         .foregroundStyle(Museum.text)
                 }
                 account
+                MuseumCard {
+                    Picker("Appearance", selection: $appearance) {
+                        ForEach(BylAppearance.allCases) { item in
+                            Text(item.label).tag(item)
+                        }
+                    }
+                    .font(Museum.bodyFont())
+                    .foregroundStyle(Museum.text)
+                }
                 preferences
                 developer
                 about
@@ -70,7 +80,7 @@ struct ProfileView: View {
                             .foregroundStyle(Museum.muted)
                     }
                 }
-                .tint(Museum.blue)
+                .tint(Museum.action)
                 .onChange(of: audioGuide) { _, on in model.setAudioGuide(on) }
                 HStack {
                     Text("Location")
@@ -84,7 +94,7 @@ struct ProfileView: View {
                 if model.location.authorizationState != .authorized, let url = URL(string: UIApplication.openSettingsURLString) {
                     Link("Open Settings", destination: url)
                         .font(Museum.bodyFont(13, weight: .semibold))
-                        .foregroundStyle(Museum.blue)
+                        .foregroundStyle(Museum.action)
                 }
             }
         }
@@ -93,7 +103,7 @@ struct ProfileView: View {
     private var developer: some View {
         MuseumCard {
             VStack(alignment: .leading, spacing: 12) {
-                Overline(text: "Server", color: Museum.purple)
+                Overline(text: "Server", color: Museum.info)
                 MuseumTextField(label: "API base URL", placeholder: AppModel.defaultBaseURL, text: $baseURL,
                                 helperText: "Leave empty for \(AppModel.defaultBaseURL). Changing it signs you out.")
                     .textInputAutocapitalization(.never)
@@ -129,7 +139,7 @@ struct ProfileView: View {
         MuseumCard(padding: Museum.Spacing.md) {
             VStack(alignment: .leading, spacing: 6) {
                 Overline(text: "About")
-                Text("Invisible Museum \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")")
+                Text("Byl \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")")
                     .font(Museum.bodyFont(14, weight: .semibold))
                     .foregroundStyle(Museum.text)
                 Text("Stories are drawn from open archives and reviewed by curators; each moment lists its sources and media credits.")

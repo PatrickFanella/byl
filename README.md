@@ -1,6 +1,8 @@
-# Invisible Museum
+# Byl
 
-Walking and biking tours of your city as if it were one giant museum. SwiftUI iOS prototype plus a Dockerized Go/PostgreSQL backend.
+Local history, on foot or by bike. Byl has SwiftUI, Compose and SvelteKit clients backed by Go and PostgreSQL. The repository and platform identifiers retain the Invisible Museum name.
+
+The apps use Studio's Classic solid / P3 Oxblood design system. See the [BYL integration record](docs/design/byl/README.md) for source ownership, asset hashes, regeneration and verification limits.
 
 > **Rebuild in progress.** The app is being refocused from AR exhibits to topic-based walking/biking tours with sourced history and media, plus user-created routes, across native iOS, Android, and web clients. See `docs/superpowers/specs/` for the current design.
 
