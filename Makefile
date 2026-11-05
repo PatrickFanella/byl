@@ -3,7 +3,7 @@
 	migrate migrate-status migrate-down migrate-reset db-shell db-reset \
 	api-health api-cities api-places api-tour backend-test \
 	nuc-up nuc-down nuc-logs nuc-smoke nuc-rollback \
-	ios-build ios-run ios-test ios-simulators android-test \
+	ios-build ios-run ios-test ios-simulators android-test android-build \
 	web-install web-dev web-check web-build web-e2e
 
 BACKEND_DIR := backend
@@ -12,6 +12,7 @@ IOS_PROJECT := InvisibleMuseum.xcodeproj
 IOS_SCHEME := InvisibleMuseum
 IOS_BUNDLE_ID := com.rork.InvisibleMuseum
 IOS_BUILD_DIR := build
+IOS_DESTINATION ?= generic/platform=iOS Simulator
 SIMULATOR_ID ?= 46977DDD-8007-4137-AA70-C106917A7DB7
 NEARBY_LAT ?= 41.7959
 NEARBY_LNG ?= -88.0092
@@ -52,11 +53,12 @@ help:
 	@printf "  make web-dev              Run the admin app against localhost:8080\n"
 	@printf "  make web-check            Type-check, lint, and unit-test the web app\n"
 	@printf "  make web-build            Build the static admin app\n"
-	@printf "  make web-e2e              Playwright against E2E_API_URL (default localhost:8080)\n\n"
+	@printf "  make web-e2e              Playwright with a temporary API and PostgreSQL\n\n"
 	@printf "iOS:\n"
 	@printf "  make ios-build            Build iOS app for simulator\n"
 	@printf "  make ios-test             Run InvisibleMuseumKit unit tests (swift test)\n"
-	@printf "  make android-test         Run the Android :core JUnit tests (gradle)\n"
+	@printf "  make android-test         Run the Android :core JUnit tests (Gradle wrapper)\n"
+	@printf "  make android-build        Build and lint the Android debug app (requires SDK)\n"
 	@printf "  make ios-run              Boot/install/launch on SIMULATOR_ID\n"
 	@printf "  make ios-simulators       List available simulators\n"
 
@@ -132,7 +134,7 @@ nuc-rollback:
 	docker compose $(NUC_COMPOSE) run --rm migrate goose -dir /migrations down
 
 ios-build:
-	cd $(IOS_DIR) && xcodebuild -project "$(IOS_PROJECT)" -scheme "$(IOS_SCHEME)" -destination 'platform=iOS Simulator,id=$(SIMULATOR_ID)' SYMROOT="$(IOS_BUILD_DIR)" build
+	cd $(IOS_DIR) && xcodebuild -project "$(IOS_PROJECT)" -scheme "$(IOS_SCHEME)" -destination '$(IOS_DESTINATION)' CODE_SIGNING_ALLOWED=NO SYMROOT="$(abspath $(IOS_DIR)/$(IOS_BUILD_DIR))" build
 
 ios-run: ios-build
 	xcrun simctl boot "$(SIMULATOR_ID)" || true
@@ -147,10 +149,12 @@ ios-simulators:
 	xcrun simctl list devices available
 
 android-test:
-	cd android && gradle :core:test --no-daemon
+	cd android && ./gradlew :core:test --no-daemon
+
+android-build:
+	cd android && ./gradlew :core:test :app:assembleDebug :app:lintDebug --no-daemon
 
 WEB_DIR := web
-E2E_API_URL ?= http://localhost:8080
 
 web-install:
 	cd $(WEB_DIR) && npx -y npm@11 install --legacy-peer-deps
@@ -165,4 +169,4 @@ web-build:
 	cd $(WEB_DIR) && npm run build
 
 web-e2e:
-	cd $(WEB_DIR) && E2E_API_URL=$(E2E_API_URL) npm run test:e2e
+	bash scripts/test-web-e2e.sh

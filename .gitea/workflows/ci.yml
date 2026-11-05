@@ -36,7 +36,7 @@ jobs:
         postgres_host="$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$postgres_id")"
         test -n "$postgres_host"
         for attempt in {1..30}; do
-          if docker exec "$postgres_id" pg_isready -U museum -d museum_test >/dev/null; then
+          if docker exec "$postgres_id" pg_isready -h 127.0.0.1 -U museum -d museum_test >/dev/null; then
             break
           fi
           if [ "$attempt" -eq 30 ]; then
@@ -54,12 +54,16 @@ jobs:
   web:
     name: Web quality
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v4
       with:
         node-version: "22"
+    - uses: actions/setup-go@v6
+      with:
+        go-version: "1.25"
+        cache: false
     - name: Install
       shell: bash
       run: npm install -g npm@11 && npm ci --legacy-peer-deps
@@ -73,3 +77,33 @@ jobs:
         npm run test:unit -- --run
         npm run build
       working-directory: web
+    - name: Install browser
+      run: npx playwright install --with-deps chromium
+      working-directory: web
+    - name: Test visitor and curator flows against an isolated API
+      run: bash scripts/test-web-e2e.sh
+  android:
+    name: Android core
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "21"
+    - name: Test Kotlin core
+      run: ./gradlew --no-daemon :core:test
+      working-directory: android
+  ios:
+    name: iOS build and package tests
+    runs-on: macos
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v6
+    - name: Test shared Swift package
+      run: swift test
+      working-directory: ios-invisible-museum/InvisibleMuseumKit
+    - name: Build unsigned iOS app
+      run: xcodebuild -quiet -project InvisibleMuseum.xcodeproj -scheme InvisibleMuseum -sdk iphoneos -destination generic/platform=iOS -derivedDataPath "$RUNNER_TEMP/invisible-museum-ios" CODE_SIGNING_ALLOWED=NO build
+      working-directory: ios-invisible-museum

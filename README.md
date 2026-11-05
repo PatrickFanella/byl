@@ -17,8 +17,8 @@ Walking and biking tours of your city as if it were one giant museum. SwiftUI iO
 ## Requirements
 
 - Docker Desktop or Docker Engine
-- Xcode
-- iOS Simulator
+- Xcode on macOS for iOS builds and package tests
+- JDK 21 and Android SDK platform 35 for the Android app; the checked-in Gradle wrapper supplies Gradle
 - Optional local Go toolchain if you want to run backend tests outside Docker
 
 ## Quick start
@@ -179,7 +179,7 @@ Vitest; Playwright covers the visitor flows and the admin smoke against a live A
 make web-install
 make web-dev        # http://localhost:5173, sign in with any email while DEV_AUTH_ENABLED=true
 make web-check
-make web-e2e        # needs a running API with DEV_AUTH_ENABLED and ADMIN_BOOTSTRAP_EMAILS=admin@example.com
+make web-e2e        # starts its own temporary PostgreSQL and API; requires Docker, Go, Node, and Playwright Chromium
 ```
 
 Set `VITE_GOOGLE_CLIENT_ID` at build time to show Google sign-in.
@@ -204,8 +204,11 @@ own routes (`/t/{slug}` links and the `invisiblemuseum://tour/{slug}` scheme), s
 keep progress when signed in with Apple. An active tour keeps working offline from the cached
 route and progress.
 
-> Built without a Swift toolchain in the authoring environment. The first step on a Mac is
-> `make ios-test && make ios-build`; expect to fix compiler nits before the first run.
+Validated on Soyuz with Xcode 27.2: the unsigned iOS app builds and all 79
+`InvisibleMuseumKit` tests pass. `make ios-build` uses a generic Simulator destination,
+so it does not depend on a machine-specific simulator UUID. For an unsigned iPhone build,
+run `make ios-build IOS_DESTINATION='generic/platform=iOS'`. These are compile and package-test
+checks; physical-device GPS, sign-in, background behavior, and audio still need device qualification.
 
 Point the app at a local API from the Profile tab (API base URL), or launch with the
 environment variable `InvisibleMuseum.apiBaseURL=http://localhost:8080`. Debug builds show the
@@ -220,19 +223,23 @@ developer email sign-in when the API runs with `DEV_AUTH_ENABLED=true`.
   rule (65 m accuracy floor, radius plus accuracy, once per stop), `ActiveTour` (route
   with cached fallback, local progress merged with the server by union, serialised
   PUTs, resume after the process is killed), `RouteBuilder`, narration planning and
-  navigation URIs. 60 JUnit 5 tests against the recorded fixtures and MockWebServer;
+  navigation URIs. 68 JUnit 5 tests against the recorded fixtures and MockWebServer;
   they run anywhere with a JDK: `make android-test`.
 - `:app` — Jetpack Compose (Material 3, Navigation, MapLibre with OpenFreeMap tiles,
   LocationManager, MediaPlayer + TextToSpeech, Credential Manager for Google sign-in,
   EncryptedSharedPreferences). Included only when an Android SDK is present
   (`ANDROID_HOME` or `local.properties`).
 
-> Written without an Android SDK in the authoring environment: `:core` is built and
-> tested here; `:app` is not compiled. First steps on a machine with the SDK:
-> `cd android && gradle wrapper && ./gradlew :core:test :app:assembleDebug`.
-> Put `museum.googleServerClientId=<web client id>` and optionally
-> `museum.apiBaseUrl=http://10.0.2.2:8080` in `android/local.properties` (plain HTTP to
-> the emulator host is allowed in debug builds only, through the debug network security config).
+Validated on Kvant with JDK 21, Gradle 8.14.3, and Android SDK 35: all 68 core
+tests, `:app:assembleDebug`, and `:app:lintDebug` pass. The Gradle wrapper is checked in
+with the distribution checksum. Run `make android-test` for the core, or
+`ANDROID_HOME="$HOME/Android/Sdk" make android-build` for the app. A local Android 15 emulator
+also loaded the seeded tour and advanced through manual arrival.
+
+Set `museum.googleServerClientId` in `android/local.properties` to the web OAuth client ID
+when configuring Google sign-in. For local development, set `museum.apiBaseUrl` to your API;
+debug builds allow HTTP to localhost and the emulator host at `10.0.2.2`. Release builds
+forbid cleartext and hide the server-override form.
 
 ## API URL configuration
 
@@ -253,6 +260,13 @@ iOS app
   -> Cloudflare / Caddy on Almaz
   -> Go API + PostgreSQL on NUC
 ```
+
+## Validation and follow-up
+
+The follow-up to the five rebuild cycles is recorded in
+[Native builds and review follow-up](docs/superpowers/2026-11-05-follow-up-validation.md),
+including the disposition of all 54 deferred report entries. CI runs the backend suite,
+web checks and browser flows, Kotlin core tests, Swift package tests, and an unsigned iOS build.
 
 ## Notes
 
