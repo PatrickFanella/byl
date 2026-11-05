@@ -220,7 +220,8 @@ func TestShareLinkLandingPage(t *testing.T) {
 	if r.status != http.StatusOK || !strings.HasPrefix(r.header.Get("Content-Type"), "text/html") {
 		t.Fatalf("%d %q", r.status, r.header.Get("Content-Type"))
 	}
-	if !strings.Contains(string(r.raw), "invisiblemuseum://tour/abc123XYZ0") {
+	if !strings.Contains(string(r.raw), `href="invisiblemuseum://tour/abc123XYZ0"`) ||
+		!strings.Contains(string(r.raw), `content="0; url=invisiblemuseum://tour/abc123XYZ0"`) {
 		t.Fatalf("landing page must link to the app scheme: %s", r.raw)
 	}
 	if r.header.Get("X-Content-Type-Options") != "nosniff" {

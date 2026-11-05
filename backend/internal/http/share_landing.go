@@ -34,5 +34,6 @@ func (d Deps) shareLanding(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Cache-Control", "no-store")
-	_ = landingTemplate.Execute(w, map[string]string{"AppURL": "invisiblemuseum://tour/" + slug})
+	// The fixed app scheme and validated slug are safe; template otherwise rejects custom schemes.
+	_ = landingTemplate.Execute(w, map[string]template.URL{"AppURL": template.URL("invisiblemuseum://tour/" + slug)})
 }
