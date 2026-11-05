@@ -1,0 +1,72 @@
+// Typed calls for the visitor site: public content plus the signed-in /me routes.
+import { api } from '#lib/api/index.ts';
+import type { components } from '#lib/api/types.ts';
+
+type Schemas = components['schemas'];
+export type City = Schemas['City'] & { topics?: Topic[] };
+export type Topic = Schemas['Topic'];
+export type PlaceSummary = Schemas['PlaceSummary'];
+export type MomentSummary = Schemas['MomentSummary'];
+export type MediaAsset = Schemas['MediaAsset'];
+export type Source = Schemas['Source'];
+export type TourSummary = Schemas['TourSummary'];
+export type TourStop = Schemas['TourStop'];
+export type TourRoute = Schemas['TourRoute'];
+export type TourProgress = Schemas['TourProgress'];
+export type RouteSummary = Schemas['RouteSummary'];
+export type PlaceDetail = PlaceSummary & {
+	primary_moment?: MomentSummary | null;
+	moments: MomentSummary[];
+};
+export type MomentDetail = MomentSummary & {
+	body: string;
+	media: MediaAsset[];
+	sources: Source[];
+	topics: Topic[];
+	narration?: MediaAsset | null;
+};
+export type TourDetail = TourSummary & { stops: TourStop[] };
+export type Account = Schemas['Account'];
+
+function qs(params: Record<string, string | number | undefined | null>): string {
+	const u = new URLSearchParams();
+	for (const [k, v] of Object.entries(params)) {
+		if (v !== undefined && v !== null && v !== '') u.set(k, String(v));
+	}
+	const s = u.toString();
+	return s ? `?${s}` : '';
+}
+
+// Public
+export const listCities = () => api.list<City>('/api/v1/cities');
+export const getCity = (ref: string) => api.get<City>(`/api/v1/cities/${ref}`);
+export const listTours = (city: string, topic?: string, mode?: string) =>
+	api.list<TourSummary>(`/api/v1/cities/${city}/tours${qs({ topic, mode })}`);
+export const getTour = (ref: string) => api.get<TourDetail>(`/api/v1/tours/${ref}`);
+export const getRoute = (tour: string, mode: string) =>
+	api.get<TourRoute>(`/api/v1/tours/${tour}/route${qs({ mode })}`);
+export const listPlaces = (city: string) =>
+	api.list<PlaceSummary>(`/api/v1/cities/${city}/places${qs({ limit: 200 })}`);
+export const listPlacesNear = (city: string, lat: number, lng: number, radiusM = 2000) =>
+	api.list<PlaceSummary>(
+		`/api/v1/cities/${city}/places${qs({ near: `${lat},${lng}`, radius_m: radiusM, limit: 50 })}`
+	);
+export const getPlace = (ref: string) => api.get<PlaceDetail>(`/api/v1/places/${ref}`);
+export const getMoment = (id: string) => api.get<MomentDetail>(`/api/v1/moments/${id}`);
+
+// Me
+export const me = () => api.get<Account>('/api/v1/me');
+export const mySaved = () => api.list<TourSummary>('/api/v1/me/saved');
+export const saveTour = (id: string) => api.put<unknown>(`/api/v1/me/saved/${id}`);
+export const unsaveTour = (id: string) => api.del(`/api/v1/me/saved/${id}`);
+export const myProgress = () => api.list<TourProgress>('/api/v1/me/progress');
+export const putProgress = (
+	tour: string,
+	body: { mode: string; visited_positions: number[]; completed: boolean }
+) => api.put<TourProgress>(`/api/v1/me/progress/${tour}`, body);
+export const myTours = () => api.list<TourSummary>('/api/v1/me/tours');
+export const createTour = (body: Record<string, unknown>) =>
+	api.post<TourDetail>('/api/v1/me/tours', body);
+export const updateTour = (id: string, body: Record<string, unknown>) =>
+	api.patch<TourDetail>(`/api/v1/me/tours/${id}`, body);
+export const deleteTour = (id: string) => api.del(`/api/v1/me/tours/${id}`);
