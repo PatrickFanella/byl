@@ -55,16 +55,16 @@ func TestAdminContentLifecycle(t *testing.T) {
 	if r := env.do(t, http.MethodPatch, "/api/v1/admin/places/"+placeID, curator, map[string]any{"latitude": 999}); r.status != 422 {
 		t.Fatalf("invalid patch: %d", r.status)
 	}
-	if r := env.do(t, http.MethodPost, "/api/v1/admin/places/"+placeID+"/publish", curator, nil); r.status != 200 || r.body["status"] != "published" {
-		t.Fatalf("publish place: %d %s", r.status, r.raw)
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/places/"+placeID+"/publish", curator, nil); r.status != 409 {
+		t.Fatalf("incomplete place must stay a draft: %d %s", r.status, r.raw)
 	}
-	if r := env.get(t, "/api/v1/places/"+placeID, ""); r.status != 200 {
-		t.Fatalf("published place public: %d", r.status)
+	if r := env.get(t, "/api/v1/places/"+placeID, ""); r.status != 404 {
+		t.Fatalf("incomplete place must stay hidden: %d", r.status)
 	}
 
 	r = env.do(t, http.MethodPost, "/api/v1/admin/moments", curator, map[string]any{
-		"place_id": placeID, "title": "Preserve Established", "body": "The preserve opened.", "date_start": "1981-01-01", "date_precision": "year", "date_display": "1981",
-		"topic_ids": []string{testdb.SeedTopicParksID}, "sources": []map[string]any{{"title": "Forest Preserve District", "url": "https://example.org"}},
+		"place_id": placeID, "title": "Preserve Established", "body": strings.Repeat("This is a sourced historical account of the preserve and its creation. ", 10) + "\n\n" + strings.Repeat("The local records explain its context and the people who established it. ", 10) + "\n\n" + strings.Repeat("The surviving landscape connects that history with the present day. ", 10), "date_start": "1981-01-01", "date_precision": "year", "date_display": "1981",
+		"topic_ids": []string{testdb.SeedTopicParksID}, "sources": []map[string]any{{"title": "Forest Preserve District", "publisher": "Forest Preserve District", "url": "https://example.org"}},
 	})
 	if r.status != 201 || r.body["status"] != "draft" || len(r.body["sources"].([]any)) != 1 {
 		t.Fatalf("create moment: %d %s", r.status, r.raw)
@@ -90,7 +90,7 @@ func TestAdminContentLifecycle(t *testing.T) {
 	if r.status != 409 || errCode(r) != "conflict" || !strings.Contains(errMessage(r), "license") {
 		t.Fatalf("publish without licence: %d %s", r.status, r.raw)
 	}
-	if r := env.do(t, http.MethodPatch, "/api/v1/admin/media/"+assetID, curator, map[string]any{"license": "CC-BY-4.0", "credit": "Someone"}); r.status != 200 || r.body["license"] != "CC-BY-4.0" {
+	if r := env.do(t, http.MethodPatch, "/api/v1/admin/media/"+assetID, curator, map[string]any{"license": "CC-BY-4.0", "credit": "Someone", "license_url": "https://creativecommons.org/licenses/by/4.0/", "source_url": "https://example.org/photo"}); r.status != 200 || r.body["license"] != "CC-BY-4.0" {
 		t.Fatalf("patch media: %d %s", r.status, r.raw)
 	}
 	before, _ := env.store.ListJobs(context.Background(), models.JobStatusQueued, 50, 0)
@@ -111,6 +111,12 @@ func TestAdminContentLifecycle(t *testing.T) {
 	if r := env.do(t, http.MethodPatch, "/api/v1/admin/places/"+placeID, curator, map[string]any{"primary_moment_id": momentID}); r.status != 200 || r.body["primary_moment"] == nil {
 		t.Fatalf("primary moment: %d %s", r.status, r.raw)
 	}
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/places/"+placeID+"/publish", curator, nil); r.status != 200 {
+		t.Fatalf("publish complete place: %d %s", r.status, r.raw)
+	}
+	if r := env.get(t, "/api/v1/places/"+placeID, ""); r.status != 200 {
+		t.Fatalf("complete place public: %d", r.status)
+	}
 	if r := env.do(t, http.MethodPatch, "/api/v1/admin/places/"+placeID, curator, map[string]any{"primary_moment_id": testdb.SeedMomentTalkiesID}); r.status != 422 {
 		t.Fatalf("primary moment from another place: %d %s", r.status, r.raw)
 	}
@@ -130,7 +136,7 @@ func TestAdminContentLifecycle(t *testing.T) {
 	if r := env.do(t, http.MethodPost, "/api/v1/admin/cities", curator, map[string]any{"name": "Naperville", "center_lat": 41.77, "center_lng": -88.15, "bbox_min_lat": 41.7, "bbox_min_lng": -88.2, "bbox_max_lat": 41.8, "bbox_max_lng": -88.1}); r.status != 201 || r.body["slug"] != "naperville" {
 		t.Fatalf("create city: %d %s", r.status, r.raw)
 	}
-	if r := env.get(t, "/api/v1/admin/media", curator); r.status != 200 || len(items(t, r)) != 1 {
+	if r := env.get(t, "/api/v1/admin/media", curator); r.status != 200 || len(items(t, r)) != 5 {
 		t.Fatalf("list media: %d %s", r.status, r.raw)
 	}
 }

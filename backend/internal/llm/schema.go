@@ -8,7 +8,7 @@ func MomentDraftSchema() map[string]any {
 		"type": "object",
 		"properties": map[string]any{
 			"title":          str("Short title for the moment, under 60 characters."),
-			"body":           str("120 to 220 words of plain prose for a visitor standing at the place. Only facts supported by the source."),
+			"body":           str("A sourced historical story, aiming for 300 to 500 words in at least three paragraphs. Only source-supported facts; shorter if evidence is insufficient, with the research gap explained in notes."),
 			"date_start":     str("YYYY-MM-DD when known, else empty string."),
 			"date_end":       str("YYYY-MM-DD when the moment spans a range, else empty string."),
 			"date_precision": map[string]any{"type": "string", "enum": []string{"day", "month", "year", "circa"}},

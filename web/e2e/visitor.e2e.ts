@@ -3,6 +3,16 @@ import { expect, test } from '@playwright/test';
 const apiUrl = process.env.E2E_API_URL;
 test.skip(!apiUrl, 'E2E_API_URL not set');
 
+test.beforeEach(async ({ page }) => {
+	// Check the packaged images against this test's API, not production.
+	await page.route('https://byl.subcult.tv/media/files/library/**', async (route) => {
+		const response = await route.fetch({
+			url: `${apiUrl}${new URL(route.request().url()).pathname}`
+		});
+		await route.fulfill({ response });
+	});
+});
+
 test('a visitor browses from home to a tour, a place, and a moment', async ({ page }) => {
 	await page.goto('/');
 	await expect(page.getByRole('heading', { name: /downers grove on foot/i })).toBeVisible();
@@ -21,10 +31,39 @@ test('a visitor browses from home to a tour, a place, and a moment', async ({ pa
 
 	await page.getByTestId('stop-row').nth(1).click();
 	await expect(page).toHaveURL(/\/places\/.+\?featured=/);
-	await expect(page.getByText(/featured on this tour/i)).toBeVisible();
-	await page.getByTestId('featured-moment').click();
-	await expect(page).toHaveURL(/\/moments\//);
+	await expect(page.getByRole('heading', { name: 'Built for the Talkies' })).toBeVisible();
+	await expect(page.getByRole('img', { name: /Tivoli marquee/ })).toBeVisible();
+	await expect
+		.poll(() =>
+			page
+				.getByRole('img', { name: /Tivoli marquee/ })
+				.evaluate((img) => (img as HTMLImageElement).naturalWidth)
+		)
+		.toBeGreaterThan(0);
+	await expect(page.getByRole('link', { name: 'Image source', exact: true })).toBeVisible();
+	await expect(page.locator('article p')).toHaveCount(5);
+	await expect(
+		page.getByRole('navigation', { name: 'Events and stories at this place' })
+	).toHaveCount(0);
 	await expect(page.getByRole('heading', { name: /sources/i })).toBeVisible();
+});
+
+test('a place lists its events and opens a selected history in place', async ({ page }) => {
+	await page.goto('/places/main-street-station');
+	const events = page.getByRole('navigation', { name: 'Events and stories at this place' });
+	await expect(events.getByRole('link')).toHaveCount(3);
+	await events.getByRole('link', { name: /Twin-City Zephyr Crash/ }).click();
+	await expect(page).toHaveURL(/featured=.*#story/);
+	await expect(
+		page.getByRole('heading', { name: 'The Twin-City Zephyr Crash', exact: true })
+	).toBeVisible();
+	await expect(page.locator('article')).toContainText('May 26, 1947');
+	await expect(events.getByRole('link', { name: /Twin-City Zephyr Crash/ })).toHaveAttribute(
+		'aria-current',
+		'true'
+	);
+	await page.reload();
+	await expect(page.locator('article')).toContainText('May 26, 1947');
 });
 
 test('the tours page removes tours that do not match the selected travel mode and topic', async ({

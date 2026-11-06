@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -354,25 +353,28 @@ func replaceTopics(ctx context.Context, q dbtx, momentID string, topicIDs []stri
 
 // MomentPublishBlockers lists reasons a moment cannot be published.
 func (s *Store) MomentPublishBlockers(ctx context.Context, momentID string) ([]string, error) {
-	rows, err := s.pool.Query(ctx, `SELECT a.id, a.caption FROM media_assets a
-		WHERE a.license = '' AND (a.id IN (SELECT media_id FROM moment_media WHERE moment_id = $1) OR a.id = (SELECT hero_media_id FROM moments WHERE id = $1))`, momentID)
+	moment, err := s.GetMoment(ctx, momentID, true)
 	if err != nil {
-		return nil, mapErr(err)
+		return nil, err
 	}
-	defer rows.Close()
-	var out []string
-	for rows.Next() {
-		var id, caption string
-		if err := rows.Scan(&id, &caption); err != nil {
-			return nil, err
-		}
-		label := id
-		if caption != "" {
-			label = fmt.Sprintf("%s (%s)", id, caption)
-		}
-		out = append(out, "media "+label+" has no license")
+	media := append([]models.MediaAsset{}, moment.Media...)
+	if moment.HeroMedia != nil {
+		media = append(media, *moment.HeroMedia)
 	}
-	return out, rows.Err()
+	out := models.HistoryReviewGaps(moment.Body, moment.Sources, media)
+	seen := map[string]bool{}
+	for _, asset := range media {
+		if seen[asset.ID] {
+			continue
+		}
+		seen[asset.ID] = true
+		if !models.ReusableLicense(asset.License) {
+			out = append(out, "media "+asset.ID+" needs a reusable license")
+		} else if asset.Kind == models.MediaKindImage && !asset.ReusableImage() {
+			out = append(out, "image "+asset.ID+" needs caption, credit, source and license URLs")
+		}
+	}
+	return out, nil
 }
 
 // PublishedMomentsUsingMedia counts published moments that attach the asset as media or hero.

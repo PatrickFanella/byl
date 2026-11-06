@@ -267,10 +267,10 @@ paths:
       responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
   /api/v1/admin/places/{id}/publish:
     post:
-      summary: "Publish a place"
+      summary: "Publish a place with a published, illustrated and sourced primary history"
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
-      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: Primary history is missing or incomplete }, "401": { description: Unauthorized } }
   /api/v1/admin/places/{id}/unpublish:
     post:
       summary: "Return a place to draft"
@@ -309,7 +309,7 @@ paths:
       responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
   /api/v1/admin/moments/{id}/publish:
     post:
-      summary: "Publish a moment; refuses while any attached media lacks a licence; enqueues narration"
+      summary: "Publish a sourced history of at least 250 words and three paragraphs with a credited reusable picture; enqueues narration"
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: Conflict }, "401": { description: Unauthorized } }

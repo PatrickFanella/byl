@@ -153,10 +153,10 @@ func TestAdminSuggestFeaturedMoment(t *testing.T) {
 		t.Fatalf("%d %s", r.status, r.raw)
 	}
 	ordered := r.body["ordered"].([]any)
-	if len(ordered) != 2 || ordered[0].(map[string]any)["moment"].(map[string]any)["id"] != testdb.SeedMomentPlatformID || ordered[0].(map[string]any)["reason"] != "daily rhythm" {
+	if len(ordered) != 3 || ordered[0].(map[string]any)["moment"].(map[string]any)["id"] != testdb.SeedMomentPlatformID || ordered[0].(map[string]any)["reason"] != "daily rhythm" {
 		t.Fatalf("ordered %v", ordered)
 	}
-	if fd.last.TopicName != "Rail and the Commuter Town" || fd.last.PlaceName != "Main Street Station" || len(fd.last.Moments) != 2 {
+	if fd.last.TopicName != "Rail and the Commuter Town" || fd.last.PlaceName != "Main Street Station" || len(fd.last.Moments) != 3 {
 		t.Fatalf("rank request %+v", fd.last)
 	}
 	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/downtown-memory-loop/stops/9/suggest", curator, nil); r.status != 404 {
@@ -180,7 +180,7 @@ func TestAdminStats(t *testing.T) {
 	pending := r.body["pending_candidates"].(map[string]any)
 	jobs := r.body["jobs"].(map[string]any)
 	published := r.body["published"].(map[string]any)
-	if pending["moment"].(float64) != 1 || jobs["queued"].(float64) != 2 || published["places"].(float64) != 4 || published["moments"].(float64) != 5 || published["tours"].(float64) != 1 {
+	if pending["moment"].(float64) != 1 || jobs["queued"].(float64) != 2 || published["places"].(float64) != 4 || published["moments"].(float64) != 7 || published["tours"].(float64) != 1 {
 		t.Fatalf("stats %s", r.raw)
 	}
 }

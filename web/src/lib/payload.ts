@@ -28,8 +28,9 @@ const momentSpec: Spec[] = [
 		key: 'body',
 		label: 'Body (Markdown)',
 		kind: 'textarea',
-		help: 'What a visitor reads or hears at the place.'
+		help: 'Aim for 300–500 sourced words in at least three paragraphs: event, context, and significance. Keep separate events at the same place as separate moments. Leave unsupported details in draft notes.'
 	},
+
 	{
 		key: 'date_display',
 		label: 'Date as shown',
@@ -43,6 +44,12 @@ const momentSpec: Spec[] = [
 		label: 'Date precision',
 		kind: 'select',
 		options: ['day', 'month', 'year', 'circa']
+	},
+	{
+		key: 'hero_media_id',
+		label: 'Picture asset id',
+		kind: 'text',
+		help: 'Attach a reviewed image from Media, with caption, creator credit, source and reusable license.'
 	},
 	{ key: 'slug', label: 'Slug', kind: 'text', help: 'Leave empty to derive from the title.' },
 	{

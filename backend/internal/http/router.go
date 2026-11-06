@@ -17,6 +17,7 @@ import (
 	"invisible-museum/backend/internal/llm"
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/repository"
+	"invisible-museum/backend/internal/seedmedia"
 	"invisible-museum/backend/internal/sources"
 )
 
@@ -69,6 +70,7 @@ func NewRouter(d Deps) http.Handler {
 
 	r.Get("/healthz", d.healthz)
 	r.Get("/t/{slug}", d.shareLanding)
+	r.Handle("/media/files/library/*", http.StripPrefix("/media/files/library/", noDirListing(http.FS(seedmedia.Files))))
 	if d.MediaFSDir != "" {
 		r.Handle("/media/files/*", http.StripPrefix("/media/files/", noDirListing(http.Dir(d.MediaFSDir))))
 	}

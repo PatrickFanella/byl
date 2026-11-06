@@ -135,6 +135,9 @@ func (w *Worker) candidateFor(ctx context.Context, cityID string, explicitPlace 
 		}
 		cand.Payload = mustJSON(payload)
 	case models.CandidateKindMedia:
+		// Keep an explicitly requested location available to the image reviewer.
+		// Proximity alone does not establish that a photograph depicts that place.
+		cand.TargetPlaceID = explicitPlace
 		kind := models.MediaKindImage
 		switch {
 		case len(f.MimeType) >= 5 && f.MimeType[:5] == "video":

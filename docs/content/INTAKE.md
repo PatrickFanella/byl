@@ -1,0 +1,87 @@
+# Illustrated place histories
+
+The physical location is a **place**. A dated event or distinct historical thread
+at that location is a **moment**. A place page shows its primary history in full
+and lists the other published moments in date order. One complete story is enough
+for a single-event place; several events do not require duplicate places.
+
+## What intake must produce
+
+Keep the place's name, address and coordinates separate from its historical
+stories. Resolve an existing place before creating another record for the same
+site. A nearby geocoded result is a review suggestion, not proof of identity.
+
+Each story needs:
+
+- A clear title and a substantial account of the event, its people and context,
+  and its significance at this place. Aim for 300–500 words in short paragraphs.
+  Publication requires at least 250 words and three paragraphs. Insufficient
+  evidence means more research, not filler to reach the threshold.
+- Named sources with a title, publisher, original URL and retrieval date. Prefer
+  original records and the institution responsible for the site. Keep conflicting
+  dates visible in review notes and cite the evidence behind the chosen account.
+- Dates at the precision the evidence supports. An ongoing historical thread can
+  use `circa`; do not invent a day to make a timeline entry look complete.
+- At least one image with a caption, creator credit, original source URL, reusable
+  license and license URL. Confirm what it depicts and when it was made. An
+  archival view, map or family portrait can provide historical context if its
+  caption says so; it must not be presented as a current site photograph.
+
+A Wikipedia article's text license does not clear its thumbnail. Follow the
+image to its own description and rights record. The current publication rules
+accept public domain/CC0 and CC BY/BY-SA images. Noncommercial, no-derivatives,
+unknown or rights-reserved images stay out of published stories. Illustrations retain their individual licenses; the repository license does not
+relicense them. Original source links and license links remain visible to visitors. Keep a record of resizing or
+other changes. Do not substitute generated reconstructions for documentary images.
+
+## Current import and review workflow
+
+1. Import sources for the city or an explicitly selected place. Review place
+   matches rather than assuming proximity establishes that a source belongs there.
+2. Draft each distinct event as its own moment candidate. The draft prompt asks
+   for the longer account above, uses only supplied evidence and leaves gaps in
+   notes. Draft jobs preserve curator-added citations and record `review_gaps`.
+   Drafting does not discover new facts or clear image rights.
+3. Import a picture from its original rights record, such as a Commons file page,
+   targeting the explicit place. Media imports retain that place association.
+   Review and fetch the asset, then attach its ID as the moment's hero picture or
+   gallery media. A loose `image_url` in a discovery payload is not an approved
+   image association.
+4. Approve candidates into draft entities. Complete text, sources and image
+   metadata in the moment editor. Incomplete candidates can be retained without
+   publishing them. The queue displays the requirements and draft research gaps.
+5. Publish the complete moment. The server checks length, paragraphs, citations
+   and image provenance/license metadata. A new place requires a published,
+   complete primary moment before the place itself can be published.
+6. Review the actual place page, image and caption, source links, event selection
+   and tour entry. Test both a one-story and a multiple-event location.
+
+The server checks completeness, not historical truth. Curator review still needs
+to verify that the sources support the prose and that the image depicts the
+claimed subject. Existing import adapters, the draft job and publication checks
+implement this contract; the broader automated route-intake roadmap remains a
+separate project. Production drafting still needs an explicitly configured LLM
+provider. This change does not enable a paid provider or public sign-in.
+
+## Downers Grove pilot
+
+[The reviewed histories](downers-grove/histories.json) and
+[source register](downers-grove/sources.json) compile into migration 3 using
+`python3 scripts/build-pilot-content.py`. CI's `--check` verifies the migration
+and the image bytes against the [media receipt](downers-grove/media.json).
+The seven published histories cover the existing four places; the station and
+museum each have multiple stories. The unrelated in-review Pierce Downer record
+remains unpublished.
+
+Station and theatre illustrations are dated photographs. Fishel Park uses an
+archival picture of the school formerly on its site. The museum uses a Smithsonian
+portrait of Henry Williams Blodgett to accompany the family history. A reusable
+photograph of the museum buildings and a current Fishel Park view are still
+desirable additions; no permission to republish the available rights-reserved or
+noncommercial photographs was inferred.
+
+The seed illustrations are packaged with the API and served locally at
+`/media/files/library/images/`; they do not depend on third-party hotlinks.
+Uploaded media keeps its separate storage lifecycle. These pilot media URLs
+target `https://byl.subcult.tv`; another installation must review its own public
+base URL when importing the pilot records.
