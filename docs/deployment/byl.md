@@ -1,0 +1,74 @@
+# Byl web releases
+
+The public application is https://byl.subcult.tv. Almaz's existing wildcard
+Cloudflare tunnel and Caddy route forward to the NUC at `10.0.0.56:3093`.
+The isolated Compose project `byl` owns PostgreSQL, the Go API, nginx web client,
+and its database/media volumes. The retired museum checkout and database volume
+are outside this deployment.
+
+## Automatic delivery
+
+`.gitea/workflows/ci.yml` builds release images after backend, web/browser,
+Android core and iOS build/package checks pass. Pull requests build and smoke-test
+both Docker images without deployment secrets. Main pushes build the exact Git
+revision, check migrations against a disposable database, verify static assets,
+and transfer the images through a dedicated SSH key. A retry reuses any image
+already accepted for that revision.
+
+The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
+services. It requires current main, matching source/revision labels, unchanged
+runtime settings and the operator-owned pre-deployment hook. The hook refuses
+changed migration files or a schema version other than 2, then saves a PostgreSQL
+custom-format dump and media archive. CI never applies production migrations.
+An intentional schema change needs a separately reviewed migration and baseline
+update on the host.
+
+The receiver replaces only API/web images and checks Docker health, exact public
+HTML and `/release.json` bytes from the image, API health, seeded city/tour
+responses, and disabled development sign-in. Failed activation restores the
+previous image IDs. A successful public check publishes a Gitea prerelease named
+`main-<12-character revision>`, reflecting the app's current rebuild status.
+This workflow does not distribute iOS or Android binaries.
+
+## Host configuration and secrets
+
+The operator installs `deploy/compose.yml` in `/srv/apps/projects/byl`, with a
+mode-0600 `.env` containing the database credentials and image selections.
+`deploy/byl.Caddyfile` is the dedicated Almaz route. PostgreSQL and API publish
+no host ports. Port 3093 accepts ingress from Almaz through the host firewall.
+
+Only `HOMELAB_DEPLOY_KEY` and `HOMELAB_KNOWN_HOSTS` belong in the repository's
+encrypted Actions secrets. The app key is restricted to one fixed receiver/profile
+and the CI source addresses; it grants no shell. The receiver revision is
+`ecc088dad74351b536f156b351cf199e95e3f220`. Key custody belongs to the SUBCULT
+homelab operator, with initial rotation due February 3, 2027. Retain unrelated
+human and service credentials during rotation.
+
+Set the Actions variable `VITE_GOOGLE_CLIENT_ID` and host `GOOGLE_CLIENT_IDS` to
+the same registered Google web client ID, allowing `https://byl.subcult.tv` as
+a JavaScript origin. Set `ADMIN_BOOTSTRAP_EMAILS` privately on the host for curator
+access. Without a Google client ID, public browsing is available but web sign-in
+is unavailable. Development sign-in stays disabled.
+
+The initial stack uses filesystem media, no generated narration, and the existing
+straight-line routing provider. Street-aware walking/cycling routing requires
+Valhalla and its map tiles; the separate `backend/docker-compose.nuc.yml` describes
+that larger setup. Straight-line routes must not be treated as street directions.
+
+## Verification and recovery
+
+Run `python3 scripts/verify_release.py <full-revision>` for public release checks.
+`bash scripts/release.sh` builds and smoke-tests without deploying by default.
+
+Host-only receiver state lives in
+`~/.local/state/fleet-deploy/byl/releases/`. Each `receipt.json` records prior and
+new image IDs and an exact rollback command. Check that a later deployment has
+not superseded it before running that command as the host operator. CI refuses
+to deploy an old revision. Do not run migration `down` to roll back an image.
+
+Backups live in `/srv/apps/projects/byl/backups/` with private permissions.
+Database dumps are transactionally consistent; the separately archived media can
+change during a backup. Initial deployment must include an isolated database
+restore check. There is no automatic backup/image pruning. The release hook
+creates backups before deployments; it does not provide scheduled or off-host
+backup coverage.

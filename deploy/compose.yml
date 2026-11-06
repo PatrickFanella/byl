@@ -1,0 +1,79 @@
+# Operator-installed baseline. CI changes only the api/web images through fleet-deploy.
+name: byl
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: byl
+      POSTGRES_USER: byl
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U byl -d byl]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+  api:
+    image: ${API_IMAGE:?set API_IMAGE}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
+      API_ADDR: ':8080'
+      PUBLIC_BASE_URL: https://byl.subcult.tv
+      DEV_AUTH_ENABLED: 'false'
+      GOOGLE_CLIENT_IDS: ${GOOGLE_CLIENT_IDS:-}
+      APPLE_CLIENT_IDS: ${APPLE_CLIENT_IDS:-com.rork.InvisibleMuseum}
+      ADMIN_BOOTSTRAP_EMAILS: ${ADMIN_BOOTSTRAP_EMAILS:-}
+      MEDIA_STORE: fs
+      MEDIA_FS_DIR: /data/media
+      MEDIA_PUBLIC_BASE_URL: https://byl.subcult.tv/media/files
+      ROUTING_PROVIDER: straightline
+      NARRATION_PROVIDER: none
+      JOB_WORKERS: '2'
+    volumes:
+      - media_data:/data/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/healthz]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+    mem_limit: 256m
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+  web:
+    image: ${WEB_IMAGE:?set WEB_IMAGE}
+    restart: unless-stopped
+    environment:
+      API_UPSTREAM: http://api:8080
+    ports:
+      - '10.0.0.56:3093:80'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1/healthz]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+    mem_limit: 128m
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+volumes:
+  postgres_data:
+  media_data:
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 10.252.85.0/28

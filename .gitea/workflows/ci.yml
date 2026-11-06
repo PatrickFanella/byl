@@ -109,3 +109,34 @@ jobs:
     - name: Build unsigned iOS app
       run: xcodebuild -quiet -project InvisibleMuseum.xcodeproj -scheme InvisibleMuseum -sdk iphoneos -destination generic/platform=iOS -derivedDataPath "$RUNNER_TEMP/invisible-museum-ios" CODE_SIGNING_ALLOWED=NO build
       working-directory: ios-invisible-museum
+  release:
+    name: Release images and deploy
+    needs: [verify, web, android, ios]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v6
+    - name: Check release automation syntax
+      run: |
+        bash -n scripts/release.sh scripts/smoke-release.sh scripts/byl-pre-deploy.sh
+        python3 -c 'from pathlib import Path; [compile(p.read_text(), str(p), "exec") for p in (Path("scripts/verify_release.py"), Path("scripts/publish-release.py"))]'
+    - name: Build and smoke-test release images
+      if: github.event_name == 'pull_request'
+      env:
+        VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+      run: bash scripts/release.sh
+    - name: Build, verify and deploy current main
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      env:
+        VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+        DEPLOY: 'true'
+        HOMELAB_DEPLOY_KEY: ${{ secrets.HOMELAB_DEPLOY_KEY }}
+        HOMELAB_KNOWN_HOSTS: ${{ secrets.HOMELAB_KNOWN_HOSTS }}
+      run: bash scripts/release.sh
+    - name: Publish successful deployment as a Gitea release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      env:
+        GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+      run: python3 scripts/publish-release.py
