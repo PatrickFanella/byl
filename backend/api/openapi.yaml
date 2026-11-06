@@ -646,6 +646,72 @@ paths:
         "404": { description: Brief not found or not owned }
         "409": { description: Version or lifecycle conflict }
         "422": { description: Field validation failed }
+  /api/v1/admin/route-briefs/{id}/research:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      summary: Get the latest private research progress (curators only)
+      description: Source content, submitted snapshots, raw provider errors and stage output are excluded. Owners cannot read another owner's progress. No public intake is enabled.
+      security: [{ bearer: [] }]
+      responses:
+        "200": { description: Private progress, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchRun" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Private brief or research run not found }
+        "409": { description: Stale version, invalid state, or exhausted resume budget }
+        "422": { description: Invalid request }
+    post:
+      summary: Start bounded research at the saved brief version
+      description: Only draft and needs_research briefs may start. Repeating a source version returns its original run. Queues a private job; an absent processor records processor_unavailable, never fabricated research. No automatic publication.
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchActionRequest" } } } }
+      responses:
+        "202": { description: Research queued or original run returned, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchRun" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Private brief or research run not found }
+        "409": { description: Stale version, invalid state, or exhausted resume budget }
+        "422": { description: Invalid request }
+  /api/v1/me/route-briefs/{id}/research:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      summary: Get the latest research progress for an owned brief
+      description: Source content, submitted snapshots, raw provider errors and stage output are excluded. Owners cannot read another owner's progress. No public intake is enabled.
+      security: [{ bearer: [] }]
+      responses:
+        "200": { description: Private progress, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchRun" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Private brief or research run not found }
+        "409": { description: Stale version, invalid state, or exhausted resume budget }
+        "422": { description: Invalid request }
+  /api/v1/admin/route-briefs/{id}/research/cancel:
+    post:
+      summary: Cancel research and release the brief for edits
+      description: Cancellation immediately marks the brief needs_research. In-flight provider results cannot commit afterward.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchActionRequest" } } } }
+      responses:
+        "202": { description: Research action recorded, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchRun" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Private brief or research run not found }
+        "409": { description: Stale version, invalid state, or exhausted resume budget }
+        "422": { description: Invalid request }
+  /api/v1/admin/route-briefs/{id}/research/resume:
+    post:
+      summary: Resume incomplete stages without resetting work budgets
+      description: Requires unchanged submitted input and remaining request, model, stage retry and elapsed budgets. Preserves completed stages and candidate edits. Creates a fresh job ID to fence old workers.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchActionRequest" } } } }
+      responses:
+        "202": { description: Research action recorded, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchRun" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Private brief or research run not found }
+        "409": { description: Stale version, invalid state, or exhausted resume budget }
+        "422": { description: Invalid request }
 components:
   securitySchemes:
     bearer:
@@ -653,6 +719,48 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    ResearchActionRequest:
+      type: object
+      additionalProperties: false
+      required: [version]
+      properties:
+        version: { type: integer, minimum: 1 }
+        run_id: { type: string, format: uuid, description: Required for cancel/resume; omit for start }
+    ResearchAttempt:
+      type: object
+      required: [attempt, status, reason]
+      properties:
+        attempt: { type: integer, minimum: 1, maximum: 3 }
+        status: { type: string, enum: [running, completed, failed, interrupted, cancelled] }
+        reason: { type: string, description: Safe code; never provider response text }
+    ResearchStage:
+      type: object
+      required: [stage, status, attempts, reason, candidate_ids, outcomes]
+      properties:
+        stage: { type: string, enum: [research, reconciliation, drafting, assembly] }
+        status: { type: string, enum: [pending, running, completed, needs_research] }
+        attempts: { type: integer, minimum: 0, maximum: 3 }
+        reason: { type: string }
+        candidate_ids: { type: array, items: { type: string, format: uuid } }
+        outcomes: { type: array, items: { $ref: "#/components/schemas/ResearchAttempt" } }
+    ResearchRun:
+      type: object
+      required: [id, brief_id, job_id, source_version, brief_version, status, reason, requests_used, tokens_reserved, request_limit, token_limit, deadline_at, created_at, stages]
+      properties:
+        id: { type: string, format: uuid }
+        brief_id: { type: string, format: uuid }
+        job_id: { type: string, format: uuid }
+        source_version: { type: integer }
+        brief_version: { type: integer }
+        status: { type: string, enum: [active, completed, needs_research, cancelled] }
+        reason: { type: string }
+        requests_used: { type: integer, description: Durably charged before each processor operation; failed or interrupted calls remain charged }
+        tokens_reserved: { type: integer, description: Conservative model-token reservation; unknown crash usage is not refunded }
+        request_limit: { type: integer, maximum: 12 }
+        token_limit: { type: integer, maximum: 20000 }
+        deadline_at: { type: string, format: date-time, description: Original 15-minute deadline, retained across resume }
+        created_at: { type: string, format: date-time }
+        stages: { type: array, items: { $ref: "#/components/schemas/ResearchStage" } }
     BriefStatus:
       type: string
       enum: [draft, processing, needs_research, review, accepted, declined]

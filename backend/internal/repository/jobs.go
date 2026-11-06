@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"invisible-museum/backend/internal/models"
@@ -93,6 +94,13 @@ func (s *Store) ListJobs(ctx context.Context, status models.JobStatus, limit, of
 
 // RetryJob requeues a failed job from scratch.
 func (s *Store) RetryJob(ctx context.Context, id string) error {
+	job, err := s.GetJob(ctx, id)
+	if err != nil {
+		return err
+	}
+	if job.Kind == models.JobKindResearchBrief {
+		return fmt.Errorf("%w: use the brief research resume action to retain budgets", ErrConflict)
+	}
 	tag, err := s.pool.Exec(ctx, `UPDATE jobs SET status = 'queued', attempts = 0, run_after = now(), finished_at = NULL, updated_at = now() WHERE id = $1 AND status = 'failed'`, id)
 	if err != nil {
 		return mapErr(err)
@@ -101,6 +109,19 @@ func (s *Store) RetryJob(ctx context.Context, id string) error {
 		return ErrNotFound
 	}
 	return nil
+}
+
+// FinishResearchJob fences completion/retry from cancelled or reclaimed claims.
+func (s *Store) FinishResearchJob(ctx context.Context, job *models.Job, note string, retryAfter *time.Time, failed bool) error {
+	status := "done"
+	if failed {
+		status = "failed"
+	}
+	if retryAfter != nil {
+		status = "queued"
+	}
+	_, err := s.pool.Exec(ctx, `UPDATE jobs SET status=$3::job_status,last_error=$4,run_after=COALESCE($5,run_after),finished_at=CASE WHEN $3='queued' THEN NULL ELSE now() END,updated_at=now() WHERE id=$1 AND attempts=$2 AND status='running'`, job.ID, job.Attempts, status, note, retryAfter)
+	return mapErr(err)
 }
 
 // ReclaimStaleJobs requeues jobs that have been running longer than olderThan (a worker died mid-job).
