@@ -117,3 +117,29 @@ func TestDraftJobFailsWithoutRetryWhenNotDraftable(t *testing.T) {
 		t.Fatal("a failed draft must leave the candidate untouched")
 	}
 }
+
+func TestRedraftPreservesCuratorCitationsAndReportsResearchGaps(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	w.Drafter = &fakeDrafter{draft: llm.MomentDraft{Title: "Evidence is thin", Body: "Only one fact is documented.", DatePrecision: "circa", Notes: "Find more records."}}
+	place := testdb.SeedPlaceStationID
+	candidate := momentCandidate(t, w, &place)
+	var payload map[string]any
+	_ = json.Unmarshal(candidate.Payload, &payload)
+	payload["sources"] = []map[string]any{{"title": "Curator's archive", "url": "https://archive.example.org/item", "publisher": "Local archive"}}
+	encoded, _ := json.Marshal(payload)
+	if err := store.UpdateCandidatePayload(ctx, candidate.ID, encoded, nil); err != nil {
+		t.Fatal(err)
+	}
+	if err := w.draftCandidate(ctx, models.DraftCandidatePayload{CandidateID: candidate.ID}); err != nil {
+		t.Fatal(err)
+	}
+	got, _ := store.GetCandidate(ctx, candidate.ID)
+	_ = json.Unmarshal(got.Payload, &payload)
+	if payload["sources"].([]any)[0].(map[string]any)["url"] != "https://archive.example.org/item" {
+		t.Fatal("redraft discarded curator evidence")
+	}
+	if got.Status != models.CandidateStatusPending || len(payload["review_gaps"].([]any)) < 2 {
+		t.Fatal("incomplete generated text escaped review")
+	}
+}

@@ -15,6 +15,7 @@ The apps use Studio's Classic solid / P3 Oxblood design system. See the [BYL int
 - `docs/superpowers/plans/` — implementation planning notes.
 - `docs/deployment/nuc-almaz.md` — NUC/Almaz deployment notes.
 - `docs/deployment/byl.md` — public Byl hosting, automatic releases and recovery.
+- `docs/content/INTAKE.md` — illustrated place histories, source/image requirements and intake review.
 - `Makefile` — root commands for backend, migrations, API smoke tests, and Simulator runs.
 
 ## Requirements

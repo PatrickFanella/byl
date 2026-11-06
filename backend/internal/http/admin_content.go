@@ -190,6 +190,25 @@ func (d Deps) adminSetPlaceStatus(status models.EntityStatus) http.HandlerFunc {
 				writeError(w, http.StatusConflict, "conflict", "place is a stop on published tours: "+strings.Join(using, ", ")+"; unpublish them first")
 				return
 			}
+		} else {
+			place, err := d.Store.GetPlace(r.Context(), id, "", true)
+			if err != nil {
+				d.fail(w, err)
+				return
+			}
+			if place.PrimaryMoment == nil || place.PrimaryMoment.Status != models.EntityStatusPublished {
+				writeError(w, http.StatusConflict, "conflict", "choose a published primary history with a picture and sources before publishing this place")
+				return
+			}
+			blockers, err := d.Store.MomentPublishBlockers(r.Context(), place.PrimaryMoment.ID)
+			if err != nil {
+				d.fail(w, err)
+				return
+			}
+			if len(blockers) > 0 {
+				writeError(w, http.StatusConflict, "conflict", "primary history is incomplete: "+strings.Join(blockers, "; "))
+				return
+			}
 		}
 		if err := d.Store.SetPlaceStatus(r.Context(), id, status); err != nil {
 			d.fail(w, err)

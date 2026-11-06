@@ -52,8 +52,8 @@ func TestListPlacesNearSortsByDistance(t *testing.T) {
 			t.Fatalf("not sorted by distance: %v", places)
 		}
 	}
-	if places[0].MomentCount != 2 {
-		t.Fatalf("station should count 2 published moments, got %d", places[0].MomentCount)
+	if places[0].MomentCount != 3 {
+		t.Fatalf("station should count 3 published moments, got %d", places[0].MomentCount)
 	}
 }
 
@@ -82,14 +82,14 @@ func TestGetPlaceHidesUnpublishedMoments(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(p.Moments) != 1 || p.PrimaryMoment == nil || p.PrimaryMoment.ID != testdb.SeedMomentBlodgettID {
+	if len(p.Moments) != 2 || p.PrimaryMoment == nil || p.PrimaryMoment.ID != testdb.SeedMomentBlodgettID {
 		t.Fatalf("published view: %+v", p)
 	}
 	all, err := s.GetPlace(ctx, testdb.SeedPlaceMuseumID, "", true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(all.Moments) != 2 {
+	if len(all.Moments) != 3 {
 		t.Fatalf("unpublished view should include the in_review moment, got %d", len(all.Moments))
 	}
 	if _, err := s.GetPlace(ctx, "nope", "downers-grove", true); !errors.Is(err, ErrNotFound) {
@@ -103,7 +103,7 @@ func TestGetMomentLoadsSourcesTopicsMedia(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(m.Sources) != 2 || m.Sources[0].Title != "Tivoli Theatre (Downers Grove, Illinois)" {
+	if len(m.Sources) != 2 || m.Sources[0].Title != "Tivoli Theatre" {
 		t.Fatalf("sources: %+v", m.Sources)
 	}
 	if len(m.Topics) != 2 || len(m.TopicIDs) != 2 {
@@ -134,7 +134,7 @@ func TestMomentPublishBlockersFlagsUnlicensedMedia(t *testing.T) {
 		t.Fatalf("expected one blocker, got %v", blockers)
 	}
 	lic := "CC-BY-4.0"
-	if _, err := s.UpdateMediaMetadata(ctx, asset.ID, models.MediaMetadataRequest{License: &lic}); err != nil {
+	if _, err := s.UpdateMediaMetadata(ctx, asset.ID, models.MediaMetadataRequest{License: &lic, Caption: ptr("The depot"), Credit: ptr("Archive photographer"), SourceURL: ptr("https://example.org/photo"), LicenseURL: ptr("https://creativecommons.org/licenses/by/4.0/")}); err != nil {
 		t.Fatal(err)
 	}
 	blockers, _ = s.MomentPublishBlockers(ctx, testdb.SeedMomentBurlingtonID)
@@ -202,7 +202,7 @@ func TestTopicsCarryMomentCounts(t *testing.T) {
 	for _, tp := range topics {
 		counts[tp.Slug] = tp.MomentCount
 	}
-	if counts["rail-and-the-commuter-town"] != 3 || counts["houses-and-builders"] != 1 {
+	if counts["rail-and-the-commuter-town"] != 4 || counts["houses-and-builders"] != 2 {
 		t.Fatalf("published moment counts per topic: %v", counts)
 	}
 	tp, err := s.CreateTopic(ctx, models.CreateTopicRequest{CityID: testdb.SeedCityID, Name: "Schools & Libraries"})

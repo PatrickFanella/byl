@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { Loader } from '#lib/loader.svelte.ts';
-	import { getPlace, type PlaceDetail } from '#lib/visitor.ts';
+	import { getPlace, getMoment, type PlaceDetail, type MomentDetail } from '#lib/visitor.ts';
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
-	import MomentCard from '#lib/components/visitor/MomentCard.svelte';
+	import MomentStory from '#lib/components/visitor/MomentStory.svelte';
+	import MediaFigure from '#lib/components/visitor/MediaFigure.svelte';
 	import SectionHeader from '#lib/components/visitor/SectionHeader.svelte';
 
 	const ref = $derived(page.params.ref ?? '');
@@ -18,9 +19,15 @@
 	const featured = $derived.by(() => {
 		const p = place.data;
 		if (!p) return null;
-		return p.moments.find((m) => m.id === featuredID) ?? p.primary_moment ?? null;
+		return p.moments.find((m) => m.id === featuredID) ?? p.primary_moment ?? p.moments[0] ?? null;
 	});
-	const others = $derived((place.data?.moments ?? []).filter((m) => m.id !== featured?.id));
+	const story = new Loader<MomentDetail>(() => getMoment(featured?.id ?? ''));
+	$effect(() => {
+		if (featured?.id) story.run();
+	});
+	const hero = $derived(
+		featured?.hero_media ?? place.data?.moments.find((m) => m.hero_media)?.hero_media
+	);
 </script>
 
 <svelte:head><title>{place.data?.name ?? 'Place'} · Byl</title></svelte:head>
@@ -34,26 +41,49 @@
 		<h1 class="text-3xl font-semibold">{p.name}</h1>
 		{#if p.address}<p class="mt-1 text-sm text-byl-muted">{p.address}</p>{/if}
 		{#if p.summary}<p class="mt-3 max-w-2xl text-byl-muted">{p.summary}</p>{/if}
+		{#if hero}<div class="mt-6"><MediaFigure asset={hero} /></div>{/if}
+
+		{#if p.moments.length > 1}
+			<nav aria-label="Events and stories at this place" class="mt-8 max-w-2xl">
+				<SectionHeader title="Events and stories" eyebrow="At this place" />
+				<ol class="mt-3 divide-y divide-byl-border border-y border-byl-border">
+					{#each p.moments as moment (moment.id)}
+						<li>
+							<a
+								href="?featured={moment.id}#story"
+								aria-current={featured?.id === moment.id ? 'true' : undefined}
+								class="flex flex-col gap-1 py-4 hover:underline sm:flex-row sm:gap-6"
+							>
+								<span class="text-sm text-byl-muted sm:w-32 sm:shrink-0"
+									>{moment.date_display || 'Date not recorded'}</span
+								>
+								<span class="font-semibold text-byl-action"
+									>{moment.title}{#if featured?.id === moment.id}<span class="sr-only">
+											(selected)</span
+										>{/if}</span
+								>
+							</a>
+						</li>
+					{/each}
+				</ol>
+			</nav>
+		{/if}
 
 		{#if featured}
-			<section class="mt-6 space-y-3">
+			<section id="story" class="mt-8 scroll-mt-6 space-y-3" aria-label="Selected history">
 				<SectionHeader
 					title={featured.title}
-					eyebrow={featuredID ? 'Featured on this tour' : 'Primary moment'}
+					eyebrow={featured.date_display || 'History and context'}
 				/>
-				<MomentCard moment={featured} prominent testid="featured-moment" />
+				<LoadState status={story.status} message={story.message} onretry={() => story.run()}>
+					{#if story.data?.id === featured.id}<MomentStory
+							moment={story.data}
+							omitMediaId={hero?.id}
+						/>{/if}
+				</LoadState>
 			</section>
 		{/if}
-		{#if others.length}
-			<section class="mt-6 space-y-3">
-				<SectionHeader
-					title={featured ? 'Also at this place' : 'Moments here'}
-					eyebrow="{others.length} more"
-				/>
-				{#each others as m (m.id)}<MomentCard moment={m} />{/each}
-			</section>
-		{/if}
-		{#if !featured && others.length === 0}
+		{#if !featured}
 			<div class="mt-6">
 				<LoadState
 					status="empty"

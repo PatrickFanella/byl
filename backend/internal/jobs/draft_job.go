@@ -109,9 +109,24 @@ func (w *Worker) draftCandidate(ctx context.Context, p models.DraftCandidatePayl
 	payload["date_precision"] = draft.DatePrecision
 	payload["date_display"] = draft.DateDisplay
 	payload["topic_ids"] = topicIDs
-	payload["sources"] = []map[string]any{{
-		"title": req.SourceTitle, "url": req.SourceURL, "publisher": req.SourcePublisher, "license": req.SourceLicense,
-	}}
+	// Redrafting must not discard citations already added by the curator.
+	if existing, ok := payload["sources"].([]any); !ok || len(existing) == 0 {
+		payload["sources"] = []map[string]any{{
+			"title": req.SourceTitle, "url": req.SourceURL, "publisher": req.SourcePublisher, "license": req.SourceLicense,
+		}}
+	}
+	var review struct {
+		Sources []models.Source `json:"sources"`
+	}
+	encoded, _ := json.Marshal(payload)
+	_ = json.Unmarshal(encoded, &review)
+	var media []models.MediaAsset
+	if heroID := str("hero_media_id"); heroID != "" {
+		if hero, err := w.store.GetMedia(ctx, heroID); err == nil {
+			media = append(media, *hero)
+		}
+	}
+	payload["review_gaps"] = models.HistoryReviewGaps(draft.Body, review.Sources, media)
 	payload["draft_notes"] = draft.Notes
 	if placeID != "" {
 		payload["place_id"] = placeID

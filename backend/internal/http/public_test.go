@@ -17,6 +17,38 @@ func TestHealthz(t *testing.T) {
 	}
 }
 
+func TestPilotPlacesHaveIllustratedSourcedHistories(t *testing.T) {
+	env := newTestEnv(t)
+	for _, id := range []string{testdb.SeedPlaceStationID, testdb.SeedPlaceTivoliID, testdb.SeedPlaceFishelID, testdb.SeedPlaceMuseumID} {
+		place, err := env.store.GetPlace(context.Background(), id, "", false)
+		if err != nil || place.PrimaryMoment == nil {
+			t.Fatalf("place history missing: %s %v", id, err)
+		}
+		for _, summary := range place.Moments {
+			moment, err := env.store.GetMoment(context.Background(), summary.ID, false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			media := append([]models.MediaAsset{}, moment.Media...)
+			if moment.HeroMedia != nil {
+				media = append(media, *moment.HeroMedia)
+			}
+			if gaps := models.HistoryReviewGaps(moment.Body, moment.Sources, media); len(gaps) != 0 {
+				t.Fatalf("%s is incomplete: %v", moment.Title, gaps)
+			}
+		}
+	}
+	for _, file := range []string{"main-street-station", "tivoli-theatre", "fishel-school", "blodgett-family"} {
+		r := env.get(t, "/media/files/library/images/"+file+".jpg", "")
+		if r.status != 200 || len(r.raw) < 10000 || r.raw[0] != 0xff || r.raw[1] != 0xd8 {
+			t.Fatalf("packaged image unavailable: %s status=%d bytes=%d", file, r.status, len(r.raw))
+		}
+	}
+	if r := env.get(t, "/media/files/library/images/", ""); r.status != 404 {
+		t.Fatal("image directory listing exposed")
+	}
+}
+
 func TestCityEndpoints(t *testing.T) {
 	env := newTestEnv(t)
 	r := env.get(t, "/api/v1/cities", "")
@@ -74,7 +106,7 @@ func TestPlacesNearAndFilters(t *testing.T) {
 func TestPlaceAndMomentDetail(t *testing.T) {
 	env := newTestEnv(t)
 	r := env.get(t, "/api/v1/places/"+testdb.SeedPlaceMuseumID, "")
-	if r.status != 200 || len(r.body["moments"].([]any)) != 1 || r.body["primary_moment"] == nil {
+	if r.status != 200 || len(r.body["moments"].([]any)) != 2 || r.body["primary_moment"] == nil {
 		t.Fatalf("%d %s", r.status, r.raw)
 	}
 	r = env.get(t, "/api/v1/places/downers-grove-museum?city=downers-grove", "")
@@ -82,7 +114,7 @@ func TestPlaceAndMomentDetail(t *testing.T) {
 		t.Fatalf("by slug: %d %s", r.status, r.raw)
 	}
 	r = env.get(t, "/api/v1/places/"+testdb.SeedPlaceStationID+"/moments", "")
-	if r.status != 200 || len(items(t, r)) != 2 {
+	if r.status != 200 || len(items(t, r)) != 3 {
 		t.Fatalf("moments: %d %s", r.status, r.raw)
 	}
 	r = env.get(t, "/api/v1/moments/"+testdb.SeedMomentTalkiesID, "")
@@ -102,7 +134,7 @@ func TestPlaceAndMomentDetail(t *testing.T) {
 		t.Fatalf("draft place moments must be hidden: %d", r.status)
 	}
 	r = env.get(t, "/api/v1/topics/"+testdb.SeedTopicRailID, "")
-	if r.status != 200 || r.body["moment_count"].(float64) != 3 {
+	if r.status != 200 || r.body["moment_count"].(float64) != 4 {
 		t.Fatalf("topic: %d %s", r.status, r.raw)
 	}
 }

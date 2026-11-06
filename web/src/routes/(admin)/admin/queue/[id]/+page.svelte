@@ -193,6 +193,30 @@
 		{/if}
 	</div>
 	<aside class="space-y-3">
+		{#if candidate.kind === 'moment' || candidate.kind === 'place'}
+			<section class="rounded-lg border border-byl-border bg-byl-background p-4 text-sm">
+				<h2 class="font-semibold">Before this place can go live</h2>
+				<ul class="mt-2 list-disc space-y-2 pl-5 text-byl-muted">
+					<li>
+						A picture with a precise caption, creator credit, original source, and reusable license.
+					</li>
+					<li>
+						A history with at least 250 words and three paragraphs, supported by named, linked
+						sources.
+					</li>
+					<li>One place record for the physical location; separate moments for distinct events.</li>
+					<li>
+						Check uncertain dates and claims against the sources. Short evidence stays a draft.
+					</li>
+				</ul>
+				{#if Array.isArray(payload.review_gaps) && payload.review_gaps.length}
+					<h3 class="mt-3 font-semibold">Draft research gaps</h3>
+					<ul class="mt-1 list-disc pl-5 text-byl-muted">
+						{#each payload.review_gaps as gap, i (i)}<li>{String(gap)}</li>{/each}
+					</ul>
+				{/if}
+			</section>
+		{/if}
 		<div class="rounded-lg border border-byl-border bg-byl-background p-4">
 			<div class="flex flex-wrap gap-2">
 				<button

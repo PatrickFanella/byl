@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 2, then saves a PostgreSQL
+changed migration files or a schema version other than 3, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -72,3 +72,30 @@ change during a backup. Initial deployment must include an isolated database
 restore check. There is no automatic backup/image pruning. The release hook
 creates backups before deployments; it does not provide scheduled or off-host
 backup coverage.
+
+## Illustrated history content, migration 3
+
+Migration `00003_illustrated_place_histories.sql` changes only the pilot content:
+seven published histories at the existing four places, two new event records,
+four illustrated assets, and their citations. It changes no table structure,
+accounts, sessions, routes or progress records. The image bytes ship in the API
+binary at `/media/files/library/images/`; no third-party hotlink or mutable media
+volume copy is needed. Source records and rights evidence are under
+`docs/content/downers-grove/`.
+
+Before admitting migration 3, back up the live database and restore it into a
+separate database. Apply all migrations to that copy with the candidate migrate
+binary, verify place/event/media/source counts, confirm all original unrelated
+rows and accounts/progress are unchanged, and check the history quality rules.
+Then back up production again, apply the reviewed migration as operator, update
+`migrations.sha256` from the same candidate image and install the matching
+operator-owned `scripts/byl-pre-deploy.sh` (expected version 3). Keep the old
+manifest/hook and database dump for recovery. The image receiver still refuses
+unadmitted migrations. A guarded main run may be retried unchanged after admission.
+
+Automatic migration down is deliberately refused: later curator edits must not
+be overwritten by a blind content rollback. Restore only the affected pilot
+content from the retained backup after reviewing subsequent writes. The two
+new event IDs and four media IDs are fixed in the reviewed migration. Image
+rollback alone remains possible because the data change is additive and keeps
+the existing API fields and relationships.
