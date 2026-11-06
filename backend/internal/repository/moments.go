@@ -127,6 +127,9 @@ func (s *Store) GetMoment(ctx context.Context, id string, includeUnpublished boo
 	if m.Media, err = s.momentMedia(ctx, id); err != nil {
 		return nil, err
 	}
+	if !includeUnpublished {
+		m.Media = publishableMedia(m.Media)
+	}
 	if m.Sources, err = s.momentSources(ctx, id); err != nil {
 		return nil, err
 	}
@@ -368,10 +371,8 @@ func (s *Store) MomentPublishBlockers(ctx context.Context, momentID string) ([]s
 			continue
 		}
 		seen[asset.ID] = true
-		if !models.ReusableLicense(asset.License) {
-			out = append(out, "media "+asset.ID+" needs a reusable license")
-		} else if asset.Kind == models.MediaKindImage && !asset.ReusableImage() {
-			out = append(out, "image "+asset.ID+" needs caption, credit, source and license URLs")
+		if issue := asset.PublicationIssue(); issue != "" {
+			out = append(out, "media "+asset.ID+": "+issue)
 		}
 	}
 	return out, nil

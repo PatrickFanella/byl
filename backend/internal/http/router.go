@@ -124,6 +124,7 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/places", d.adminCreatePlace)
 			r.Get("/places/{id}", d.adminGetPlace)
 			r.Patch("/places/{id}", d.adminUpdatePlace)
+			r.Put("/places/{id}/media", d.adminSetPlaceMedia)
 			r.Delete("/places/{id}", d.adminSetPlaceStatus(models.EntityStatusArchived))
 			r.Post("/places/{id}/publish", d.adminSetPlaceStatus(models.EntityStatusPublished))
 			r.Post("/places/{id}/unpublish", d.adminSetPlaceStatus(models.EntityStatusDraft))
@@ -139,6 +140,7 @@ func NewRouter(d Deps) http.Handler {
 			r.Put("/moments/{id}/topics", d.adminSetMomentTopics)
 			r.Get("/media", d.adminListMedia)
 			r.Post("/media", d.adminUploadMedia)
+			r.Post("/media/links", d.adminCreateMediaLink)
 			r.Patch("/media/{id}", d.adminUpdateMedia)
 			r.Get("/tours", d.adminListTours)
 			r.Post("/tours", d.adminCreateTour)
@@ -234,6 +236,9 @@ func noDirListing(root http.FileSystem) http.Handler {
 			return
 		}
 		w.Header().Set("X-Content-Type-Options", "nosniff")
+		if strings.HasPrefix(strings.TrimPrefix(p, "/"), "documents/") {
+			w.Header().Set("Content-Disposition", "attachment")
+		}
 		fs.ServeHTTP(w, r)
 	})
 }

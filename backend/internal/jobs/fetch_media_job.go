@@ -38,6 +38,12 @@ func (w *Worker) fetchMedia(ctx context.Context, p models.FetchMediaPayload) err
 		}
 		return err
 	}
+	if asset.External {
+		return nil
+	}
+	if asset.Kind == models.MediaKindVideo {
+		return fmt.Errorf("%w: video hosting is disabled; add an external link", ErrNoRetry)
+	}
 	if asset.StorageKey != "" {
 		return nil // already fetched
 	}
@@ -68,12 +74,12 @@ func (w *Worker) fetchMedia(ctx context.Context, p models.FetchMediaPayload) err
 	}
 	prefix, want := "images", "image/"
 	switch asset.Kind {
-	case models.MediaKindVideo:
-		prefix, want = "videos", "video/"
+	case models.MediaKindDocument:
+		prefix, want = "documents", "application/pdf"
 	case models.MediaKindAudio:
 		prefix, want = "audio", "audio/"
 	}
-	if !strings.HasPrefix(contentType, want) {
+	if (asset.Kind == models.MediaKindDocument && contentType != "application/pdf" && contentType != "text/plain") || (asset.Kind != models.MediaKindDocument && !strings.HasPrefix(contentType, want)) {
 		return fmt.Errorf("%w: %s asset but the download is %q", ErrNoRetry, asset.Kind, contentType)
 	}
 	if strings.Contains(contentType, "svg") || strings.Contains(contentType, "xml") || strings.Contains(contentType, "html") {

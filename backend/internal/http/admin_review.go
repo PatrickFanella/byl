@@ -179,6 +179,15 @@ func (d Deps) createFromCandidate(r *http.Request, c *models.Candidate, payload 
 		if extra.MediaURL == "" && asset.PublicURL == "" {
 			return "", map[string]string{"payload": "needs media_url"}, nil
 		}
+		if asset.Kind == models.MediaKindVideo && !asset.External {
+			return "", map[string]string{"external": "videos must be external links"}, nil
+		}
+		if asset.External {
+			req := models.MediaLinkRequest{Kind: asset.Kind, PublicURL: asset.PublicURL, Caption: asset.Caption, Credit: asset.Credit, SourceURL: asset.SourceURL}
+			if fields := req.Validate(); len(fields) > 0 {
+				return "", fields, nil
+			}
+		}
 		asset.ID = ""
 		asset.StorageKey = ""
 		asset.Status = models.EntityStatusDraft
@@ -186,7 +195,7 @@ func (d Deps) createFromCandidate(r *http.Request, c *models.Candidate, payload 
 		if err != nil {
 			return "", nil, err
 		}
-		if extra.MediaURL != "" {
+		if extra.MediaURL != "" && !asset.External {
 			if err := d.Store.Enqueue(r.Context(), models.JobKindFetchMedia, models.FetchMediaPayload{CandidateID: c.ID, AssetID: m.ID}); err != nil {
 				return "", nil, err
 			}
@@ -204,6 +213,19 @@ func (d Deps) createFromCandidate(r *http.Request, c *models.Candidate, payload 
 				if err := d.Store.ReplaceMomentMedia(r.Context(), existing.ID, append(ids, m.ID)); err != nil {
 					return "", nil, err
 				}
+			}
+		}
+		if c.TargetMomentID == nil && c.TargetPlaceID != nil {
+			existing, err := d.Store.PlaceMedia(r.Context(), *c.TargetPlaceID, true)
+			if err != nil {
+				return "", nil, err
+			}
+			ids := []string{}
+			for _, media := range existing {
+				ids = append(ids, media.ID)
+			}
+			if err := d.Store.ReplacePlaceMedia(r.Context(), *c.TargetPlaceID, append(ids, m.ID)); err != nil {
+				return "", nil, err
 			}
 		}
 		return m.ID, nil, nil

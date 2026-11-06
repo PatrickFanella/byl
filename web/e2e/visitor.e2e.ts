@@ -40,7 +40,12 @@ test('a visitor browses from home to a tour, a place, and a moment', async ({ pa
 				.evaluate((img) => (img as HTMLImageElement).naturalWidth)
 		)
 		.toBeGreaterThan(0);
-	await expect(page.getByRole('link', { name: 'Image source', exact: true })).toBeVisible();
+	await expect(
+		page
+			.locator('figure')
+			.filter({ has: page.getByRole('img', { name: /Tivoli marquee/ }) })
+			.getByRole('link', { name: 'Image source', exact: true })
+	).toBeVisible();
 	await expect(page.locator('article p')).toHaveCount(5);
 	await expect(
 		page.getByRole('navigation', { name: 'Events and stories at this place' })

@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 3, then saves a PostgreSQL
+changed migration files or a schema version other than 5, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -99,3 +99,34 @@ content from the retained backup after reviewing subsequent writes. The two
 new event IDs and four media IDs are fixed in the reviewed migration. Image
 rollback alone remains possible because the data change is additive and keeps
 the existing API fields and relationships.
+
+## Place collections, migrations 4 and 5
+
+Migration 4 adds the document media kind, an `external` flag defaulting to false,
+and ordered place/media associations. Existing fields, records and event
+attachments remain. Migration 5 adds the reviewed collection register: three
+photos, one hosted PDF, one external video reference and one external document
+reference. Its three additional event associations refer to the specific crash
+or Blodgett histories; all six assets also appear in their place collections.
+
+Rehearse both migrations against a restored production backup before admission.
+Use two stages to avoid sending new document/video records to the previous web
+client. First back up production, apply only migration 4, and admit the exact new
+five-file checksum manifest with an operator-owned copy of the hook expecting
+version 4. This is a temporary, explicit schema admission for the new image; the
+receiver still applies no migration. The new API works with either version 4 or
+5. Retain the prior hook and manifest.
+
+Let normal main CI activate and verify the new API/web images. Then apply the
+reviewed data-only migration 5 with that image's migration binary and install
+the source hook expecting version 5. Verify collection membership, the hosted
+file bytes and download headers, external links, and browser behavior. No video
+file or third-party thumbnail should be transferred. Later automatic releases
+use the final version-5 hook and exact migration manifest.
+
+The previous web image cannot display the new document/video references. Before
+an image rollback, review later curator edits and selectively unlink the three
+new event associations if returning to that client. Retain the asset records,
+files and place associations for recovery. Automatic down refuses to delete
+curator collections; a database restore or selective rollback needs an operator
+review of subsequent writes. Keep the per-release database and media backups.

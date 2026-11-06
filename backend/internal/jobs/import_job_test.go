@@ -316,3 +316,57 @@ func TestFetchMediaJobRefusesOversizedResponse(t *testing.T) {
 		t.Fatal("oversized media must not be attached")
 	}
 }
+
+func TestVideoFindBecomesReferenceRatherThanDownload(t *testing.T) {
+	w := &Worker{}
+	place := "00000000-0000-4000-8000-00000000b0b4"
+	cand, err := w.candidateFor(context.Background(), "city", &place, "archive", sources.Found{
+		Kind: models.CandidateKindMedia, ExternalID: "video-1", Title: "House documentary", Credit: "Historical society",
+		URL: "https://archive.example.org/details/house", MediaURL: "https://archive.example.org/download/house.mp4", MimeType: "video/mp4",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var payload map[string]any
+	if err := json.Unmarshal(cand.Payload, &payload); err != nil {
+		t.Fatal(err)
+	}
+	if payload["external"] != true || payload["public_url"] != "https://archive.example.org/details/house" || payload["media_url"] != nil || cand.TargetPlaceID == nil || *cand.TargetPlaceID != place {
+		t.Fatalf("video candidate must keep its watch page and place, without a downloadable URL: %v", payload)
+	}
+}
+
+func TestFetchMediaNeverDownloadsVideos(t *testing.T) {
+	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) { calls++; rw.WriteHeader(500) }))
+	defer srv.Close()
+	w.Sources = sources.NewRegistry(sources.NewHTTPClient("ua"), nil)
+	w.Sources.Client().AllowPrivateHosts = true
+	payload, _ := json.Marshal(map[string]any{"media_url": srv.URL + "/video.mp4"})
+	cand, err := store.CreateCandidate(ctx, models.Candidate{Kind: models.CandidateKindMedia, Origin: models.CandidateOriginImport, Payload: payload})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, external := range []bool{false, true} {
+		asset, err := store.CreateMedia(ctx, models.MediaAsset{Kind: models.MediaKindVideo, External: external, PublicURL: srv.URL + "/watch"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = w.fetchMedia(ctx, models.FetchMediaPayload{CandidateID: cand.ID, AssetID: asset.ID})
+		if external && err != nil {
+			t.Fatal(err)
+		}
+		if !external && (err == nil || !strings.Contains(err.Error(), "video hosting is disabled")) {
+			t.Fatalf("video file must be refused: %v", err)
+		}
+		got, _ := store.GetMedia(ctx, asset.ID)
+		if got.StorageKey != "" {
+			t.Fatal("video bytes were stored")
+		}
+	}
+	if calls != 0 {
+		t.Fatalf("made %d video requests", calls)
+	}
+}

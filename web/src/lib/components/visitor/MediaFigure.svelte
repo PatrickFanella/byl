@@ -4,13 +4,21 @@
 </script>
 
 <figure>
-	<img
-		src={asset.public_url}
-		alt={asset.caption}
-		width={asset.width ?? undefined}
-		height={asset.height ?? undefined}
-		class="max-h-[32rem] w-full rounded-lg bg-byl-surface object-contain"
-	/>
+	<a
+		href={asset.public_url}
+		target="_blank"
+		rel="noreferrer"
+		aria-label={`View full photo: ${asset.caption}`}
+		class="block"
+	>
+		<img
+			src={asset.public_url}
+			alt={asset.caption}
+			width={asset.width ?? undefined}
+			height={asset.height ?? undefined}
+			class="max-h-[32rem] w-full rounded-lg bg-byl-surface object-contain"
+		/>
+	</a>
 	<figcaption class="mt-2 max-w-2xl space-y-1 text-sm text-byl-muted">
 		{#if asset.caption}<p>{asset.caption}</p>{/if}
 		<p class="text-xs">

@@ -1,35 +1,88 @@
 <script lang="ts">
 	import type { MediaAsset } from '#lib/visitor.ts';
 	import MediaFigure from '#lib/components/visitor/MediaFigure.svelte';
-
 	let { media }: { media: MediaAsset[] } = $props();
-	const credit = (a: MediaAsset) =>
-		[a.credit, a.license].filter(Boolean).join(' · ') || 'Credit unavailable';
+	const photos = $derived(media.filter((a) => a.kind === 'image'));
+	const documents = $derived(media.filter((a) => a.kind === 'document'));
+	const videos = $derived(media.filter((a) => a.kind === 'video'));
+	const audio = $derived(media.filter((a) => a.kind === 'audio'));
 </script>
 
-<div class="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2">
-	{#each media as asset (asset.id)}
-		{#if asset.kind === 'image'}
-			<div class="w-72 shrink-0 snap-start"><MediaFigure {asset} /></div>
-		{:else}
-			<figure class="w-72 shrink-0 snap-start">
-				<div class="h-52 overflow-hidden rounded-lg border border-byl-border bg-byl-surface">
-					{#if asset.kind === 'video'}
-						<!-- svelte-ignore a11y_media_has_caption -->
-						<video src={asset.public_url} controls class="h-full w-full object-cover"></video>
-					{:else if asset.kind === 'audio'}
-						<div class="flex h-full flex-col items-center justify-center gap-2 p-4">
-							<audio src={asset.public_url} controls class="w-full"></audio>
-						</div>
-					{:else}
-						<img src={asset.public_url} alt={asset.caption} class="h-full w-full object-cover" />
-					{/if}
-				</div>
-				<figcaption class="mt-2 text-sm">
-					{#if asset.caption}<div class="text-byl-muted">{asset.caption}</div>{/if}
-					<div class="text-xs text-byl-muted">{credit(asset)}</div>
-				</figcaption>
-			</figure>
-		{/if}
-	{/each}
+<div class="space-y-7">
+	{#if photos.length}
+		<section aria-label="Photos">
+			<h3 class="font-semibold">Photos</h3>
+			<div class="mt-3 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+				{#each photos as asset (asset.id)}<MediaFigure {asset} />{/each}
+			</div>
+		</section>
+	{/if}
+	{#if documents.length}
+		<section aria-label="Documents">
+			<h3 class="font-semibold">Documents</h3>
+			<ul class="mt-2 divide-y divide-byl-border border-y border-byl-border">
+				{#each documents as asset (asset.id)}
+					<li class="space-y-1 py-4">
+						<a
+							href={asset.public_url}
+							target="_blank"
+							rel="noreferrer"
+							class="font-semibold text-byl-action underline">{asset.caption} ↗</a
+						>
+						<p class="text-sm text-byl-muted">
+							{asset.credit} · {asset.external
+								? 'Read at source'
+								: asset.mime_type === 'application/pdf'
+									? 'Download PDF'
+									: 'Download text document'}
+						</p>
+						<p class="text-xs text-byl-muted">
+							{#if !asset.external && asset.license_url}<a
+									href={asset.license_url}
+									target="_blank"
+									rel="noreferrer"
+									class="underline">{asset.license}</a
+								> ·
+							{/if}
+							<a href={asset.source_url} target="_blank" rel="noreferrer" class="underline"
+								>Original source</a
+							>
+						</p>
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
+	{#if videos.length}
+		<section aria-label="Videos">
+			<h3 class="font-semibold">Videos</h3>
+			<p class="mt-1 text-sm text-byl-muted">Watch on the publisher’s site.</p>
+			<ul class="mt-2 divide-y divide-byl-border border-y border-byl-border">
+				{#each videos as asset (asset.id)}
+					<li class="space-y-1 py-4">
+						<a
+							href={asset.public_url}
+							target="_blank"
+							rel="noreferrer"
+							class="font-semibold text-byl-action underline">{asset.caption} ↗</a
+						>
+						<p class="text-sm text-byl-muted">{asset.credit}</p>
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
+	{#if audio.length}
+		<section aria-label="Audio">
+			<h3 class="font-semibold">Audio</h3>
+			{#each audio as asset (asset.id)}
+				<figure class="mt-3 max-w-md">
+					<audio src={asset.public_url} controls class="w-full"></audio>
+					<figcaption class="mt-1 text-sm text-byl-muted">
+						{asset.caption} · {asset.credit}
+					</figcaption>
+				</figure>
+			{/each}
+		</section>
+	{/if}
 </div>

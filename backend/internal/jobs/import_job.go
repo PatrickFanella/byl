@@ -142,6 +142,8 @@ func (w *Worker) candidateFor(ctx context.Context, cityID string, explicitPlace 
 		switch {
 		case len(f.MimeType) >= 5 && f.MimeType[:5] == "video":
 			kind = models.MediaKindVideo
+		case f.MimeType == "application/pdf" || f.MimeType == "text/plain":
+			kind = models.MediaKindDocument
 		case len(f.MimeType) >= 5 && f.MimeType[:5] == "audio":
 			kind = models.MediaKindAudio
 		}
@@ -149,6 +151,11 @@ func (w *Worker) candidateFor(ctx context.Context, cityID string, explicitPlace 
 			"kind": kind, "media_url": f.MediaURL, "mime_type": f.MimeType, "width": f.Width, "height": f.Height,
 			"caption": firstNonEmpty(f.Text, f.Title), "credit": f.Credit, "license": f.License, "license_url": f.LicenseURL,
 			"source_url": f.URL, "lat": f.Lat, "lng": f.Lng, "raw": raw,
+		}
+		if kind == models.MediaKindVideo {
+			payload["external"] = true
+			payload["public_url"] = f.URL
+			delete(payload, "media_url")
 		}
 		cand.Payload = mustJSON(payload)
 	default:

@@ -3,9 +3,16 @@
 	import StatusPill from '#lib/components/StatusPill.svelte';
 	import Notice from '#lib/components/Notice.svelte';
 	import PayloadForm from '#lib/components/PayloadForm.svelte';
+	import MediaAttachments from '#lib/components/MediaAttachments.svelte';
 	import Map from '#lib/components/Map.svelte';
 	import { fieldsFor, applyFields, type Field } from '#lib/payload.ts';
-	import { updatePlace, setPlaceStatus, createMoment, errorMessage } from '#lib/admin.ts';
+	import {
+		updatePlace,
+		setPlaceStatus,
+		setPlaceMedia,
+		createMoment,
+		errorMessage
+	} from '#lib/admin.ts';
 	import { ApiError } from '#lib/api/index.ts';
 	import type { PageProps } from './$types';
 
@@ -18,6 +25,7 @@
 	let notice = $state({ kind: 'info' as 'info' | 'error' | 'success', message: '' });
 	let busy = $state('');
 	let primary = $derived(place.primary_moment_id ?? '');
+	let mediaIds = $derived(place.media.map((asset) => asset.id));
 
 	async function save() {
 		busy = 'save';
@@ -26,6 +34,7 @@
 			const body = applyFields({}, fields) as Record<string, unknown>;
 			if (primary !== (place.primary_moment_id ?? '')) body.primary_moment_id = primary;
 			await updatePlace(place.id, body);
+			await setPlaceMedia(place.id, mediaIds);
 			notice = { kind: 'success', message: 'Saved.' };
 			await invalidateAll();
 		} catch (e) {
@@ -77,6 +86,7 @@
 <div class="mt-4 grid gap-6 lg:grid-cols-3">
 	<div class="space-y-4 lg:col-span-2">
 		<PayloadForm bind:fields {errors} />
+		<MediaAttachments library={[...data.library, ...place.media]} bind:ids={mediaIds} />
 		<label class="block text-sm">
 			<span class="text-byl-text">Primary moment (featured on user routes)</span>
 			<select class="mt-1 w-full rounded-md border-byl-border-control" bind:value={primary}>

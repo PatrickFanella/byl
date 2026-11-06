@@ -20,8 +20,8 @@ func kindForContentType(ct string) (models.MediaKind, string) {
 	switch {
 	case strings.HasPrefix(ct, "image/"):
 		return models.MediaKindImage, "images"
-	case strings.HasPrefix(ct, "video/"):
-		return models.MediaKindVideo, "videos"
+	case ct == "application/pdf" || ct == "text/plain":
+		return models.MediaKindDocument, "documents"
 	case strings.HasPrefix(ct, "audio/"):
 		return models.MediaKindAudio, "audio"
 	}
@@ -47,7 +47,7 @@ func (d Deps) adminUploadMedia(w http.ResponseWriter, r *http.Request) {
 	contentType := detectContentType(header.Header.Get("Content-Type"), header.Filename, head)
 	kind, prefix := kindForContentType(contentType)
 	if kind == "" || strings.Contains(contentType, "svg") || strings.Contains(contentType, "xml") || strings.Contains(contentType, "html") {
-		writeValidation(w, map[string]string{"file": "must be an image, video, or audio file"})
+		writeValidation(w, map[string]string{"file": "must be a photo, PDF, plain-text document or audio file; add videos as external links"})
 		return
 	}
 	extensions, _ := mime.ExtensionsByType(contentType)
@@ -90,14 +90,35 @@ func (d Deps) adminUpdateMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := chi.URLParam(r, "id")
-	if req.License != nil && strings.TrimSpace(*req.License) == "" {
-		n, err := d.Store.PublishedMomentsUsingMedia(r.Context(), id)
+	current, err := d.Store.GetMedia(r.Context(), id)
+	if err != nil {
+		d.fail(w, err)
+		return
+	}
+	for _, field := range []struct {
+		value  *string
+		target *string
+	}{
+		{req.Caption, &current.Caption}, {req.Credit, &current.Credit}, {req.License, &current.License},
+		{req.LicenseURL, &current.LicenseURL}, {req.SourceURL, &current.SourceURL},
+	} {
+		if field.value != nil {
+			*field.target = *field.value
+		}
+	}
+	if issue := current.PublicationIssue(); issue != "" {
+		moments, err := d.Store.PublishedMomentsUsingMedia(r.Context(), id)
 		if err != nil {
 			d.fail(w, err)
 			return
 		}
-		if n > 0 {
-			writeError(w, http.StatusConflict, "conflict", "asset is attached to a published moment; unpublish it before removing the license")
+		places, err := d.Store.PublishedPlacesUsingMedia(r.Context(), id)
+		if err != nil {
+			d.fail(w, err)
+			return
+		}
+		if moments+places > 0 {
+			writeError(w, http.StatusConflict, "conflict", "asset is attached to published content: "+issue)
 			return
 		}
 	}
@@ -109,8 +130,27 @@ func (d Deps) adminUpdateMedia(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, asset)
 }
 
-// detectContentType trusts a specific declared type, otherwise sniffs the bytes, then the extension.
+// detectContentType uses the file signature rather than untrusted metadata.
 func detectContentType(_, _ string, head []byte) string {
 	// Neither a declared MIME type nor a filename can override the file signature.
 	return strings.Split(http.DetectContentType(head), ";")[0]
+}
+
+func (d Deps) adminCreateMediaLink(w http.ResponseWriter, r *http.Request) {
+	var req models.MediaLinkRequest
+	if !decodeOrFail(w, r, &req) {
+		return
+	}
+	if fields := req.Validate(); len(fields) > 0 {
+		writeValidation(w, fields)
+		return
+	}
+	asset, err := d.Store.CreateMedia(r.Context(), models.MediaAsset{
+		Kind: req.Kind, External: true, PublicURL: req.PublicURL, Caption: req.Caption, Credit: req.Credit, SourceURL: req.SourceURL,
+	})
+	if err != nil {
+		d.fail(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, asset)
 }

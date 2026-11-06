@@ -265,6 +265,19 @@ paths:
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/places/{id}/media:
+    put:
+      summary: Replace ordered photos, documents and video references for a place
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MediaListRequest" } } } }
+      responses:
+        "200": { description: Updated place, content: { application/json: { schema: { $ref: "#/components/schemas/PlaceDetail" } } } }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+        "404": { description: Place or asset not found }
+        "409": { description: Published place requires complete file rights or external reference metadata }
+        "422": { description: Invalid attachment list }
   /api/v1/admin/places/{id}/publish:
     post:
       summary: "Publish a place with a published, illustrated and sourced primary history"
@@ -349,10 +362,20 @@ paths:
       security: [{ bearer: [] }]
       responses: { "200": { description: OK }, "401": { description: Unauthorized } }
     post:
-      summary: "Upload a media file (multipart: file, caption, credit, license, license_url, source_url)"
+      summary: "Upload a photo, PDF, plain-text document or audio file (64 MiB maximum); video uploads are disabled"
       security: [{ bearer: [] }]
       requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [file], properties: { file: { type: string, format: binary }, caption: { type: string }, credit: { type: string }, license: { type: string }, license_url: { type: string }, source_url: { type: string } } } } } }
       responses: { "201": { description: Created }, "400": { description: Bad request }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+  /api/v1/admin/media/links:
+    post:
+      summary: Add an external video or document link without downloading or embedding it
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MediaLinkRequest" } } } }
+      responses:
+        "201": { description: Created reference, content: { application/json: { schema: { $ref: "#/components/schemas/MediaAsset" } } } }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+        "422": { description: Invalid kind, URL, title or creator }
   /api/v1/admin/media/{id}:
     patch:
       summary: "Update asset metadata and licence"
@@ -575,10 +598,11 @@ components:
         moment_count: { type: integer, description: Published moments carrying this topic }
     MediaAsset:
       type: object
-      required: [id, kind, public_url, mime_type, caption, credit, license, license_url, source_url, status, created_at, updated_at]
+      required: [id, kind, external, public_url, mime_type, caption, credit, license, license_url, source_url, status, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
-        kind: { type: string, enum: [image, video, audio] }
+        kind: { type: string, enum: [image, video, audio, document] }
+        external: { type: boolean, description: True for references opened at the source; never downloaded or embedded }
         storage_key: { type: string, readOnly: true, description: Blob-store key; empty until an imported asset is fetched }
         public_url: { type: string, format: uri }
         mime_type: { type: string }
@@ -626,6 +650,7 @@ components:
           properties:
             primary_moment: { $ref: "#/components/schemas/MomentSummary", nullable: true }
             moments: { type: array, items: { $ref: "#/components/schemas/MomentSummary" } }
+            media: { type: array, items: { $ref: "#/components/schemas/MediaAsset" } }
     Source:
       type: object
       required: [title]
@@ -933,7 +958,7 @@ components:
       type: object
       required: [media_ids]
       properties:
-        media_ids: { type: array, items: { type: string, format: uuid } }
+        media_ids: { type: array, maxItems: 100, uniqueItems: true, items: { type: string, format: uuid } }
     SourcesRequest:
       type: object
       required: [sources]
@@ -944,6 +969,15 @@ components:
       required: [topic_ids]
       properties:
         topic_ids: { type: array, items: { type: string, format: uuid } }
+    MediaLinkRequest:
+      type: object
+      required: [kind, public_url, caption, credit, source_url]
+      properties:
+        kind: { type: string, enum: [video, document] }
+        public_url: { type: string, format: uri, description: Original http(s) watch or document URL }
+        caption: { type: string, minLength: 1, description: Title and relevance to the place or event }
+        credit: { type: string, minLength: 1, description: Creator or publisher }
+        source_url: { type: string, format: uri }
     MediaMetadataRequest:
       type: object
       properties:

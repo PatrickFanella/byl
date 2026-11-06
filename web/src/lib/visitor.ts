@@ -17,6 +17,7 @@ export type RouteSummary = Schemas['RouteSummary'];
 export type PlaceDetail = PlaceSummary & {
 	primary_moment?: MomentSummary | null;
 	moments: MomentSummary[];
+	media: MediaAsset[];
 };
 export type MomentDetail = MomentSummary & {
 	body: string;

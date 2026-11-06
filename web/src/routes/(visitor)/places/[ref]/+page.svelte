@@ -5,6 +5,7 @@
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
 	import MomentStory from '#lib/components/visitor/MomentStory.svelte';
 	import MediaFigure from '#lib/components/visitor/MediaFigure.svelte';
+	import MediaGallery from '#lib/components/visitor/MediaGallery.svelte';
 	import SectionHeader from '#lib/components/visitor/SectionHeader.svelte';
 
 	const ref = $derived(page.params.ref ?? '');
@@ -26,7 +27,9 @@
 		if (featured?.id) story.run();
 	});
 	const hero = $derived(
-		featured?.hero_media ?? place.data?.moments.find((m) => m.hero_media)?.hero_media
+		[featured?.hero_media, ...(place.data?.moments.map((moment) => moment.hero_media) ?? [])].find(
+			(asset) => asset?.kind === 'image' && !asset.external
+		)
 	);
 </script>
 
@@ -81,6 +84,12 @@
 							omitMediaId={hero?.id}
 						/>{/if}
 				</LoadState>
+			</section>
+		{/if}
+		{#if p.media?.length}
+			<section class="mt-10 space-y-4" aria-label="From this place">
+				<SectionHeader title="From this place" eyebrow="Photos and records" />
+				<MediaGallery media={p.media.filter((asset) => asset.id !== hero?.id)} />
 			</section>
 		{/if}
 		{#if !featured}

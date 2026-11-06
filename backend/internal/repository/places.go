@@ -158,7 +158,11 @@ func (s *Store) GetPlace(ctx context.Context, ref, cityRef string, includeUnpubl
 	if err != nil {
 		return nil, err
 	}
-	detail := &models.PlaceDetail{PlaceSummary: p, Moments: moments}
+	media, err := s.PlaceMedia(ctx, id, includeUnpublished)
+	if err != nil {
+		return nil, err
+	}
+	detail := &models.PlaceDetail{PlaceSummary: p, Moments: moments, Media: media}
 	if p.PrimaryMomentID != nil {
 		for i := range moments {
 			if moments[i].ID == *p.PrimaryMomentID {

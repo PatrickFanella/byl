@@ -200,6 +200,12 @@ func (d Deps) adminSetPlaceStatus(status models.EntityStatus) http.HandlerFunc {
 				writeError(w, http.StatusConflict, "conflict", "choose a published primary history with a picture and sources before publishing this place")
 				return
 			}
+			for _, asset := range place.Media {
+				if issue := asset.PublicationIssue(); issue != "" {
+					writeError(w, http.StatusConflict, "conflict", "place media "+asset.ID+": "+issue)
+					return
+				}
+			}
 			blockers, err := d.Store.MomentPublishBlockers(r.Context(), place.PrimaryMoment.ID)
 			if err != nil {
 				d.fail(w, err)
@@ -341,16 +347,18 @@ func (d Deps) adminSetMomentMedia(w http.ResponseWriter, r *http.Request) {
 		d.fail(w, err)
 		return
 	}
-	if existing.Status == models.EntityStatusPublished {
-		unlicensed, err := d.Store.UnlicensedMedia(r.Context(), req.MediaIDs)
-		if err != nil {
-			d.fail(w, err)
-			return
-		}
-		if len(unlicensed) > 0 {
-			writeError(w, http.StatusConflict, "conflict", "moment is published; these assets have no license: "+strings.Join(unlicensed, ", "))
-			return
-		}
+	if fields := req.Validate(); len(fields) > 0 {
+		writeValidation(w, fields)
+		return
+	}
+	blockers, err := d.Store.MediaPublishBlockers(r.Context(), req.MediaIDs)
+	if err != nil {
+		d.fail(w, err)
+		return
+	}
+	if existing.Status == models.EntityStatusPublished && len(blockers) > 0 {
+		writeError(w, http.StatusConflict, "conflict", strings.Join(blockers, "; "))
+		return
 	}
 	if err := d.Store.ReplaceMomentMedia(r.Context(), id, req.MediaIDs); err != nil {
 		d.fail(w, err)

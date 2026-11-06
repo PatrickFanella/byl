@@ -80,10 +80,11 @@ type Topic struct {
 	MomentCount int    `json:"moment_count"`
 }
 
-// MediaAsset is an image, video, or audio file with its licence.
+// MediaAsset is a hosted file or an external video/document reference.
 type MediaAsset struct {
 	ID              string       `json:"id"`
 	Kind            MediaKind    `json:"kind"`
+	External        bool         `json:"external"`
 	StorageKey      string       `json:"storage_key,omitempty"`
 	PublicURL       string       `json:"public_url"`
 	MimeType        string       `json:"mime_type"`
@@ -125,6 +126,7 @@ type PlaceDetail struct {
 	PlaceSummary
 	PrimaryMoment *MomentSummary  `json:"primary_moment"`
 	Moments       []MomentSummary `json:"moments"`
+	Media         []MediaAsset    `json:"media"`
 }
 
 // Source is a citation attached to a moment.

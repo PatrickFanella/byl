@@ -46,6 +46,7 @@ export type PlaceSummary = Schemas['PlaceSummary'];
 export type PlaceDetail = Schemas['PlaceSummary'] & {
 	primary_moment?: MomentSummary | null;
 	moments: MomentSummary[];
+	media: MediaAsset[];
 };
 export type MomentSummary = Schemas['MomentSummary'];
 export type MomentDetail = MomentSummary & {
@@ -124,3 +125,13 @@ export function errorMessage(e: unknown, fallback: string): string {
 	if (e instanceof ApiError) return e.message;
 	return fallback;
 }
+
+export const createMediaLink = (body: {
+	kind: 'video' | 'document';
+	public_url: string;
+	caption: string;
+	credit: string;
+	source_url: string;
+}) => api.post<MediaAsset>('/api/v1/admin/media/links', body);
+export const setPlaceMedia = (id: string, media_ids: string[]) =>
+	api.put<PlaceDetail>(`/api/v1/admin/places/${id}/media`, { media_ids });
