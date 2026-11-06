@@ -47,7 +47,13 @@ const (
 	JobKindImportSource      = "import_source"
 	JobKindDraftCandidate    = "draft_candidate"
 	JobKindFetchMedia        = "fetch_media"
+	JobKindResearchBrief     = "research_brief"
 )
+
+// ResearchBriefPayload references durable private checkpoints rather than source text.
+type ResearchBriefPayload struct {
+	RunID string `json:"run_id"`
+}
 
 // ImportSourcePayload asks a source adapter to fill the review queue.
 type ImportSourcePayload struct {

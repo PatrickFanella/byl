@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 6, then saves a PostgreSQL
+changed migration files or a schema version other than 7, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -158,3 +158,43 @@ production SQL. An older API/web image can run against version 6; it ignores the
 new table. Retain private submissions during an image rollback. Automatic down
 refuses to destroy them; any later schema removal needs a reviewed backup and
 explicit data-retention decision.
+
+## Resumable route research, migration 7
+
+Migration 7 adds private research runs, stage checkpoints and attempt outcomes.
+Each run freezes its submitted brief and moves through research, reconciliation,
+drafting and assembly. Outputs and pending review candidates commit together.
+Completed stages are skipped on retry, and candidate insertion never overwrites
+curator edits. Nothing in this workflow approves candidates or publishes entities.
+
+Curators start with `POST /api/v1/admin/route-briefs/{id}/research` and the latest
+brief `version`. Retrying that source version returns its existing run. The GET
+at the same path returns safe progress; owners have a read-only equivalent under
+`/me`. Cancel and resume actions add `/cancel` or `/resume` and require both the
+current brief version and `run_id`. Cancellation releases the brief for editing
+and fences in-flight results. Resume requires unchanged submitted input and
+retains checkpoints, charged usage, attempt counts and the original deadline.
+Generic job retry refuses research jobs so it cannot reset those budgets.
+
+Runs allow at most 12 processor operations, three attempts per stage, 20,000
+reserved model tokens and 15 minutes from creation. Every operation is charged
+before invocation and receives a 30-second context deadline and a 2,000-token
+ceiling. Reservations survive interruption because crash usage can be unknown.
+Each processor implementation must make at most one external request per
+operation, honor the context and enforce the token ceiling. Failed calls use
+safe reason codes; raw provider errors, source content and credentials must not
+enter progress responses or routine logs. Attempt outcomes remain after a retry
+succeeds. Stale job claims cannot commit results or finish a newer worker's job.
+
+The processor is intentionally unconfigured in this delivery. A queued run ends
+in `needs_research` with `processor_unavailable`, without external requests or
+model charges. Source discovery and real stage adapters are later roadmap work.
+Stubbed-provider tests establish orchestration behavior; they do not qualify
+real research quality, provider cost accounting or route safety.
+
+Rehearse migration 7 on a restored production copy, verify existing records and
+public responses, then take a fresh backup before operator application. Admit
+the exact seven-file manifest and source hook expecting schema 7. CI applies no
+production SQL. Older application images ignore the additive tables; retain the
+checkpoints and private outputs during image rollback. Automatic down refuses
+to delete them.
