@@ -392,6 +392,35 @@ type MediaMetadataRequest struct {
 	SourceURL  *string `json:"source_url"`
 }
 
+// MediaLinkRequest records a reference; the destination is never downloaded.
+type MediaLinkRequest struct {
+	Kind      MediaKind `json:"kind"`
+	PublicURL string    `json:"public_url"`
+	Caption   string    `json:"caption"`
+	Credit    string    `json:"credit"`
+	SourceURL string    `json:"source_url"`
+}
+
+func (r MediaLinkRequest) Validate() Fields {
+	f := Fields{}
+	if r.Kind != MediaKindVideo && r.Kind != MediaKindDocument {
+		f.set("kind", "must be video or document")
+	}
+	if !webURL(r.PublicURL) {
+		f.set("public_url", "must be an http(s) URL")
+	}
+	if !webURL(r.SourceURL) {
+		f.set("source_url", "must be an http(s) URL")
+	}
+	if strings.TrimSpace(r.Caption) == "" {
+		f.set("caption", "title is required")
+	}
+	if strings.TrimSpace(r.Credit) == "" {
+		f.set("credit", "creator or publisher is required")
+	}
+	return f
+}
+
 // SourcesRequest replaces a moment's sources.
 type SourcesRequest struct {
 	Sources []Source `json:"sources"`
@@ -416,6 +445,21 @@ type TopicsRequest struct {
 // MediaListRequest replaces a moment's media.
 type MediaListRequest struct {
 	MediaIDs []string `json:"media_ids"`
+}
+
+func (r MediaListRequest) Validate() Fields {
+	f := Fields{}
+	if len(r.MediaIDs) > 100 {
+		f.set("media_ids", "at most 100 attachments are allowed")
+	}
+	seen := map[string]bool{}
+	for _, id := range r.MediaIDs {
+		if id == "" || seen[id] {
+			f.set("media_ids", "must contain unique, nonempty asset IDs")
+		}
+		seen[id] = true
+	}
+	return f
 }
 
 // RoleRequest changes an account's role.

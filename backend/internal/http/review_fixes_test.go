@@ -97,7 +97,7 @@ func TestStopChangesOnPublishedCuratedTourRefused(t *testing.T) {
 func TestLicenceRemovalOnPublishedMomentRefused(t *testing.T) {
 	env := newTestEnv(t)
 	curator := env.signIn(t, "c@example.com", models.AccountRoleCurator)
-	licensedAsset := uploadMedia(t, env, curator, "a.jpg", "image/jpeg", []byte("\xff\xd8\xffjpeg"), map[string]string{"license": "CC0-1.0"})
+	licensedAsset := uploadMedia(t, env, curator, "a.jpg", "image/jpeg", []byte("\xff\xd8\xffjpeg"), map[string]string{"license": "CC0-1.0", "caption": "Archive photograph", "credit": "Archive", "source_url": "https://example.org/photo", "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"})
 	unlicensedAsset := uploadMedia(t, env, curator, "b.jpg", "image/jpeg", []byte("\xff\xd8\xffjpeg"), nil)
 	licensed, unlicensed := licensedAsset["id"].(string), unlicensedAsset["id"].(string)
 	moment := "/api/v1/admin/moments/" + testdb.SeedMomentTalkiesID

@@ -9,7 +9,7 @@ const MinHistoryWords = 250
 
 func webURL(value string) bool {
 	u, err := url.Parse(value)
-	return err == nil && (u.Scheme == "http" || u.Scheme == "https") && u.Host != ""
+	return err == nil && (u.Scheme == "http" || u.Scheme == "https") && u.Host != "" && u.User == nil
 }
 
 // ReusableLicense accepts the licenses reviewed for illustrated place histories.
@@ -22,7 +22,7 @@ func ReusableLicense(value string) bool {
 }
 
 func (m MediaAsset) ReusableImage() bool {
-	return m.Kind == MediaKindImage && m.PublicURL != "" && ReusableLicense(m.License) &&
+	return m.Kind == MediaKindImage && !m.External && m.PublicURL != "" && ReusableLicense(m.License) &&
 		strings.TrimSpace(m.Caption) != "" && strings.TrimSpace(m.Credit) != "" && webURL(m.SourceURL) && webURL(m.LicenseURL)
 }
 

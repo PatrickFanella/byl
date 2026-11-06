@@ -54,14 +54,15 @@ func (m TravelMode) Valid() bool {
 type MediaKind string
 
 const (
-	MediaKindImage MediaKind = "image"
-	MediaKindVideo MediaKind = "video"
-	MediaKindAudio MediaKind = "audio"
+	MediaKindImage    MediaKind = "image"
+	MediaKindVideo    MediaKind = "video"
+	MediaKindAudio    MediaKind = "audio"
+	MediaKindDocument MediaKind = "document"
 )
 
 func (k MediaKind) Valid() bool {
 	switch k {
-	case MediaKindImage, MediaKindVideo, MediaKindAudio:
+	case MediaKindImage, MediaKindVideo, MediaKindAudio, MediaKindDocument:
 		return true
 	}
 	return false

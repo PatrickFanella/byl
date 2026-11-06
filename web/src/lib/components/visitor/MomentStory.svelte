@@ -15,10 +15,14 @@
 	const media = $derived(m.media.filter((asset) => asset.id !== omitMediaId));
 </script>
 
-{#if media.length}<div class="mt-5"><MediaGallery {media} /></div>{/if}
 <article class="byl-story prose mt-5 max-w-2xl">
 	{#each paragraphs as p, i (i)}<p>{p}</p>{/each}
 </article>
+
+{#if media.length}<section class="mt-8 space-y-3" aria-label="Related material">
+		<h2 class="text-lg font-semibold">Related material</h2>
+		<MediaGallery {media} />
+	</section>{/if}
 
 {#if m.topics.length}
 	<div class="mt-5 flex flex-wrap gap-2">

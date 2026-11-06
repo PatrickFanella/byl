@@ -36,6 +36,7 @@ func TestAdminRoleGating(t *testing.T) {
 func TestAdminContentLifecycle(t *testing.T) {
 	env := newTestEnv(t)
 	curator := env.signIn(t, "c@example.com", models.AccountRoleCurator)
+	seedMediaCount := len(items(t, env.get(t, "/api/v1/admin/media", curator)))
 
 	r := env.do(t, http.MethodPost, "/api/v1/admin/places", curator, map[string]any{"city_id": testdb.SeedCityID, "name": "Lyman Woods", "latitude": 41.82, "longitude": -87.99, "kind": "park"})
 	if r.status != 201 || r.body["status"] != "draft" || r.body["slug"] != "lyman-woods" {
@@ -136,7 +137,7 @@ func TestAdminContentLifecycle(t *testing.T) {
 	if r := env.do(t, http.MethodPost, "/api/v1/admin/cities", curator, map[string]any{"name": "Naperville", "center_lat": 41.77, "center_lng": -88.15, "bbox_min_lat": 41.7, "bbox_min_lng": -88.2, "bbox_max_lat": 41.8, "bbox_max_lng": -88.1}); r.status != 201 || r.body["slug"] != "naperville" {
 		t.Fatalf("create city: %d %s", r.status, r.raw)
 	}
-	if r := env.get(t, "/api/v1/admin/media", curator); r.status != 200 || len(items(t, r)) != 5 {
+	if r := env.get(t, "/api/v1/admin/media", curator); r.status != 200 || len(items(t, r)) != seedMediaCount+1 {
 		t.Fatalf("list media: %d %s", r.status, r.raw)
 	}
 }

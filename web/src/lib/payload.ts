@@ -83,7 +83,7 @@ const mediaSpec: Spec[] = [
 		key: 'license',
 		label: 'Licence',
 		kind: 'text',
-		help: 'Required before anything using this asset can be published, e.g. CC-BY-SA-4.0, CC0-1.0, PD.'
+		help: 'Required for hosted copies, e.g. CC-BY-SA-4.0, CC0-1.0, PD. External video/document references need a title, creator and source instead.'
 	},
 	{ key: 'license_url', label: 'Licence URL', kind: 'text' },
 	{ key: 'source_url', label: 'Source URL', kind: 'text' }

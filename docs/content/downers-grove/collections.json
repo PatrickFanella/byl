@@ -1,0 +1,146 @@
+[
+  {
+    "file": "backend/internal/seedmedia/images/station-2017.jpg",
+    "sha256": "6724712fe4808992744fac7cd348d718e73da3b89339016ef3bf529f9c4d7ee2",
+    "source_url": "https://commons.wikimedia.org/wiki/File:20170720_07_Metra_station,_Downers_Grove,_Illinois_(44195883935).jpg",
+    "download_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/20170720_07_Metra_station%2C_Downers_Grove%2C_Illinois_%2844195883935%29.jpg/1280px-20170720_07_Metra_station%2C_Downers_Grove%2C_Illinois_%2844195883935%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "original_url": "https://upload.wikimedia.org/wikipedia/commons/7/75/20170720_07_Metra_station%2C_Downers_Grove%2C_Illinois_%2844195883935%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "creator": "David Wilson from Oak Park, Illinois, USA",
+    "license": "CC-BY-2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "date": "2017-07-20 09:29",
+    "width": 1280,
+    "height": 960,
+    "description": "20170720 07 Metra station, Downers Grove, Illinois",
+    "changes": "Wikimedia thumbnail resize; no crop or retouching",
+    "retrieved_at": "2026-11-06",
+    "id": "00000000-0000-4000-8000-00000000f1f1",
+    "kind": "image",
+    "external": false,
+    "public_url": "https://byl.subcult.tv/media/files/library/images/station-2017.jpg",
+    "mime_type": "image/jpeg",
+    "caption": "Main Street station platform and shelter, July 20, 2017. Resized by Wikimedia.",
+    "credit": "David Wilson from Oak Park, Illinois, USA",
+    "places": [
+      "00000000-0000-4000-8000-00000000b0b1"
+    ],
+    "moments": []
+  },
+  {
+    "file": "backend/internal/seedmedia/images/tivoli-2024.jpg",
+    "sha256": "147ee70f45dec75661d22dfef71365e47637ee03b68d5f4f8b1935e93451d361",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tivoli_Theatre,_Downers_Grove_Main_Street.jpg",
+    "download_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Tivoli_Theatre%2C_Downers_Grove_Main_Street.jpg/1280px-Tivoli_Theatre%2C_Downers_Grove_Main_Street.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "original_url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Tivoli_Theatre%2C_Downers_Grove_Main_Street.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "creator": "AEDIAEDI",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "date": "20 October 2024\u00a0(according to Exif data)",
+    "width": 1280,
+    "height": 1700,
+    "description": "Downers Grove Main Street (Metra train station in Downers Grove, Illinois, USA)",
+    "changes": "Wikimedia thumbnail resize; no crop or retouching",
+    "retrieved_at": "2026-11-06",
+    "id": "00000000-0000-4000-8000-00000000f1f3",
+    "kind": "image",
+    "external": false,
+    "public_url": "https://byl.subcult.tv/media/files/library/images/tivoli-2024.jpg",
+    "mime_type": "image/jpeg",
+    "caption": "The Tivoli exterior and illuminated marquee, October 20, 2024. Resized by Wikimedia.",
+    "credit": "AEDIAEDI",
+    "places": [
+      "00000000-0000-4000-8000-00000000b0b2"
+    ],
+    "moments": []
+  },
+  {
+    "file": "backend/internal/seedmedia/images/station-night-2010.jpg",
+    "sha256": "3c70397a938e9cd1b90360ab35c40b6a04c44b170a150907e0098c1dcef5a797",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Downers_Grove.jpg",
+    "download_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Downers_Grove.jpg/1280px-Downers_Grove.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "original_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Downers_Grove.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "creator": "Maggie Wolff",
+    "license": "CC-BY-2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "date": "2010-11-30 21:48:50",
+    "width": 1280,
+    "height": 960,
+    "description": "Downers Grove-Main Street Metra station.",
+    "changes": "Wikimedia thumbnail resize; no crop or retouching",
+    "retrieved_at": "2026-11-06",
+    "id": "00000000-0000-4000-8000-00000000f1f2",
+    "kind": "image",
+    "external": false,
+    "public_url": "https://byl.subcult.tv/media/files/library/images/station-night-2010.jpg",
+    "mime_type": "image/jpeg",
+    "caption": "Main Street station at night, November 30, 2010. Resized by Wikimedia.",
+    "credit": "Maggie Wolff",
+    "places": [
+      "00000000-0000-4000-8000-00000000b0b1"
+    ],
+    "moments": []
+  },
+  {
+    "id": "00000000-0000-4000-8000-00000000f1f4",
+    "kind": "document",
+    "external": false,
+    "public_url": "https://byl.subcult.tv/media/files/library/documents/icc-downers-grove-1947.pdf",
+    "mime_type": "application/pdf",
+    "caption": "Accident investigation 3092: Downers Grove, April 3, 1947 (report dated May 26, 1947)",
+    "credit": "United States Interstate Commerce Commission; digitized by the National Transportation Library",
+    "license": "PD",
+    "license_url": "https://www.copyright.gov/title17/92chap1.html#105",
+    "source_url": "https://rosap.ntl.bts.gov/view/dot/44964",
+    "download_url": "https://rosap.ntl.bts.gov/view/dot/44964/dot_44964_DS1.pdf",
+    "file": "backend/internal/seedmedia/documents/icc-downers-grove-1947.pdf",
+    "sha256": "6957482658c323dadc42008f2331b2f73038ad8473f8b8b94343807c7897b0a2",
+    "retrieved_at": "2026-11-06",
+    "changes": "None; original 12-page scan",
+    "places": [
+      "00000000-0000-4000-8000-00000000b0b1"
+    ],
+    "moments": [
+      "00000000-0000-4000-8000-00000000d0d8"
+    ]
+  },
+  {
+    "id": "00000000-0000-4000-8000-00000000f1f5",
+    "kind": "video",
+    "external": true,
+    "public_url": "https://www.youtube.com/watch?v=HD62Tk7lySY",
+    "mime_type": "",
+    "caption": "History Happens Here: The 1846 Blodgett House",
+    "credit": "Jim Toth / Node Films, with Downers Grove Museum and Downers Grove Historical Society",
+    "license": "",
+    "license_url": "",
+    "source_url": "https://dghistory.org/videos/",
+    "retrieved_at": "2026-11-06",
+    "note": "The Historical Society links this documentary about Israel and Avis Blodgett. Link only; no video or thumbnail copied.",
+    "places": [
+      "00000000-0000-4000-8000-00000000b0b4"
+    ],
+    "moments": [
+      "00000000-0000-4000-8000-00000000d0d5"
+    ]
+  },
+  {
+    "id": "00000000-0000-4000-8000-00000000f1f6",
+    "kind": "document",
+    "external": true,
+    "public_url": "https://www.downers.us/legacy_documents/board_commission/HPDRB/Agenda_10-18-17.pdf",
+    "mime_type": "application/pdf",
+    "caption": "Village historic preservation packet (2017): Blodgett houses and local landmarks",
+    "credit": "Village of Downers Grove",
+    "license": "",
+    "license_url": "",
+    "source_url": "https://www.downers.us/legacy_documents/board_commission/HPDRB/Agenda_10-18-17.pdf",
+    "retrieved_at": "2026-11-06",
+    "note": "Historic building descriptions include the Charles Blodgett home on page 23. Link only; copying rights not inferred.",
+    "places": [
+      "00000000-0000-4000-8000-00000000b0b4"
+    ],
+    "moments": [
+      "00000000-0000-4000-8000-00000000d0d7"
+    ]
+  }
+]

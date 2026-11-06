@@ -34,6 +34,49 @@ unknown or rights-reserved images stay out of published stories. Illustrations r
 relicense them. Original source links and license links remain visible to visitors. Keep a record of resizing or
 other changes. Do not substitute generated reconstructions for documentary images.
 
+## Photo collections, documents and video references
+
+A featured illustration is only the starting point. Collect additional views of
+the location, historical photographs, maps and scanned records when they explain
+the place or event. Record the subject, date and viewpoint when known in the
+caption. Distinguish a later photograph of the location from a photograph of the
+event itself. Keep creator, original source and reuse rights with every copied
+file. Prefer a useful, varied selection over repeated near-identical views.
+
+Attach material about the physical site to the place. Attach a document or video
+about a particular event to that event. The same library item can be attached to
+both; it is stored once. Curators can select and order attachments in either
+editor. Visitors see separate Photos, Documents and Videos groups, and can open
+a full photograph from its image.
+
+The media library accepts photos, PDFs, plain-text documents and audio up to
+64 MiB per upload. Scanned documents can also be uploaded as images. PDFs and
+text documents download as attachments. For another document format, or a record
+without permission to copy, add a document link to its original location. A
+document needs a descriptive title, creator/publisher, original source, and the
+date or event context supported by that source. Hosted copies also need a
+reusable license and its URL.
+
+Videos are external references. Add the original watch-page URL, a descriptive
+title explaining its relevance, creator/publisher and source page. Copying rights
+are not required merely to link to an authorized publisher's page. Do not download
+video files, copy thumbnails, embed a player, or infer that a linked video's
+license permits redistribution. Video uploads are refused; imported video
+candidates become external links and never enqueue a file download.
+
+The drafting prompt records relevant attachment leads and exact supplied URLs in
+review notes. It distinguishes a video transcript or description from watching
+the video, and does not invent file rights or new source URLs. These leads still
+need curator review and an explicit attachment.
+
+Imported media candidates retain their explicit place/event target. Approval
+attaches the item to that target; incomplete file metadata stays out of public
+collections. Publication and attachment changes on published content require
+complete provenance. External references use reference metadata checks rather
+than the license checks used for hosted copies. Curator review still establishes
+that the material is relevant and the publisher is the original or an authorized
+source.
+
 ## Current import and review workflow
 
 1. Import sources for the city or an explicitly selected place. Review place
@@ -85,3 +128,10 @@ The seed illustrations are packaged with the API and served locally at
 Uploaded media keeps its separate storage lifecycle. These pilot media URLs
 target `https://byl.subcult.tv`; another installation must review its own public
 base URL when importing the pilot records.
+
+[The collection register](downers-grove/collections.json) adds three dated site
+photographs, a hosted copy of the Interstate Commerce Commission's 12-page 1947
+accident report, a link to the Historical Society's Blodgett House documentary,
+and a linked Village preservation packet. It records file hashes, rights, source
+URLs, retrieval dates and place/event associations. Migration 4 adds document and
+place-collection storage; migration 5 installs these reviewed collection records.

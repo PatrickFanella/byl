@@ -7,12 +7,12 @@ import (
 	"invisible-museum/backend/internal/models"
 )
 
-const mediaCols = `id, kind, storage_key, public_url, mime_type, width, height, duration_seconds, caption, credit, license, license_url, source_url, status, created_at, updated_at`
+const mediaCols = `id, kind, storage_key, public_url, mime_type, width, height, duration_seconds, caption, credit, license, license_url, source_url, status, created_at, updated_at, external`
 
 func scanMedia(row interface{ Scan(...any) error }) (models.MediaAsset, error) {
 	var m models.MediaAsset
 	err := row.Scan(&m.ID, &m.Kind, &m.StorageKey, &m.PublicURL, &m.MimeType, &m.Width, &m.Height, &m.DurationSeconds,
-		&m.Caption, &m.Credit, &m.License, &m.LicenseURL, &m.SourceURL, &m.Status, &m.CreatedAt, &m.UpdatedAt)
+		&m.Caption, &m.Credit, &m.License, &m.LicenseURL, &m.SourceURL, &m.Status, &m.CreatedAt, &m.UpdatedAt, &m.External)
 	return m, err
 }
 
@@ -22,9 +22,9 @@ func (s *Store) CreateMedia(ctx context.Context, m models.MediaAsset) (*models.M
 		m.Status = models.EntityStatusDraft
 	}
 	var id string
-	err := s.pool.QueryRow(ctx, `INSERT INTO media_assets (kind, storage_key, public_url, mime_type, width, height, duration_seconds, caption, credit, license, license_url, source_url, status)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,
-		m.Kind, m.StorageKey, m.PublicURL, m.MimeType, m.Width, m.Height, m.DurationSeconds, m.Caption, m.Credit, m.License, m.LicenseURL, m.SourceURL, m.Status).Scan(&id)
+	err := s.pool.QueryRow(ctx, `INSERT INTO media_assets (kind, storage_key, public_url, mime_type, width, height, duration_seconds, caption, credit, license, license_url, source_url, status, external)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`,
+		m.Kind, m.StorageKey, m.PublicURL, m.MimeType, m.Width, m.Height, m.DurationSeconds, m.Caption, m.Credit, m.License, m.LicenseURL, m.SourceURL, m.Status, m.External).Scan(&id)
 	if err != nil {
 		return nil, mapErr(err)
 	}
