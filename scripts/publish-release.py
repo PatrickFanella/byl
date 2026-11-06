@@ -17,6 +17,7 @@ def main():
     headers = {
         "Authorization": "token " + os.environ["GITEA_TOKEN"],
         "Content-Type": "application/json",
+        "User-Agent": "Byl-release/1",
     }
     try:
         with urllib.request.urlopen(urllib.request.Request(endpoint + "/tags/" + tag, headers=headers), timeout=30) as response:

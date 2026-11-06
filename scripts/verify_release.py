@@ -29,7 +29,7 @@ def verify(revision):
     request = urllib.request.Request(
         "https://byl.subcult.tv/api/v1/auth/dev",
         data=b'{"email":"release-check@example.invalid"}',
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "User-Agent": "Byl-release-check/1"},
     )
     try:
         urllib.request.urlopen(request, timeout=20)
