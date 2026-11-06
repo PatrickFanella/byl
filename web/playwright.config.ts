@@ -16,7 +16,8 @@ export default defineConfig({
 	webServer: {
 		command: 'npm run build && npm run preview -- --port 4173',
 		port: 4173,
-		reuseExistingServer: true,
+		// Each run has a fresh API port and must own its matching web proxy.
+		reuseExistingServer: false,
 		env: { VITE_API_PROXY: apiUrl ?? 'http://localhost:8080' }
 	}
 });

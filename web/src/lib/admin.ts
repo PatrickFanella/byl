@@ -37,6 +37,23 @@ export const draftCandidate = (id: string) =>
 export const createImport = (body: Record<string, unknown>) =>
 	api.post<{ job: Job }>('/api/v1/admin/imports', body);
 
+export type RouteBrief = Schemas['RouteBrief'];
+export type RouteBriefInput = Schemas['RouteBriefInput'];
+export type BriefStatus = Schemas['BriefStatus'];
+export const listRouteBriefs = (status = '', offset = 0) =>
+	api.list<RouteBrief>(`/api/v1/admin/route-briefs${qs({ status, offset, limit: 50 })}`);
+export const getRouteBrief = (id: string) =>
+	api.get<RouteBrief>(`/api/v1/admin/route-briefs/${encodeURIComponent(id)}`);
+export const createRouteBrief = (submitted: RouteBriefInput, key: string) =>
+	api.request<RouteBrief>('POST', '/api/v1/admin/route-briefs', submitted, false, {
+		'Idempotency-Key': key
+	});
+export const updateRouteBrief = (id: string, version: number, submitted: RouteBriefInput) =>
+	api.put<RouteBrief>(`/api/v1/admin/route-briefs/${encodeURIComponent(id)}`, {
+		version,
+		submitted
+	});
+
 export function sleep(ms: number) {
 	return new Promise((r) => setTimeout(r, ms));
 }
