@@ -59,6 +59,8 @@ else
   curl --fail --silent "http://$host:$port/release.json" > "$scratch/release.json"
   python3 -c 'import json,sys; assert json.load(open(sys.argv[1])) == {"revision":sys.argv[2]}' "$scratch/release.json" "$revision"
   curl --fail --silent "http://$host:$port/" > "$scratch/index.html"
-  grep -q 'Byl' "$scratch/index.html"
+  grep -q '_app/immutable' "$scratch/index.html"
+  curl --fail --silent "http://$host:$port/brand/favicon.svg" > "$scratch/favicon.svg"
+  grep -q '<svg' "$scratch/favicon.svg"
 fi
 echo "$service release image smoke test passed"

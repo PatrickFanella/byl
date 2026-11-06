@@ -18,8 +18,8 @@ def get(path):
 
 def verify(revision):
     assert json.loads(get("/release.json")) == {"revision": revision}
-    assert b"Byl" in get("/")
-    assert b"Byl" in get("/admin")
+    assert b"_app/immutable" in get("/")
+    assert b"_app/immutable" in get("/admin")
     get("/healthz")
     cities = json.loads(get("/api/v1/cities"))["items"]
     assert any(city["slug"] == "downers-grove" for city in cities)
