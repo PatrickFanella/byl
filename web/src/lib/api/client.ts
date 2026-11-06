@@ -42,8 +42,15 @@ export class ApiClient {
 		this.fetchFn = opts.fetch ?? ((input, init) => fetch(input, init));
 	}
 
-	async request<T>(method: Method, path: string, body?: unknown, isForm = false): Promise<T> {
+	async request<T>(
+		method: Method,
+		path: string,
+		body?: unknown,
+		isForm = false,
+		extraHeaders: Record<string, string> = {}
+	): Promise<T> {
 		const headers = new Headers({ Accept: 'application/json' });
+		for (const [name, value] of Object.entries(extraHeaders)) headers.set(name, value);
 		const token = this.token();
 		if (token) headers.set('Authorization', `Bearer ${token}`);
 		let payload: BodyInit | undefined;

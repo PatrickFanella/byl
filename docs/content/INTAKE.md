@@ -77,6 +77,26 @@ than the license checks used for hosted copies. Curator review still establishes
 that the material is relevant and the publisher is the original or an authorized
 source.
 
+## Start a private route brief
+
+Curators can start at **Route briefs** in the admin navigation. Save a topic and
+area first, then resume the saved brief from its link. Optional fields collect
+unresolved place/event names, source links, walking/cycling preferences, trip
+shape, duration, endpoints and a pilot identifier. Submitted notes and links are
+private research leads; they do not become verified evidence or public prose.
+
+The workspace shows the brief's lifecycle, current reason and saved version.
+More research is needed when the state says `needs_research`; its reason explains
+the unresolved work. Processing pauses edits. If another curator saved a newer
+version, the form retains unsaved edits and asks you to copy them before reloading
+the saved brief. Retrying creation after a lost response uses the same request
+key and opens the original record.
+
+Saving a brief does not start automated research or publish a tour. Use the
+existing import and review tools below while the research worker is being built.
+Visitor submissions remain disabled, and production curator access still needs
+the deferred sign-in configuration.
+
 ## Current import and review workflow
 
 1. Import sources for the city or an explicitly selected place. Review place
