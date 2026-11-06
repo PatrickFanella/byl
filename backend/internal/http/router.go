@@ -98,6 +98,10 @@ func NewRouter(d Deps) http.Handler {
 		r.Group(func(r chi.Router) {
 			r.Use(d.requireAuth)
 			r.Get("/me", d.me)
+			r.Get("/me/route-briefs", d.listRouteBriefs(false))
+			r.Post("/me/route-briefs", d.routeBriefIntakeDisabled)
+			r.Get("/me/route-briefs/{id}", d.getRouteBrief(false))
+			r.Put("/me/route-briefs/{id}", d.routeBriefIntakeDisabled)
 			r.Delete("/auth/session", d.logout)
 			r.Get("/me/tours", d.listMyTours)
 			r.Post("/me/tours", d.createMyTour)
@@ -114,6 +118,11 @@ func NewRouter(d Deps) http.Handler {
 
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(d.requireAuth, requireRole(models.AccountRoleCurator))
+			r.Get("/route-briefs", d.listRouteBriefs(true))
+			r.Post("/route-briefs", d.adminCreateRouteBrief)
+			r.Get("/route-briefs/{id}", d.getRouteBrief(true))
+			r.Put("/route-briefs/{id}", d.adminUpdateRouteBrief)
+			r.Post("/route-briefs/{id}/state", d.adminSetRouteBriefState)
 			r.Get("/cities", d.adminListCities)
 			r.Post("/cities", d.adminCreateCity)
 			r.Patch("/cities/{id}", d.adminUpdateCity)

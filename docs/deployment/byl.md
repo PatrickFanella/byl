@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 5, then saves a PostgreSQL
+changed migration files or a schema version other than 6, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -130,3 +130,31 @@ new event associations if returning to that client. Retain the asset records,
 files and place associations for recovery. Automatic down refuses to delete
 curator collections; a database restore or selective rollback needs an operator
 review of subsequent writes. Keep the per-release database and media backups.
+
+## Private route briefs, migration 6
+
+Migration 6 adds only `route_briefs` and its indexes. It does not alter existing
+content or account records. Submitted notes, unresolved place/event names and
+links live in the private `submitted` object; intake creates no evidence,
+candidates, tours or public prose. Curators use `/api/v1/admin/route-briefs`.
+Owners can read their own records through `/api/v1/me/route-briefs`, but visitor
+creation and edits return `403 intake_disabled`. There is deliberately no
+environment switch that opens public intake before the publication flow is ready.
+
+Creation allows 10 new briefs per rolling 24 hours and 20 unresolved briefs per
+account, serialized in PostgreSQL. An optional `Idempotency-Key` header (up to
+128 bytes) makes retried creation safe. Use a new key for a different submission.
+Edits and curator decisions require the latest `version`; conflicts return 409
+and leave the saved record intact. Editing a disposition resets it to draft and
+requires another review. Stop a processing brief before editing it. Accepting a
+brief never publishes content.
+
+Before deployment, restore a fresh production backup into an isolated database,
+apply migration 6 and check the original rows, public catalogue and new private
+API behavior. Back up production again, apply the reviewed additive migration as
+operator, and admit the exact six-file checksum manifest with the source hook
+expecting version 6. CI continues to refuse unadmitted migrations and applies no
+production SQL. An older API/web image can run against version 6; it ignores the
+new table. Retain private submissions during an image rollback. Automatic down
+refuses to destroy them; any later schema removal needs a reviewed backup and
+explicit data-retention decision.

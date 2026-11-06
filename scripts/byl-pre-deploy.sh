@@ -12,7 +12,7 @@ manifest=$(docker run --rm --network none --entrypoint sh "$image" -c 'sha256sum
   exit 1
 }
 version=$(docker exec byl-postgres-1 psql -U byl -d byl -Atqc 'SELECT max(version_id) FROM goose_db_version WHERE is_applied')
-[[ $version == 5 ]]
+[[ $version == 6 ]]
 backup="$root/backups/$(date -u +%Y%m%dT%H%M%S)-$revision"
 mkdir -p "$backup"
 docker exec byl-postgres-1 pg_dump -U byl -d byl -Fc > "$backup/database.dump"
