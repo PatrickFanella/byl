@@ -1,0 +1,9 @@
+http://byl.subcult.tv {
+	@plain header X-Forwarded-Proto http
+	redir @plain https://byl.subcult.tv{uri} 308
+	encode zstd gzip
+	header -Server
+	reverse_proxy http://10.0.0.56:3093 {
+		header_up X-Forwarded-Proto https
+	}
+}

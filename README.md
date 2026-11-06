@@ -14,6 +14,7 @@ The apps use Studio's Classic solid / P3 Oxblood design system. See the [BYL int
 - `android/` — Kotlin/Compose visitor app with a JVM-tested `:core` module.
 - `docs/superpowers/plans/` — implementation planning notes.
 - `docs/deployment/nuc-almaz.md` — NUC/Almaz deployment notes.
+- `docs/deployment/byl.md` — public Byl hosting, automatic releases and recovery.
 - `Makefile` — root commands for backend, migrations, API smoke tests, and Simulator runs.
 
 ## Requirements

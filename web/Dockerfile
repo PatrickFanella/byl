@@ -8,8 +8,13 @@ COPY web/ ./
 ARG VITE_GOOGLE_CLIENT_ID=
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 RUN npx openapi-typescript /backend/api/openapi.yaml -o src/lib/api/types.ts && npx vite build
+ARG REVISION=development
+RUN printf '{"revision":"%s"}\n' "$REVISION" > /app/build/release.json
 
 FROM nginx:1.27-alpine
+ARG REVISION=development
+LABEL org.opencontainers.image.source="https://git.subcult.tv/subculture-collective/invisible-museum" \
+      org.opencontainers.image.revision=$REVISION
 COPY web/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build /app/build /usr/share/nginx/html
 ENV API_UPSTREAM=http://api:8080

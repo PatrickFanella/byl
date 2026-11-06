@@ -7,6 +7,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/api ./c
     CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/migrate ./cmd/migrate
 
 FROM alpine:3.20
+ARG REVISION=development
+LABEL org.opencontainers.image.source="https://git.subcult.tv/subculture-collective/invisible-museum" \
+      org.opencontainers.image.revision=$REVISION
 RUN apk add --no-cache ca-certificates && adduser -D -H appuser && mkdir -p /data/media && chown appuser /data/media
 USER appuser
 COPY --from=build /out/api /api
