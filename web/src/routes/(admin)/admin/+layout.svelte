@@ -12,6 +12,7 @@
 
 	const nav = [
 		{ href: '/admin', label: 'Dashboard' },
+		{ href: '/admin/briefs', label: 'Route briefs' },
 		{ href: '/admin/queue', label: 'Review queue' },
 		{ href: '/admin/imports', label: 'Imports' },
 		{ href: '/admin/places', label: 'Places' },
