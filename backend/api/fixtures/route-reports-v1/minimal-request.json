@@ -1,0 +1,10 @@
+{
+  "tour_id": "b61b2ac5-306e-4e4c-b68e-74a3dc8d2a4b",
+  "revision_id": "57467d07-921d-4705-bef7-6e1b8800c4e2",
+  "mode": "walk",
+  "affected": {
+    "kind": "entrance",
+    "stop_id": "0152ed8c-ef31-483a-81da-fd0c1fc9ad7a"
+  },
+  "reason": "blocked"
+}

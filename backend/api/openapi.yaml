@@ -921,6 +921,82 @@ paths:
         "404": { description: Owned tour not found }
         "409": { description: Stale draft/published pointer, unready routes, changed routing inputs or publication blockers }
         "422": { description: Invalid expected version }
+  /api/v1/me/route-reports:
+    post:
+      summary: Submit a private operational report about a frozen tour revision
+      description: Accepts a minimal blocked-entrance report without source or alternative. Defaults direction/duration to unknown. No public historical content, trip recording, route mutation or contribution consent is created. Allows 10 new reports per 24 hours and 20 unresolved reports per account; idempotent retries do not consume another slot. Maximum body is 32 KiB.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: Idempotency-Key, in: header, schema: { type: string, maxLength: 128, pattern: '^[!-~]+$' }, description: Optional account-scoped printable ASCII retry key; reuse with changed input returns 409 }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RouteReportInput" } } } }
+      responses:
+        "201": { description: Created in private review, content: { application/json: { schema: { $ref: "#/components/schemas/RouteReport" } } } }
+        "200": { description: Existing report for this retry key, including current disposition, content: { application/json: { schema: { $ref: "#/components/schemas/RouteReport" } } } }
+        "400": { description: Malformed body or unknown field }
+        "401": { description: Authentication required }
+        "404": { description: Visible tour revision not found }
+        "409": { description: Retry key used for different input }
+        "413": { description: Body exceeds 32 KiB }
+        "422": { description: Invalid input, revision mode/stop/direction references or unrelated geometry }
+        "429": { description: Account submission quota reached }
+    get:
+      summary: List only this account's private route reports
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/BriefStatus" } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses:
+        "200": { description: Private report list, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/RouteReport" } }, next_cursor: { type: string } } } } } }
+        "401": { description: Authentication required }
+        "422": { description: Unknown status }
+  /api/v1/me/route-reports/{id}:
+    get:
+      summary: Read this account's report and private disposition
+      description: Remains readable by its submitter after the referenced route is withdrawn. Never includes another account's report.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: Private report, content: { application/json: { schema: { $ref: "#/components/schemas/RouteReport" } } } }
+        "401": { description: Authentication required }
+        "404": { description: Owned report not found }
+  /api/v1/admin/route-reports:
+    get:
+      summary: List private route reports for curator review
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/BriefStatus" } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses:
+        "200": { description: Private report list }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "422": { description: Unknown status }
+  /api/v1/admin/route-reports/{id}:
+    get:
+      summary: Read a private operational report as curator
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: Private report, content: { application/json: { schema: { $ref: "#/components/schemas/RouteReport" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Report not found }
+  /api/v1/admin/route-reports/{id}/state:
+    post:
+      summary: Record a private report disposition at an expected version
+      description: Reuses the brief lifecycle, starting in review. Acceptance records a decision only; it edits no tour, entrance, geometry or story. Reasons are private to the submitter and curators. Submitted input is immutable.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/BriefStateRequest" } } } }
+      responses:
+        "200": { description: Updated private disposition, content: { application/json: { schema: { $ref: "#/components/schemas/RouteReport" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Report not found }
+        "409": { description: Stale version or invalid lifecycle transition }
+        "422": { description: Invalid decision }
 components:
   securitySchemes:
     bearer:
@@ -928,6 +1004,63 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    ReportLocation:
+      type: object
+      additionalProperties: false
+      required: [kind]
+      description: Stop/entrance needs stop_id only, with optional arrival_id for a recorded entrance. Segment needs from_stop_id and to_stop_id from adjacent positions in this snapshot; forward/reverse direction must agree. Unknown entrances need no approved arrival_id.
+      properties:
+        kind: { type: string, enum: [stop, entrance, segment] }
+        stop_id: { type: string, format: uuid }
+        arrival_id: { type: string, format: uuid }
+        from_stop_id: { type: string, format: uuid }
+        to_stop_id: { type: string, format: uuid }
+    RouteReportInput:
+      type: object
+      additionalProperties: false
+      required: [tour_id, revision_id, mode, affected, reason]
+      properties:
+        tour_id: { type: string, format: uuid }
+        revision_id: { type: string, format: uuid, description: The immutable revision the visitor saw, not today's draft }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        direction: { type: string, enum: [forward, reverse, unknown], default: unknown }
+        affected: { $ref: "#/components/schemas/ReportLocation" }
+        reason: { type: string, enum: [blocked, closed, unsafe, access, surface, improvement, other] }
+        details: { type: string, maxLength: 4000, description: Private operational observation; required for other }
+        observed_on: { type: string, format: date, nullable: true, description: Omit or null when the observation date is unknown }
+        duration: { type: string, enum: [permanent, temporary, unknown], default: unknown }
+        better: { type: string, maxLength: 1000, description: "What improves, such as safety or surface; required for improvement" }
+        source_url: { type: string, maxLength: 2000, description: Optional HTTP(S) reference without credentials; never fetched by this API }
+        annotation:
+          type: object
+          nullable: true
+          additionalProperties: false
+          required: [lat, lng]
+          description: One affected-location point within 1 km of the selected frozen stop/entrance/segment; no background trip trace
+          properties:
+            lat: { type: number, minimum: -90, maximum: 90 }
+            lng: { type: number, minimum: -180, maximum: 180 }
+        alternative:
+          type: object
+          nullable: true
+          additionalProperties: false
+          required: [type, coordinates]
+          description: Optional unverified local suggestion. Every point stays within 1 km of the affected frozen path. For a segment, ends connect within 100 m of its ordered endpoints. For a stop/entrance, at least one end connects within 100 m. Proximity does not prove access or traversability.
+          properties:
+            type: { type: string, enum: [LineString] }
+            coordinates: { type: array, minItems: 2, maxItems: 64, items: { type: array, minItems: 2, maxItems: 2, items: { type: number } }, description: "WGS84 [longitude, latitude] pairs" }
+    RouteReport:
+      type: object
+      required: [id, owner_account_id, submitted, status, reason, version, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        owner_account_id: { type: string, format: uuid, readOnly: true, description: Derived from the authenticated session }
+        submitted: { $ref: "#/components/schemas/RouteReportInput" }
+        status: { $ref: "#/components/schemas/BriefStatus" }
+        reason: { type: string, description: Private disposition reason visible to the submitter and curators }
+        version: { type: integer, minimum: 1 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
     PublishRevisionRequest:
       type: object
       additionalProperties: false

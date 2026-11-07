@@ -352,3 +352,51 @@ attach their bearer token to those reads; anonymous reads show the current
 public release. A personal route with its first routes still pending has no
 published revision yet, so progress returns 409 until it is ready. Client update
 prompts and full adoption of the revision endpoints remain separate work.
+
+
+## Private route problems and improvement reports
+
+Operational feedback is separate from historical research. A signed-in visitor
+can submit `POST /api/v1/me/route-reports` for the immutable tour revision they
+saw. Supply `tour_id`, `revision_id`, `mode`, a `reason`, and an `affected` object.
+A minimal blocked entrance uses `affected.kind: "entrance"`, the captured
+`affected.stop_id`, and `reason: "blocked"`. No source, alternate path, date or approved entrance ID
+is required. Direction and duration default to `unknown`; do not invent an
+observation date when it is unknown.
+
+An affected location is a stable `stop_id`, an entrance at that stop with an
+optional captured `arrival_id`, or a segment with adjacent `from_stop_id` and
+`to_stop_id`. Segment order must agree with a known `forward` or `reverse`
+direction. Mode, identities and optional geometry are checked against that frozen
+revision, so later reorders cannot retarget a report. A historical private
+revision does not become reportable by strangers when an owner later shares a
+new version.
+
+Reasons are `blocked`, `closed`, `unsafe`, `access`, `surface`, `improvement` or
+`other`. Duration is `permanent`, `temporary` or `unknown`. For an improvement,
+record `better` in concrete terms such as a safer crossing or smoother surface;
+`other` needs explanatory details. `observed_on` is an optional calendar date.
+An optional `source_url` is a reference, not inspected evidence, and this API
+never fetches it. Do not copy a report or its unverified anecdote into visitor
+history.
+
+One optional `annotation` point marks the affected location. An optional
+`alternative` is a bounded local LineString suggestion, not a recorded trip or
+approved route. Points must stay near the frozen affected path and connect to
+its anchors; the exact limits are in the OpenAPI/operator contract. Proximity
+does not prove a legal entrance, connection at a crossing, or mode eligibility.
+There is no photo upload or background location recording in this workflow.
+
+Owner list/get endpoints are `/api/v1/me/route-reports` and `/{id}`. Curators use
+`/api/v1/admin/route-reports`, `/{id}` and `POST /{id}/state` with the expected
+`version`, disposition `status` and a reason. New reports enter private `review`.
+The existing brief lifecycle controls subsequent decisions; accepting a report
+records a disposition and changes no route or public story. The report and
+reason remain visible only to its submitter and curators, even after the original
+route is withdrawn. Submission input is immutable; a new observation is a new
+report. Preserve the original retry key across transport retries to avoid
+creating duplicates. Quotas and bounded bodies limit intake.
+
+This adds API and client fixtures for later report forms. It leaves ordinary
+new-tour public intake closed and does not configure public sign-in, create
+historical drafts or grant contribution consent.

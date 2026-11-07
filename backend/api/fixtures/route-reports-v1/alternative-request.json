@@ -1,0 +1,28 @@
+{
+  "tour_id": "b61b2ac5-306e-4e4c-b68e-74a3dc8d2a4b",
+  "revision_id": "57467d07-921d-4705-bef7-6e1b8800c4e2",
+  "mode": "walk",
+  "direction": "forward",
+  "affected": {
+    "kind": "segment",
+    "from_stop_id": "0152ed8c-ef31-483a-81da-fd0c1fc9ad7a",
+    "to_stop_id": "e4a59171-be43-4b6b-8689-94eb6f8a795c"
+  },
+  "reason": "improvement",
+  "duration": "permanent",
+  "better": "Synthetic proposal: a smoother walking surface.",
+  "observed_on": "2026-11-07",
+  "alternative": {
+    "type": "LineString",
+    "coordinates": [
+      [
+        -88.0092,
+        41.7959
+      ],
+      [
+        -88.0111,
+        41.8083
+      ]
+    ]
+  }
+}
