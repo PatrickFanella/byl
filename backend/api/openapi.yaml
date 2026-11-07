@@ -676,6 +676,20 @@ paths:
         "404": { description: Brief not found or not owned }
         "409": { description: Version or lifecycle conflict }
         "422": { description: Field validation failed }
+  /api/v1/admin/route-briefs/{id}/itinerary:
+    get:
+      summary: Inspect a private source-linked itinerary proposal
+      description: Curators only, including for the brief owner. Returns the latest research run or a specified retained run. No tour is created, no source/candidate is approved, and no travel distance or time is claimed before computation.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: run_id, in: query, schema: { type: string, format: uuid }, description: Optional retained research run belonging to this brief }
+      responses:
+        "200": { description: Private snapshot or null proposal while assembly is pending, content: { application/json: { schema: { $ref: "#/components/schemas/BriefItinerary" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Brief or research run not found }
+        "422": { description: Invalid retained proposal }
   /api/v1/admin/route-briefs/{id}/research:
     parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
     get:
@@ -1715,6 +1729,82 @@ components:
       properties:
         items: { type: array, items: { $ref: "#/components/schemas/SourceEvidence" } }
         next_cursor: { type: string, description: Empty; use limit and offset }
+    ItineraryMaterial:
+      type: object
+      required: [record_id, review_version, place_id, place_name, city_id, latitude, longitude, moment_title, narrative, evidence_kind, content_sha256, source_urls, evidence_ids]
+      properties:
+        record_id: { type: string, format: uuid }
+        review_version: { type: integer, minimum: 0 }
+        place_id: { type: string, format: uuid }
+        place_name: { type: string }
+        city_id: { type: string, format: uuid }
+        latitude: { type: number }
+        longitude: { type: number }
+        moment_id: { type: string, format: uuid }
+        candidate_id: { type: string, format: uuid }
+        moment_title: { type: string }
+        narrative: { type: string, maxLength: 2000, description: Exact retained paragraph or evidence-linked claim, not fresh generated history }
+        evidence_kind: { type: string, enum: [curated_record, evidence_linked_draft] }
+        content_sha256: { type: string }
+        source_urls: { type: array, maxItems: 5, items: { type: string, format: uri } }
+        evidence_ids: { type: array, maxItems: 5, items: { type: string, format: uuid } }
+    ItineraryGap:
+      type: object
+      required: [code, detail]
+      properties:
+        code: { type: string }
+        detail: { type: string }
+        record_id: { type: string, format: uuid }
+        place_candidate_id: { type: string, format: uuid, nullable: true }
+        moment_candidate_id: { type: string, format: uuid, nullable: true }
+    ItineraryStop:
+      type: object
+      required: [material, theme_reason, what_to_notice, transition, planned_dwell_minutes, planned_narration_minutes]
+      properties:
+        material: { $ref: "#/components/schemas/ItineraryMaterial" }
+        theme_reason: { type: string }
+        what_to_notice: { type: string, description: Explicit curator research question until current viewing guidance is independently supported }
+        transition: { type: string, description: Thematic transition, never turn directions or an access assertion }
+        planned_dwell_minutes: { type: integer, minimum: 0 }
+        planned_narration_minutes: { type: integer, minimum: 0 }
+    ItineraryProposal:
+      type: object
+      required: [version, status, created_at, title, introduction, requested_shape, trip_shape, modes, target_duration_minutes, travel_minutes, travel_state, planned_dwell_minutes, planned_narration_minutes, stops, travel_sequence, excluded, research_gaps, assumptions]
+      description: Private unpublished proposal. Travel sequence contains zero-based stop indices, including non-narrated closing or retraced travel. Optimistic straight-line screening is not computed route distance, legal access or publication readiness.
+      properties:
+        version: { type: integer, enum: [1] }
+        status: { type: string, enum: [draft, needs_research] }
+        created_at: { type: string, format: date-time }
+        title: { type: string }
+        introduction: { type: string }
+        requested_shape: { type: string, enum: [flexible, loop, point_to_point, out_and_back] }
+        trip_shape: { type: string, enum: [loop, point_to_point, out_and_back] }
+        modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
+        target_duration_minutes: { type: integer, nullable: true }
+        travel_minutes: { type: integer, nullable: true, description: Null until actual route computation; never filled by geographic screening }
+        travel_state: { type: string, enum: [not_computed] }
+        planned_dwell_minutes: { type: integer, minimum: 0 }
+        planned_narration_minutes: { type: integer, minimum: 0 }
+        stops: { type: array, maxItems: 8, items: { $ref: "#/components/schemas/ItineraryStop" } }
+        travel_sequence: { type: array, maxItems: 15, items: { type: integer, minimum: 0, maximum: 7 } }
+        excluded:
+          type: array
+          items:
+            type: object
+            required: [material, reason]
+            properties:
+              material: { $ref: "#/components/schemas/ItineraryMaterial" }
+              reason: { type: string }
+        research_gaps: { type: array, items: { $ref: "#/components/schemas/ItineraryGap" } }
+        assumptions: { type: array, items: { type: string } }
+    BriefItinerary:
+      type: object
+      required: [run_id, source_version, brief_version, proposal]
+      properties:
+        run_id: { type: string, format: uuid }
+        source_version: { type: integer, minimum: 1 }
+        brief_version: { type: integer, minimum: 1 }
+        proposal: { $ref: "#/components/schemas/ItineraryProposal", nullable: true }
     ResearchActionRequest:
       type: object
       additionalProperties: false
@@ -1773,7 +1863,7 @@ components:
         event_leads: { type: array, maxItems: 20, items: { type: string, minLength: 1, maxLength: 2000 } }
         source_links: { type: array, maxItems: 20, items: { type: string, format: uri, minLength: 1, maxLength: 2000 }, description: HTTP or HTTPS only; no embedded credentials }
         modes: { type: array, maxItems: 2, uniqueItems: true, items: { $ref: "#/components/schemas/TravelMode" }, description: Defaults to walk and bike }
-        trip_shape: { type: string, enum: [flexible, loop, point_to_point], default: flexible }
+        trip_shape: { type: string, enum: [flexible, loop, point_to_point, out_and_back], default: flexible }
         duration_minutes: { type: [integer, "null"], minimum: 15, maximum: 1440 }
         start_preference: { type: string, maxLength: 500, default: "" }
         end_preference: { type: string, maxLength: 500, default: "" }

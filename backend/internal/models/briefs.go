@@ -120,8 +120,8 @@ func (r RouteBriefInput) Validate() Fields {
 	if len(r.Modes) > 2 || (len(r.Modes) == 2 && r.Modes[0] == r.Modes[1]) {
 		f.set("modes", "choose walk, bike, or both once")
 	}
-	if r.TripShape != "" && r.TripShape != "loop" && r.TripShape != "point_to_point" && r.TripShape != "flexible" {
-		f.set("trip_shape", "must be loop, point_to_point, or flexible")
+	if r.TripShape != "" && r.TripShape != "loop" && r.TripShape != "point_to_point" && r.TripShape != "out_and_back" && r.TripShape != "flexible" {
+		f.set("trip_shape", "must be loop, point_to_point, out_and_back, or flexible")
 	}
 	if r.DurationMinutes != nil && (*r.DurationMinutes < 15 || *r.DurationMinutes > 1440) {
 		f.set("duration_minutes", "must be between 15 and 1440")

@@ -124,8 +124,8 @@ version, the form retains unsaved edits and asks you to copy them before reloadi
 the saved brief. Retrying creation after a lost response uses the same request
 key and opens the original record.
 
-Saving a brief does not start automated research or publish a tour. Use the
-private research API to start discovery at the saved version. Use the existing
+Saving a brief does not start automated research or publish a tour. Use **Start research from saved brief**, or the private research API, to start
+discovery at the saved version. Use the existing
 import and review tools below to develop and publish the resulting leads.
 Visitor submissions remain disabled, and production curator access still needs
 the deferred sign-in configuration.
@@ -153,9 +153,10 @@ classifications remain distinct from inspected page passages, and every retrieve
 passage remains untrusted. Failed sources remain explicit outcomes; a failed
 provider does not erase another provider's successful results.
 
-The coordinator saves its shortlist and runs local reconciliation before pausing
-at drafting and assembly, which still need their roadmap implementations. Empty results or a stage
-timeout leave a named research gap. Saving discovery does not create public
+The coordinator saves its shortlist, runs local reconciliation, captures available
+historical material and assembles a private itinerary proposal. Missing supported
+histories, empty results or a stage timeout leave named research gaps. New
+historical generation uses the per-candidate inspected draft workflow below. Saving discovery does not create public
 content or approve media rights. Source policy, credentials and request limits
 are documented in `docs/deployment/byl.md`.
 
@@ -517,10 +518,10 @@ image-rights and publication review. The proposal's claim trail describes its
 generated text; subsequent curator rewrites need their own factual review.
 
 Media and narration remain optional and require separate approval. Drafting
-creates no attachments or playback jobs. Brief research's automated drafting and
-assembly adapters remain separate integration work; these changes provide the
-inspected per-candidate draft path. A configured provider is still required, and
-this change enables neither a paid provider nor public sign-in.
+creates no attachments or playback jobs. Brief research can reuse completed
+per-candidate proposals during local material capture and itinerary assembly, as
+described below. Generating a new historical proposal still requires a configured
+provider; local assembly enables neither a paid provider nor public sign-in.
 
 ## Path assessment before publishing a route
 
@@ -569,3 +570,60 @@ conditions, grant access permission or publish automatically. Release requires
 current passing assessments for every selected mode plus the existing content
 checks and an explicit publication action. Keep historical stories editable while
 research continues; do not invent access facts to complete an itinerary.
+
+## Assemble a private itinerary proposal
+
+The brief workspace now offers **Start research from saved brief** and **Inspect
+itinerary proposal**. Save edits before starting. Starting research uses the saved
+version and preserves unsaved form text; it does not silently reload the editor.
+Inspection can be repeated after processing without changing the form. Curators
+can also read `GET /api/v1/admin/route-briefs/{id}/itinerary`; optional `run_id`
+selects a retained run belonging to that brief. This source-rich proposal is
+curator-only, including when the brief's owner has an ordinary visitor account.
+Owner research progress continues to omit stage output and source text.
+
+After reconciliation, the local drafting-material stage captures sourced existing
+historical records and current evidence-linked candidate proposals. It retains
+place/event/candidate IDs, identity review versions, selected text, source URLs,
+evidence IDs and content hashes. Unknown identities, archived records, missing
+source material and generated proposals whose candidate input has changed remain
+linked research gaps. No candidate is approved and no curator text is overwritten.
+The B5 source/citation validator is run again before using a generated proposal.
+An existing curated record and an evidence-linked generated draft remain visibly
+different sources of material.
+
+Assembly ranks the requested topic and event terms, chooses one featured event
+per physical place and orders a compact selection. It does not add unrelated
+stops to reach a count. A shared place can feature different histories for
+different themes. Outlying supported material remains linked in exclusions;
+fewer than two supported locations yields a useful partial proposal marked
+needs research. A single-location history can still be developed independently.
+Requested starts/ends must resolve to supported place names; unresolved or
+incompatible endpoints remain explicit gaps.
+
+Trip shape accepts loop, point-to-point and out-and-back, with flexible retained
+for briefs that do not choose. The proposal separates story order from a travel
+sequence: a loop closes to the first stop, and out-and-back retraces its stops
+without creating duplicate narrated stories. Planned dwell is three minutes per
+stop, with planned narration based on the retained text at 130 words per minute.
+Actual travel time stays uncomputed. A deliberately optimistic straight-line
+screen can exclude impractical geography; it does not establish route distance,
+travel time, legal connectivity, access or publication quality. If no duration
+was supplied, the proposal records a provisional 60-minute screen. Flexible shape
+records a point-to-point planning assumption for review.
+
+The introduction and transitions describe the selected theme and accounts without
+new historical facts or navigation instructions. Stop narratives reuse retained
+paragraphs/claims. What-to-notice entries are explicitly curator research questions
+until current viewing guidance is supported. Research gaps, exclusions and
+planning assumptions remain visible. This bounded deterministic assembly makes
+no model request; local material/assembly stages retain deadlines, attempt limits,
+cancellation and worker fences without reserving external requests or model tokens.
+Completed checkpoints replay without creating another proposal or tour.
+
+The result is a private proposal. It creates no tour row, publishes no content and
+computes no route. Curator acceptance/materialization and the existing historical,
+media-rights and path-quality publication gates remain separate steps. Full source
+and identity records remain linked to the brief even when a bounded proposal omits
+material. Start a fresh saved-version research run when the brief or research has
+changed; inspect an older run when reviewing its original snapshot.

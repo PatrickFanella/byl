@@ -41,9 +41,11 @@ test('a computed development route stays a draft with actionable quality finding
 	// The worker computes straight-line routes within a few seconds; the page loads data after reload.
 	await expect(async () => {
 		await page.reload();
-		await expect(page.locator('aside li', { hasText: 'walk' }).getByText('ready')).toBeVisible({
-			timeout: 4000
-		});
+		for (const mode of ['walk', 'bike']) {
+			await expect(page.locator('aside li', { hasText: mode }).getByText('ready')).toBeVisible({
+				timeout: 4000
+			});
+		}
 	}).toPass({ timeout: 45_000, intervals: [2000] });
 
 	await expect(page.getByRole('button', { name: 'Publish', exact: true })).toBeDisabled();

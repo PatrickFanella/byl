@@ -229,6 +229,7 @@
 					<option value="flexible">Flexible</option><option value="loop">Loop</option><option
 						value="point_to_point">Point to point</option
 					>
+					<option value="out_and_back">Out and back</option>
 				</select>
 				{#if errors.trip_shape}<p id="brief-shape-error" class="mt-1 text-sm text-byl-danger">
 						{errors.trip_shape}

@@ -186,9 +186,10 @@ safe reason codes; raw provider errors, source content and credentials must not
 enter progress responses or routine logs. Attempt outcomes remain after a retry
 succeeds. Stale job claims cannot commit results or finish a newer worker's job.
 
-The processor is intentionally unconfigured in this delivery. A queued run ends
-in `needs_research` with `processor_unavailable`, without external requests or
-model charges. Source discovery and real stage adapters are later roadmap work.
+The initial migration-7 delivery left the processor unconfigured: a queued run
+ended in `needs_research` with `processor_unavailable`, without external requests
+or model charges. Later discovery, reconciliation and local material/assembly
+stages are described below.
 Stubbed-provider tests establish orchestration behavior; they do not qualify
 real research quality, provider cost accounting or route safety.
 
@@ -241,7 +242,8 @@ does not bypass access restrictions or copy full archives into public content.
 Media reuse stays `unresolved`: inspecting text or a page license does not clear
 images, video or documents for copying. No media is downloaded by evidence jobs.
 These manual curator retrieval limits are separate from the automatic research-
-run budget described below. Historical drafting remains a separate roadmap issue.
+run budget described below. Retrieval does not generate historical prose; use the
+per-candidate evidence-linked drafting path described below.
 
 ## Regional topics and curated tours, migration 9
 
@@ -291,9 +293,9 @@ write behavior; regional editing requires the current API.
 
 Starting a saved brief's research run now executes discovery. It reuses relevant
 published collection records and permitted retained brief evidence before new
-requests. The remaining reconciliation, drafting and assembly processors remain
-unconfigured; a successful discovery checkpoint therefore pauses with
-`processor_unavailable` rather than claiming to have drafted a tour.
+requests. Local reconciliation and historical-material/assembly stages now follow
+discovery as described below. Missing supported histories remain research gaps;
+generating new candidate histories still needs the explicitly configured B5 drafter.
 
 `BRIEF_DISCOVERY_PROVIDERS` selects up to three distinct providers from
 `wikipedia_search,loc,internet_archive` (the default). Wikipedia uses its public
@@ -365,8 +367,9 @@ at most 201 places, 101 moments per place, 21 source references per moment and
 requires review. Leads are at most 32768 encoded bytes, with at most 20 per stage;
 the private checkpoint retains its 256 KiB cap. This stage makes no external
 requests and uses no model provider. The coordinator's conservative stage budget
-reservation remains charged. Historical drafting and itinerary assembly still
-pause with `processor_unavailable` until their adapters are implemented.
+reservation remains charged. The later local historical-material and assembly
+stages reuse retained records/proposals without another provider reservation;
+missing historical drafts stay named research gaps.
 
 ## Reviewed public arrival points, migration 11
 
@@ -664,8 +667,10 @@ stop or drain draft processing: old workers do not enforce these evidence/edit
 guards. Keep schema 14 and later candidate/evidence history; prefer a forward fix
 or read-only recovery. Do not restore an older dump over curator work. No real
 paid-model output or authenticated production drafting is certified by stubbed
-provider, database and browser tests. Automated brief-stage drafting/assembly
-integration, native clients and field-routing qualification remain separate.
+provider, database and browser tests. Brief-stage material capture and assembly
+can reuse these proposals as described below; new historical generation remains
+an explicit curator job. Native clients and field-routing qualification remain
+separate.
 
 ## Path quality checkpoints, schema 16
 
@@ -704,3 +709,29 @@ Earlier APIs can read retained snapshots but their route writers invalidate qual
 and their revision inserts lack the new gate's requirements. Prefer a forward fix;
 if an older image is needed for diagnosis, keep it read-only. Do not restore an
 older dump over later curator work or resume older workers as a recovery shortcut.
+
+## Local themed itinerary proposals, schema 16 unchanged
+
+The API worker enables bounded local historical-material capture and itinerary
+assembly after reconciliation. Existing curated source records and validated B5
+candidate drafts can support a private proposal without a new model call. Missing
+material remains a named research gap. Local stages retain claim/version,
+cancellation, deadline and attempt fences, but reserve no external-request or
+model budget. Existing optional research processors retain their provider-stage
+reservation behavior.
+
+Completed proposals use the existing private research checkpoint JSON; no new
+migration, manifest or hook version is required beyond schema 16. Research
+progress for owners still excludes source output. The curator itinerary endpoint
+returns the retained run/source version; cross-brief run references are refused.
+The brief workspace starts saved-version research and inspects proposals without
+discarding unsaved form edits. No public tour, candidate approval, route computation
+or publication is implied by assembly. Production sign-in/model/Valhalla settings
+are not activated by this change.
+
+Qualification must include actual PostgreSQL replay, cancellation, source-linked
+candidate validation and curator/owner boundary checks. Published catalogue,
+revision and route fields should match the prior release. Retain existing schema,
+research snapshots, candidates and later curator work during image recovery;
+new out-and-back brief values may be uneditable in an older client until the
+current application is restored. Prefer a forward fix when later work exists.
