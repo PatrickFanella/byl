@@ -676,6 +676,28 @@ paths:
         "404": { description: Brief not found or not owned }
         "409": { description: Version or lifecycle conflict }
         "422": { description: Field validation failed }
+  /api/v1/admin/route-briefs/{id}/review-package:
+    get:
+      operationId: adminGetCuratorReviewPackage
+      summary: Inspect one complete private curator package
+      description: Read-only repeatable-read snapshot of retained drafts, selected dependencies, private passages, proposed shared changes and optional prepared geometry. Curator/admin only, including for a brief's owner. A review version grants no publication authority; approval is a separate operation.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: run_id, in: query, schema: { type: string, format: uuid }, description: Retained run belonging to this brief; defaults to latest }
+        - { name: tour_id, in: query, schema: { type: string, format: uuid }, description: Optional curated working tour; mismatch remains inspectable with blocking tasks }
+        - { name: expected_version, in: query, schema: { type: string, pattern: '^[a-fA-F0-9]{64}$' }, description: Exact prior response version; changed dependencies return 409 }
+      responses:
+        "200":
+          description: Complete or partial private package, including no-run/processing/needs-research cases. Cache-Control no-store and Vary Authorization.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CuratorReviewPackage" }
+        "401": { description: Unauthorized }
+        "403": { description: Curator role required }
+        "404": { description: Brief/run/tour unavailable or run belongs to another brief }
+        "409": { description: Exact reviewed version changed }
+        "422": { description: Invalid version token or package exceeds bounded read size }
   /api/v1/admin/route-briefs/{id}/itinerary:
     get:
       summary: Inspect a private source-linked itinerary proposal
@@ -1730,6 +1752,73 @@ components:
       properties:
         items: { type: array, items: { $ref: "#/components/schemas/SourceEvidence" } }
         next_cursor: { type: string, description: Empty; use limit and offset }
+    CuratorReviewPackage:
+      type: object
+      required: [schema_version, version, state, ready_to_publish, brief, research, submitted, proposal, tour, routes, path_reports, reconciliation, entities, evidence, tasks, visitor_stories]
+      description: At most 20 reconciliation records, 64 stage candidates, 64 sources and 8 MiB serialized. Every relevant current dependency affects the deterministic SHA-256 version. No rows, publication decisions or provider requests are created by reading.
+      properties:
+        schema_version: { type: integer, enum: [1] }
+        version: { type: string, pattern: '^[a-f0-9]{64}$' }
+        state: { type: string, enum: [not_started, processing, needs_research, stale, ready_for_review] }
+        ready_to_publish: { type: boolean, description: Eligibility for separate explicit curator approval, not an approval or field-access certificate }
+        brief: { $ref: "#/components/schemas/RouteBrief" }
+        research: { $ref: "#/components/schemas/ResearchRun", nullable: true }
+        submitted: { $ref: "#/components/schemas/RouteBriefInput", nullable: true, description: Frozen submitted input for the selected retained run }
+        proposal: { $ref: "#/components/schemas/ItineraryProposal", nullable: true }
+        tour: { $ref: "#/components/schemas/TourDetail", nullable: true, description: Current prepared working copy; no publication is performed }
+        routes:
+          type: object
+          additionalProperties: { $ref: "#/components/schemas/TourRoute", nullable: true }
+        path_reports:
+          type: object
+          additionalProperties: { $ref: "#/components/schemas/PathQualityReport", nullable: true }
+        reconciliation: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/ReconciliationRecord" } }
+        entities: { type: array, items: { $ref: "#/components/schemas/ReviewPackageEntity" } }
+        evidence: { type: array, maxItems: 64, items: { $ref: "#/components/schemas/SourceEvidence" } }
+        tasks: { type: array, items: { $ref: "#/components/schemas/ReviewPackageTask" } }
+        visitor_stories: { type: array, maxItems: 8, items: { $ref: "#/components/schemas/ReviewVisitorStory" } }
+    ReviewPackageEntity:
+      type: object
+      required: [key, kind, id, required, disposition, current, candidate, proposed, proposal_source, changes]
+      properties:
+        key: { type: string, description: Kind-qualified existing or candidate identity }
+        kind: { type: string, enum: [place, moment, media, candidate] }
+        id: { type: string }
+        required: { type: boolean, description: Selected dependency versus contextual lead; an unselected candidate is not approved by reviewing this package }
+        disposition: { type: string, enum: [new_entity, reused_published, reused_draft, proposed_shared_edit, proposed_draft_edit, unavailable] }
+        current: { type: object, nullable: true, additionalProperties: true, description: Typed current place summary, complete moment or media; null for new entities }
+        candidate: { $ref: "#/components/schemas/Candidate", nullable: true }
+        proposed: { type: object, nullable: true, additionalProperties: true, description: Private candidate editor input or latest unapplied generated draft; never silently applied }
+        proposal_source: { type: string, enum: ["", candidate_editor, generated_draft_unapplied] }
+        changes:
+          type: array
+          items:
+            type: object
+            required: [field, before, after]
+            properties:
+              field: { type: string }
+              before: { nullable: true, description: Previous JSON field value }
+              after: { nullable: true, description: Proposed JSON field value }
+    ReviewPackageTask:
+      type: object
+      required: [code, entity_key, detail]
+      properties:
+        code: { type: string }
+        entity_key: { type: string }
+        detail: { type: string }
+    ReviewVisitorStory:
+      type: object
+      required: [position, place_id, moment_id, candidate_id, title, body, text_source, source_urls, evidence_ids]
+      properties:
+        position: { type: integer, minimum: 1 }
+        place_id: { type: string }
+        moment_id: { type: string }
+        candidate_id: { type: string }
+        title: { type: string }
+        body: { type: string, description: Full selected current story or validated generated draft; captured paragraph only when stale/unavailable }
+        text_source: { type: string, enum: [curated_record, evidence_linked_draft, captured_partial] }
+        source_urls: { type: array, nullable: true, items: { type: string } }
+        evidence_ids: { type: array, nullable: true, items: { type: string } }
     ItineraryMaterial:
       type: object
       required: [record_id, review_version, place_id, place_name, city_id, latitude, longitude, moment_title, narrative, evidence_kind, content_sha256, source_urls, evidence_ids]

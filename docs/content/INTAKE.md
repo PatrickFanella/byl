@@ -627,3 +627,14 @@ media-rights and path-quality publication gates remain separate steps. Full sour
 and identity records remain linked to the brief even when a bounded proposal omits
 material. Start a fresh saved-version research run when the brief or research has
 changed; inspect an older run when reviewing its original snapshot.
+
+
+## Inspect the complete private review package
+
+Curators can read `/api/v1/admin/route-briefs/{id}/review-package`, optionally with
+`run_id` and a prepared curated `tour_id`. The response combines selected visitor
+stories, evidence passages, current/new/shared dependencies, proposed differences,
+geometry, path checks and unresolved tasks in one versioned snapshot. Processing
+and needs-research results remain inspectable and cannot become publication-ready.
+Reading creates no records and approves nothing. See [the package contract](CURATOR-PACKAGE.md)
+for exact-version checks, readiness, bounds and the later approval/UI boundaries.
