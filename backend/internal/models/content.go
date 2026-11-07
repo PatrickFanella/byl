@@ -70,14 +70,15 @@ type CityDetail struct {
 	Topics []Topic `json:"topics"`
 }
 
-// Topic is a museum wing.
+// Topic is a shared theme with an original city reference.
 type Topic struct {
-	ID          string `json:"id"`
-	CityID      string `json:"city_id"`
-	Slug        string `json:"slug"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	MomentCount int    `json:"moment_count"`
+	ID          string   `json:"id"`
+	CityID      string   `json:"city_id"`
+	CityIDs     []string `json:"city_ids"`
+	Slug        string   `json:"slug"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	MomentCount int      `json:"moment_count"`
 }
 
 // MediaAsset is a hosted file or an external video/document reference.

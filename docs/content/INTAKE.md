@@ -77,6 +77,38 @@ than the license checks used for hosted copies. Curator review still establishes
 that the material is relevant and the publisher is the original or an authorized
 source.
 
+## Regional curated tours and shared themes
+
+A curated tour can include places from several municipalities. Each place keeps
+its own `city_id`; a tour does not move or duplicate a place to cross a boundary.
+The tour retains its original `city_id` and slug for existing references, while
+its `city_ids` lists the original city and all stop municipalities. City discovery
+includes a public published tour in each represented municipality, once per tour.
+Private and unlisted tours stay out of city discovery; direct-link access retains
+the existing visibility rules.
+
+Use one topic ID for a theme shared across the selected area. The curator topic
+API accepts `city_ids` on creation or update, automatically retains the topic's
+original city and supports up to thirty municipalities in total. Omitted/null
+coverage leaves an existing topic unchanged; an empty array requests only its
+original city. A municipality still used by the topic's moments or tours cannot
+be removed. Add coverage before assigning that theme to a new municipality.
+Topic coverage is public catalogue metadata; it is not a private tour boundary.
+
+Original city/slug topic references retain precedence. When several shared
+topics use the same slug in another municipality, use the topic ID rather than
+guessing which theme was intended. Shared topics retain a total published-moment
+count across their coverage; place and tour discovery remain filtered by the
+requested city. The topic's original city, slug, title and description remain.
+
+Older clients receive the same tour fields and full ordered stop list; each stop
+still contains the place's real municipality and coordinates. They may label a
+regional tour using its original city and ignore `city_ids`. Existing web/native
+readers can follow the recorded tour by ID/slug. Personal-route builders retain
+their single-city validation. Regional selection/editing controls, street/trail
+access validation and device/field qualification remain separate work. Curators
+can create regional tours and shared topics through the existing admin API.
+
 ## Start a private route brief
 
 Curators can start at **Route briefs** in the admin navigation. Save a topic and

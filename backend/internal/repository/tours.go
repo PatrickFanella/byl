@@ -54,7 +54,9 @@ type UpdateTourInput struct {
 	Visibility  *models.TourVisibility
 }
 
-const tourCols = `t.id, t.city_id, t.slug, t.title, t.summary, t.topic_id, t.modes::text[], t.hero_media_id, t.status, t.visibility, t.owner_account_id,
+const tourCols = `t.id, t.city_id,
+	ARRAY(SELECT city_id::text FROM (SELECT t.city_id UNION SELECT p.city_id FROM tour_stops ts JOIN places p ON p.id=ts.place_id WHERE ts.tour_id=t.id) coverage ORDER BY city_id),
+	t.slug, t.title, t.summary, t.topic_id, t.modes::text[], t.hero_media_id, t.status, t.visibility, t.owner_account_id,
 	(SELECT count(*) FROM tour_stops ts WHERE ts.tour_id = t.id), t.created_at, t.updated_at`
 
 type tourRow struct {
@@ -65,7 +67,7 @@ type tourRow struct {
 func scanTour(row interface{ Scan(...any) error }) (tourRow, error) {
 	var r tourRow
 	var modes []string
-	err := row.Scan(&r.ID, &r.CityID, &r.Slug, &r.Title, &r.Summary, &r.TopicID, &modes, &r.heroMediaID, &r.Status, &r.Visibility, &r.OwnerAccountID, &r.StopCount, &r.CreatedAt, &r.UpdatedAt)
+	err := row.Scan(&r.ID, &r.CityID, &r.CityIDs, &r.Slug, &r.Title, &r.Summary, &r.TopicID, &modes, &r.heroMediaID, &r.Status, &r.Visibility, &r.OwnerAccountID, &r.StopCount, &r.CreatedAt, &r.UpdatedAt)
 	if err != nil {
 		return r, err
 	}
@@ -195,7 +197,8 @@ func (s *Store) ListTours(ctx context.Context, f TourFilter) ([]models.TourSumma
 	args := []any{}
 	add := func(v any) int { args = append(args, v); return len(args) }
 	if f.CityID != "" {
-		where = append(where, fmt.Sprintf("t.city_id = $%d", add(f.CityID)))
+		n := add(f.CityID)
+		where = append(where, fmt.Sprintf("(t.city_id=$%d OR EXISTS (SELECT 1 FROM tour_stops ts JOIN places p ON p.id=ts.place_id WHERE ts.tour_id=t.id AND p.city_id=$%d))", n, n))
 	}
 	if f.TopicID != "" {
 		where = append(where, fmt.Sprintf("t.topic_id = $%d", add(f.TopicID)))
@@ -222,7 +225,7 @@ func (s *Store) ListTours(ctx context.Context, f TourFilter) ([]models.TourSumma
 	if offset < 0 {
 		offset = 0
 	}
-	tours, err := s.queryTours(ctx, s.pool, fmt.Sprintf("WHERE %s ORDER BY t.title LIMIT $%d OFFSET $%d", strings.Join(where, " AND "), add(limit+1), add(offset)), args...)
+	tours, err := s.queryTours(ctx, s.pool, fmt.Sprintf("WHERE %s ORDER BY t.title,t.id LIMIT $%d OFFSET $%d", strings.Join(where, " AND "), add(limit+1), add(offset)), args...)
 	if err != nil {
 		return nil, "", err
 	}
@@ -364,6 +367,12 @@ func (s *Store) CreateTour(ctx context.Context, in CreateTourInput) (*models.Tou
 		if err != nil {
 			return err
 		}
+		// Lock coverage before the FK takes a key-share lock on the topic row.
+		if in.TopicID != nil && *in.TopicID != "" {
+			if err := requireTopicCities(ctx, tx, *in.TopicID, nil); err != nil {
+				return err
+			}
+		}
 		if err := tx.QueryRow(ctx, `INSERT INTO tours (city_id, slug, title, summary, topic_id, modes, hero_media_id, status, visibility, owner_account_id)
 			VALUES ($1,$2,$3,$4,$5,$6::travel_mode[],$7,$8,$9,$10) RETURNING id`,
 			in.CityID, slug, strings.TrimSpace(in.Title), in.Summary, nullable(in.TopicID), modes, nullable(in.HeroMediaID), status, visibility, nullable(in.OwnerAccountID)).Scan(&id); err != nil {
@@ -383,6 +392,16 @@ func (s *Store) CreateTour(ctx context.Context, in CreateTourInput) (*models.Tou
 // UpdateTour patches a tour; changing modes adds or removes route rows and jobs.
 func (s *Store) UpdateTour(ctx context.Context, id string, in UpdateTourInput) (*models.TourDetail, error) {
 	err := s.withTx(ctx, func(tx pgx.Tx) error {
+		// Existing tour writes take the tour lock before any topic lock, like ReplaceStops.
+		var lockedID string
+		if err := tx.QueryRow(ctx, `SELECT id FROM tours WHERE id=$1 FOR UPDATE`, id).Scan(&lockedID); err != nil {
+			return err
+		}
+		if !in.ClearTopic && in.TopicID != nil && *in.TopicID != "" {
+			if err := requireTopicCities(ctx, tx, *in.TopicID, nil); err != nil {
+				return err
+			}
+		}
 		var modesArgValue any
 		if in.Modes != nil {
 			modesArgValue = modesArg(in.Modes)
@@ -397,6 +416,9 @@ func (s *Store) UpdateTour(ctx context.Context, id string, in UpdateTourInput) (
 		}
 		if tag.RowsAffected() == 0 {
 			return ErrNotFound
+		}
+		if err := requireTourTopicCities(ctx, tx, id); err != nil {
+			return err
 		}
 		if in.Modes != nil {
 			return syncRoutesTx(ctx, tx, id, modesArg(in.Modes), false)
@@ -413,7 +435,7 @@ func (s *Store) UpdateTour(ctx context.Context, id string, in UpdateTourInput) (
 func (s *Store) ReplaceStops(ctx context.Context, tourID string, stops []models.StopInput) error {
 	return mapErr(s.withTx(ctx, func(tx pgx.Tx) error {
 		var modes []string
-		if err := tx.QueryRow(ctx, `SELECT modes::text[] FROM tours WHERE id = $1`, tourID).Scan(&modes); err != nil {
+		if err := tx.QueryRow(ctx, `SELECT modes::text[] FROM tours WHERE id = $1 FOR UPDATE`, tourID).Scan(&modes); err != nil {
 			return err
 		}
 		if err := replaceStopsTx(ctx, tx, tourID, stops); err != nil {
@@ -425,7 +447,8 @@ func (s *Store) ReplaceStops(ctx context.Context, tourID string, stops []models.
 
 func replaceStopsTx(ctx context.Context, tx pgx.Tx, tourID string, stops []models.StopInput) error {
 	var cityID string
-	if err := tx.QueryRow(ctx, `SELECT city_id FROM tours WHERE id = $1`, tourID).Scan(&cityID); err != nil {
+	var ownerID *string
+	if err := tx.QueryRow(ctx, `SELECT city_id,owner_account_id FROM tours WHERE id = $1 FOR UPDATE`, tourID).Scan(&cityID, &ownerID); err != nil {
 		return err
 	}
 	if _, err := tx.Exec(ctx, `DELETE FROM tour_stops WHERE tour_id = $1`, tourID); err != nil {
@@ -442,7 +465,7 @@ func replaceStopsTx(ctx context.Context, tx pgx.Tx, tourID string, stops []model
 			}
 			return err
 		}
-		if placeCity != cityID {
+		if ownerID != nil && placeCity != cityID {
 			return fmt.Errorf("%w: stop %d: place is in a different city", ErrInvalidReference, i+1)
 		}
 		var featured any
@@ -464,7 +487,19 @@ func replaceStopsTx(ctx context.Context, tx pgx.Tx, tourID string, stops []model
 			return err
 		}
 	}
-	return nil
+	return requireTourTopicCities(ctx, tx, tourID)
+}
+
+func requireTourTopicCities(ctx context.Context, q dbtx, tourID string) error {
+	var topicID *string
+	var cities []string
+	if err := q.QueryRow(ctx, `SELECT t.topic_id,ARRAY(SELECT city_id::text FROM (SELECT t.city_id UNION SELECT p.city_id FROM tour_stops ts JOIN places p ON p.id=ts.place_id WHERE ts.tour_id=t.id) coverage ORDER BY city_id) FROM tours t WHERE t.id=$1`, tourID).Scan(&topicID, &cities); err != nil {
+		return err
+	}
+	if topicID == nil {
+		return nil
+	}
+	return requireTopicCities(ctx, q, *topicID, cities)
 }
 
 // syncRoutesTx makes tour_routes match modes. New modes get a pending row and a job; when

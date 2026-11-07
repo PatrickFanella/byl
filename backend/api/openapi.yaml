@@ -947,7 +947,8 @@ components:
       required: [id, city_id, slug, name, description, moment_count]
       properties:
         id: { type: string, format: uuid }
-        city_id: { type: string, format: uuid }
+        city_id: { type: string, format: uuid, description: Original municipality retained for existing city/slug references }
+        city_ids: { type: array, items: { type: string, format: uuid }, uniqueItems: true, readOnly: true, description: Municipalities sharing this theme; includes city_id. Optional on older API versions. }
         slug: { type: string }
         name: { type: string }
         description: { type: string }
@@ -1092,7 +1093,8 @@ components:
       required: [id, city_id, slug, title, summary, modes, status, visibility, stop_count, routes, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
-        city_id: { type: string, format: uuid }
+        city_id: { type: string, format: uuid, description: Original discovery city retained for older clients; stops retain their actual municipalities }
+        city_ids: { type: array, items: { type: string, format: uuid }, uniqueItems: true, readOnly: true, description: Original city plus municipalities of the current stops. Optional on older API versions. }
         slug: { type: string }
         title: { type: string }
         summary: { type: string }
@@ -1253,6 +1255,7 @@ components:
       required: [city_id, name]
       properties:
         city_id: { type: string, format: uuid }
+        city_ids: { type: array, maxItems: 30, items: { type: string, format: uuid }, description: Topic coverage; city_id is included automatically. At most 30 municipalities including the original city. }
         slug: { type: string }
         name: { type: string }
         description: { type: string }
@@ -1261,6 +1264,7 @@ components:
       properties:
         name: { type: string }
         description: { type: string }
+        city_ids: { type: array, nullable: true, maxItems: 30, items: { type: string, format: uuid }, description: Replaces coverage; omitted/null leaves it unchanged and an empty array retains only the original city. Municipalities still used by moments/tours cannot be removed. }
     CreatePlaceRequest:
       type: object
       required: [city_id, name, latitude, longitude]
