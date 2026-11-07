@@ -144,13 +144,17 @@ export class ActiveWalk {
 	get pastLegs(): Leg[] {
 		const legs = this.route?.legs ?? [];
 		const next = this.nextStop;
-		return next ? legs.filter((l) => l.to_position < next.position) : legs;
+		return next
+			? legs.filter((l) => l.from_position < l.to_position && l.to_position < next.position)
+			: legs;
 	}
 
 	get futureLegs(): Leg[] {
 		const next = this.nextStop;
 		if (!next) return [];
-		return (this.route?.legs ?? []).filter((l) => l.to_position > next.position);
+		return (this.route?.legs ?? []).filter(
+			(l) => l.to_position > next.position || l.to_position < l.from_position
+		);
 	}
 
 	/** A new GPS fix: updates the distance and lets the monitor decide on arrival. */

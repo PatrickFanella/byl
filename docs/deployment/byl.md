@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 14, then saves a PostgreSQL
+changed migration files or a schema version other than 15, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -548,9 +548,8 @@ intent version is explicitly published; an initial pending public view omits it.
 Recompute retains the approved pointer; old published snapshots keep their full
 reference geometry and choices. Snapshots expose no author IDs/private rationale.
 
-This is durable reference/selection data. Current routing still uses historical
-site coordinates, as recorded in `routing_intent.coordinate_source`; it does not
-yet apply corridor/shaping data to geometry. That integration belongs to issue 27.
+Schema 14 provided durable reference/selection data while routing still used
+historical sites. Schema 15 adds controlled routing as described below.
 Source/mode labels and a curator approval are not a legal-access or field
 certificate. Curators must review reference copying rights and access context
 before publication; do not infer permission from a map link or crossing.
@@ -563,6 +562,69 @@ Do not restore an older dump over later curator decisions. Never-published tours
 with retained proposals are hidden on deletion rather than physically erased.
 No region-scale import, street router, public sign-in or field validation is
 activated by this migration.
+
+## Approved navigation, schema 15
+
+Migration 15 adds function wrappers without rewriting existing table rows, cached
+routes or published snapshots. Migrations 1–14 keep their exact checksums. With
+no approved arrival, the existing route-input hash remains identical; corridor
+versions are already fenced by migration 14. Approved arrival identities,
+versions and point/access JSON enter the hash. A result from an earlier approval
+is rejected even when the tour's routing generation has not changed. The worker
+reads the working snapshot and hash in one database statement, then rechecks the
+hash under tour/place locks before committing its result.
+
+Any approved arrival or non-null corridor intent requests controlled navigation.
+Each stop must have an independently allowed arrival for that mode. The Valhalla
+adapter sends story entrances as `break` and intermediate reference/shaping points
+as `via`; via allows the U-turn needed by an out-and-back without creating a story
+leg. Ordered directed traversals retain all reference vertices, selected connector
+controls and reviewed shapes. Explicit matching start/end node identities declare
+a return, with a final leg from the last story to the first. Open paths must start
+and finish at their corresponding approved entrances. Ambiguous repeated stop
+occurrences and reversed or boundary-coincident shapes fail for review.
+
+The request is bounded to 256 controls without silent resampling. A provider can
+reject a lower configured limit. Independent mode failures remain visible; no
+other-mode, nearest-road or straight-line fallback is used. The development
+provider deliberately lacks controlled capability. Entrances without a corridor
+allow normal network paths between stops. With a corridor, geometry guards require
+ordered controls and constrain returned vertices to a 50 m control envelope;
+endpoints also have a 50 m bound. Requested travel cannot be shortened by more
+than 10% plus 25 m, and provider totals must agree with story-leg totals within
+rounding tolerance. These engineering bounds detect omitted controls and obvious
+shortcuts; they are not calibrated field or topology certification. Issue #29
+owns broader path-quality assessment, including parallel roads and crossings.
+
+New controlled legs retain stable stop IDs, `navigation_source` and an optional
+`return` flag in the existing JSON column. New snapshots label
+`routing_intent.coordinate_source` as `approved_navigation`, retain arrival
+coordinates in routing stops and retain the original historical coordinates as
+`site_latitude`/`site_longitude`. Previously published snapshots keep their exact
+content. Controlled computation never fulfills legacy automatic release intent;
+curator/owner publication is explicit. Maps and totals include closing travel;
+the existing visit/completion workflow still tracks narrated story stops. Web,
+Android and iOS classify the closing leg as future travel while stories remain;
+this does not introduce a separate guided return/completion phase.
+Segment reports can target a declared closing leg in either travel direction.
+
+Before admitting schema 15, independently restore a fresh actual production
+backup, apply exact accepted SQL in isolation and compare all existing table
+fingerprints, ready hashes, old API reads and public catalogue/revision/story/
+geometry responses. Verify the actual operator backup and media archive before
+production SQL. Recheck the live baseline under the receiver lock, apply as
+operator and admit the exact fifteen-file manifest and source hook expecting 15.
+CI never applies production SQL. Admission and live verification are separate
+from code/CI acceptance; this section specifies the gate, not a deployment claim.
+
+Down refuses to discard approved input fences/history. Retain schema 15, backup
+and image receipts. Earlier APIs can read the additive schema but older workers
+ignore controlled routing and its publication semantics. After navigation-aware
+writes, use a forward fix or read-only prior-image recovery with old workers
+stopped/drained. Do not restore an older dump over later curator work. This change
+does not activate production Valhalla, download map tiles, configure public sign-in
+or establish real-world access. The bounded development comparison is recorded in
+[the routing evidence note](../routing/approved-path-comparison-2026-11-07.md).
 
 
 ## Inspected historical draft proposals, schema 14 unchanged

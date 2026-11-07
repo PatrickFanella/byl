@@ -303,8 +303,13 @@ review note.
 Navigation callers can use `GET /api/v1/places/{place}/arrival?mode=walk|bike`.
 Only an allowed mode receives a `navigation_point`; unknown, restricted and closed
 modes receive null. Historical coordinates remain in the ordinary place response.
-Clients and route recomputation still need their later roadmap integration before
-visitors use this selection automatically. The Downer burial entrance used in
+Route recomputation uses reviewed entrances when any stop has an approved point
+or the tour has approved corridor intent. Every stop then needs an allowed point
+for the requested mode; unknown, restricted and closed fail explicitly. Review
+an entrance change, then recompute: the old working cache cannot be published
+against changed approval inputs. Already published revisions keep their captured
+entrances and geometry. Client guidance and field qualification remain separate.
+The Downer burial entrance used in
 backend tests is a synthetic fixture lead, not an inspected real-world entrance.
 
 
@@ -366,8 +371,9 @@ is required. Direction and duration default to `unknown`; do not invent an
 observation date when it is unknown.
 
 An affected location is a stable `stop_id`, an entrance at that stop with an
-optional captured `arrival_id`, or a segment with adjacent `from_stop_id` and
-`to_stop_id`. Segment order must agree with a known `forward` or `reverse`
+optional captured `arrival_id`, or a segment with `from_stop_id` and `to_stop_id`
+from adjacent story positions or a declared closing return leg. Segment order
+must agree with a known `forward` or `reverse`
 direction. Mode, identities and optional geometry are checked against that frozen
 revision, so later reorders cannot retarget a report. A historical private
 revision does not become reportable by strangers when an owner later shares a
@@ -424,7 +430,7 @@ only through the declared endpoint identities; review grade separation rather
 than equating coordinate overlap with a traversable junction.
 
 A shaping point is tied to a particular traversal occurrence and lies between
-adjacent stable story-stop IDs. It shapes future routing without creating a
+adjacent stable story-stop IDs. It shapes routing without creating a
 place, moment, narrated stop or arrival event. Its order is separate from the
 story-stop list. A later stop reorder can invalidate these references; approve a
 replacement or explicit removal before publishing that draft. Recompute preserves
@@ -436,8 +442,8 @@ Approval also compares the captured working draft version. A stale approval
 returns 409 and requires a fresh proposal. Approval changes the working intent
 and routing generation; it does not release a new public tour, including for a
 personal route. Publish explicitly after reviewing the ready working routes.
-Later recompute and legacy metadata saves keep that release gate closed until
-the current intent version has been explicitly published. A pending first tour
+Controlled navigation always requires explicit publication, including after a
+later recompute or legacy metadata save. A pending first tour
 view also omits the unreleased corridor.
 Approved removals retain their intent version with null intent. Completed reviews
 and input remain immutable.
@@ -447,9 +453,23 @@ mode paths; `routing_intent.corridor` pins its ID/version/checksum. Private auth
 IDs and review notes are absent. The checksum covers canonical typed intent JSON,
 not a remotely downloaded file. Import limits and coordinate tolerances are in
 the OpenAPI/operator contract. Source links are recorded without fetching them.
-Current route generation still uses historical sites; applying this intent to
-actual geometry is later work. No trail/access or on-site claim follows from the
-synthetic topology fixture or from storing an approved reference.
+The controlled Valhalla adapter uses story entrances as break points and reference
+vertices/shaping points as via points. These retain one leg per story interval.
+An explicitly closed node path includes a final travel leg from the last story
+to the first; it adds no narrated stop. Open paths must end at the final approved
+entrance. Repeated stop occurrences need an unambiguous ordered selection;
+otherwise routing fails for review. A shape at a story boundary must be moved
+strictly between its referenced stops. There is no straight-line or other-mode
+fallback, automatic road substitution, reference simplification or provider-limit
+retry with fewer points. At most 256 controls may be computed; providers can have
+a lower limit. Use an explicitly reviewed bounded reference when a limit fails.
+
+Routes without approved navigation inputs retain their historical-site behavior.
+Production still uses the development provider, which cannot compute approved
+navigation. A ready controlled result confirms geometry/protocol checks only;
+current access, topology quality and on-site qualification need their own review.
+The bounded development comparison is recorded in
+[the routing evidence note](../routing/approved-path-comparison-2026-11-07.md).
 
 
 ## Historical proposals from inspected evidence

@@ -14,23 +14,36 @@ func (w *Worker) computeRoute(ctx context.Context, p models.ComputeRoutePayload)
 	if !p.Mode.Valid() {
 		return fmt.Errorf("invalid mode %q", p.Mode)
 	}
-	pts, digest, err := w.store.TourRouteInputs(ctx, p.TourID, p.Mode, p.RouteVersion)
+	tour, digest, err := w.store.TourNavigationInputs(ctx, p.TourID, p.Mode, p.RouteVersion)
 	if errors.Is(err, repository.ErrRouteSuperseded) {
 		return err
 	}
 	if err != nil {
 		return fmt.Errorf("load stops: %w", err)
 	}
-	if len(pts) < 2 {
-		return routeInputFailure{cause: fmt.Errorf("tour has %d stops; a route needs at least two", len(pts)), digest: digest}
+	plan, err := routing.BuildPlan(tour, p.Mode)
+	if err != nil {
+		return routeInputFailure{cause: fmt.Errorf("%w: %w", ErrNoRetry, err), digest: digest}
 	}
-	points := make([]routing.Point, 0, len(pts))
-	for _, pt := range pts {
-		points = append(points, routing.Point{Lat: pt.Lat, Lng: pt.Lng})
+	var route routing.Route
+	if plan.Controlled {
+		provider, ok := w.router.(routing.ControlledRouter)
+		if !ok {
+			return routeInputFailure{cause: fmt.Errorf("%w: provider_does_not_support_approved_navigation", ErrNoRetry), digest: digest}
+		}
+		route, err = provider.RouteControlled(ctx, p.Mode, routing.ControlledRequest{Controls: plan.Controls, FollowReference: plan.FollowReference})
+	} else {
+		points := make([]routing.Point, 0, len(plan.Controls))
+		for _, point := range plan.Controls {
+			points = append(points, point.Point)
+		}
+		route, err = w.router.Route(ctx, p.Mode, points)
 	}
-	route, err := w.router.Route(ctx, p.Mode, points)
 	if err != nil {
 		return routeInputFailure{cause: err, digest: digest}
+	}
+	if len(route.Legs) != len(plan.Legs) {
+		return routeInputFailure{cause: fmt.Errorf("%w: provider_story_leg_count_mismatch", ErrNoRetry), digest: digest}
 	}
 	tr := models.TourRoute{
 		TourID: p.TourID, Mode: p.Mode, Status: models.RouteStatusReady, Provider: route.Provider,
@@ -39,7 +52,13 @@ func (w *Worker) computeRoute(ctx context.Context, p models.ComputeRoutePayload)
 		Legs:     make([]models.RouteLeg, 0, len(route.Legs)),
 	}
 	for i, leg := range route.Legs {
-		tr.Legs = append(tr.Legs, models.RouteLeg{FromPosition: i + 1, ToPosition: i + 2, DistanceM: leg.DistanceM, DurationS: leg.DurationS, Geometry: leg.Geometry})
+		boundary := plan.Legs[i]
+		stored := models.RouteLeg{FromPosition: boundary.From, ToPosition: boundary.To, DistanceM: leg.DistanceM, DurationS: leg.DurationS, Geometry: leg.Geometry}
+		if plan.Controlled {
+			stored.FromStopID, stored.ToStopID = boundary.FromID, boundary.ToID
+			stored.NavigationSource, stored.Return = "approved_navigation", boundary.Return
+		}
+		tr.Legs = append(tr.Legs, stored)
 	}
 	err = w.store.UpsertRouteVersioned(ctx, tr, p.RouteVersion, digest)
 	if errors.Is(err, repository.ErrRouteSuperseded) {

@@ -201,6 +201,12 @@ func TestRouteReportUsesCapturedEntranceAfterArrivalChanges(t *testing.T) {
 	if _, err := s.ReviewArrival(ctx, testdb.SeedPlaceStationID, proposal.ID, author, models.ArrivalReviewRequest{Action: "approve", Note: "Synthetic snapshot fixture"}); err != nil {
 		t.Fatal(err)
 	}
+	if _, err := s.PublishTourRevision(ctx, original.TourID, author, models.PublishRevisionRequest{DraftVersion: original.DraftVersion, CurrentRevisionID: &original.ID}); !errors.Is(err, ErrConflict) {
+		t.Fatalf("changed entrance must invalidate the old route cache: %v", err)
+	}
+	// This test isolates frozen report targeting using the repository's explicit
+	// ready-route fixture; controlled provider behavior has separate worker tests.
+	readyFixtureRoutes(t, s, ctx, original.TourID)
 	r, err := s.PublishTourRevision(ctx, original.TourID, author, models.PublishRevisionRequest{DraftVersion: original.DraftVersion, CurrentRevisionID: &original.ID})
 	if err != nil {
 		t.Fatal(err)
@@ -234,5 +240,36 @@ func TestRouteReportAnnotationDistanceUsesSegmentInterior(t *testing.T) {
 	}
 	if !geo.NearPolyline([2]float64{180, 0.005}, [][2]float64{{179.9, 0}, {-179.9, 0}}, 1000) {
 		t.Fatal("longitude wrapping broke a local annotation")
+	}
+}
+
+func TestRouteReportCanTargetDeclaredClosingLeg(t *testing.T) {
+	stops := []models.TourStop{{ID: "first", Position: 1}, {ID: "middle", Position: 2}, {ID: "last", Position: 3}}
+	leg := models.RouteLeg{FromPosition: 3, ToPosition: 1, FromStopID: "last", ToStopID: "first", Return: true, NavigationSource: "approved_navigation", Geometry: [][2]float64{{-88, 41}, {-88, 41.001}}}
+	snapshot := &models.TourSnapshot{Tour: models.TourDetail{TourSummary: models.TourSummary{Modes: []models.TravelMode{models.TravelModeWalk}}, Stops: stops}}
+	snapshot.Routes = map[models.TravelMode]models.TourRoute{models.TravelModeWalk: {Status: models.RouteStatusReady, Legs: []models.RouteLeg{leg}}}
+	revision := &models.TourRevision{Snapshot: snapshot}
+	in := models.RouteReportInput{Mode: models.TravelModeWalk, Direction: "forward", Affected: models.ReportLocation{Kind: "segment", FromStopID: "last", ToStopID: "first"}, Annotation: reportPoint(41.0005, -88)}
+	if err := validateReportLocation(revision, in); err != nil {
+		t.Fatalf("closing leg cannot be reported: %v", err)
+	}
+	in.Direction = "reverse"
+	if err := validateReportLocation(revision, in); err == nil {
+		t.Fatal("closing leg direction was ignored")
+	}
+	in.Affected.FromStopID, in.Affected.ToStopID = "first", "last"
+	if err := validateReportLocation(revision, in); err != nil {
+		t.Fatalf("reverse closing leg: %v", err)
+	}
+	// Two-story loops have a forward leg and a closing leg between the same
+	// pair. Unknown direction should prefer the submitted endpoint order.
+	revision.Snapshot.Tour.Stops = []models.TourStop{stops[0], {ID: "last", Position: 2}}
+	leg.FromPosition = 2
+	revision.Snapshot.Routes[models.TravelModeWalk] = models.TourRoute{Status: models.RouteStatusReady, Legs: []models.RouteLeg{
+		{FromPosition: 1, ToPosition: 2, Geometry: [][2]float64{{0, 0}, {0, 0.001}}}, leg,
+	}}
+	in.Direction, in.Affected.FromStopID, in.Affected.ToStopID = "unknown", "last", "first"
+	if err := validateReportLocation(revision, in); err != nil {
+		t.Fatalf("two-story return selected the reversed outgoing leg: %v", err)
 	}
 }

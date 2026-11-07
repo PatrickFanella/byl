@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -149,6 +150,21 @@ class ActiveTourTest {
         m.handleFix(fix(tour.stops[1]))
         assertEquals(listOf(2), m.state.value.pastLegs.map { it.toPosition })
         assertEquals(3, m.state.value.activeLeg?.toPosition)
+    }
+
+    @Test
+    fun `closing travel stays ahead while story stops remain`() = runTest {
+        val base: TourRoute = Fixtures.decode("route")
+        val closing = base.legs.last().copy(fromPosition = 4, toPosition = 1)
+        routeBody = MuseumJson.encodeToString(base.copy(legs = base.legs + closing))
+        val m = model(false)
+        m.loadRoute()
+        assertTrue(m.state.value.futureLegs.contains(closing))
+        for (stop in tour.stops.take(3)) m.handleFix(fix(stop))
+        assertEquals(4, m.state.value.nextStop?.position)
+        assertEquals(listOf(2, 3), m.state.value.pastLegs.map { it.toPosition })
+        assertEquals(4, m.state.value.activeLeg?.toPosition)
+        assertEquals(listOf(closing), m.state.value.futureLegs)
     }
 
     @Test

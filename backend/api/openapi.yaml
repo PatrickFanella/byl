@@ -1252,7 +1252,7 @@ components:
       type: object
       additionalProperties: false
       required: [kind]
-      description: Stop/entrance needs stop_id only, with optional arrival_id for a recorded entrance. Segment needs from_stop_id and to_stop_id from adjacent positions in this snapshot; forward/reverse direction must agree. Unknown entrances need no approved arrival_id.
+      description: Stop/entrance needs stop_id only, with optional arrival_id for a recorded entrance. Segment needs from_stop_id and to_stop_id from adjacent positions or a declared closing leg in this snapshot; forward/reverse direction must agree. Unknown direction prefers the submitted endpoint order. Unknown entrances need no approved arrival_id.
       properties:
         kind: { type: string, enum: [stop, entrance, segment] }
         stop_id: { type: string, format: uuid }
@@ -1322,7 +1322,7 @@ components:
           type: object
           properties:
             modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
-            coordinate_source: { type: string, enum: [historical_site] }
+            coordinate_source: { type: string, enum: [historical_site, approved_navigation], description: Approved navigation uses reviewed arrival coordinates; site coordinates remain separate context }
             corridor:
               type: object
               description: Optional released intent reference; full reference geometry and mode choices are in tour.corridor. Does not claim current generated geometry follows this intent.
@@ -1331,7 +1331,7 @@ components:
                 id: { type: string, format: uuid }
                 version: { type: integer, format: int64, minimum: 1 }
                 content_sha256: { type: string }
-            stops: { type: array, items: { type: object, properties: { stop_id: { type: string }, place_id: { type: string }, latitude: { type: number }, longitude: { type: number }, arrival_point: { $ref: "#/components/schemas/ApprovedArrival", nullable: true } } } }
+            stops: { type: array, items: { type: object, properties: { stop_id: { type: string }, place_id: { type: string }, latitude: { type: number }, longitude: { type: number }, site_latitude: { type: number, description: Present for approved navigation }, site_longitude: { type: number, description: Present for approved navigation }, arrival_point: { $ref: "#/components/schemas/ApprovedArrival", nullable: true } } } }
     TourRevision:
       type: object
       properties:
@@ -1823,6 +1823,10 @@ components:
       type: object
       required: [from_position, to_position, distance_m, duration_s, geometry]
       properties:
+        from_stop_id: { type: string, format: uuid, description: Stable story boundary for approved navigation }
+        to_stop_id: { type: string, format: uuid, description: Stable story boundary for approved navigation }
+        navigation_source: { type: string, enum: [approved_navigation], description: Provider-computed approved controls; does not certify current access or path quality }
+        return: { type: boolean, description: Closing travel from the last story stop to the first; creates no additional narrated stop }
         from_position: { type: integer }
         to_position: { type: integer }
         distance_m: { type: number }

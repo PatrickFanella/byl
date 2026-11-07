@@ -17,6 +17,23 @@ import (
 // ErrRouteSuperseded fences route results after stop/mode/recompute inputs change.
 var ErrRouteSuperseded = errors.New("route inputs superseded")
 
+// TourNavigationInputs captures approved inputs and their fence in one database
+// statement. Separate reads could pair an old arrival with a new input hash.
+func (s *Store) TourNavigationInputs(ctx context.Context, tourID string, mode models.TravelMode, version int64) (*models.TourDetail, string, error) {
+	var raw []byte
+	var digest string
+	err := s.pool.QueryRow(ctx, `SELECT byl_tour_snapshot(t.id)->'tour',byl_route_input_hash(t.id,$3) FROM tours t JOIN tour_revision_state st ON st.tour_id=t.id WHERE t.id=$1 AND st.route_version=$2 AND st.deleted_at IS NULL`, tourID, version, mode).Scan(&raw, &digest)
+	if errors.Is(mapErr(err), ErrNotFound) {
+		return nil, "", ErrRouteSuperseded
+	}
+	if err != nil {
+		return nil, "", err
+	}
+	var tour models.TourDetail
+	err = json.Unmarshal(raw, &tour)
+	return &tour, digest, err
+}
+
 // TourRouteInputs takes one consistent view of routing version and ordered sites.
 func (s *Store) TourRouteInputs(ctx context.Context, tourID string, mode models.TravelMode, version int64) ([]geo.Point, string, error) {
 	var raw []byte
@@ -214,6 +231,15 @@ func (s *Store) publishRequestedRevisionTx(ctx context.Context, tourID string) e
 		return err
 	}
 	if !corridorReleased {
+		return nil
+	}
+	// Provider success is not publication approval. Controlled navigation always
+	// waits for the explicit curator/owner publication endpoint.
+	var controlled bool
+	if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_routes r CROSS JOIN LATERAL jsonb_array_elements(r.legs) leg WHERE r.tour_id=$1 AND leg->>'navigation_source'='approved_navigation')`, tourID).Scan(&controlled); err != nil {
+		return err
+	}
+	if controlled {
 		return nil
 	}
 	blockers, err := s.TourPublishBlockers(ctx, tourID)

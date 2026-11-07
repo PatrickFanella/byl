@@ -14,7 +14,7 @@ type Point struct {
 	Lng float64
 }
 
-// Leg is the path between two consecutive stops.
+// Leg is the path between story boundaries, including a closing return.
 type Leg struct {
 	DistanceM float64
 	DurationS int
@@ -33,6 +33,26 @@ type Route struct {
 // Router computes a route through the points in order.
 type Router interface {
 	Route(ctx context.Context, mode models.TravelMode, points []Point) (Route, error)
+}
+
+// Waypoint marks a story boundary or a non-story routing control. Via points
+// may permit a U-turn (for an out-and-back) but must not create another leg.
+type Waypoint struct {
+	Point
+	Break bool
+}
+
+// ControlledRequest distinguishes a corridor reference from entrances alone.
+// Entrances alone allow the provider to choose a network path between stops.
+type ControlledRequest struct {
+	Controls        []Waypoint
+	FollowReference bool
+}
+
+// ControlledRouter explicitly supports approved entrances and shaping points.
+// Development straight-line routing deliberately has no such capability.
+type ControlledRouter interface {
+	RouteControlled(context.Context, models.TravelMode, ControlledRequest) (Route, error)
 }
 
 // ErrTooFewPoints is returned for fewer than two points.

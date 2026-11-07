@@ -12,7 +12,12 @@ import (
 )
 
 func TestCorridorMigrationRetainsExistingRowsAndRouteHashes(t *testing.T) {
-	pool := testdb.OpenVersion(t, 13)
+	assertNavigationMigrationPreservesRows(t, 13)
+}
+
+func assertNavigationMigrationPreservesRows(t *testing.T, version int64) {
+	t.Helper()
+	pool := testdb.OpenVersion(t, version)
 	ctx := context.Background()
 	s := New(pool)
 	readyFixtureRoutes(t, s, ctx, testdb.SeedTourID)

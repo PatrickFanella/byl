@@ -202,9 +202,9 @@ class ActiveTour(
         val visited = _state.value.visited
         _state.update {
             it.copy(
-                pastLegs = if (next == null) legs else legs.filter { l -> l.toPosition < next.position },
+                pastLegs = if (next == null) legs else legs.filter { l -> l.fromPosition < l.toPosition && l.toPosition < next.position },
                 activeLeg = if (next == null) null else legs.firstOrNull { l -> l.toPosition == next.position && l.fromPosition in visited },
-                futureLegs = if (next == null) emptyList() else legs.filter { l -> l.toPosition > next.position }
+                futureLegs = if (next == null) emptyList() else legs.filter { l -> l.toPosition > next.position || l.toPosition < l.fromPosition }
             )
         }
     }

@@ -133,6 +133,32 @@ final class ActiveTourModelTests: XCTestCase {
         XCTAssertEqual(m.activeLeg?.toPosition, 3)
     }
 
+    func testClosingTravelStaysAheadWhileStoryStopsRemain() async throws {
+        var body = try XCTUnwrap(JSONSerialization.jsonObject(with: fixtureData("route")) as? [String: Any])
+        var legs = try XCTUnwrap(body["legs"] as? [[String: Any]])
+        var closing = try XCTUnwrap(legs.last)
+        closing["from_position"] = 4
+        closing["to_position"] = 1
+        closing["return"] = true
+        closing["navigation_source"] = "approved_navigation"
+        legs.append(closing)
+        body["legs"] = legs
+        let data = try JSONSerialization.data(withJSONObject: body)
+        StubURLProtocol.handler = { method, path in
+            method == "GET" && path == "/api/v1/tours/\(self.tourID)/route"
+                ? (200, data) : (404, fixtureData("error_not_found"))
+        }
+        let m = model(signedIn: false)
+        await m.loadRoute()
+        XCTAssertEqual(m.futureLegs.map(\.toPosition), [2, 3, 4, 1])
+        for stop in tour.stops.prefix(3) { m.handle(location: fix(at: stop)) }
+        await m.flush()
+        XCTAssertEqual(m.nextStop?.position, 4)
+        XCTAssertEqual(m.pastLegs.map(\.toPosition), [2, 3])
+        XCTAssertEqual(m.activeLeg?.toPosition, 4)
+        XCTAssertEqual(m.futureLegs.map(\.toPosition), [1])
+    }
+
     func testRouteFallsBackToCacheWhenTheAPIIsDown() async {
         stubRouteAndProgress()
         await model(signedIn: false).loadRoute()

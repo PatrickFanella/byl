@@ -2,13 +2,17 @@ package models
 
 import "time"
 
-// RouteLeg is the path between two consecutive stops.
+// RouteLeg joins story stops, including an optional closing return to the first.
 type RouteLeg struct {
-	FromPosition int          `json:"from_position"`
-	ToPosition   int          `json:"to_position"`
-	DistanceM    float64      `json:"distance_m"`
-	DurationS    int          `json:"duration_s"`
-	Geometry     [][2]float64 `json:"geometry"`
+	FromStopID       string       `json:"from_stop_id,omitempty"`
+	ToStopID         string       `json:"to_stop_id,omitempty"`
+	NavigationSource string       `json:"navigation_source,omitempty"`
+	Return           bool         `json:"return,omitempty"`
+	FromPosition     int          `json:"from_position"`
+	ToPosition       int          `json:"to_position"`
+	DistanceM        float64      `json:"distance_m"`
+	DurationS        int          `json:"duration_s"`
+	Geometry         [][2]float64 `json:"geometry"`
 }
 
 // LineString is a GeoJSON LineString with [lng, lat] coordinates.
