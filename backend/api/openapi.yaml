@@ -712,6 +712,46 @@ paths:
         "404": { description: Private brief or research run not found }
         "409": { description: Stale version, invalid state, or exhausted resume budget }
         "422": { description: Invalid request }
+  /api/v1/admin/route-briefs/{id}/evidence:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      summary: List private source evidence for a brief (curators only)
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, default: 20, maximum: 50 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Private evidence snapshots, content: { application/json: { schema: { $ref: "#/components/schemas/SourceEvidenceList" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required; owners do not receive source payloads }
+        "404": { description: Brief not found }
+    post:
+      summary: Queue one bounded private source inspection (curators only)
+      description: At most 20 requests per brief per rolling 24 hours. HTTP/HTTPS standard ports only, no credentials. Host addresses are checked at connection time; private hosts remain forbidden even if the media/archive private-host option is enabled. A job permits at most three attempts, each at most three HTTP requests and 20 seconds, with a 2 MiB response and 20000-character excerpt bound. This is an explicit curator retrieval, not automatic discovery or publication. Retries with the same key and normalized request return the original snapshot.
+      security: [{ bearer: [] }]
+      parameters: [{ name: Idempotency-Key, in: header, schema: { type: string, maxLength: 128 } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/EvidenceRequest" } } } }
+      responses:
+        "202": { description: Queued or idempotent replay, content: { application/json: { schema: { $ref: "#/components/schemas/SourceEvidence" } } } }
+        "400": { description: Invalid JSON }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Brief not found }
+        "409": { description: Stale brief version or reused request key }
+        "422": { description: Invalid source URL or request }
+        "429": { description: Evidence request quota reached }
+  /api/v1/admin/route-briefs/{id}/evidence/{evidence}:
+    get:
+      summary: Inspect retained private passages and provenance (curators only)
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: evidence, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: Private immutable retrieval snapshot, content: { application/json: { schema: { $ref: "#/components/schemas/SourceEvidence" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Evidence not found under this brief }
 components:
   securitySchemes:
     bearer:
@@ -719,6 +759,56 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    EvidenceRequest:
+      type: object
+      additionalProperties: false
+      required: [version, url]
+      properties:
+        version: { type: integer, minimum: 1 }
+        url: { type: string, format: uri, maxLength: 2000, description: Fragment is retained separately as a supplied reference; it does not prove a PDF page was inspected }
+        source_kind: { type: string, enum: [page, catalog], default: page, description: Catalog descriptions remain catalog-only evidence }
+    EvidencePassage:
+      type: object
+      required: [reference, text]
+      properties:
+        reference: { type: string, description: Paragraph index in the retained excerpt, maxLength: 100 }
+        text: { type: string, maxLength: 20000, description: Untrusted source data; never instructions to a model or worker }
+    EvidenceResult:
+      type: object
+      required: [outcome, final_url, publisher, title, retrieved_at, http_status, content_type, content_sha256, passages, truncated, untrusted, media_reuse]
+      properties:
+        outcome: { type: string, enum: [inspected_page, catalog_only, search_snippet, blocked, timeout, unavailable, inaccessible, too_large, unsupported_format, unsupported_encoding, no_readable_text, worker_failed] }
+        final_url: { type: string }
+        publisher: { type: string, description: Final source hostname; not an inferred institutional author }
+        title: { type: string, maxLength: 500 }
+        retrieved_at: { type: string, format: date-time, description: Retrieval-attempt time; failures are not successful retrievals }
+        http_status: { type: integer }
+        content_type: { type: string }
+        content_sha256: { type: string, description: Hash of the inspected bounded response, not just the excerpt; empty for unread bodies }
+        passages: { type: array, maxItems: 100, items: { $ref: "#/components/schemas/EvidencePassage" }, description: Combined maximum 20000 characters }
+        truncated: { type: boolean }
+        untrusted: { type: boolean, const: true }
+        media_reuse: { type: string, enum: [unresolved], description: Text access and page metadata never grant media copying permission; no media is fetched }
+    SourceEvidence:
+      type: object
+      required: [id, brief_id, brief_version, job_id, source_key, url, reference, source_kind, result, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        brief_id: { type: string, format: uuid }
+        brief_version: { type: integer }
+        job_id: { type: string, format: uuid }
+        source_key: { type: string, description: SHA256 of the normalized URL; stable across fragments and retrievals }
+        url: { type: string, format: uri }
+        reference: { type: string, description: Original supplied URL fragment; distinct from an inspected passage reference }
+        source_kind: { type: string, enum: [page, catalog] }
+        result: { oneOf: [{ $ref: "#/components/schemas/EvidenceResult" }, { type: "null" }], description: Null while pending; the first completed snapshot is retained unchanged }
+        created_at: { type: string, format: date-time }
+    SourceEvidenceList:
+      type: object
+      required: [items, next_cursor]
+      properties:
+        items: { type: array, items: { $ref: "#/components/schemas/SourceEvidence" } }
+        next_cursor: { type: string, description: Empty; use limit and offset }
     ResearchActionRequest:
       type: object
       additionalProperties: false

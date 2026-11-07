@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 7, then saves a PostgreSQL
+changed migration files or a schema version other than 8, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -198,3 +198,48 @@ the exact seven-file manifest and source hook expecting schema 7. CI applies no
 production SQL. Older application images ignore the additive tables; retain the
 checkpoints and private outputs during image rollback. Automatic down refuses
 to delete them.
+
+## Private source evidence, migration 8
+
+Migration 8 adds only `source_evidence` and its indexes. Before deployment,
+restore a fresh production snapshot, apply the exact reviewed migration and
+compare existing rows/public responses. Take a fresh production database/media
+backup, apply the additive migration as operator, and install the exact
+eight-file manifest with the source hook expecting schema 8. CI applies no
+production SQL and refuses an unadmitted manifest. Retain the previous images,
+hook, manifest and backups. Application image rollback keeps schema 8 and later
+private evidence; automatic down refuses to remove it.
+
+Curators use `POST /api/v1/admin/route-briefs/{id}/evidence` with the saved brief
+`version`, a source `url` and optional `source_kind` (`page` or `catalog`). The
+optional `Idempotency-Key` header makes request retries safe. There are at most
+20 new retrievals per brief per rolling 24 hours. GET at the same path lists
+snapshots; adding `/{evidence}` returns one retained result and its passages.
+All evidence APIs require the curator role, including for the brief's owner.
+There is no public or owner source-payload endpoint. Source content remains
+private, untrusted data. Jobs carry the evidence ID, never URLs or source text.
+
+Each explicit curator job allows three attempts, each with a total 20-second
+timeout, at most two redirects, a 2 MiB body limit and a 20,000-character excerpt
+limit. There is no HTTP-layer retry. Each connection uses the existing public-IP
+guard with direct IP dialing and no environment proxy; evidence ignores the
+trusted-private-host option used by other archive/media operations. Credentials,
+nonstandard ports, non-web redirects and HTTPS downgrades are refused. Completed
+snapshots are immutable across retries and worker restarts. A new request key
+creates a separate retrieval snapshot; the normalized URL keeps the same source
+identity. Old snapshots retain their original brief version.
+
+Only UTF-8 HTML/plain text is excerpted. A publisher field records the final
+hostname, not an inferred institutional author. Paragraph references locate text
+within the retained excerpt; the supplied fragment is stored separately and is
+not proof of inspecting a PDF page. PDFs and other formats remain explicit
+`unsupported_format` gaps until a reviewed extractor exists. Inaccessible,
+oversized, timed-out and unreadable sources remain named outcomes. Catalogues
+stay `catalog_only`; search snippets are never inspected full sources. This
+does not bypass access restrictions or copy full archives into public content.
+
+Media reuse stays `unresolved`: inspecting text or a page license does not clear
+images, video or documents for copying. No media is downloaded by evidence jobs.
+The research processor remains unconfigured; automatic discovery and evidence-
+bound historical drafting are separate roadmap issues. These manual curator
+retrieval limits are separate from the unchanged automatic research-run budget.

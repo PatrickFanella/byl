@@ -23,6 +23,7 @@ type Client struct {
 	// AllowPrivateHosts lets GetPublic reach loopback, private, link-local and ULA addresses.
 	// Off by default; turn it on only for development or a trusted LAN archive.
 	AllowPrivateHosts bool
+	evidenceTransport http.RoundTripper
 
 	mu   sync.Mutex
 	last map[string]time.Time
@@ -96,6 +97,10 @@ func (c *Client) GetPublic(ctx context.Context, url string) (*http.Response, err
 // publicOnlyTransport clones base (or the default transport) with a dialer that resolves the
 // host itself and refuses non-public addresses, so DNS answers are checked at connect time.
 func publicOnlyTransport(base http.RoundTripper) http.RoundTripper {
+	return publicTransportWithResolver(base, net.DefaultResolver.LookupIPAddr, (&net.Dialer{Timeout: 10 * time.Second}).DialContext)
+}
+
+func publicTransportWithResolver(base http.RoundTripper, lookup func(context.Context, string) ([]net.IPAddr, error), dial func(context.Context, string, string) (net.Conn, error)) http.RoundTripper {
 	var t *http.Transport
 	if bt, ok := base.(*http.Transport); ok && bt != nil {
 		t = bt.Clone()
@@ -104,13 +109,13 @@ func publicOnlyTransport(base http.RoundTripper) http.RoundTripper {
 	}
 	// Dial targets directly: through a proxy only the proxy's address would be checked.
 	t.Proxy = nil
-	dialer := &net.Dialer{Timeout: 10 * time.Second}
+	t.DialTLSContext = nil
 	t.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		host, port, err := net.SplitHostPort(addr)
 		if err != nil {
 			return nil, err
 		}
-		ips, err := net.DefaultResolver.LookupIPAddr(ctx, host)
+		ips, err := lookup(ctx, host)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +124,7 @@ func publicOnlyTransport(base http.RoundTripper) http.RoundTripper {
 			if !publicIP(ip.IP) {
 				continue
 			}
-			conn, err := dialer.DialContext(ctx, network, net.JoinHostPort(ip.IP.String(), port))
+			conn, err := dial(ctx, network, net.JoinHostPort(ip.IP.String(), port))
 			if err == nil {
 				return conn, nil
 			}
