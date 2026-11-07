@@ -95,6 +95,10 @@
 				<div class="space-y-5 lg:col-span-2">
 					<TourCard tour={t} href={`/tours/${t.slug}`} />
 					<h1 class="sr-only">{t.title}</h1>
+					{#if t.status !== 'published'}<p class="rounded-lg border border-byl-border p-3 text-sm">
+							Draft · Only you can open this route. Its path needs review before publication or
+							sharing.
+						</p>{/if}
 					{#if t.summary}<p class="text-byl-muted">{t.summary}</p>{/if}
 
 					<div class="rounded-lg border border-byl-border bg-byl-surface p-4">
@@ -119,25 +123,27 @@
 					</div>
 
 					<div class="flex flex-wrap gap-2">
-						{#each t.modes as mode (mode)}
-							<a
-								href="/tours/{t.slug}/walk?mode={mode}"
-								class="rounded-lg px-4 py-2 text-sm font-semibold {mode === t.modes[0]
-									? 'bg-byl-action text-byl-action-text'
-									: 'border border-byl-border hover:bg-byl-surface'}"
-								>{mode === 'bike' ? 'Start riding' : 'Start walking'}</a
+						{#if t.status === 'published'}
+							{#each t.modes as mode (mode)}
+								<a
+									href="/tours/{t.slug}/walk?mode={mode}"
+									class="rounded-lg px-4 py-2 text-sm font-semibold {mode === t.modes[0]
+										? 'bg-byl-action text-byl-action-text'
+										: 'border border-byl-border hover:bg-byl-surface'}"
+									>{mode === 'bike' ? 'Start riding' : 'Start walking'}</a
+								>
+							{/each}
+							<button
+								class="rounded-lg border border-byl-border px-4 py-2 text-sm hover:bg-byl-surface disabled:opacity-50"
+								onclick={toggleSave}
+								disabled={saveBusy}>{saved ? '♥ Saved' : '♡ Save for later'}</button
 							>
-						{/each}
-						<button
-							class="rounded-lg border border-byl-border px-4 py-2 text-sm hover:bg-byl-surface disabled:opacity-50"
-							onclick={toggleSave}
-							disabled={saveBusy}>{saved ? '♥ Saved' : '♡ Save for later'}</button
-						>
-						<a
-							href="invisiblemuseum://tour/{t.slug}"
-							class="rounded-lg border border-byl-border px-4 py-2 text-sm text-byl-muted hover:bg-byl-surface"
-							>Open in the app</a
-						>
+							<a
+								href="invisiblemuseum://tour/{t.slug}"
+								class="rounded-lg border border-byl-border px-4 py-2 text-sm text-byl-muted hover:bg-byl-surface"
+								>Open in the app</a
+							>
+						{/if}
 					</div>
 					{#if wantSave && !$current}
 						<SignInPrompt reason="Sign in to save tours and keep your progress on every device." />

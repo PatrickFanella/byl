@@ -71,7 +71,7 @@ func TestUserRoutesLifecycle(t *testing.T) {
 	}
 	slug := r.body["slug"].(string)
 	id := r.body["id"].(string)
-	if len(slug) != 10 || r.body["visibility"] != "unlisted" || r.body["status"] != "published" || len(r.body["stops"].([]any)) != 4 {
+	if len(slug) != 10 || r.body["visibility"] != "unlisted" || r.body["status"] != "draft" || len(r.body["stops"].([]any)) != 4 {
 		t.Fatalf("created route: %s", r.raw)
 	}
 	if r.body["stops"].([]any)[2].(map[string]any)["featured_moment"] == nil {
@@ -81,7 +81,7 @@ func TestUserRoutesLifecycle(t *testing.T) {
 	if len(queued) != 4 {
 		t.Fatalf("expected 2 seed + 2 new route jobs queued, got %d", len(queued))
 	}
-	if r := env.get(t, "/api/v1/tours/"+slug, ""); r.status != 200 {
+	if r := env.get(t, "/api/v1/tours/"+slug, ""); r.status != 404 {
 		t.Fatalf("unlisted route by link: %d", r.status)
 	}
 	if r := env.get(t, "/api/v1/cities/downers-grove/tours", ""); len(items(t, r)) != 1 {

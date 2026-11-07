@@ -111,14 +111,18 @@ func TestTourPublishBlockers(t *testing.T) {
 		t.Fatal(err)
 	}
 	joined := strings.Join(blockers, "; ")
-	if len(blockers) != 2 || !strings.Contains(joined, "walk") || !strings.Contains(joined, "bike") {
-		t.Fatalf("expected pending walk and bike blockers, got %v", blockers)
+	if len(blockers) != 4 || !strings.Contains(joined, "walk") || !strings.Contains(joined, "bike") || !strings.Contains(joined, "path quality is missing") {
+		t.Fatalf("expected pending geometry and missing quality for both modes, got %v", blockers)
 	}
 	for _, m := range models.AllTravelModes {
 		if err := s.UpsertRoute(ctx, models.TourRoute{TourID: testdb.SeedTourID, Mode: m, Status: models.RouteStatusReady, DistanceM: 1, DurationS: 1}); err != nil {
 			t.Fatal(err)
 		}
 	}
+	if blockers, err := s.TourPublishBlockers(ctx, testdb.SeedTourID); err != nil || len(blockers) != 2 || !strings.Contains(strings.Join(blockers, ";"), "path quality") {
+		t.Fatalf("ready geometry bypassed quality: %v %v", blockers, err)
+	}
+	readyFixtureRoutes(t, s, ctx, testdb.SeedTourID)
 	if err := s.SetPlaceStatus(ctx, testdb.SeedPlaceFishelID, models.EntityStatusDraft); err != nil {
 		t.Fatal(err)
 	}

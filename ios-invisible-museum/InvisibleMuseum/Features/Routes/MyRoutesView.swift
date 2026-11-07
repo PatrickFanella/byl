@@ -70,10 +70,16 @@ struct MyRoutesView: View {
                     NavigationLink(value: TourRef(ref: tour.slug)) { TourCard(tour: tour) }
                         .buttonStyle(.plain)
                     HStack(spacing: 8) {
-                        ShareLink(item: RouteBuilderModel.shareURL(slug: tour.slug, base: model.client.baseURL), subject: Text(tour.title)) {
-                            Label("Share", systemImage: "square.and.arrow.up")
+                        if tour.status == "published" {
+                            ShareLink(item: RouteBuilderModel.shareURL(slug: tour.slug, base: model.client.baseURL), subject: Text(tour.title)) {
+                                Label("Share", systemImage: "square.and.arrow.up")
+                            }
+                            .buttonStyle(.museum(.secondary, size: .small))
+                        } else {
+                            Text("Draft · Path review required before sharing")
+                                .font(Museum.bodyFont(12))
+                                .foregroundStyle(Museum.muted)
                         }
-                        .buttonStyle(.museum(.secondary, size: .small))
                         Button {
                             Task {
                                 actionError = nil

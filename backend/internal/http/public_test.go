@@ -173,6 +173,7 @@ func TestTourEndpoints(t *testing.T) {
 		t.Fatalf("pending route: %d %s", r.status, r.raw)
 	}
 	env.drain(t)
+	env.publishFixture(t, testdb.SeedTourID)
 	r = env.get(t, "/api/v1/tours/downtown-memory-loop/route?mode=walk", "")
 	if r.status != 200 || r.body["status"] != "ready" {
 		t.Fatalf("ready route: %d %s", r.status, r.raw)

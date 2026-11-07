@@ -193,6 +193,10 @@ func TestAdminTourPublishing(t *testing.T) {
 		t.Fatalf("publish before routes: %d %s", r.status, r.raw)
 	}
 	env.drain(t)
+	if failed := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/publish", curator, nil); failed.status != 409 || !strings.Contains(errMessage(failed), "development_geometry") {
+		t.Fatalf("development path published: %d %s", failed.status, failed.raw)
+	}
+	env.qualifyFixtureRoutes(t, tourID)
 	r = env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/publish", curator, nil)
 	if r.status != 200 || r.body["status"] != "published" {
 		t.Fatalf("publish: %d %s", r.status, r.raw)

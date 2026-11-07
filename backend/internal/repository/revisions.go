@@ -344,6 +344,22 @@ func (s *Store) listPublishedTours(ctx context.Context, f TourFilter) ([]models.
 
 // UpsertRouteVersioned rejects worker output after routing inputs change.
 func (s *Store) UpsertRouteVersioned(ctx context.Context, r models.TourRoute, version int64, expectedHash ...string) error {
+	return s.upsertRouteCheckpoint(ctx, r, version, expectedHash, nil)
+}
+
+// UpsertRouteQualified commits geometry and its exact evidence checkpoint under
+// one version/hash fence. A plain route update cannot reuse an old quality stamp.
+func (s *Store) UpsertRouteQualified(ctx context.Context, r models.TourRoute, version int64, digest string, report models.PathQualityReport) error {
+	if !report.Valid() || report.InputHash != digest || report.Mode != r.Mode || report.Provider != r.Provider || report.RouteSHA256 != r.RoutingFingerprint() {
+		return ErrInvalidReference
+	}
+	if report.Status == "pass" && (r.Status != models.RouteStatusReady || r.Geometry == nil || len(r.Legs) == 0 || len(report.Attribution.Legs) != len(r.Legs)) {
+		return ErrInvalidReference
+	}
+	return s.upsertRouteCheckpoint(ctx, r, version, []string{digest}, &report)
+}
+
+func (s *Store) upsertRouteCheckpoint(ctx context.Context, r models.TourRoute, version int64, expectedHash []string, report *models.PathQualityReport) error {
 	return s.Transaction(ctx, func(tx *Store) error {
 		var id string
 		if err := tx.pool.QueryRow(ctx, `SELECT id FROM tours WHERE id=$1 FOR UPDATE`, r.TourID).Scan(&id); err != nil {
@@ -385,6 +401,11 @@ func (s *Store) UpsertRouteVersioned(ctx context.Context, r models.TourRoute, ve
 		}
 		if err := tx.UpsertRoute(ctx, r); err != nil {
 			return err
+		}
+		if report != nil {
+			if err := tx.savePathQuality(ctx, r.TourID, version, *report); err != nil {
+				return err
+			}
 		}
 		return tx.publishRequestedRevisionTx(ctx, r.TourID)
 	})

@@ -2,7 +2,7 @@ import SwiftUI
 import InvisibleMuseumKit
 
 /// Pick published places, order them, name the route, choose modes and visibility, create or
-/// update, then share the link.
+/// update; sharing becomes available after publication.
 struct RouteBuilderView: View {
     @Environment(AppModel.self) private var model
     @State private var builder: RouteBuilderModel?
@@ -44,7 +44,7 @@ struct RouteBuilderView: View {
                     Text(tour.tour.title)
                         .font(Museum.title(24))
                         .foregroundStyle(Museum.text)
-                    Text(tour.tour.visibility == "private" ? "Only you can open it." : "Anyone with the link can open it; it is not listed publicly.")
+                    Text(tour.tour.status != "published" ? "Saved as a draft that only you can open. The path needs review before publication or sharing." : tour.tour.visibility == "private" ? "Only you can open it." : "Anyone with the link can open it; it is not listed publicly.")
                         .font(Museum.bodyFont(14))
                         .foregroundStyle(Museum.muted)
                     Text("Routes are computed in the background; distances appear in a minute.")
@@ -52,10 +52,12 @@ struct RouteBuilderView: View {
                         .foregroundStyle(Museum.faint)
                 }
             }
-            ShareLink(item: RouteBuilderModel.shareURL(slug: tour.tour.slug, base: model.client.baseURL), subject: Text(tour.tour.title)) {
-                Label("Share the link", systemImage: "square.and.arrow.up")
+            if tour.tour.status == "published" {
+                ShareLink(item: RouteBuilderModel.shareURL(slug: tour.tour.slug, base: model.client.baseURL), subject: Text(tour.tour.title)) {
+                    Label("Share the link", systemImage: "square.and.arrow.up")
+                }
+                .buttonStyle(.museum(.primary, size: .large))
             }
-            .buttonStyle(.museum(.primary, size: .large))
             Button("Done") { onDone(tour) }
                 .buttonStyle(.museum(.secondary))
         }
@@ -81,7 +83,7 @@ private struct BuilderForm: View {
                 if builder.modes.isEmpty {
                     MuseumInlineHint(text: "Pick at least one way to travel.", tint: Museum.danger, isError: true)
                 }
-                Overline(text: "Who can open it")
+                Overline(text: "Who can open it after publication")
                 HStack(spacing: 8) {
                     Button { builder.visibility = "unlisted" } label: { MuseumChip(title: "Anyone with the link", isSelected: builder.visibility == "unlisted", icon: "link") }
                     Button { builder.visibility = "private" } label: { MuseumChip(title: "Only me", isSelected: builder.visibility == "private", icon: "lock") }

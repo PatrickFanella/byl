@@ -81,13 +81,18 @@
 			</div>
 			<h2 class="mt-1 text-2xl font-semibold">{created.title}</h2>
 			<p class="mt-1 text-sm text-byl-muted">
-				{created.visibility === 'private'
-					? 'Only you can open it.'
-					: 'Anyone with the link can open it; it is not listed publicly.'} Distances appear once the
+				{created.status !== 'published'
+					? 'Saved as a draft that only you can open. The path needs review before publication or sharing.'
+					: created.visibility === 'private'
+						? 'Only you can open it.'
+						: 'Anyone with the link can open it; it is not listed publicly.'} Distances appear once the
 				route has been computed.
 			</p>
 		</div>
-		<ShareLink url={shareURL(origin, created.slug)} title={created.title} />
+		{#if created.status === 'published'}<ShareLink
+				url={shareURL(origin, created.slug)}
+				title={created.title}
+			/>{/if}
 		<div class="flex gap-2">
 			<a
 				href="/tours/{created.slug}"
@@ -144,7 +149,9 @@
 				{#if builder.modes.length === 0}<p class="text-xs text-byl-danger">
 						Pick at least one way to travel.
 					</p>{/if}
-				<div class="pt-2 text-xs font-bold tracking-normal text-byl-action">Who can open it</div>
+				<div class="pt-2 text-xs font-bold tracking-normal text-byl-action">
+					Who can open it after publication
+				</div>
 				<div class="flex gap-2">
 					<button
 						type="button"

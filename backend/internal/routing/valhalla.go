@@ -120,7 +120,7 @@ func (v *Valhalla) route(ctx context.Context, mode models.TravelMode, controls [
 	r := Route{Provider: "valhalla", DistanceM: out.Trip.Summary.Length * 1000, DurationS: int(math.Round(out.Trip.Summary.Time))}
 	for _, leg := range out.Trip.Legs {
 		geom := DecodePolyline6(leg.Shape)
-		r.Legs = append(r.Legs, Leg{DistanceM: leg.Summary.Length * 1000, DurationS: int(math.Round(leg.Summary.Time)), Geometry: geom})
+		r.Legs = append(r.Legs, Leg{DistanceM: leg.Summary.Length * 1000, DurationS: int(math.Round(leg.Summary.Time)), Geometry: geom, EncodedShape: leg.Shape})
 		r.Geometry = append(r.Geometry, geom...)
 	}
 	if len(r.Legs) == 0 {

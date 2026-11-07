@@ -10,7 +10,7 @@ async function signIn(page: Page, email: string) {
 	await expect(page).not.toHaveURL(/\/signin/);
 }
 
-test('a signed-in visitor builds a route and a stranger opens the share link', async ({
+test('a visitor saves an owner-only draft until its path is reviewed', async ({
 	page,
 	browser
 }) => {
@@ -23,20 +23,33 @@ test('a signed-in visitor builds a route and a stranger opens the share link', a
 	await page.getByRole('button', { name: /^Add Tivoli Theatre$/ }).click();
 	await page.getByRole('button', { name: /create route/i }).click();
 	await expect(page.getByText(/route created/i)).toBeVisible();
-	const link = await page.getByLabel('Share link').inputValue();
-	expect(link).toMatch(/\/t\/[A-Za-z0-9_-]{10}$/);
-
-	// Review Focus 4: a signed-out stranger lands on the unlisted tour, never on sign-in.
+	await expect(page.getByText(/saved as a draft that only you can open/i)).toBeVisible();
+	await expect(page.getByLabel('Share link')).toHaveCount(0);
+	await page.getByRole('link', { name: 'Open the route' }).click();
+	await expect(page.getByRole('heading', { name: 'Two stops', exact: true })).toBeVisible();
+	await expect(
+		page.getByText(
+			'Draft · Only you can open this route. Its path needs review before publication or sharing.',
+			{ exact: true }
+		)
+	).toBeVisible({
+		timeout: 15_000
+	});
+	await expect(
+		page.getByRole('link', { name: /start walking|start riding|open in the app/i })
+	).toHaveCount(0);
+	const draftURL = page.url();
 	const stranger = await browser.newContext();
 	const other = await stranger.newPage();
-	await other.goto(link);
-	await expect(other).toHaveURL(/\/tours\//);
-	await expect(other.getByRole('heading', { name: 'Two stops' })).toBeVisible();
-	await expect(other.getByRole('link', { name: /open in the app/i })).toBeVisible();
+	await other.goto(draftURL);
+	await expect(other.getByRole('heading', { name: 'Two stops' })).toHaveCount(0);
+	await expect(other.getByText(/not found|could not|couldn't/i).first()).toBeVisible();
 	await stranger.close();
 
 	await page.goto('/routes');
 	await expect(page.getByRole('link', { name: /two stops/i })).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Share', exact: true })).toHaveCount(0);
+	await expect(page.getByText(/draft · path review required before sharing/i)).toBeVisible();
 });
 
 test('saving a tour lists it under Saved', async ({ page }) => {

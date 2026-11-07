@@ -1,6 +1,11 @@
 package models
 
-import "time"
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"time"
+)
 
 // RouteLeg joins story stops, including an optional closing return to the first.
 type RouteLeg struct {
@@ -23,33 +28,56 @@ type LineString struct {
 
 // RouteSummary describes a route without its geometry.
 type RouteSummary struct {
-	Mode             TravelMode  `json:"mode"`
-	Status           RouteStatus `json:"status"`
-	DistanceM        float64     `json:"distance_m"`
-	DurationS        int         `json:"duration_s"`
-	EstimatedMinutes *int        `json:"estimated_minutes"`
-	Error            string      `json:"error,omitempty"`
-	ComputedAt       *time.Time  `json:"computed_at"`
+	Quality          *PathQualitySummary `json:"quality,omitempty"`
+	Mode             TravelMode          `json:"mode"`
+	Status           RouteStatus         `json:"status"`
+	DistanceM        float64             `json:"distance_m"`
+	DurationS        int                 `json:"duration_s"`
+	EstimatedMinutes *int                `json:"estimated_minutes"`
+	Error            string              `json:"error,omitempty"`
+	ComputedAt       *time.Time          `json:"computed_at"`
 }
 
 // TourRoute is the full route for one mode.
 type TourRoute struct {
-	ID         string      `json:"id"`
-	TourID     string      `json:"tour_id"`
-	Mode       TravelMode  `json:"mode"`
-	Status     RouteStatus `json:"status"`
-	Provider   string      `json:"provider"`
-	DistanceM  float64     `json:"distance_m"`
-	DurationS  int         `json:"duration_s"`
-	Geometry   *LineString `json:"geometry"`
-	Legs       []RouteLeg  `json:"legs"`
-	Error      string      `json:"error,omitempty"`
-	ComputedAt *time.Time  `json:"computed_at"`
+	Quality    *PathQualitySummary `json:"quality,omitempty"`
+	ID         string              `json:"id"`
+	TourID     string              `json:"tour_id"`
+	Mode       TravelMode          `json:"mode"`
+	Status     RouteStatus         `json:"status"`
+	Provider   string              `json:"provider"`
+	DistanceM  float64             `json:"distance_m"`
+	DurationS  int                 `json:"duration_s"`
+	Geometry   *LineString         `json:"geometry"`
+	Legs       []RouteLeg          `json:"legs"`
+	Error      string              `json:"error,omitempty"`
+	ComputedAt *time.Time          `json:"computed_at"`
+}
+
+// RoutingFingerprint binds a quality checkpoint to the exact computed result,
+// excluding database timestamps, generated row IDs and derived quality metadata.
+func (r TourRoute) RoutingFingerprint() string {
+	value := struct {
+		TourID    string
+		Mode      TravelMode
+		Status    RouteStatus
+		Provider  string
+		DistanceM float64
+		DurationS int
+		Geometry  *LineString
+		Legs      []RouteLeg
+	}{r.TourID, r.Mode, r.Status, r.Provider, r.DistanceM, r.DurationS, r.Geometry, r.Legs}
+	raw, err := json.Marshal(value)
+	if err != nil {
+		return ""
+	}
+	digest := sha256.Sum256(raw)
+	return hex.EncodeToString(digest[:])
 }
 
 // Summary projects a route to its summary.
 func (r TourRoute) Summary() RouteSummary {
-	s := RouteSummary{Mode: r.Mode, Status: r.Status, DistanceM: r.DistanceM, DurationS: r.DurationS, Error: r.Error, ComputedAt: r.ComputedAt}
+	s := RouteSummary{Mode: r.Mode, Status: r.Status, DistanceM: r.DistanceM, DurationS: r.DurationS, Error: r.Error, ComputedAt: r.ComputedAt, Quality: r.Quality}
 	if r.Status == RouteStatusReady {
 		m := (r.DurationS + 59) / 60
 		s.EstimatedMinutes = &m

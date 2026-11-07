@@ -68,6 +68,7 @@ func TestStopChangesKeepPublishedCuratedSnapshot(t *testing.T) {
 	env := newTestEnv(t)
 	curator := env.signIn(t, "c@example.com", models.AccountRoleCurator)
 	env.drain(t)
+	env.publishFixture(t, testdb.SeedTourID)
 	body := map[string]any{"stops": []map[string]any{{"place_id": testdb.SeedPlaceStationID}, {"place_id": testdb.SeedPlaceMuseumID}}}
 	if r := env.do(t, http.MethodPut, "/api/v1/admin/tours/"+testdb.SeedTourID+"/stops", curator, body); r.status != 200 {
 		t.Fatalf("stops on published tour: %d %s", r.status, r.raw)
@@ -122,6 +123,8 @@ func TestSavedHidesPrivateAndUnpublishedTours(t *testing.T) {
 	bob := env.signIn(t, "bob@example.com", "")
 	r := env.do(t, http.MethodPost, "/api/v1/me/tours", alice, userRoute(testdb.SeedPlaceStationID, testdb.SeedPlaceTivoliID))
 	slug, id := r.body["slug"].(string), r.body["id"].(string)
+	env.drain(t)
+	env.publishFixture(t, id)
 	if r := env.do(t, http.MethodPut, "/api/v1/me/saved/"+slug, bob, nil); r.status != 204 {
 		t.Fatalf("save: %d", r.status)
 	}

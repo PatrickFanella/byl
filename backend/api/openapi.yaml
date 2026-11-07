@@ -144,10 +144,11 @@ paths:
         - { name: cursor, in: query, schema: { type: string }, description: Opaque cursor returned by the previous response }
       responses: { "200": { description: OK } }
     post:
-      summary: Create a route from 2 to 30 published places in one city
+      summary: Create a draft route from 2 to 30 published places in one city
+      description: New personal routes are owner-only drafts. Visibility applies after publication; sharing requires current passing path quality and explicit publication.
       security: [{ bearer: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateUserTourRequest" } } } }
-      responses: { "201": { description: Created, unlisted by default }, "404": { description: Unknown city }, "422": { description: Validation failed } }
+      responses: { "201": { description: Draft created, unlisted visibility by default }, "404": { description: Unknown city }, "422": { description: Validation failed } }
   /api/v1/me/tours/{id}:
     get:
       summary: Get one of my routes
@@ -424,8 +425,8 @@ paths:
       responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
   /api/v1/admin/tours/{id}/publish:
     post:
-      summary: "Publish a tour; refuses unless every place is published and every route is ready"
-      description: Atomically snapshot an expected draft and advance its published pointer. An omitted body uses the server-loaded versions for older clients; revision-aware clients send both expected values. Current site coordinates must match the route input digest.
+      summary: "Publish a tour; requires published places, ready geometry and current passing path quality"
+      description: Atomically snapshot an expected draft and advance its published pointer. An omitted body uses the server-loaded versions for older clients; revision-aware clients send both expected values. Current routing inputs and the computed result must match retained quality; missing, stale, blocked and needs-research reports refuse publication.
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       requestBody: { required: false, content: { application/json: { schema: { $ref: "#/components/schemas/PublishRevisionRequest" } } } }
@@ -436,6 +437,30 @@ paths:
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+  /api/v1/admin/tours/{id}/routes/quality:
+    get:
+      operationId: adminGetPathQuality
+      summary: Inspect private current or retained path-quality evidence
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { in: query, name: mode, required: true, schema: { $ref: "#/components/schemas/TravelMode" } }
+        - { in: query, name: report_id, schema: { type: string, format: uuid }, description: Optional retained checkpoint; absence selects current working evidence }
+      responses:
+        '200':
+          description: Private report; null before computation. Input freshness is evaluated on read.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [mode, report]
+                properties:
+                  mode: { $ref: "#/components/schemas/TravelMode" }
+                  report: { $ref: "#/components/schemas/PathQualityReport", nullable: true }
+        '401': { description: Unauthorized }
+        '403': { description: Forbidden }
+        '404': { description: Not found }
+        '422': { description: Validation failed }
   /api/v1/admin/tours/{id}/routes/recompute:
     post:
       summary: "Mark routes pending and enqueue route jobs"
@@ -1163,6 +1188,126 @@ components:
         modes: { type: array, maxItems: 2, uniqueItems: true, items: { $ref: "#/components/schemas/TravelMode" }, description: "Explicit independently allowed modes; empty is unresolved and cannot be selected" }
         geometry: { $ref: "#/components/schemas/ReferenceLine" }
         source: { $ref: "#/components/schemas/CorridorSource", nullable: true }
+        network: { $ref: "#/components/schemas/CorridorNetwork" }
+        access: { type: array, maxItems: 2, items: { $ref: "#/components/schemas/CorridorAccess" } }
+    CorridorNetwork:
+      type: object
+      additionalProperties: false
+      required: [ways, from_node_id, to_node_id]
+      description: Reviewed network identity assertions oriented with the segment. Source inspection is retained privately with the proposal; identity labels alone cannot pass quality.
+      properties:
+        ways:
+          type: array
+          minItems: 1
+          maxItems: 64
+          items:
+            type: object
+            additionalProperties: false
+            required: [id]
+            properties:
+              id: { type: integer, format: int64, minimum: 1 }
+              reverse: { type: boolean, default: false, description: Against the OSM way's digitized direction }
+        from_node_id: { type: integer, format: int64, minimum: 1 }
+        to_node_id: { type: integer, format: int64, minimum: 1 }
+    CorridorAccess:
+      type: object
+      additionalProperties: false
+      required: [mode, status]
+      properties:
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        status: { type: string, enum: [unknown, allowed, restricted, closed] }
+        notes: { type: string, maxLength: 1000 }
+    CorridorEvidenceRef:
+      type: object
+      additionalProperties: false
+      required: [segment_id, purpose, evidence_id, reference, quote]
+      description: Private exact citation to an existing completed inspected-page snapshot. Access requires mode; network purpose omits mode. Catalogue metadata and source URLs alone cannot qualify.
+      properties:
+        segment_id: { type: string }
+        purpose: { type: string, enum: [network, access] }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        evidence_id: { type: string, format: uuid }
+        reference: { type: string }
+        quote: { type: string, minLength: 1, maxLength: 300 }
+    PathQualityIssue:
+      type: object
+      required: [code, severity, origin, detail]
+      properties:
+        code: { type: string }
+        severity: { type: string, enum: [blocked, needs_research, information] }
+        origin: { type: string, enum: [inspected_source, provider_assertion, curator_assertion, unknown] }
+        segment_id: { type: string }
+        detail: { type: string }
+    PathQualitySummary:
+      type: object
+      required: [version, status, issues, checked_at, input_current]
+      description: Passing quality makes computed travel eligible for curator review; it is not publication approval or field/access certification. Existing immutable legacy revisions may omit quality. Input freshness is captured in frozen summaries and evaluated on read for working reports.
+      properties:
+        report_id: { type: string, format: uuid }
+        version: { type: integer, enum: [1] }
+        status: { type: string, enum: [pass, needs_research, blocked] }
+        issues: { type: array, maxItems: 512, items: { $ref: "#/components/schemas/PathQualityIssue" } }
+        checked_at: { type: string, format: date-time }
+        input_current: { type: boolean }
+    PathInspection:
+      type: object
+      required: [segment_id, purpose, evidence_id, reference, quote, url, content_sha256, retrieved_at]
+      properties:
+        segment_id: { type: string }
+        purpose: { type: string, enum: [network, access] }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        evidence_id: { type: string, format: uuid }
+        reference: { type: string }
+        quote: { type: string, maxLength: 300 }
+        url: { type: string, format: uri }
+        content_sha256: { type: string }
+        retrieved_at: { type: string, format: date-time }
+    PathEdge:
+      type: object
+      description: Provider assertions, not independently inspected source facts
+      properties:
+        id: { type: integer, format: int64 }
+        way_id: { type: integer, format: int64 }
+        begin_node_id: { type: integer, format: int64 }
+        end_node_id: { type: integer, format: int64 }
+        forward: { type: boolean }
+        use: { type: string }
+        traversability: { type: string }
+        travel_mode: { type: string }
+        bridge: { type: boolean }
+        tunnel: { type: boolean }
+        begin_shape_index: { type: integer }
+        end_shape_index: { type: integer }
+    PathAttribution:
+      type: object
+      required: [provider, method]
+      properties:
+        provider: { type: string }
+        method: { type: string, enum: [trace_attributes/edge_walk] }
+        failure: { type: string, description: Explicit bounded outcome; no replacement path or map-snap result is accepted }
+        legs:
+          type: array
+          nullable: true
+          maxItems: 30
+          items:
+            type: object
+            properties:
+              geometry: { type: array, items: { type: array, minItems: 2, maxItems: 2, items: { type: number } } }
+              edges: { type: array, items: { $ref: "#/components/schemas/PathEdge" } }
+              osm_changeset: { type: integer, format: int64 }
+    PathQualityReport:
+      allOf:
+        - { $ref: "#/components/schemas/PathQualitySummary" }
+        - type: object
+          required: [input_hash, route_sha256, mode, provider, inspections]
+          description: Private retained checkpoint. Public route summaries omit inspection identifiers/excerpts and detailed provider attribution. Quotes prove traceability rather than semantic support.
+          properties:
+            input_hash: { type: string }
+            route_sha256: { type: string, description: SHA-256 of the exact computed result excluding bookkeeping fields }
+            mode: { $ref: "#/components/schemas/TravelMode" }
+            provider: { type: string }
+            inspections: { type: array, maxItems: 192, items: { $ref: "#/components/schemas/PathInspection" } }
+            attribution: { $ref: "#/components/schemas/PathAttribution" }
     CorridorTraversal:
       type: object
       additionalProperties: false
@@ -1214,6 +1359,7 @@ components:
         version: { type: integer, format: int64, minimum: 0 }
         intent: { $ref: "#/components/schemas/CorridorIntent", nullable: true }
         remove: { type: boolean, default: false }
+        quality_evidence: { type: array, maxItems: 192, items: { $ref: "#/components/schemas/CorridorEvidenceRef" }, description: Private retained inspection references; omitted on public intent and may be omitted from metadata lists }
     CorridorReviewRequest:
       type: object
       additionalProperties: false
@@ -1241,6 +1387,7 @@ components:
         draft_version: { type: integer, format: int64, minimum: 0 }
         intent: { $ref: "#/components/schemas/CorridorIntent", nullable: true }
         remove: { type: boolean }
+        quality_evidence: { type: array, maxItems: 192, items: { $ref: "#/components/schemas/CorridorEvidenceRef" }, description: Private retained inspection references; omitted on public intent and may be omitted from metadata lists }
         content_sha256: { type: string }
         status: { type: string, enum: [pending, approved, rejected] }
         created_by: { type: string, format: uuid }
@@ -1812,6 +1959,7 @@ components:
       type: object
       required: [mode, status, distance_m, duration_s]
       properties:
+        quality: { $ref: "#/components/schemas/PathQualitySummary" }
         mode: { $ref: "#/components/schemas/TravelMode" }
         status: { type: string, enum: [pending, ready, failed] }
         distance_m: { type: number }
@@ -1836,6 +1984,7 @@ components:
       type: object
       required: [id, tour_id, mode, status, provider, distance_m, duration_s, legs]
       properties:
+        quality: { $ref: "#/components/schemas/PathQualitySummary" }
         id: { type: string, format: uuid }
         tour_id: { type: string, format: uuid }
         mode: { $ref: "#/components/schemas/TravelMode" }

@@ -36,6 +36,7 @@ func TestRevisionHTTPRetainsLegacyTripAndExplicitStableProgress(t *testing.T) {
 		t.Fatalf("draft leaked %s", r.raw)
 	}
 	e.drain(t)
+	e.qualifyFixtureRoutes(t, testdb.SeedTourID)
 	admin = e.get(t, "/api/v1/admin/tours/"+testdb.SeedTourID, curator)
 	release := map[string]any{"draft_version": admin.body["draft_version"], "current_revision_id": id}
 	r := e.do(t, http.MethodPost, "/api/v1/admin/tours/"+testdb.SeedTourID+"/publish", curator, release)
@@ -82,6 +83,7 @@ func TestUnreleasedPrivateRevisionDoesNotBecomePublicThroughVisibilityEdit(t *te
 	}
 	id := r.body["id"].(string)
 	e.drain(t)
+	e.publishFixture(t, id)
 	working := e.get(t, "/api/v1/me/tours/"+id, owner)
 	privateRevision := working.body["revision_id"].(string)
 	r = e.do(t, http.MethodPatch, "/api/v1/me/tours/"+id, owner, map[string]any{"visibility": "unlisted", "stops": []map[string]any{{"place_id": testdb.SeedPlaceMuseumID}, {"place_id": testdb.SeedPlaceStationID}}})
@@ -99,6 +101,7 @@ func TestUnreleasedPrivateRevisionDoesNotBecomePublicThroughVisibilityEdit(t *te
 		t.Fatalf("private metadata exposed %d %s", r.status, r.raw)
 	}
 	e.drain(t)
+	e.publishFixture(t, id)
 	if r := e.get(t, base, ""); r.status != 200 || len(r.body["stops"].([]any)) != 2 {
 		t.Fatalf("new authorized public release %d %s", r.status, r.raw)
 	}

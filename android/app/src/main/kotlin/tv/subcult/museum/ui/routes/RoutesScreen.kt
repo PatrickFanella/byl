@@ -74,8 +74,9 @@ fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Uni
                 items.forEach { tour ->
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         TourCard(tour) { onOpenTour(tour.slug) }
+                        if (tour.status != "published") Text("Draft · Path review required before sharing", color = Museum.muted, style = MaterialTheme.typography.bodySmall)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
+                            if (tour.status == "published") OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                                 val url = shareUrl(model.container.resolveBaseUrl(), tour.slug)
                                 val send = Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_SUBJECT, tour.title); putExtra(Intent.EXTRA_TEXT, url) }
                                 context.startActivity(Intent.createChooser(send, "Share route"))

@@ -32,14 +32,16 @@ type ReferenceLine struct {
 // CorridorSegment has explicit endpoint identities. Geometry crossings create
 // no connection; road connectors must be selected and reviewed explicitly.
 type CorridorSegment struct {
-	ID       string          `json:"id"`
-	Kind     string          `json:"kind"`
-	FromNode string          `json:"from_node"`
-	ToNode   string          `json:"to_node"`
-	Branches []string        `json:"branches"`
-	Modes    []TravelMode    `json:"modes"`
-	Geometry ReferenceLine   `json:"geometry"`
-	Source   *CorridorSource `json:"source"`
+	ID       string           `json:"id"`
+	Kind     string           `json:"kind"`
+	FromNode string           `json:"from_node"`
+	ToNode   string           `json:"to_node"`
+	Branches []string         `json:"branches"`
+	Modes    []TravelMode     `json:"modes"`
+	Geometry ReferenceLine    `json:"geometry"`
+	Source   *CorridorSource  `json:"source"`
+	Network  *CorridorNetwork `json:"network,omitempty"`
+	Access   []CorridorAccess `json:"access,omitempty"`
 }
 
 // CorridorTraversal selects one directed reference segment, including repeats.
@@ -82,9 +84,10 @@ type CorridorIntent struct {
 // CorridorProposalRequest compares the approved pointer and captures the draft
 // version server-side. Removal must be explicit and separately reviewed.
 type CorridorProposalRequest struct {
-	Version int64           `json:"version"`
-	Intent  *CorridorIntent `json:"intent"`
-	Remove  bool            `json:"remove"`
+	Version         int64                 `json:"version"`
+	Intent          *CorridorIntent       `json:"intent"`
+	Remove          bool                  `json:"remove"`
+	QualityEvidence []CorridorEvidenceRef `json:"quality_evidence,omitempty"`
 }
 
 // ApprovedCorridor excludes private authors and review rationales from snapshots.
@@ -98,19 +101,20 @@ type ApprovedCorridor struct {
 
 // CorridorProposal is private curator review history.
 type CorridorProposal struct {
-	ID            string          `json:"id"`
-	TourID        string          `json:"tour_id"`
-	BaseVersion   int64           `json:"base_version"`
-	DraftVersion  int64           `json:"draft_version"`
-	Intent        *CorridorIntent `json:"intent"`
-	Remove        bool            `json:"remove"`
-	ContentSHA256 string          `json:"content_sha256"`
-	Status        string          `json:"status"`
-	CreatedBy     string          `json:"created_by"`
-	ReviewedBy    *string         `json:"reviewed_by"`
-	ReviewNote    string          `json:"review_note"`
-	CreatedAt     time.Time       `json:"created_at"`
-	ReviewedAt    *time.Time      `json:"reviewed_at"`
+	ID              string                `json:"id"`
+	TourID          string                `json:"tour_id"`
+	BaseVersion     int64                 `json:"base_version"`
+	DraftVersion    int64                 `json:"draft_version"`
+	Intent          *CorridorIntent       `json:"intent"`
+	Remove          bool                  `json:"remove"`
+	ContentSHA256   string                `json:"content_sha256"`
+	Status          string                `json:"status"`
+	CreatedBy       string                `json:"created_by"`
+	ReviewedBy      *string               `json:"reviewed_by"`
+	ReviewNote      string                `json:"review_note"`
+	CreatedAt       time.Time             `json:"created_at"`
+	ReviewedAt      *time.Time            `json:"reviewed_at"`
+	QualityEvidence []CorridorEvidenceRef `json:"quality_evidence,omitempty"`
 }
 
 func boundedIdentity(s string) bool {
@@ -139,6 +143,9 @@ func (c CorridorIntent) Validate() Fields {
 	nodes := map[string][2]float64{}
 	vertices := 0
 	for _, s := range c.Segments {
+		if err := s.ValidateQualityReference(); err != nil {
+			f["quality_reference"] = err.Error()
+		}
 		if !boundedIdentity(s.ID) || !boundedIdentity(s.FromNode) || !boundedIdentity(s.ToNode) {
 			f["segments"] = "segment and endpoint node identities are required"
 		}

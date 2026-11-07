@@ -65,10 +65,14 @@
 					<div class="space-y-2">
 						<TourCard {tour} />
 						<div class="flex flex-wrap items-center gap-2 text-sm">
-							<button
-								class="rounded-lg border border-byl-border px-3 py-1.5 hover:bg-byl-surface"
-								onclick={() => (sharing = sharing === tour.id ? null : tour.id)}>Share</button
-							>
+							{#if tour.status === 'published'}
+								<button
+									class="rounded-lg border border-byl-border px-3 py-1.5 hover:bg-byl-surface"
+									onclick={() => (sharing = sharing === tour.id ? null : tour.id)}>Share</button
+								>
+							{:else}<span class="text-xs text-byl-muted"
+									>Draft · Path review required before sharing</span
+								>{/if}
 							<a
 								href="/routes/{tour.id}/edit"
 								class="rounded-lg border border-byl-border px-3 py-1.5 hover:bg-byl-surface">Edit</a
@@ -79,7 +83,7 @@
 							>
 							<span class="text-xs text-byl-muted">{tour.visibility}</span>
 						</div>
-						{#if sharing === tour.id}
+						{#if sharing === tour.id && tour.status === 'published'}
 							<ShareLink url={shareURL(origin, tour.slug)} title={tour.title} />
 						{/if}
 					</div>

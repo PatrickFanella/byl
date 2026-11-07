@@ -61,6 +61,10 @@ func (s *Store) ProposeCorridor(ctx context.Context, tour, author string, in mod
 	if err != nil || len(raw) > 262144 {
 		return nil, ErrInvalidReference
 	}
+	inspections, err := s.captureCorridorInspections(ctx, in)
+	if err != nil {
+		return nil, err
+	}
 	hash := sha256.Sum256(raw)
 	var id string
 	err = s.Transaction(ctx, func(tx *Store) error {
@@ -91,7 +95,10 @@ func (s *Store) ProposeCorridor(ctx context.Context, tour, author string, in mod
 		if !in.Remove {
 			intent = raw
 		}
-		return tx.pool.QueryRow(ctx, `INSERT INTO tour_corridor_proposals(tour_id,base_version,draft_version,intent,remove,content_sha256,created_by) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id`, tour, in.Version, working.DraftVersion, intent, in.Remove, hex.EncodeToString(hash[:]), author).Scan(&id)
+		if err := tx.pool.QueryRow(ctx, `INSERT INTO tour_corridor_proposals(tour_id,base_version,draft_version,intent,remove,content_sha256,created_by) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id`, tour, in.Version, working.DraftVersion, intent, in.Remove, hex.EncodeToString(hash[:]), author).Scan(&id); err != nil {
+			return err
+		}
+		return tx.saveCorridorInspections(ctx, id, in.QualityEvidence, inspections)
 	})
 	if err != nil {
 		return nil, mapErr(err)
@@ -104,7 +111,12 @@ func (s *Store) GetCorridorProposal(ctx context.Context, tour, id string) (*mode
 	if !isUUID(tour) || !isUUID(id) {
 		return nil, ErrNotFound
 	}
-	return scanCorridor(s.pool.QueryRow(ctx, `SELECT `+corridorCols+` FROM tour_corridor_proposals WHERE tour_id=$1 AND id=$2`, tour, id))
+	p, err := scanCorridor(s.pool.QueryRow(ctx, `SELECT `+corridorCols+` FROM tour_corridor_proposals WHERE tour_id=$1 AND id=$2`, tour, id))
+	if err != nil {
+		return nil, err
+	}
+	p.QualityEvidence, err = s.corridorInspectionRefs(ctx, id)
+	return p, err
 }
 
 // ListCorridorProposals keeps completed/private proposals separate from public intent.

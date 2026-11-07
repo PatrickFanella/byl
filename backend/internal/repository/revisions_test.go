@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
+	"time"
 
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/testdb"
@@ -30,8 +32,42 @@ func revisionFixture(t *testing.T) (*Store, context.Context, string, *models.Tou
 
 func readyFixtureRoutes(t *testing.T, s *Store, ctx context.Context, tour string) {
 	t.Helper()
+	var qualitySchema bool
+	if err := s.pool.QueryRow(ctx, `SELECT to_regclass('tour_path_quality_reports') IS NOT NULL`).Scan(&qualitySchema); err != nil {
+		t.Fatal(err)
+	}
 	for _, mode := range models.AllTravelModes {
-		if err := s.UpsertRoute(ctx, models.TourRoute{TourID: tour, Mode: mode, Status: models.RouteStatusReady, Provider: "fixture", DistanceM: 1000, DurationS: 120, Geometry: &models.LineString{Type: "LineString", Coordinates: [][2]float64{{-88.01, 41.80}, {-88.02, 41.81}}}, Legs: []models.RouteLeg{}}); err != nil {
+		route := models.TourRoute{TourID: tour, Mode: mode, Status: models.RouteStatusReady, Provider: "fixture", DistanceM: 1000, DurationS: 120, Geometry: &models.LineString{Type: "LineString", Coordinates: [][2]float64{{-88.01, 41.80}, {-88.02, 41.81}}}, Legs: []models.RouteLeg{}}
+		if !qualitySchema {
+			if err := s.UpsertRoute(ctx, route); err != nil {
+				t.Fatal(err)
+			}
+			continue
+		}
+		// These persistence tests inject an explicit synthetic qualified checkpoint.
+		// Actual network/access assessment has separate provider/worker fixtures.
+		route.Provider = "valhalla"
+		var version int64
+		if err := s.pool.QueryRow(ctx, `SELECT route_version FROM tour_revision_state WHERE tour_id=$1`, tour).Scan(&version); err != nil {
+			t.Fatal(err)
+		}
+		points, digest, err := s.TourRouteInputs(ctx, tour, mode, version)
+		if err != nil {
+			t.Fatal(err)
+		}
+		attr := &models.PathAttribution{Provider: "valhalla", Method: "trace_attributes/edge_walk"}
+		for i := 1; i < len(points); i++ {
+			geometry := [][2]float64{{points[i-1].Lng, points[i-1].Lat}, {points[i].Lng, points[i].Lat}}
+			route.Legs = append(route.Legs, models.RouteLeg{FromPosition: i, ToPosition: i + 1, DistanceM: 1000 / float64(len(points)-1), DurationS: 40, Geometry: geometry})
+			attr.Legs = append(attr.Legs, models.AttributedLeg{Geometry: geometry, OSMChangeset: 1, Edges: []models.PathEdge{{ID: int64(i), WayID: int64(i), BeginNodeID: int64(i), EndNodeID: int64(i + 1), Forward: true, Use: "footway", TravelMode: "pedestrian", Traversability: "both", BeginShapeIndex: 0, EndShapeIndex: 1}}})
+			if mode == models.TravelModeBike {
+				attr.Legs[len(attr.Legs)-1].Edges[0].TravelMode = "bicycle"
+				attr.Legs[len(attr.Legs)-1].Edges[0].Use = "cycleway"
+			}
+		}
+		report := models.PathQualityReport{PathQualitySummary: models.PathQualitySummary{Version: 1, Status: "pass", Issues: []models.PathQualityIssue{}, CheckedAt: time.Now().UTC(), InputCurrent: true}, InputHash: digest, Mode: mode, Provider: route.Provider, Attribution: attr, Inspections: []models.PathInspection{{SegmentID: "synthetic-checkpoint", Purpose: "network", EvidenceID: "persistence-fixture", URL: "https://example.org/persistence", ContentSHA256: strings.Repeat("a", 64), RetrievedAt: time.Now().UTC(), Reference: "fixture", Quote: "Synthetic persistence checkpoint; not real access evidence."}}}
+		report.RouteSHA256 = route.RoutingFingerprint()
+		if err := s.UpsertRouteQualified(ctx, route, version, digest, report); err != nil {
 			t.Fatal(err)
 		}
 	}

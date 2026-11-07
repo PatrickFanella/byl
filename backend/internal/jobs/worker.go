@@ -240,7 +240,15 @@ func (w *Worker) onFinalFailure(ctx context.Context, job *models.Job, runErr err
 	if !errors.As(runErr, &inputFailure) {
 		return nil
 	}
-	err := w.store.UpsertRouteVersioned(ctx, models.TourRoute{TourID: p.TourID, Mode: p.Mode, Status: models.RouteStatusFailed, Error: runErr.Error()}, p.RouteVersion, inputFailure.digest)
+	failedRoute := models.TourRoute{TourID: p.TourID, Mode: p.Mode, Status: models.RouteStatusFailed, Error: runErr.Error()}
+	var err error
+	if inputFailure.quality != nil {
+		failedRoute.Provider = inputFailure.quality.Provider
+		inputFailure.quality.RouteSHA256 = failedRoute.RoutingFingerprint()
+		err = w.store.UpsertRouteQualified(ctx, failedRoute, p.RouteVersion, inputFailure.digest, *inputFailure.quality)
+	} else {
+		err = w.store.UpsertRouteVersioned(ctx, failedRoute, p.RouteVersion, inputFailure.digest)
+	}
 	if errors.Is(err, repository.ErrRouteSuperseded) || errors.Is(err, repository.ErrNotFound) {
 		return nil
 	}
