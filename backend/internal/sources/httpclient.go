@@ -169,7 +169,17 @@ func publicIP(ip net.IP) bool {
 
 func (c *Client) do(ctx context.Context, hc *http.Client, url string) (*http.Response, error) {
 	var lastErr error
-	for attempt := 0; attempt < 2; attempt++ {
+	attempts := 2
+	if _, ok := ctx.Value(discoveryBudgetKey{}).(discoveryBudget); ok {
+		hc = c.discoveryHTTP(ctx, hc)
+		attempts = 1 // every retry must be an explicit, durably budgeted operation
+		if t, ok := hc.Transport.(discoveryTransport); ok {
+			if base, ok := t.base.(*http.Transport); ok {
+				defer base.CloseIdleConnections()
+			}
+		}
+	}
+	for attempt := 0; attempt < attempts; attempt++ {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 		if err != nil {
 			return nil, err
@@ -189,7 +199,7 @@ func (c *Client) do(ctx context.Context, hc *http.Client, url string) (*http.Res
 			_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 1<<16))
 			resp.Body.Close()
 			lastErr = fmt.Errorf("sources: %s returned %d", req.URL.Host, resp.StatusCode)
-			if attempt == 0 {
+			if attempt+1 < attempts {
 				select {
 				case <-ctx.Done():
 					return nil, ctx.Err()
@@ -210,14 +220,25 @@ func (c *Client) do(ctx context.Context, hc *http.Client, url string) (*http.Res
 
 // GetJSON fetches and decodes a JSON document of at most maxBytes, returning the raw bytes too.
 func (c *Client) GetJSON(ctx context.Context, url string, maxBytes int64, dst any) ([]byte, error) {
+	_, discovery := ctx.Value(discoveryBudgetKey{}).(discoveryBudget)
+	if discovery && maxBytes > evidenceMaxBytes {
+		maxBytes = evidenceMaxBytes
+	}
 	resp, err := c.Get(ctx, url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	raw, err := io.ReadAll(io.LimitReader(resp.Body, maxBytes))
+	readLimit := maxBytes
+	if discovery {
+		readLimit++
+	}
+	raw, err := io.ReadAll(io.LimitReader(resp.Body, readLimit))
 	if err != nil {
 		return nil, err
+	}
+	if discovery && int64(len(raw)) > maxBytes {
+		return nil, errors.New("discovery response exceeds byte limit")
 	}
 	if err := json.Unmarshal(raw, dst); err != nil {
 		return nil, fmt.Errorf("sources: decode %s: %w", url, err)

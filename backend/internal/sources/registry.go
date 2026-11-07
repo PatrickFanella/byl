@@ -17,6 +17,7 @@ type Registry struct {
 func NewRegistry(client *Client, localArchiveURLs []string) *Registry {
 	r := &Registry{byName: map[string]entry{}, client: client}
 	r.add(NewWikipedia(client, ""), Info{Description: "Wikipedia articles near a point: a place and a moment per article", SupportsNear: true})
+	r.add(NewWikipediaSearch(client, ""), Info{Description: "Wikipedia full-text search links and snippets; page inspection is separate", SupportsQuery: true})
 	r.add(NewCommons(client, ""), Info{Description: "Wikimedia Commons images near a point, with licence metadata", SupportsNear: true})
 	r.add(NewInternetArchive(client, ""), Info{Description: "Internet Archive texts, images, and films matching a query", SupportsQuery: true})
 	r.add(NewLOC(client, ""), Info{Description: "Library of Congress items matching a query", SupportsQuery: true})

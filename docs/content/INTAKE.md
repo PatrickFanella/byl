@@ -93,9 +93,39 @@ the saved brief. Retrying creation after a lost response uses the same request
 key and opens the original record.
 
 Saving a brief does not start automated research or publish a tour. Use the
-existing import and review tools below while the research worker is being built.
+private research API to start discovery at the saved version. Use the existing
+import and review tools below to develop and publish the resulting leads.
 Visitor submissions remain disabled, and production curator access still needs
 the deferred sign-in configuration.
+
+## Discovery from a brief
+
+Discovery first checks published places and moments and retained private evidence.
+It searches using the area, topic and up to two supplied place/event leads. A hit
+needs explicit geographic support and either the topic terms or an exact named
+lead in its returned text. A known city's bounding box can support geography;
+coordinates outside it disqualify a result. Ambiguous city names and missing
+coordinates do not cause automatic geocoding or invented locations.
+
+The private research checkpoint retains up to twelve shortlisted leads, their
+queries, originating providers, source URLs and relevance reasons. Duplicate
+normalized URLs retain their separate origins. Published collection references
+retain their entity IDs. This source-level deduplication does not resolve whether
+two different records describe the same place or event.
+
+Configured local-history pages and supplied links on permitted hosts are inspected
+with bounded evidence retrieval. Discovery follows at most two named references
+from the initial frontier; it does not crawl recursively. Wikipedia search returns
+links and snippets. LOC and Internet Archive return catalogue descriptions. These
+classifications remain distinct from inspected page passages, and every retrieved
+passage remains untrusted. Failed sources remain explicit outcomes; a failed
+provider does not erase another provider's successful results.
+
+The coordinator saves its shortlist and pauses before reconciliation, drafting and
+assembly, which still need their roadmap implementations. Empty results or a stage
+timeout leave a named research gap. Saving discovery does not create public
+content or approve media rights. Source policy, credentials and request limits
+are documented in `docs/deployment/byl.md`.
 
 ## Current import and review workflow
 

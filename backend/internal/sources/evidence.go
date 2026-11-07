@@ -72,6 +72,10 @@ type EvidenceRetriever interface {
 // automatic retry and a total 20-second deadline. Private access is never enabled,
 // even when this client allows trusted private media/archive URLs elsewhere.
 func (c *Client) RetrieveEvidence(ctx context.Context, raw, kind string) (models.EvidenceResult, error) {
+	return c.retrieveEvidence(ctx, raw, kind, nil)
+}
+
+func (c *Client) retrieveEvidence(ctx context.Context, raw, kind string, inspectLinks func(string, string)) (models.EvidenceResult, error) {
 	result := models.EvidenceResult{Outcome: "blocked", RetrievedAt: time.Now().UTC(), Untrusted: true, MediaReuse: "unresolved", Passages: []models.EvidencePassage{}}
 	page, _, _, err := NormalizeEvidenceURL(raw)
 	if err != nil {
@@ -102,6 +106,7 @@ func (c *Client) RetrieveEvidence(ctx context.Context, raw, kind string) (models
 	if transport, ok := hc.Transport.(*http.Transport); ok {
 		defer transport.CloseIdleConnections()
 	}
+	hc.Transport = withDiscoveryTransport(limited, hc.Transport)
 	hc.CheckRedirect = func(next *http.Request, via []*http.Request) error {
 		if len(via) >= 3 {
 			return errEvidenceRedirect
@@ -136,6 +141,9 @@ func (c *Client) RetrieveEvidence(ctx context.Context, raw, kind string) (models
 		}
 		if ctx.Err() != nil {
 			return result, ctx.Err()
+		}
+		if errors.Is(err, ErrDiscoveryBudget) {
+			return result, ErrDiscoveryBudget
 		}
 		switch {
 		case errors.Is(err, ErrPrivateHost) || errors.Is(err, errEvidenceRedirect):
@@ -194,6 +202,9 @@ func (c *Client) RetrieveEvidence(ctx context.Context, raw, kind string) (models
 	result.ContentSHA256 = hex.EncodeToString(digest[:])
 	text := string(body)
 	if result.ContentType == "text/html" {
+		if inspectLinks != nil {
+			inspectLinks(result.FinalURL, text)
+		}
 		result.Title, text = ExtractArticle(text)
 	}
 	if result.Title == "" {

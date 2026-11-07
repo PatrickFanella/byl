@@ -240,6 +240,57 @@ does not bypass access restrictions or copy full archives into public content.
 
 Media reuse stays `unresolved`: inspecting text or a page license does not clear
 images, video or documents for copying. No media is downloaded by evidence jobs.
-The research processor remains unconfigured; automatic discovery and evidence-
-bound historical drafting are separate roadmap issues. These manual curator
-retrieval limits are separate from the unchanged automatic research-run budget.
+These manual curator retrieval limits are separate from the automatic research-
+run budget described below. Historical drafting remains a separate roadmap issue.
+
+## Private brief discovery policy
+
+Starting a saved brief's research run now executes discovery. It reuses relevant
+published collection records and permitted retained brief evidence before new
+requests. The remaining reconciliation, drafting and assembly processors remain
+unconfigured; a successful discovery checkpoint therefore pauses with
+`processor_unavailable` rather than claiming to have drafted a tour.
+
+`BRIEF_DISCOVERY_PROVIDERS` selects up to three distinct providers from
+`wikipedia_search,loc,internet_archive` (the default). Wikipedia uses its public
+MediaWiki `list=search` API, restricted to article namespace, with twelve results
+and no continuation. LOC and Internet Archive reuse the existing adapters. The
+archive adapter requests catalogue metadata without fetching media-file details.
+No provider requires a credential, and no model provider is enabled by discovery.
+
+`BRIEF_DISCOVERY_SEED_URLS` replaces the default starting pages with up to four
+HTTP(S) pages. Defaults are `https://dghistory.org/`, the Downers Grove Wikipedia
+overview and the DuPage County Wikipedia overview. Hosts from these configured
+pages permit submitted source links and followed references; off-policy pages and
+page redirects remain blocked. `LOCAL_ARCHIVE_URLS` continues to configure manual
+imports independently. A private-host bypass never applies to discovery.
+
+Discovery considers at most four starting links (submitted links first), three
+archive queries (area/topic, then up to two area/lead/topic queries) and two named
+references from the initial page frontier. It does not recurse, request provider
+pagination, copy media or use geocoding to guess missing locations. Results need
+explicit area plus topic/lead support in their returned content, independent of
+the query. A resolved city boundary rejects out-of-area coordinates. Conservative
+matching can miss useful sources; absence from the shortlist is not proof that
+the history does not exist.
+
+Every HTTP request, including redirects, consumes a persisted research allowance
+before it is sent. The first uses the allowance reserved when the research stage
+began; additional source requests spend no model tokens. The existing twelve-
+request run ceiling, stage retry ceiling, twenty-thousand-token ceiling and
+fifteen-minute run deadline remain in force. The initial stage retains its
+conservative 2,000-token reservation even when discovery uses no model or network.
+There are no HTTP retries during discovery. Each call has at most two redirects,
+a 20-second HTTP timeout, a 2 MiB body bound and the public-IP connection guard.
+The research stage has a 30-second ceiling; a timeout checkpoints its successful
+partial results with `provider_unavailable`. Worker cancellation and stale claims
+still prevent commits. A depleted request allowance stops further calls and
+retains completed provider results.
+
+The private stage output retains at most twelve leads with their source, query,
+relevance reasons and evidence classification, plus up to six retrieval snapshots
+with 3,000-character excerpts and content hashes. A catalogue or search snippet
+does not become inspected full-text evidence. Page excerpts stay untrusted and
+media reuse stays unresolved. Source URLs and provider errors do not enter routine
+job logs or owner progress responses. No new schema migration is needed beyond
+the separately admitted migration 8. Image rollback retains private checkpoints.

@@ -14,7 +14,7 @@ import (
 // ResearchTask grants one bounded provider operation. Implementations must honor
 // ctx, perform at most one external request, and cap total model tokens at
 // MaxTokens. They return proposed data only; persistence belongs to the worker.
-// Source discovery/adapters are intentionally implemented in later roadmap issues.
+// Multi-request source discovery uses its own durably reserved worker path.
 type ResearchTask struct {
 	RunID     string
 	Stage     string
@@ -67,7 +67,7 @@ func (w *Worker) researchBrief(ctx context.Context, job *models.Job) (string, er
 		if completed {
 			continue
 		}
-		if w.Research == nil {
+		if w.Research == nil && (stage != "research" || w.Discovery == nil) {
 			if err := w.store.StopBriefResearch(ctx, run.ID, job, "processor_unavailable"); err != nil && !errors.Is(err, repository.ErrResearchInactive) {
 				return "", errors.New("research checkpoint unavailable")
 			}
@@ -88,9 +88,20 @@ func (w *Worker) researchBrief(ctx context.Context, job *models.Job) (string, er
 			deadline = run.DeadlineAt
 		}
 		stageCtx, cancel := context.WithDeadline(ctx, deadline)
-		out, runErr := w.Research.Process(stageCtx, ResearchTask{RunID: run.ID, Stage: stage, Submitted: run.Submitted, Previous: previous, MaxTokens: repository.ResearchTokenReservation})
+		var out models.ResearchOutput
+		var runErr error
+		if stage == "research" && w.Discovery != nil {
+			out, runErr = w.discoverBrief(stageCtx, run, job)
+		} else {
+			out, runErr = w.Research.Process(stageCtx, ResearchTask{RunID: run.ID, Stage: stage, Submitted: run.Submitted, Previous: previous, MaxTokens: repository.ResearchTokenReservation})
+		}
 		stageErr := stageCtx.Err()
 		cancel()
+		// Discovery can checkpoint successful partial results after its 30-second
+		// stage deadline. Worker shutdown and the run's persisted deadline still fence commits.
+		if stage == "research" && w.Discovery != nil && runErr == nil && len(out.Data) > 0 && ctx.Err() == nil {
+			stageErr = nil
+		}
 		if runErr != nil || stageErr != nil {
 			if ctx.Err() != nil {
 				return "", errors.New("research interrupted")
