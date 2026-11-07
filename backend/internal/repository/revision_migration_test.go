@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"reflect"
 	"slices"
 	"testing"
 	"time"
@@ -17,6 +18,10 @@ func TestRevisionMigrationPinsLegacyProgressWithoutRewritingSourceRows(t *testin
 	s := New(pool)
 	ctx := context.Background()
 	a, err := s.UpsertAccount(ctx, models.AuthProviderDev, "legacy-migration", "legacy@example.com", "", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	storyBefore, err := s.GetMoment(ctx, testdb.SeedMomentBurlingtonID, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,6 +58,9 @@ func TestRevisionMigrationPinsLegacyProgressWithoutRewritingSourceRows(t *testin
 	r, err := s.GetTourRevision(ctx, testdb.SeedTourID, p.RevisionID)
 	if err != nil || r.Number != 1 || len(r.Snapshot.Moments) == 0 {
 		t.Fatalf("backfill %+v %v", r, err)
+	}
+	if !reflect.DeepEqual(publicProjection(t, storyBefore), publicProjection(t, r.Snapshot.Moments[storyBefore.ID])) {
+		t.Fatal("backfilled snapshot lost derived public story metadata")
 	}
 	progress, err := s.GetRevisionProgress(ctx, a.ID, p.RevisionID)
 	if err != nil || len(progress.VisitedStopIDs) != 2 || !slices.Contains(progress.VisitedStopIDs, r.Snapshot.Tour.Stops[0].ID) || !slices.Contains(progress.VisitedStopIDs, r.Snapshot.Tour.Stops[3].ID) {
