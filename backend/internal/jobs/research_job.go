@@ -67,7 +67,7 @@ func (w *Worker) researchBrief(ctx context.Context, job *models.Job) (string, er
 		if completed {
 			continue
 		}
-		if w.Research == nil && (stage != "research" || w.Discovery == nil) {
+		if w.Research == nil && (stage != "research" || w.Discovery == nil) && (stage != "reconciliation" || !w.Reconcile) {
 			if err := w.store.StopBriefResearch(ctx, run.ID, job, "processor_unavailable"); err != nil && !errors.Is(err, repository.ErrResearchInactive) {
 				return "", errors.New("research checkpoint unavailable")
 			}
@@ -92,6 +92,8 @@ func (w *Worker) researchBrief(ctx context.Context, job *models.Job) (string, er
 		var runErr error
 		if stage == "research" && w.Discovery != nil {
 			out, runErr = w.discoverBrief(stageCtx, run, job)
+		} else if stage == "reconciliation" && w.Reconcile {
+			out, runErr = w.reconcileBrief(stageCtx, run, previous["research"])
 		} else {
 			out, runErr = w.Research.Process(stageCtx, ResearchTask{RunID: run.ID, Stage: stage, Submitted: run.Submitted, Previous: previous, MaxTokens: repository.ResearchTokenReservation})
 		}

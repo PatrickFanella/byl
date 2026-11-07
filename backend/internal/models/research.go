@@ -54,9 +54,10 @@ type ResearchActionRequest struct {
 // ResearchOutput is persisted atomically with any proposed review candidates.
 // It never creates or changes public entities or overwrites existing candidates.
 type ResearchOutput struct {
-	Data          json.RawMessage
-	Candidates    []Candidate
-	NeedsResearch string
+	Data            json.RawMessage
+	Candidates      []Candidate
+	NeedsResearch   string
+	Reconciliations []ReconciliationProposal
 }
 
 // ResearchReasonMessage maps safe reason codes to user-facing descriptions.

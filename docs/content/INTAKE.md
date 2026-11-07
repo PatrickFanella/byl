@@ -153,11 +153,49 @@ classifications remain distinct from inspected page passages, and every retrieve
 passage remains untrusted. Failed sources remain explicit outcomes; a failed
 provider does not erase another provider's successful results.
 
-The coordinator saves its shortlist and pauses before reconciliation, drafting and
-assembly, which still need their roadmap implementations. Empty results or a stage
+The coordinator saves its shortlist and runs local reconciliation before pausing
+at drafting and assembly, which still need their roadmap implementations. Empty results or a stage
 timeout leave a named research gap. Saving discovery does not create public
 content or approve media rights. Source policy, credentials and request limits
 are documented in `docs/deployment/byl.md`.
+
+## Reconciliation before drafting
+
+The local reconciliation stage compares known collection IDs, names, current
+addresses, coordinates, source references, dates and curator-confirmed aliases.
+It distinguishes an existing place and existing moment, an existing place needing
+a new moment, and a proposed new place. Proximity alone never establishes identity.
+Ambiguous names, unconfirmed aliases, historical street numbers, moved buildings,
+conflicting dates and incomplete geography remain named review issues. Catalogue
+limits also require review rather than allowing an unchecked new place.
+
+Discovery snippets usually lack structured identity facts. Curators can supplement
+a lead using `POST /api/v1/admin/route-briefs/{id}/reconciliation` with the saved
+brief `version` and an `item`. Its optional `identity` carries the place name,
+current address, municipality ID, historical addresses, aliases, movement and date
+leads. Coordinates must come from the source or curator; the stage does not invent
+them. Supplying a source URL records a reference without fetching or verifying it.
+
+GET at that path lists private records with the original `proposal`, latest
+`assessment` and candidate links. Adding `/{record}/sources` pages every retained
+provenance entry for that brief using `limit` (up to 50) and `offset`. Every distinct
+source, query and inferred fact remains in the database.
+Canonical identity keys share pending candidates across repeated and overlapping
+briefs. Candidate payloads are never overwritten, including after curator edits.
+Potential collisions with earlier pending identities require review. New places
+and moments enter the existing pending candidate queue, with no invented history
+body. A new place is queued first; its moment can be queued after place approval
+and another reconciliation pass. Candidate approval still creates drafts; publication keeps its history,
+illustration, media-rights and route gates.
+
+Curators resolve an identity with
+`PUT /api/v1/admin/route-briefs/{id}/reconciliation/{record}/decision`, providing
+the last `review_version` as `version`, an outcome, existing place/moment IDs and
+a review `note`. Confirmed aliases and historical addresses are retained with that
+versioned decision. Stale decisions return 409; a moment from another place is
+refused. Decisions link records and establish matching claims; they do not merge,
+replace or publish collection rows. Later runs preserve the explicit decision.
+All reconciliation payloads require curator access, including for brief owners.
 
 ## Current import and review workflow
 

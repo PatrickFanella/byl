@@ -372,6 +372,33 @@ func (s *Store) CommitResearchStage(ctx context.Context, runID, stage string, cl
 			}
 		}
 		ids := []string{}
+		if out.Reconciliations != nil {
+			if stage != "reconciliation" {
+				return tx.stopResearchTx(ctx, r, b, "needs_research", "invalid_output")
+			}
+			records, err := tx.commitReconciliation(ctx, b, runID, out.Reconciliations)
+			if err != nil {
+				return err
+			}
+			if time.Now().After(r.DeadlineAt) {
+				return ErrResearchInactive
+			}
+			out.Data, err = json.Marshal(models.ReconciliationReport{Records: records})
+			if err != nil {
+				return err
+			}
+			if len(out.Data) > 262144 {
+				return ErrInvalidReference
+			} // roll back candidates and checkpoint together
+			for _, record := range records {
+				if record.PlaceCandidateID != nil {
+					ids = append(ids, *record.PlaceCandidateID)
+				}
+				if record.MomentCandidateID != nil {
+					ids = append(ids, *record.MomentCandidateID)
+				}
+			}
+		}
 		for i, c := range out.Candidates {
 			externalID := fmt.Sprintf("%s:%s:%d", runID, stage, i)
 			var id string

@@ -22,6 +22,7 @@ type DiscoveryItem struct {
 	Area     string            `json:"area,omitempty"`
 	Evidence string            `json:"evidence"`
 	Origins  []DiscoveryOrigin `json:"origins"`
+	Identity *IdentityFacts    `json:"identity,omitempty"`
 }
 
 // DiscoverySource retains a bounded retrieval snapshot, including unsuccessful access.
