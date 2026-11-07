@@ -6,13 +6,13 @@
   "snapshot": {
     "moments": {
       "00000000-0000-4000-8000-00000000d0d1": {
-        "body": "The arrival of the Chicago, Burlington \u0026 Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop became an organizing point for the village: shops, streets, houses and everyday journeys gathered around the tracks. The railway was both a connection to the city and a reason for a town center to develop here.\n\nThat change did not begin on empty ground. The Encyclopedia of Chicago describes a community of farming families already established around the grove. Samuel Curtiss laid out a subdivision in 1863, the year before the railroad arrived. The settlement incorporated as a village in 1873. Reading those dates together shows a sequence of land development, transportation investment and local government, rather than a town created in a single dramatic moment.\n\nThe railway also helps explain the shape of the wider community. Growth developed near the Main Street, Belmont and East Grove stations. A rail siding and access to Chicago later made Downers Grove a destination for mail-order houses supplied by Sears, Roebuck \u0026 Co. between 1908 and 1940. Building materials and commuters moved along the same corridor, connecting domestic life with a much larger regional economy.\n\nPassenger traffic eventually needed a different arrangement from freight handling. In 1911 a new passenger station replaced the original depot, which continued as a freight facility before being demolished. The Historical Society identifies the surviving building as Classical Revival with Beaux Arts influences. Its symmetrical front, pilasters and terra-cotta detailing belong to a station built almost half a century after the line arrived. Damage from the 1947 train wreck led to repairs using original bricks, giving the building itself evidence of successive periods of use and rebuilding.",
+        "body": "The arrival of the Chicago, Burlington & Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop became an organizing point for the village: shops, streets, houses and everyday journeys gathered around the tracks. The railway was both a connection to the city and a reason for a town center to develop here.\n\nThat change did not begin on empty ground. The Encyclopedia of Chicago describes a community of farming families already established around the grove. Samuel Curtiss laid out a subdivision in 1863, the year before the railroad arrived. The settlement incorporated as a village in 1873. Reading those dates together shows a sequence of land development, transportation investment and local government, rather than a town created in a single dramatic moment.\n\nThe railway also helps explain the shape of the wider community. Growth developed near the Main Street, Belmont and East Grove stations. A rail siding and access to Chicago later made Downers Grove a destination for mail-order houses supplied by Sears, Roebuck & Co. between 1908 and 1940. Building materials and commuters moved along the same corridor, connecting domestic life with a much larger regional economy.\n\nPassenger traffic eventually needed a different arrangement from freight handling. In 1911 a new passenger station replaced the original depot, which continued as a freight facility before being demolished. The Historical Society identifies the surviving building as Classical Revival with Beaux Arts influences. Its symmetrical front, pilasters and terra-cotta detailing belong to a station built almost half a century after the line arrived. Damage from the 1947 train wreck led to repairs using original bricks, giving the building itself evidence of successive periods of use and rebuilding.",
         "created_at": "2026-11-07T10:01:58.703602Z",
         "date_display": "1864",
         "date_end": "1873-12-31",
         "date_precision": "year",
         "date_start": "1864-01-01",
-        "excerpt": "The arrival of the Chicago, Burlington \u0026 Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop…",
+        "excerpt": "The arrival of the Chicago, Burlington & Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop…",
         "has_narration": false,
         "hero_media": {
           "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
@@ -76,16 +76,18 @@
         ],
         "status": "published",
         "title": "The Burlington Arrives",
-        "topic_ids": null,
+        "topic_ids": [
+          "00000000-0000-4000-8000-00000000a0a1"
+        ],
         "topics": [
           {
             "city_id": "00000000-0000-4000-8000-0000000000c1",
             "city_ids": [
               "00000000-0000-4000-8000-0000000000c1"
             ],
-            "description": "How the Chicago, Burlington \u0026 Quincy line turned a farm settlement into a railroad suburb, and how the daily commute still shapes downtown.",
+            "description": "How the Chicago, Burlington & Quincy line turned a farm settlement into a railroad suburb, and how the daily commute still shapes downtown.",
             "id": "00000000-0000-4000-8000-00000000a0a1",
-            "moment_count": 0,
+            "moment_count": 4,
             "name": "Rail and the Commuter Town",
             "slug": "rail-and-the-commuter-town"
           }
@@ -197,7 +199,9 @@
         ],
         "status": "published",
         "title": "Israel and Avis Blodgett and the Underground Railroad",
-        "topic_ids": null,
+        "topic_ids": [
+          "00000000-0000-4000-8000-00000000a0a4"
+        ],
         "topics": [
           {
             "city_id": "00000000-0000-4000-8000-0000000000c1",
@@ -206,7 +210,7 @@
             ],
             "description": "The settlers, blacksmiths, and architects whose buildings survive, and the stories those buildings carry.",
             "id": "00000000-0000-4000-8000-00000000a0a4",
-            "moment_count": 0,
+            "moment_count": 2,
             "name": "Houses and Builders",
             "slug": "houses-and-builders"
           }
@@ -391,7 +395,9 @@
             "slug": "blodgett-house",
             "status": "published",
             "title": "Israel and Avis Blodgett and the Underground Railroad",
-            "topic_ids": null
+            "topic_ids": [
+              "00000000-0000-4000-8000-00000000a0a4"
+            ]
           },
           "featured_moment_id": null,
           "id": "e4a59171-be43-4b6b-8689-94eb6f8a795c",
@@ -423,7 +429,7 @@
             "date_end": "1873-12-31",
             "date_precision": "year",
             "date_start": "1864-01-01",
-            "excerpt": "The arrival of the Chicago, Burlington \u0026 Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop…",
+            "excerpt": "The arrival of the Chicago, Burlington & Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop…",
             "has_narration": false,
             "hero_media": {
               "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
@@ -448,7 +454,9 @@
             "slug": "the-burlington-arrives",
             "status": "published",
             "title": "The Burlington Arrives",
-            "topic_ids": null
+            "topic_ids": [
+              "00000000-0000-4000-8000-00000000a0a1"
+            ]
           },
           "featured_moment_id": null,
           "id": "0152ed8c-ef31-483a-81da-fd0c1fc9ad7a",

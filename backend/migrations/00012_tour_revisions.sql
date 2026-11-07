@@ -14,17 +14,21 @@ CREATE FUNCTION byl_tour_snapshot(tour UUID) RETURNS JSONB LANGUAGE sql STABLE A
   WHERE ts.tour_id=tour
  ), stories AS (
   SELECT m.id,to_jsonb(m) || jsonb_build_object(
+   'has_narration',m.narration_media_id IS NOT NULL,
+   'topic_ids',ARRAY(SELECT mt.topic_id FROM moment_topics mt JOIN topics tp ON tp.id=mt.topic_id WHERE mt.moment_id=m.id ORDER BY tp.name,tp.id),
    'hero_media',(SELECT to_jsonb(a) FROM media_assets a WHERE a.id=m.hero_media_id),
    'narration',(SELECT to_jsonb(a) FROM media_assets a WHERE a.id=m.narration_media_id),
    'sources',COALESCE((SELECT jsonb_agg(to_jsonb(ms) ORDER BY ms.position) FROM moment_sources ms WHERE ms.moment_id=m.id),'[]'::jsonb),
    'media',COALESCE((SELECT jsonb_agg(to_jsonb(a) ORDER BY mm.position) FROM moment_media mm JOIN media_assets a ON a.id=mm.media_id WHERE mm.moment_id=m.id AND a.status='published'),'[]'::jsonb),
-   'topics',COALESCE((SELECT jsonb_agg(to_jsonb(tp) || jsonb_build_object('city_ids',ARRAY(SELECT city_id FROM topic_cities WHERE topic_id=tp.id ORDER BY city_id)) ORDER BY tp.id) FROM moment_topics mt JOIN topics tp ON tp.id=mt.topic_id WHERE mt.moment_id=m.id),'[]'::jsonb)) AS story
+   'topics',COALESCE((SELECT jsonb_agg(to_jsonb(tp) || jsonb_build_object('city_ids',ARRAY(SELECT city_id FROM topic_cities WHERE topic_id=tp.id ORDER BY city_id),
+    'moment_count',(SELECT count(*) FROM moment_topics counted JOIN moments published ON published.id=counted.moment_id WHERE counted.topic_id=tp.id AND published.status='published')) ORDER BY tp.name,tp.id) FROM moment_topics mt JOIN topics tp ON tp.id=mt.topic_id WHERE mt.moment_id=m.id),'[]'::jsonb)) AS story
   FROM moments m WHERE m.id IN (SELECT selected_moment FROM stops)
  )
  SELECT jsonb_build_object(
   'tour',to_jsonb(t) || jsonb_build_object(
    'city_ids',ARRAY(SELECT city_id FROM (SELECT t.city_id UNION SELECT p.city_id FROM stops s JOIN places p ON p.id=s.place_id) c ORDER BY city_id),
-   'topic',(SELECT to_jsonb(tp) || jsonb_build_object('city_ids',ARRAY(SELECT city_id FROM topic_cities WHERE topic_id=tp.id ORDER BY city_id)) FROM topics tp WHERE tp.id=t.topic_id),
+   'topic',(SELECT to_jsonb(tp) || jsonb_build_object('city_ids',ARRAY(SELECT city_id FROM topic_cities WHERE topic_id=tp.id ORDER BY city_id),
+    'moment_count',(SELECT count(*) FROM moment_topics counted JOIN moments published ON published.id=counted.moment_id WHERE counted.topic_id=tp.id AND published.status='published')) FROM topics tp WHERE tp.id=t.topic_id),
    'hero_media',(SELECT to_jsonb(a) FROM media_assets a WHERE a.id=t.hero_media_id),
    'stop_count',(SELECT count(*) FROM stops),
    'stops',COALESCE((SELECT jsonb_agg(jsonb_build_object('id',s.id,'position',s.position,'place',s.place,'featured_moment_id',s.featured_moment_id,'featured_moment',st.story,'note',s.note) ORDER BY s.position) FROM stops s LEFT JOIN stories st ON st.id=s.selected_moment),'[]'::jsonb)),

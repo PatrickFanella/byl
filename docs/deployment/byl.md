@@ -410,6 +410,14 @@ invalid positions. Existing working tours, stops, routes and historical site
 coordinates remain unchanged. Published snapshots retain content and geometry
 when those working records change.
 
+The pre-admission compatibility rehearsal found missing derived story/topic
+fields in the first schema-12 candidate (#76). The corrected, still-unadmitted
+migration captures topic IDs, published topic counts and narration availability
+with the rest of the snapshot. Compare complete public tour/story projections,
+including these joined fields, rather than only stored source columns. Compare
+RFC 3339 timestamps by instant when their timezone strings differ. Migrations
+1–11 are unchanged; do not admit the initial `ddedb1b` release candidate.
+
 Before admission, restore a fresh schema-11 production backup into an isolated
 database and apply the exact accepted migration. Compare all preexisting table
 fingerprints, publication counts, snapshot content/geometry and progress mappings.
