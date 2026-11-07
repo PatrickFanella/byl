@@ -273,3 +273,35 @@ accident report, a link to the Historical Society's Blodgett House documentary,
 and a linked Village preservation packet. It records file hashes, rights, source
 URLs, retrieval dates and place/event associations. Migration 4 adds document and
 place-collection storage; migration 5 installs these reviewed collection records.
+
+## Historical sites and public arrival points
+
+A place's historical coordinates remain separate from its public entrance or
+viewpoint. Legacy places have `arrival_point: null`, `arrival_version: 0` and
+unknown navigation access. A nearby road, shared driveway or the site centroid
+never becomes a reviewed entrance automatically.
+
+Curators propose a point using `POST /api/v1/admin/places/{id}/arrivals`, with the
+current approved arrival `version` and a `point`. Each point names an `entrance`
+or `viewpoint`, gives coordinates, and includes exactly one `walk` and one `bike`
+assessment. Access is `unknown`, `allowed`, `restricted` or `closed`. Surface is
+recorded separately and can also be unknown. Known access or surface requires a
+source URL/title and a retrieval date; each mode retains its own evidence/context.
+This is a source-based review, not an accessibility certification or field claim.
+
+The proposal stays private and leaves the current approved point visible.
+`POST /api/v1/admin/places/{id}/arrivals/{arrival}/review` takes the proposal's
+`base_version` as `version`, an `approve` or `reject` action, and a private review
+note. Approval advances the public arrival version atomically. A stale approval
+returns 409, requiring a fresh proposal against the current version. Rejection
+keeps the approved point. Changed locations or restrictions always need a new
+proposal and review; completed inputs/reviews remain readable in private history.
+Point and access notes are public after approval; keep private rationale in the
+review note.
+
+Navigation callers can use `GET /api/v1/places/{place}/arrival?mode=walk|bike`.
+Only an allowed mode receives a `navigation_point`; unknown, restricted and closed
+modes receive null. Historical coordinates remain in the ordinary place response.
+Clients and route recomputation still need their later roadmap integration before
+visitors use this selection automatically. The Downer burial entrance used in
+backend tests is a synthetic fixture lead, not an inspected real-world entrance.

@@ -104,22 +104,24 @@ type MediaAsset struct {
 
 // PlaceSummary is a place without its moments expanded.
 type PlaceSummary struct {
-	ID              string       `json:"id"`
-	CityID          string       `json:"city_id"`
-	Slug            string       `json:"slug"`
-	Name            string       `json:"name"`
-	Summary         string       `json:"summary"`
-	Kind            string       `json:"kind"`
-	Latitude        float64      `json:"latitude"`
-	Longitude       float64      `json:"longitude"`
-	ArrivalRadiusM  float64      `json:"arrival_radius_m"`
-	Address         string       `json:"address"`
-	Status          EntityStatus `json:"status"`
-	PrimaryMomentID *string      `json:"primary_moment_id"`
-	MomentCount     int          `json:"moment_count"`
-	DistanceM       *float64     `json:"distance_m,omitempty"`
-	CreatedAt       time.Time    `json:"created_at"`
-	UpdatedAt       time.Time    `json:"updated_at"`
+	ID              string           `json:"id"`
+	CityID          string           `json:"city_id"`
+	Slug            string           `json:"slug"`
+	Name            string           `json:"name"`
+	Summary         string           `json:"summary"`
+	Kind            string           `json:"kind"`
+	Latitude        float64          `json:"latitude"`
+	Longitude       float64          `json:"longitude"`
+	ArrivalRadiusM  float64          `json:"arrival_radius_m"`
+	ArrivalPoint    *ApprovedArrival `json:"arrival_point"`
+	ArrivalVersion  int              `json:"arrival_version"`
+	Address         string           `json:"address"`
+	Status          EntityStatus     `json:"status"`
+	PrimaryMomentID *string          `json:"primary_moment_id"`
+	MomentCount     int              `json:"moment_count"`
+	DistanceM       *float64         `json:"distance_m,omitempty"`
+	CreatedAt       time.Time        `json:"created_at"`
+	UpdatedAt       time.Time        `json:"updated_at"`
 }
 
 // PlaceDetail is a place with its moments.
