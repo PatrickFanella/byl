@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -286,7 +287,15 @@ func (s *Store) GetTour(ctx context.Context, ref string, publicOnly bool) (*mode
 	if err != nil {
 		return nil, err
 	}
-	return &models.TourDetail{TourSummary: tours[0], Stops: stops, Corridor: corridor, WorkingCopy: true}, nil
+	tour := &models.TourDetail{TourSummary: tours[0], Stops: stops, Corridor: corridor, WorkingCopy: true, Journeys: map[models.TravelMode]*models.RouteJourney{}}
+	for _, mode := range tour.Modes {
+		route, err := s.GetTourRoute(ctx, id, mode)
+		if err != nil && !errors.Is(err, ErrNotFound) {
+			return nil, err
+		}
+		tour.Journeys[mode] = models.DescribeJourney(tour, route)
+	}
+	return tour, nil
 }
 
 func (s *Store) tourStops(ctx context.Context, tourID string, publicOnly bool) ([]models.TourStop, error) {

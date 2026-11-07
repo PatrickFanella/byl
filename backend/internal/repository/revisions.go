@@ -68,7 +68,11 @@ func scanRevision(row interface{ Scan(...any) error }) (*models.TourRevision, er
 	r.Snapshot.Tour.RevisionNumber = r.Number
 	r.Snapshot.Tour.DraftVersion = r.DraftVersion
 	r.Snapshot.Tour.Routes = map[models.TravelMode]models.RouteSummary{}
+	r.Snapshot.Tour.Journeys = map[models.TravelMode]*models.RouteJourney{}
 	for mode, route := range r.Snapshot.Routes {
+		route.Journey = models.DescribeJourney(&r.Snapshot.Tour, &route)
+		r.Snapshot.Routes[mode] = route
+		r.Snapshot.Tour.Journeys[mode] = route.Journey
 		r.Snapshot.Tour.Routes[mode] = route.Summary()
 	}
 	for id, m := range r.Snapshot.Moments {
@@ -82,6 +86,11 @@ func scanRevision(row interface{ Scan(...any) error }) (*models.TourRevision, er
 				summary := m.MomentSummary
 				stop.FeaturedMoment = &summary
 			}
+		}
+	}
+	for _, mode := range r.Snapshot.Tour.Modes {
+		if r.Snapshot.Tour.Journeys[mode] == nil {
+			r.Snapshot.Tour.Journeys[mode] = models.DescribeJourney(&r.Snapshot.Tour, nil)
 		}
 	}
 	return r, nil

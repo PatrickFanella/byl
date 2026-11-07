@@ -117,3 +117,32 @@ extension APIModelsTests {
         XCTAssertEqual(try decoder.decode(MomentDetail.self, from: JSONEncoder().encode(moment)), moment)
     }
 }
+
+extension APIModelsTests {
+    func testSharedJourneyFixturesAndLegacyCompatibility() throws {
+        let route = try decoder.decode(TourRoute.self, from: fixture("journey-route-return"))
+        let tour = try decoder.decode(TourDetail.self, from: fixture("journey-tour-partial"))
+        let journey = try XCTUnwrap(route.journey)
+        XCTAssertTrue(journey.usable)
+        XCTAssertEqual(journey.itineraryDurationS, 2904)
+        XCTAssertEqual(journey.roundTripDurationS, 2904)
+        XCTAssertEqual(journey.returnPlan.durationS, 300)
+        XCTAssertEqual(journey.segments.first?.surface, "asphalt")
+        XCTAssertNil(journey.segments.last?.surface)
+        XCTAssertEqual(tour.journeys?["bike"]?.state, "failed")
+        XCTAssertNil(tour.journeys?["bike"]?.travelDurationS)
+        XCTAssertEqual(tour.tour.routes["walk"]?.estimatedMinutes, 29)
+        XCTAssertEqual(try decoder.decode(TourRoute.self, from: JSONEncoder().encode(route)), route)
+        XCTAssertEqual(try decoder.decode(TourDetail.self, from: JSONEncoder().encode(tour)), tour)
+        for name in ["journey-route-pending", "journey-route-failed"] {
+            let unavailable = try decoder.decode(TourRoute.self, from: fixture(name))
+            XCTAssertNil(unavailable.journey?.itineraryDurationS)
+            XCTAssertFalse(unavailable.journey?.usable ?? true)
+        }
+        let unreviewed = try decoder.decode(TourRoute.self, from: fixture("journey-route-unreviewed"))
+        XCTAssertFalse(unreviewed.journey?.usable ?? true)
+        XCTAssertEqual(unreviewed.journey?.state, "unreviewed")
+        XCTAssertNil(try decoder.decode(TourRoute.self, from: fixture("route")).journey)
+        XCTAssertNil(try decoder.decode(TourDetail.self, from: fixture("tour")).journeys)
+    }
+}

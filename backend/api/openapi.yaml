@@ -1194,6 +1194,7 @@ components:
       required: [id, kind, from_node, to_node, branches, modes, geometry]
       description: Explicit endpoint node identities define connections. Endpoints sharing a node must agree within 20 m. Equal/near coordinates or geometry crossings never create a shared node. Road connectors require their own source context.
       properties:
+        surface: { type: string, maxLength: 80, description: Optional sourced surface assertion; omitted means unknown }
         id: { type: string, minLength: 1, maxLength: 100 }
         kind: { type: string, enum: [trail, road_connector] }
         from_node: { type: string, minLength: 1, maxLength: 100 }
@@ -2045,6 +2046,55 @@ components:
             narration: { $ref: "#/components/schemas/MediaAsset", nullable: true, description: "Audio asset; null means use on-device speech" }
             created_at: { type: string, format: date-time }
             updated_at: { type: string, format: date-time }
+    RouteJourney:
+      type: object
+      description: Versioned read projection of selected computed travel and approved public references. A usable path is eligible for curator review, not automatic publication or field certification. Legacy route fields remain travel-only.
+      required: [version, state, computation, quality, usable, issue_codes, travel_distance_m, travel_duration_s, dwell_duration_s, narration_duration_s, itinerary_duration_s, round_trip_duration_s, return_plan, segments, assumptions]
+      properties:
+        version: { type: integer, enum: [1] }
+        state: { type: string, enum: [missing, pending, failed, unreviewed, needs_research, blocked, stale, unavailable, usable] }
+        computation: { type: string, enum: [missing, pending, ready, failed] }
+        quality: { type: string, enum: [unreviewed, pass, needs_research, blocked] }
+        usable: { type: boolean, description: Current passing quality and available selected geometry; not a publication decision }
+        issue_codes: { type: array, items: { type: string }, description: Deduplicated outcome codes; no private findings or source passages }
+        travel_distance_m: { type: number, nullable: true, minimum: 0 }
+        travel_duration_s: { type: integer, nullable: true, minimum: 0 }
+        dwell_duration_s: { type: integer, minimum: 0, description: Assumed 180 seconds per stop }
+        narration_duration_s: { type: integer, minimum: 0, description: Assumed 120 seconds per featured story; not measured audio duration }
+        itinerary_duration_s: { type: integer, nullable: true, description: Selected computed travel plus dwell and narration; null without geometry. Includes an explicitly computed return once. }
+        round_trip_duration_s: { type: integer, nullable: true, description: Same itinerary total only when a closing return is included; otherwise unknown }
+        return_plan:
+          type: object
+          required: [status, distance_m, duration_s]
+          properties:
+            status: { type: string, enum: [included, unplanned] }
+            distance_m: { type: number, nullable: true }
+            duration_s: { type: integer, nullable: true }
+        segments: { type: array, items: { $ref: "#/components/schemas/JourneySegment" } }
+        assumptions: { type: array, items: { type: string } }
+    JourneySegment:
+      type: object
+      description: Ordered approved reference traversal, including repeats and reverse directions. No inferred match to provider edges and no estimated segment distance/time. Surface and access are sourced curator assertions, not current field proof.
+      required: [id, kind, reverse, basis, surface, modes, access, source]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [trail, road_connector] }
+        reverse: { type: boolean }
+        basis: { type: string, enum: [approved_reference] }
+        surface: { type: string, nullable: true, maxLength: 80, description: Unknown when absent from approved reference }
+        modes: { type: array, nullable: true, items: { $ref: "#/components/schemas/TravelMode" } }
+        access: { type: string, enum: [allowed, unknown, restricted, closed] }
+        source:
+          type: object
+          required: [url, title, publisher, version, retrieved_on, license, license_url]
+          properties:
+            url: { type: string, format: uri }
+            title: { type: string }
+            publisher: { type: string }
+            version: { type: string }
+            retrieved_on: { type: string, format: date }
+            license: { type: string }
+            license_url: { type: string, format: uri }
     RouteSummary:
       type: object
       required: [mode, status, distance_m, duration_s]
@@ -2054,7 +2104,7 @@ components:
         status: { type: string, enum: [pending, ready, failed] }
         distance_m: { type: number }
         duration_s: { type: integer }
-        estimated_minutes: { type: integer, nullable: true, description: Present only when status is ready }
+        estimated_minutes: { type: integer, nullable: true, description: Travel-only rounded-up minutes when status is ready; does not imply usable quality or include stop time }
         error: { type: string }
         computed_at: { type: string, format: date-time, nullable: true }
     RouteLeg:
@@ -2074,6 +2124,7 @@ components:
       type: object
       required: [id, tour_id, mode, status, provider, distance_m, duration_s, legs]
       properties:
+        journey: { $ref: "#/components/schemas/RouteJourney", description: Additive projection; absent on older APIs }
         quality: { $ref: "#/components/schemas/PathQualitySummary" }
         id: { type: string, format: uuid }
         tour_id: { type: string, format: uuid }
@@ -2132,6 +2183,11 @@ components:
         - $ref: "#/components/schemas/TourSummary"
         - type: object
           properties:
+            journeys:
+              type: object
+              readOnly: true
+              description: All requested modes, including missing results. Derived from the selected working copy or frozen revision; absent on older APIs. Legacy routes map and summaries keep their meaning.
+              additionalProperties: { $ref: "#/components/schemas/RouteJourney" }
             corridor: { $ref: "#/components/schemas/ApprovedCorridor", readOnly: true, description: "Working approved intent in editing reads; frozen released intent in public/revision reads. Omitted before any approved intent." }
             stops: { type: array, items: { $ref: "#/components/schemas/TourStop" } }
     TourProgress:

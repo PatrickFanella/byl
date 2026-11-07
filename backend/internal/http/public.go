@@ -291,6 +291,7 @@ func (d Deps) getTourRoute(w http.ResponseWriter, r *http.Request) {
 		d.fail(w, err)
 		return
 	}
+	route.Journey = models.DescribeJourney(tour, route)
 	writeJSON(w, http.StatusOK, route)
 }
 
