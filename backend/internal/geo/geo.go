@@ -88,3 +88,31 @@ func RandomSlug(n int) string {
 	}
 	return string(buf)
 }
+
+// NearPolyline bounds a point near existing reference geometry using a local
+// projection. It does not infer access or connections at visual crossings.
+func NearPolyline(point [2]float64, path [][2]float64, radius float64) bool {
+	for i, a := range path {
+		if DistanceMeters(point[1], point[0], a[1], a[0]) <= radius {
+			return true
+		}
+		if i == 0 {
+			continue
+		}
+		b := path[i-1]
+		x := math.Remainder(a[0]-b[0], 360) * math.Cos((a[1]+b[1])*math.Pi/360)
+		y := a[1] - b[1]
+		px := math.Remainder(point[0]-b[0], 360) * math.Cos((a[1]+b[1])*math.Pi/360)
+		py := point[1] - b[1]
+		if x*x+y*y == 0 {
+			continue
+		}
+		t := max(0, min(1, (px*x+py*y)/(x*x+y*y)))
+		lng := math.Remainder(b[0]+t*math.Remainder(a[0]-b[0], 360), 360)
+		lat := b[1] + t*y
+		if DistanceMeters(point[1], point[0], lat, lng) <= radius {
+			return true
+		}
+	}
+	return false
+}

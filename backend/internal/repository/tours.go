@@ -276,7 +276,11 @@ func (s *Store) GetTour(ctx context.Context, ref string, publicOnly bool) (*mode
 	if err != nil {
 		return nil, err
 	}
-	return &models.TourDetail{TourSummary: tours[0], Stops: stops, WorkingCopy: true}, nil
+	corridor, err := s.GetApprovedCorridor(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &models.TourDetail{TourSummary: tours[0], Stops: stops, Corridor: corridor, WorkingCopy: true}, nil
 }
 
 func (s *Store) tourStops(ctx context.Context, tourID string, publicOnly bool) ([]models.TourStop, error) {
@@ -611,7 +615,7 @@ func (s *Store) DeleteTour(ctx context.Context, id string) error {
 			return mapErr(err)
 		}
 		var retained bool
-		if err := tx.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_revisions WHERE tour_id=$1)`, id).Scan(&retained); err != nil {
+		if err := tx.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_revisions WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_corridor_proposals WHERE tour_id=$1)`, id).Scan(&retained); err != nil {
 			return err
 		}
 		if !retained {
@@ -705,7 +709,20 @@ func (s *Store) TourPublishBlockers(ctx context.Context, id string) ([]string, e
 			out = append(out, msg)
 		}
 	}
-	return out, rrows.Err()
+	if err := rrows.Err(); err != nil {
+		return nil, err
+	}
+	rrows.Close()
+	working, err := s.GetTour(ctx, id, false)
+	if err != nil {
+		return nil, err
+	}
+	if working.Corridor != nil && working.Corridor.Intent != nil {
+		if err := working.Corridor.Intent.ValidateStops(working); err != nil {
+			out = append(out, "reviewed corridor intent needs replacement: "+err.Error())
+		}
+	}
+	return out, nil
 }
 
 // GetTourRoute returns the full route for a mode.

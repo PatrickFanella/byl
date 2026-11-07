@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
 	"slices"
 
 	"invisible-museum/backend/internal/geo"
@@ -215,13 +214,13 @@ func validateReportLocation(revision *models.TourRevision, in models.RouteReport
 	}
 	// One point marks the affected area; it cannot encode a background trip trace.
 	// Alternatives stay within 1 km of that area and connect to its anchors.
-	if in.Annotation != nil && !nearReportPath([2]float64{*in.Annotation.Lng, *in.Annotation.Lat}, path, 1000) {
+	if in.Annotation != nil && !geo.NearPolyline([2]float64{*in.Annotation.Lng, *in.Annotation.Lat}, path, 1000) {
 		return bad
 	}
 	if in.Alternative != nil {
 		points := in.Alternative.Coordinates
 		for _, p := range points {
-			if !nearReportPath([2]float64{p[0], p[1]}, path, 1000) {
+			if !geo.NearPolyline([2]float64{p[0], p[1]}, path, 1000) {
 				return bad
 			}
 		}
@@ -237,32 +236,4 @@ func validateReportLocation(revision *models.TourRevision, in models.RouteReport
 		}
 	}
 	return nil
-}
-
-// nearReportPath uses a local projection only to bound unverified annotations.
-// It does not assert traversability or create connections at visual crossings.
-func nearReportPath(point [2]float64, path [][2]float64, radius float64) bool {
-	for i, a := range path {
-		if geo.DistanceMeters(point[1], point[0], a[1], a[0]) <= radius {
-			return true
-		}
-		if i == 0 {
-			continue
-		}
-		b := path[i-1]
-		x := math.Remainder(a[0]-b[0], 360) * math.Cos((a[1]+b[1])*math.Pi/360)
-		y := a[1] - b[1]
-		px := math.Remainder(point[0]-b[0], 360) * math.Cos((a[1]+b[1])*math.Pi/360)
-		py := point[1] - b[1]
-		if x*x+y*y == 0 {
-			continue
-		}
-		t := max(0, min(1, (px*x+py*y)/(x*x+y*y)))
-		lng := math.Remainder(b[0]+t*math.Remainder(a[0]-b[0], 360), 360)
-		lat := b[1] + t*y
-		if geo.DistanceMeters(point[1], point[0], lat, lng) <= radius {
-			return true
-		}
-	}
-	return false
 }

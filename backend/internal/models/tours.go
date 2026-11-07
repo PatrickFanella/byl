@@ -92,7 +92,8 @@ type TourStop struct {
 type TourDetail struct {
 	WorkingCopy bool `json:"-"`
 	TourSummary
-	Stops []TourStop `json:"stops"`
+	Stops    []TourStop        `json:"stops"`
+	Corridor *ApprovedCorridor `json:"corridor,omitempty"`
 }
 
 // TourProgress records a visitor's progress through a tour.
