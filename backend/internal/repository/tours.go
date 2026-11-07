@@ -178,7 +178,7 @@ func (s *Store) queryTours(ctx context.Context, q dbtx, where string, args ...an
 
 func (s *Store) routeSummaries(ctx context.Context, q dbtx, tourIDs []string) (map[string]map[models.TravelMode]models.RouteSummary, error) {
 	out := map[string]map[models.TravelMode]models.RouteSummary{}
-	rows, err := q.Query(ctx, `SELECT tour_id, mode, status, distance_m, duration_s, error, computed_at FROM tour_routes WHERE tour_id = ANY($1)`, tourIDs)
+	rows, err := q.Query(ctx, `SELECT tour_id, mode, status, distance_m, duration_s, error, computed_at,byl_path_quality_summary(tour_id,mode) FROM tour_routes WHERE tour_id = ANY($1)`, tourIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -186,8 +186,14 @@ func (s *Store) routeSummaries(ctx context.Context, q dbtx, tourIDs []string) (m
 	for rows.Next() {
 		var tourID string
 		var r models.TourRoute
-		if err := rows.Scan(&tourID, &r.Mode, &r.Status, &r.DistanceM, &r.DurationS, &r.Error, &r.ComputedAt); err != nil {
+		var quality []byte
+		if err := rows.Scan(&tourID, &r.Mode, &r.Status, &r.DistanceM, &r.DurationS, &r.Error, &r.ComputedAt, &quality); err != nil {
 			return nil, err
+		}
+		if len(quality) > 0 {
+			if err := json.Unmarshal(quality, &r.Quality); err != nil {
+				return nil, err
+			}
 		}
 		if out[tourID] == nil {
 			out[tourID] = map[models.TravelMode]models.RouteSummary{}
@@ -615,7 +621,7 @@ func (s *Store) DeleteTour(ctx context.Context, id string) error {
 			return mapErr(err)
 		}
 		var retained bool
-		if err := tx.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_revisions WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_corridor_proposals WHERE tour_id=$1)`, id).Scan(&retained); err != nil {
+		if err := tx.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_revisions WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_corridor_proposals WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_path_quality_reports WHERE tour_id=$1)`, id).Scan(&retained); err != nil {
 			return err
 		}
 		if !retained {
@@ -686,7 +692,7 @@ func (s *Store) TourPublishBlockers(ctx context.Context, id string) ([]string, e
 	if stopCount == 0 {
 		out = append(out, "tour has no stops")
 	}
-	rrows, err := s.pool.Query(ctx, `SELECT m::text, COALESCE(r.status::text, 'missing'), COALESCE(r.error, ''), COALESCE(i.input_hash=byl_route_input_hash($1,m),false) FROM unnest((SELECT modes FROM tours WHERE id = $1)) AS m
+	rrows, err := s.pool.Query(ctx, `SELECT m::text, COALESCE(r.status::text, 'missing'), COALESCE(r.error, ''), COALESCE(i.input_hash=byl_route_input_hash($1,m),false),byl_path_quality_passes($1,m),byl_path_quality_summary($1,m) FROM unnest((SELECT modes FROM tours WHERE id = $1)) AS m
  LEFT JOIN tour_routes r ON r.tour_id=$1 AND r.mode=m LEFT JOIN tour_route_inputs i ON i.tour_id=$1 AND i.mode=m ORDER BY m`, id)
 	if err != nil {
 		return nil, mapErr(err)
@@ -695,8 +701,30 @@ func (s *Store) TourPublishBlockers(ctx context.Context, id string) ([]string, e
 	for rrows.Next() {
 		var mode, status, errText string
 		var fresh bool
-		if err := rrows.Scan(&mode, &status, &errText, &fresh); err != nil {
+		var qualityPass bool
+		var qualityRaw []byte
+		if err := rrows.Scan(&mode, &status, &errText, &fresh, &qualityPass, &qualityRaw); err != nil {
 			return nil, err
+		}
+		if !qualityPass {
+			state := "missing"
+			if len(qualityRaw) > 0 {
+				var q models.PathQualitySummary
+				if err := json.Unmarshal(qualityRaw, &q); err != nil {
+					return nil, err
+				}
+				state = q.Status
+				if !q.InputCurrent {
+					state = "stale"
+				}
+				for i, issue := range q.Issues {
+					if i >= 3 {
+						break
+					}
+					state += " " + issue.Code
+				}
+			}
+			out = append(out, "route for "+mode+" path quality is "+state)
 		}
 		if status == string(models.RouteStatusReady) && !fresh {
 			out = append(out, "route for "+mode+" inputs changed; recompute before publication")
@@ -729,10 +757,16 @@ func (s *Store) TourPublishBlockers(ctx context.Context, id string) ([]string, e
 func (s *Store) GetTourRoute(ctx context.Context, tourID string, mode models.TravelMode) (*models.TourRoute, error) {
 	var r models.TourRoute
 	var geom, legs []byte
-	err := s.pool.QueryRow(ctx, `SELECT id, tour_id, mode, status, provider, distance_m, duration_s, geometry, legs, error, computed_at FROM tour_routes WHERE tour_id = $1 AND mode = $2`, tourID, mode).
-		Scan(&r.ID, &r.TourID, &r.Mode, &r.Status, &r.Provider, &r.DistanceM, &r.DurationS, &geom, &legs, &r.Error, &r.ComputedAt)
+	var quality []byte
+	err := s.pool.QueryRow(ctx, `SELECT id, tour_id, mode, status, provider, distance_m, duration_s, geometry, legs, error, computed_at,byl_path_quality_summary(tour_id,mode) FROM tour_routes WHERE tour_id = $1 AND mode = $2`, tourID, mode).
+		Scan(&r.ID, &r.TourID, &r.Mode, &r.Status, &r.Provider, &r.DistanceM, &r.DurationS, &geom, &legs, &r.Error, &r.ComputedAt, &quality)
 	if err != nil {
 		return nil, mapErr(err)
+	}
+	if len(quality) > 0 {
+		if err := json.Unmarshal(quality, &r.Quality); err != nil {
+			return nil, err
+		}
 	}
 	if len(geom) > 0 {
 		r.Geometry = &models.LineString{}

@@ -45,7 +45,7 @@ import tv.subcult.museum.ui.components.Overline
 import tv.subcult.museum.ui.components.SignInPrompt
 import tv.subcult.museum.ui.theme.Museum
 
-/** Pick published places, order them, name the route, choose modes and visibility, then share. */
+/** Pick published places, order them, name the route, choose modes and visibility; share after publication. */
 @Composable
 fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Unit) {
     val app by model.state.collectAsStateWithLifecycle()
@@ -77,10 +77,10 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Overline(if (editingId == null) "Route created" else "Route updated", Museum.success)
                         Text(done.title, style = MaterialTheme.typography.headlineMedium, color = Museum.text)
-                        Text(if (done.visibility == "private") "Only you can open it." else "Anyone with the link can open it; it is not listed publicly.", color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
+                        Text(if (done.status != "published") "Saved as a draft that only you can open. The path needs review before publication or sharing." else if (done.visibility == "private") "Only you can open it." else "Anyone with the link can open it; it is not listed publicly.", color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
-                Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
+                if (done.status == "published") Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                     val url = shareUrl(model.container.resolveBaseUrl(), done.slug)
                     val send = Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_SUBJECT, done.title); putExtra(Intent.EXTRA_TEXT, url) }
                     context.startActivity(Intent.createChooser(send, "Share route"))
@@ -99,7 +99,7 @@ fun RouteBuilderScreen(model: AppViewModel, editingId: String?, onDone: () -> Un
                         FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = s.bike, onClick = { b.bike = !s.bike }, label = { Text("Biking") })
                     }
                     if (s.modes.isEmpty()) Text("Pick at least one way to travel.", color = Museum.danger, style = MaterialTheme.typography.bodySmall)
-                    Overline("Who can open it")
+                    Overline("Who can open it after publication")
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = s.visibility == "unlisted", onClick = { b.visibility = "unlisted" }, label = { Text("Anyone with the link") })
                         FilterChip(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), selected = s.visibility == "private", onClick = { b.visibility = "private" }, label = { Text("Only me") })

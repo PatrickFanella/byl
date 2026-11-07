@@ -43,6 +43,7 @@ func TestRegionalCuratedTourAPIAndLegacyReads(t *testing.T) {
 		t.Fatal("cross-city tour bypassed pending route check")
 	}
 	e.drain(t)
+	e.qualifyFixtureRoutes(t, id)
 	if got := e.do(t, http.MethodPost, "/api/v1/admin/tours/"+id+"/publish", curator, nil); got.status != 200 {
 		t.Fatalf("publish: %d %s", got.status, got.raw)
 	}

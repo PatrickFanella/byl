@@ -443,8 +443,9 @@ returns 409 and requires a fresh proposal. Approval changes the working intent
 and routing generation; it does not release a new public tour, including for a
 personal route. Publish explicitly after reviewing the ready working routes.
 Controlled navigation always requires explicit publication, including after a
-later recompute or legacy metadata save. A pending first tour
-view also omits the unreleased corridor.
+later recompute or legacy metadata save. New personal routes remain owner-only
+drafts until their first qualified publication; the owner can inspect working
+intent while research continues.
 Approved removals retain their intent version with null intent. Completed reviews
 and input remain immutable.
 
@@ -520,3 +521,51 @@ creates no attachments or playback jobs. Brief research's automated drafting and
 assembly adapters remain separate integration work; these changes provide the
 inspected per-candidate draft path. A configured provider is still required, and
 this change enables neither a paid provider nor public sign-in.
+
+## Path assessment before publishing a route
+
+A computed line can be retained as a draft while its access and network evidence
+are unresolved. New personal routes start as owner-only drafts; choosing unlisted
+visibility describes access after publication. Existing published revisions remain
+available while a curator develops a replacement.
+
+For each selected corridor segment, record `network.ways` in traversal order,
+including each way's digitized orientation, and the reference's `from_node_id` and
+`to_node_id`. These are reviewed OpenStreetMap identities, not IDs inferred from
+nearby geometry. Record an independent `access` decision for each mode: allowed,
+unknown, restricted or closed. Select road connectors explicitly and retain their
+own source context. A line crossing, bridge or tunnel does not establish a junction.
+
+Submit private `quality_evidence` alongside the corridor proposal through
+`POST /api/v1/admin/tours/{id}/corridors`. Each reference identifies the segment,
+`purpose` (network or access), completed source `evidence_id`, passage `reference`
+and an exact retained quote of at most 300 characters. Access references also need
+`mode`; network references omit it. The existing inspected-evidence workflow must
+retrieve the source first. Catalogue descriptions, a source URL and provider
+assertions do not count as inspected page passages. A quote establishes provenance;
+a curator must still establish that it supports the claimed identity or access.
+References and normalized inspections are captured before review and retained
+with that immutable proposal. Missing evidence remains a research gap.
+
+After approving the arrivals and corridor, recompute each mode. The tour editor
+shows whether path quality is blocked, needs research, out of date or ready for
+curator review. **Inspect retained evidence** opens the private passages and provider
+outcome. The private API is
+`GET /api/v1/admin/tours/{id}/routes/quality?mode=walk` (or bike); `report_id` selects
+a retained checkpoint. Curator authorization is required even for a tour's owner.
+Public summaries contain findings and an opaque report ID, without private quotes
+or source-evidence identifiers.
+
+A passing assessment requires matching ordered network ways and directions,
+connected nodes, permitted mode/access and inspected reference evidence. Strict
+provider attribution must describe the computed path; a map-snap fallback cannot
+substitute another route. Straight-line development geometry cannot pass.
+Known closures block their mode before routing. Missing provider identities,
+ambiguous access and failed attribution remain named gaps. Changing the routing
+inputs or rewriting a route invalidates the assessment for publication.
+
+Passing means eligible for curator review. It does not establish current field
+conditions, grant access permission or publish automatically. Release requires
+current passing assessments for every selected mode plus the existing content
+checks and an explicit publication action. Keep historical stories editable while
+research continues; do not invent access facts to complete an itinerary.

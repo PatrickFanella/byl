@@ -11,7 +11,10 @@ async function devToken(request: APIRequestContext, email: string): Promise<stri
 	return (await res.json()).token as string;
 }
 
-test('a curator builds a tour, waits for routes, and publishes it', async ({ page, request }) => {
+test('a computed development route stays a draft with actionable quality findings', async ({
+	page,
+	request
+}) => {
 	await devToken(request, 'admin@example.com');
 	await page.goto('/signin');
 	await page.getByLabel('Email').fill('admin@example.com');
@@ -43,12 +46,24 @@ test('a curator builds a tour, waits for routes, and publishes it', async ({ pag
 		});
 	}).toPass({ timeout: 45_000, intervals: [2000] });
 
-	await page.getByRole('button', { name: 'Publish' }).click();
-	await expect(page.getByText('Published.')).toBeVisible();
-
+	await expect(page.getByRole('button', { name: 'Publish', exact: true })).toBeDisabled();
+	await expect(
+		page.getByText(
+			'Publication requires a current passing path assessment for every selected mode.'
+		)
+	).toBeVisible();
+	await expect(page.getByText('Publication blocked', { exact: true })).toHaveCount(2);
+	await page.getByRole('button', { name: 'Inspect retained evidence' }).first().click();
+	await expect(
+		page.getByText('No independently inspected source passages were retained.')
+	).toBeVisible();
+	await page.setViewportSize({ width: 390, height: 844 });
+	expect(
+		await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+	).toBeTruthy();
 	const pub = await request.get(
 		`${apiUrl}/api/v1/cities/downers-grove/tours?topic=downtown-after-dark`
 	);
 	const items = (await pub.json()).items as { title: string }[];
-	expect(items.some((t) => t.title === title)).toBeTruthy();
+	expect(items.some((t) => t.title === title)).toBeFalsy();
 });

@@ -188,3 +188,10 @@ export type HistoricalDraft = {
 		outcome: string;
 	}[];
 };
+
+export type PathQualitySummary = Schemas['PathQualitySummary'];
+export type PathQualityReport = Schemas['PathQualityReport'];
+export const getPathQuality = (tour: string, mode: 'walk' | 'bike', report_id?: string) =>
+	api.get<{ report: PathQualityReport | null }>(
+		`/api/v1/admin/tours/${encodeURIComponent(tour)}/routes/quality${qs({ mode, report_id })}`
+	);

@@ -101,6 +101,11 @@ func corridorPlan(plan Plan, tour *models.TourDetail, intent *models.CorridorInt
 	var startNode, endNode string
 	for i, traversal := range selection.Path {
 		segment := segments[traversal.SegmentID]
+		for _, access := range segment.Access {
+			if access.Mode == selection.Mode && (access.Status == "closed" || access.Status == "restricted") {
+				return Plan{}, fmt.Errorf("corridor_access_%s: %s segment %s", access.Status, selection.Mode, segment.ID)
+			}
+		}
 		coordinates := slices.Clone(segment.Geometry.Coordinates)
 		from, to := segment.FromNode, segment.ToNode
 		if traversal.Reverse {

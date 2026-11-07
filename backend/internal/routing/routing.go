@@ -16,9 +16,10 @@ type Point struct {
 
 // Leg is the path between story boundaries, including a closing return.
 type Leg struct {
-	DistanceM float64
-	DurationS int
-	Geometry  [][2]float64 // [lng, lat]
+	DistanceM    float64
+	DurationS    int
+	Geometry     [][2]float64 // [lng, lat]
+	EncodedShape string       // Original provider polyline for strict attribution.
 }
 
 // Route is a full multi-stop route.
@@ -53,6 +54,11 @@ type ControlledRequest struct {
 // Development straight-line routing deliberately has no such capability.
 type ControlledRouter interface {
 	RouteControlled(context.Context, models.TravelMode, ControlledRequest) (Route, error)
+}
+
+// PathInspector attributes the computed path without choosing replacement travel.
+type PathInspector interface {
+	InspectPath(context.Context, models.TravelMode, Route) (*models.PathAttribution, error)
 }
 
 // ErrTooFewPoints is returned for fewer than two points.

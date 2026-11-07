@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -9,6 +10,31 @@ import (
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/repository"
 )
+
+// adminPathQuality exposes retained evidence only within the curator workspace.
+func (d Deps) adminPathQuality(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
+	tour, ok := d.adminTour(w, r)
+	if !ok {
+		return
+	}
+	mode := models.TravelMode(r.URL.Query().Get("mode"))
+	if !mode.Valid() {
+		writeValidation(w, map[string]string{"mode": "must be walk or bike"})
+		return
+	}
+	id := r.URL.Query().Get("report_id")
+	report, err := d.Store.GetPathQualityReport(r.Context(), tour.ID, mode, id)
+	if errors.Is(err, repository.ErrNotFound) && id == "" {
+		writeJSON(w, http.StatusOK, map[string]any{"mode": mode, "report": nil})
+		return
+	}
+	if err != nil {
+		d.fail(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"mode": mode, "report": report})
+}
 
 func (d Deps) adminListTours(w http.ResponseWriter, r *http.Request) {
 	f := repository.TourFilter{IncludeUnpublished: true, Limit: queryInt(r, "limit", 50), Cursor: r.URL.Query().Get("cursor")}

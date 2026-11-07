@@ -191,6 +191,7 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/tours/{id}/publish", d.adminPublishTour)
 			r.Post("/tours/{id}/unpublish", d.adminUnpublishTour)
 			r.Post("/tours/{id}/routes/recompute", d.adminRecomputeRoutes)
+			r.Get("/tours/{id}/routes/quality", d.adminPathQuality)
 			r.Get("/candidates", d.adminListCandidates)
 			r.Post("/candidates", d.adminCreateCandidate)
 			r.Get("/candidates/{id}", d.adminGetCandidate)

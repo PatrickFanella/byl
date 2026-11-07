@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
+	import PathQualityPanel from '#lib/components/PathQualityPanel.svelte';
 	import StatusPill from '#lib/components/StatusPill.svelte';
 	import Notice from '#lib/components/Notice.svelte';
 	import Dialog from '#lib/components/Dialog.svelte';
@@ -45,6 +46,17 @@
 	let suggestFor = $state(-1);
 	let suggestions: { moment: MomentSummary; reason: string }[] = $state([]);
 
+	const qualityReady = $derived(
+		tour.modes.length > 0 &&
+			tour.modes.every((mode) => {
+				const route = tour.routes?.[mode];
+				return (
+					route?.status === 'ready' &&
+					route.quality?.status === 'pass' &&
+					route.quality.input_current
+				);
+			})
+	);
 	const locked = $derived(tour.status === 'published' && !tour.owner_account_id);
 	const markers = $derived(
 		tour.stops.map((s) => ({
@@ -312,12 +324,20 @@
 					</li>
 				{/each}
 			</ul>
+			{#each tour.modes as mode (mode)}<PathQualityPanel
+					tourId={tour.id}
+					{mode}
+					summary={tour.routes?.[mode]?.quality}
+				/>{/each}
 			<button
 				class="mt-2 text-xs underline disabled:opacity-50"
 				disabled={locked || !!busy}
 				onclick={recompute}>Recompute routes</button
 			>
 		</div>
+		{#if !qualityReady}<p class="text-byl-warning">
+				Publication requires a current passing path assessment for every selected mode.
+			</p>{/if}
 		<div class="flex flex-wrap gap-2">
 			{#if tour.status === 'published'}
 				<button
@@ -328,7 +348,7 @@
 			{:else}
 				<button
 					class="rounded-md bg-byl-success-surface px-3 py-1.5 text-byl-action-text disabled:opacity-50"
-					disabled={!!busy}
+					disabled={!!busy || !qualityReady}
 					onclick={publish}>Publish</button
 				>
 			{/if}

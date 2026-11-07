@@ -93,29 +93,35 @@ private struct TourDetailContent: View {
 
     private func actions(_ tour: TourDetail) -> some View {
         VStack(spacing: 10) {
-            ForEach(tour.tour.modes, id: \.self) { mode in
-                Button {
-                    model.startTour(tour, mode: mode)
-                } label: {
-                    Label(mode == "bike" ? "Start riding" : "Start walking", systemImage: mode == "bike" ? "bicycle" : "figure.walk")
-                }
-                .buttonStyle(.museum(mode == tour.tour.modes.first ? .primary : .secondary, size: .large))
-                .disabled(tour.stops.isEmpty)
-            }
-            Button {
-                if model.isSignedIn {
-                    Task {
-                        await detail.toggleSave()
-                        if detail.saveError == nil, let id = detail.tour?.tour.id { model.setSaved(id, detail.isSaved) }
+            if tour.tour.status != "published" {
+                Text("Draft · Only you can open this route. Its path needs review before publication or sharing.")
+                    .font(Museum.bodyFont(14))
+                    .foregroundStyle(Museum.muted)
+            } else {
+                ForEach(tour.tour.modes, id: \.self) { mode in
+                    Button {
+                        model.startTour(tour, mode: mode)
+                    } label: {
+                        Label(mode == "bike" ? "Start riding" : "Start walking", systemImage: mode == "bike" ? "bicycle" : "figure.walk")
                     }
-                } else {
-                    model.presentSignIn = true
+                    .buttonStyle(.museum(mode == tour.tour.modes.first ? .primary : .secondary, size: .large))
+                    .disabled(tour.stops.isEmpty)
                 }
-            } label: {
-                Label(detail.isSaved ? "Saved" : "Save for later", systemImage: detail.isSaved ? "heart.fill" : "heart")
+                Button {
+                    if model.isSignedIn {
+                        Task {
+                            await detail.toggleSave()
+                            if detail.saveError == nil, let id = detail.tour?.tour.id { model.setSaved(id, detail.isSaved) }
+                        }
+                    } else {
+                        model.presentSignIn = true
+                    }
+                } label: {
+                    Label(detail.isSaved ? "Saved" : "Save for later", systemImage: detail.isSaved ? "heart.fill" : "heart")
+                }
+                .buttonStyle(.museum(.ghost))
+                .disabled(detail.saveBusy)
             }
-            .buttonStyle(.museum(.ghost))
-            .disabled(detail.saveBusy)
             if let error = detail.saveError {
                 MuseumInlineHint(text: error, tint: Museum.danger, isError: true)
             }

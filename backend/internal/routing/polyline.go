@@ -1,5 +1,35 @@
 package routing
 
+import (
+	"math"
+	"strings"
+)
+
+// EncodePolyline6 retains the route's ordered WGS84 coordinates at provider
+// precision. Attribution never simplifies or chooses different travel geometry.
+func EncodePolyline6(points [][2]float64) string {
+	var out strings.Builder
+	var lat, lng int64
+	write := func(value int64) {
+		value <<= 1
+		if value < 0 {
+			value = ^value
+		}
+		for value >= 0x20 {
+			out.WriteByte(byte((0x20 | (value & 0x1f)) + 63))
+			value >>= 5
+		}
+		out.WriteByte(byte(value + 63))
+	}
+	for _, point := range points {
+		a, b := int64(math.Round(point[1]*1e6)), int64(math.Round(point[0]*1e6))
+		write(a - lat)
+		write(b - lng)
+		lat, lng = a, b
+	}
+	return out.String()
+}
+
 // DecodePolyline6 decodes a Google-style encoded polyline at 1e-6 precision into [lng, lat] pairs.
 func DecodePolyline6(s string) [][2]float64 {
 	var out [][2]float64

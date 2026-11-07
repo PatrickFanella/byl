@@ -107,7 +107,7 @@ func TestRouteJobFailsAfterMaxAttempts(t *testing.T) {
 		t.Fatalf("failed jobs: %+v", failed)
 	}
 	blockers, _ := store.TourPublishBlockers(ctx, testdb.SeedTourID)
-	if len(blockers) != 2 {
+	if len(blockers) != 4 {
 		t.Fatalf("tour must stay unpublishable: %v", blockers)
 	}
 }

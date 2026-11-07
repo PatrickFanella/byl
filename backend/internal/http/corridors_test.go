@@ -82,6 +82,7 @@ func TestCorridorHTTPReviewAndExplicitPublication(t *testing.T) {
 	if r := e.get(t, public, ""); r.body["revision_id"] != tour["revision_id"] || r.body["corridor"] != nil {
 		t.Fatalf("review auto-published %s", r.raw)
 	}
+	e.qualifyFixtureRoutes(t, testdb.SeedTourID)
 	working := e.get(t, admin, curator).body
 	if r := e.do(t, http.MethodPost, admin+"/publish", curator, map[string]any{"draft_version": working["draft_version"], "current_revision_id": tour["revision_id"]}); r.status != 200 {
 		t.Fatalf("publish %d %s", r.status, r.raw)
@@ -139,6 +140,7 @@ func TestCorridorReviewDoesNotTriggerPersonalLegacyRelease(t *testing.T) {
 	}
 	id := r.body["id"].(string)
 	e.drain(t)
+	e.publishFixture(t, id)
 	tour := e.get(t, "/api/v1/me/tours/"+id, owner).body
 	e.approveCorridorFixtureArrivals(t, curator, tour)
 	admin := "/api/v1/admin/tours/" + id
@@ -164,6 +166,7 @@ func TestCorridorReviewDoesNotTriggerPersonalLegacyRelease(t *testing.T) {
 	if r := e.get(t, "/api/v1/tours/"+id, owner); r.body["revision_id"] != tour["revision_id"] || r.body["corridor"] != nil {
 		t.Fatalf("recompute/legacy save released a pending corridor %s", r.raw)
 	}
+	e.qualifyFixtureRoutes(t, id)
 	if r := e.do(t, http.MethodPost, "/api/v1/me/tours/"+id+"/publish", owner, nil); r.status != 200 || r.body["corridor"] == nil {
 		t.Fatalf("explicit owner release %d %s", r.status, r.raw)
 	}
@@ -190,9 +193,10 @@ func TestCorridorPendingInitialViewRequiresExplicitRelease(t *testing.T) {
 		t.Fatal(r.raw)
 	}
 	e.drain(t)
-	if r := e.get(t, "/api/v1/tours/"+id, ""); r.status != 200 || r.body["revision_id"] != nil || r.body["corridor"] != nil {
+	if r := e.get(t, "/api/v1/tours/"+id, ""); r.status != 404 {
 		t.Fatalf("pending initial view exposed unpublished intent %d %s", r.status, r.raw)
 	}
+	e.qualifyFixtureRoutes(t, id)
 	if r := e.do(t, http.MethodPost, "/api/v1/me/tours/"+id+"/publish", owner, nil); r.status != 200 || r.body["revision_id"] == nil || r.body["corridor"] == nil {
 		t.Fatalf("explicit first release %d %s", r.status, r.raw)
 	}

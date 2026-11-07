@@ -67,7 +67,7 @@ func (d Deps) createMyTour(w http.ResponseWriter, r *http.Request) {
 	}
 	tour, err := d.Store.CreateTour(r.Context(), repository.CreateTourInput{
 		CityID: cityID, RandomSlug: true, Title: req.Title, Summary: req.Summary, Modes: req.Modes,
-		Status: models.EntityStatusPublished, Visibility: visibility, OwnerAccountID: &a.ID, Stops: req.Stops,
+		Status: models.EntityStatusDraft, Visibility: visibility, OwnerAccountID: &a.ID, Stops: req.Stops,
 	})
 	if err != nil {
 		d.fail(w, err)

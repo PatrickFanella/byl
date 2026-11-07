@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page, type APIRequestContext } from '@playwright/test';
 
 const apiUrl = process.env.E2E_API_URL;
 test.skip(!apiUrl, 'E2E_API_URL not set');
@@ -23,11 +23,9 @@ test('a visitor browses from home to a tour, a place, and a moment', async ({ pa
 	await expect(page).toHaveURL(/\/tours\/downtown-memory-loop$/);
 	await expect(page.getByRole('heading', { name: 'Downtown Memory Loop' })).toBeVisible();
 	await expect(page.getByTestId('stop-row')).toHaveCount(4);
-	// Routes are computed by the worker shortly after the seed; wait for the estimate.
-	await expect(async () => {
-		await page.reload();
-		await expect(page.getByText(/min walk/).first()).toBeVisible({ timeout: 2000 });
-	}).toPass({ timeout: 60_000 });
+	// The seeded pre-quality revision is immutable. Development recomputation
+	// cannot replace it or fabricate a public travel estimate.
+	await expect(page.getByText('Route being computed')).toHaveCount(2);
 
 	await page.getByTestId('stop-row').nth(1).click();
 	await expect(page).toHaveURL(/\/places\/.+\?featured=/);
@@ -98,12 +96,7 @@ test('the tours page removes tours that do not match the selected travel mode an
 	expect(created.ok()).toBeTruthy();
 	const fixture = (await created.json()) as { id: string };
 	try {
-		await expect(async () => {
-			const published = await request.post(`${apiUrl}/api/v1/admin/tours/${fixture.id}/publish`, {
-				headers
-			});
-			expect(published.ok()).toBeTruthy();
-		}).toPass({ timeout: 30_000, intervals: [1000] });
+		await addCatalogueFixture(page, request, fixture.id);
 		await page.goto('/tours');
 		await expect(page.getByRole('link', { name: new RegExp(title) })).toBeVisible();
 		await page.getByRole('button', { name: /biking/i }).click();
@@ -176,12 +169,7 @@ test('shared topics with the same slug filter tours by their distinct IDs', asyn
 	expect(created.ok()).toBeTruthy();
 	const fixture = await created.json();
 	try {
-		await expect(async () => {
-			const published = await request.post(`${apiUrl}/api/v1/admin/tours/${fixture.id}/publish`, {
-				headers
-			});
-			expect(published.ok()).toBeTruthy();
-		}).toPass({ timeout: 30_000, intervals: [1000] });
+		await addCatalogueFixture(page, request, fixture.id);
 		await page.goto('/tours');
 		const selected = page.waitForRequest((r) => {
 			const url = new URL(r.url());
@@ -198,3 +186,28 @@ test('shared topics with the same slug filter tours by their distinct IDs', asyn
 		await request.delete(`${apiUrl}/api/v1/admin/tours/${fixture.id}`, { headers });
 	}
 });
+
+// Browser filter behavior uses one explicit synthetic published entry. A
+// development router cannot create publication-quality geometry. Actual API
+// visibility/filter rules and publication are covered by backend integration.
+async function addCatalogueFixture(page: Page, request: APIRequestContext, id: string) {
+	const login = await request.post(`${apiUrl}/api/v1/auth/dev`, {
+		data: { email: 'admin@example.com' }
+	});
+	const token = (await login.json()).token;
+	const response = await request.get(`${apiUrl}/api/v1/admin/tours/${id}`, {
+		headers: { Authorization: `Bearer ${token}` }
+	});
+	const fixture = { ...(await response.json()), status: 'published', visibility: 'public' };
+	await page.route('**/api/v1/cities/*/tours**', async (route) => {
+		const response = await route.fetch();
+		const body = await response.json();
+		const query = new URL(route.request().url()).searchParams;
+		if (
+			(!query.get('mode') || fixture.modes.includes(query.get('mode'))) &&
+			(!query.get('topic') || fixture.topic_id === query.get('topic'))
+		)
+			body.items.push(fixture);
+		await route.fulfill({ response, json: body });
+	});
+}

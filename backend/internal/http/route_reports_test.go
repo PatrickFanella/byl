@@ -50,6 +50,7 @@ func reportBody(t *testing.T, tour map[string]any) map[string]any {
 func TestRouteReportHTTPPrivacyRetriesAndDisposition(t *testing.T) {
 	e := newTestEnv(t)
 	e.drain(t)
+	e.publishFixture(t, testdb.SeedTourID)
 	owner := e.signIn(t, "reporter@example.com", "")
 	other := e.signIn(t, "other@example.com", "")
 	curator := e.signIn(t, "curator@example.com", models.AccountRoleCurator)
@@ -167,6 +168,7 @@ func TestRouteReportsRejectPrivateHistoricalRevisions(t *testing.T) {
 	}
 	id := r.body["id"].(string)
 	e.drain(t)
+	e.publishFixture(t, id)
 	tour := e.get(t, "/api/v1/me/tours/"+id, owner).body
 	input := reportBody(t, tour)
 	if r := e.do(t, http.MethodPost, "/api/v1/me/route-reports", other, input); r.status != 404 {

@@ -2,6 +2,8 @@ package jobs
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"strings"
 	"testing"
 
@@ -102,7 +104,7 @@ func TestControlledRouteWorkerRejectsDevelopmentProvider(t *testing.T) {
 	}
 }
 
-func TestControlledSuccessRequiresExplicitPublicationAndPinsCoordinates(t *testing.T) {
+func TestControlledGeometryCannotPublishWithoutInspectedPathEvidence(t *testing.T) {
 	w, s, ctx := newWorker(t, &controlledJobRouter{Router: routing.NewStraightLine()}, narration.None{})
 	drain(t, w, ctx)
 	before, err := s.GetTour(ctx, testdb.SeedTourID, false)
@@ -124,16 +126,22 @@ func TestControlledSuccessRequiresExplicitPublicationAndPinsCoordinates(t *testi
 	if err != nil || *after.RevisionID != *before.RevisionID {
 		t.Fatalf("worker auto-published %+v %v", after, err)
 	}
-	released, err := s.PublishTourRevision(ctx, after.ID, "", models.PublishRevisionRequest{DraftVersion: after.DraftVersion, CurrentRevisionID: before.RevisionID})
-	if err != nil {
+	if _, err := s.PublishTourRevision(ctx, after.ID, "", models.PublishRevisionRequest{DraftVersion: after.DraftVersion, CurrentRevisionID: before.RevisionID}); !errors.Is(err, repository.ErrConflict) {
+		t.Fatalf("unqualified controlled geometry published: %v", err)
+	}
+	var raw []byte
+	if err := pool.QueryRow(ctx, `SELECT byl_tour_snapshot($1)`, after.ID).Scan(&raw); err != nil {
 		t.Fatal(err)
 	}
-	intent := string(released.Snapshot.RoutingIntent)
-	if !strings.Contains(intent, `"coordinate_source": "approved_navigation"`) || !strings.Contains(intent, `"site_latitude"`) {
-		t.Fatalf("incorrect frozen routing inputs %s", intent)
+	var snapshot models.TourSnapshot
+	if err := json.Unmarshal(raw, &snapshot); err != nil {
+		t.Fatal(err)
 	}
-	first := released.Snapshot.Tour.Stops[0]
-	point := released.Snapshot.Routes[models.TravelModeWalk].Legs[0].Geometry[0]
+	if !strings.Contains(string(snapshot.RoutingIntent), `"coordinate_source": "approved_navigation"`) {
+		t.Fatal("working inputs lost approved arrival")
+	}
+	first := snapshot.Tour.Stops[0]
+	point := snapshot.Routes[models.TravelModeWalk].Legs[0].Geometry[0]
 	if point[1] != *first.Place.ArrivalPoint.Point.Latitude || point[1] == first.Place.Latitude {
 		t.Fatal("route used historical site rather than reviewed entrance")
 	}

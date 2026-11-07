@@ -93,7 +93,8 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
                 }
             }
 
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (tour.status != "published") Text("Draft · Only you can open this route. Its path needs review before publication or sharing.", color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
+            else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 tour.modes.forEachIndexed { i, mode ->
                     val label = if (mode == "bike") "Start riding" else "Start walking"
                     if (i == 0) Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.startTour(tour, mode) }, enabled = tour.stops.isNotEmpty(), modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text(label) }

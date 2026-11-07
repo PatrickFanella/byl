@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 15, then saves a PostgreSQL
+changed migration files or a schema version other than 16, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -666,3 +666,41 @@ or read-only recovery. Do not restore an older dump over curator work. No real
 paid-model output or authenticated production drafting is certified by stubbed
 provider, database and browser tests. Automated brief-stage drafting/assembly
 integration, native clients and field-routing qualification remain separate.
+
+## Path quality checkpoints, schema 16
+
+Migration 16 adds immutable private corridor-inspection input and per-mode quality
+report history, plus a current-report pointer. Reports bind the exact routing
+input version/hash and computed route fingerprint. Rewriting a route invalidates
+its pointer, including writes from older applications. Publication requires current
+passing quality for every selected mode; a database insert trigger also protects
+against revision publication by a previous API. Previously published snapshots,
+active trips and existing collection rows are not rewritten.
+
+The worker requests bounded Valhalla `trace_attributes` with `shape_match=edge_walk`
+on original story-leg shapes. It does not fall back to snapping, substitute a path
+or turn provider assertions into inspected access evidence. Unavailable attributes
+leave a research result, while known closures prevent routing that mode. See
+[the two-pilot comparison](../routing/path-quality-comparison-2026-11-07.md) for the
+observed development-provider limitation. No production routing provider is
+activated by this change. New personal routes remain owner-only drafts until they
+meet publication requirements. Existing published tours remain readable.
+
+Before admission, independently restore a fresh actual schema-15 production backup
+into isolated PostgreSQL, apply the exact accepted migration and compare existing
+tables, snapshots and complete public responses. Rehearse the previous API's reads
+against the expanded schema. Confirm both older plain route writes and stale
+reports cannot authorize new publication, without changing retained production
+rows. Check that the candidate image contains the exact admitted SQL. Under the
+deployment lock, recheck the accepted head and live baseline before applying SQL;
+admit the exact sixteen-file manifest and source hook expecting schema 16. CI
+applies no production SQL and refuses an unadmitted manifest before activation.
+Independently restore the actual release backup and verify the live revision and
+public responses after release.
+
+Automatic down refuses to delete the new evidence/history or remove the gate.
+Retain schema 16, accepted source, image digests, backups and deployment receipts.
+Earlier APIs can read retained snapshots but their route writers invalidate quality
+and their revision inserts lack the new gate's requirements. Prefer a forward fix;
+if an older image is needed for diagnosis, keep it read-only. Do not restore an
+older dump over later curator work or resume older workers as a recovery shortcut.
