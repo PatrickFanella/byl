@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 9, then saves a PostgreSQL
+changed migration files or a schema version other than 10, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -338,3 +338,32 @@ does not become inspected full-text evidence. Page excerpts stay untrusted and
 media reuse stays unresolved. Source URLs and provider errors do not enter routine
 job logs or owner progress responses. No new schema migration is needed beyond
 the separately admitted migration 8. Image rollback retains private checkpoints.
+
+## Private identity reconciliation, migration 10
+
+Migration 10 adds `reconciliation_records`, `reconciliation_sources` (with its
+ordering sequence) and append-only `reconciliation_decisions`. Existing collection,
+account, research and candidate rows are unchanged. Original inferences and each
+distinct source/query are retained; curator decisions use optimistic versions.
+Stable candidate keys and a transaction advisory lock prevent competing briefs
+from minting duplicate candidates. Candidate payloads and published content are
+never replaced by this stage. The lock follows the brief/run/job claim fences;
+cancelled or superseded workers cannot commit reconciliation records.
+
+Before activating the accepted image, restore a fresh production snapshot, apply
+the exact reviewed SQL, compare all existing table fingerprints, and run the
+previous API against that copy. Back up live database/media under the receiver
+lock, admit migration 10 as operator, then install the exact ten-file migration
+manifest and source hook expecting schema 10. CI applies no SQL and refuses an
+unadmitted manifest. Retain prior images, hook, manifest, backups and receipts.
+Image rollback keeps schema 10 and later provenance; automatic down refuses to
+remove it. Do not restore an old dump over later curator decisions.
+
+Production enables local reconciliation after source discovery. Matching examines
+at most 201 places, 101 moments per place, 21 source references per moment and
+1001 latest curator claims; exceeding the corresponding 200/100/20/1000 bounds
+requires review. Leads are at most 32768 encoded bytes, with at most 20 per stage;
+the private checkpoint retains its 256 KiB cap. This stage makes no external
+requests and uses no model provider. The coordinator's conservative stage budget
+reservation remains charged. Historical drafting and itinerary assembly still
+pause with `processor_unavailable` until their adapters are implemented.

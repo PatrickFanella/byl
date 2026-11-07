@@ -78,6 +78,7 @@ func main() {
 	worker := jobs.New(store, prov.Router, prov.Narrator, prov.Blob, cfg.JobWorkers, log)
 	worker.Sources = prov.Sources
 	worker.Discovery = sources.NewDiscovery(prov.Sources, sources.DiscoveryPolicy{Providers: cfg.DiscoveryProviders, Seeds: cfg.DiscoverySeedURLs})
+	worker.Reconcile = true
 	worker.Drafter = prov.Drafter
 	workerDone := make(chan struct{})
 	go func() {

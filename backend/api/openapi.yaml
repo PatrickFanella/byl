@@ -752,6 +752,62 @@ paths:
         "401": { description: Authentication required }
         "403": { description: Curator role required }
         "404": { description: Evidence not found under this brief }
+  /api/v1/admin/route-briefs/{id}/reconciliation:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      summary: List private identity matches, review issues and retained provenance (curators only)
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, default: 20, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Private reconciliation records, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/ReconciliationRecord" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Brief not found }
+    post:
+      summary: Reconcile a sourced identity lead without changing published content
+      description: Requires the saved brief version. Stable identity keys share pending candidates across overlapping briefs; each distinct source and query is retained. Missing or conflicting facts remain review issues. Source URLs are references only; this endpoint does not fetch them.
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ReconciliationRequest" } } } }
+      responses:
+        "200": { description: Existing or new private identity record, content: { application/json: { schema: { $ref: "#/components/schemas/ReconciliationRecord" } } } }
+        "400": { description: Invalid JSON }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Brief not found }
+        "409": { description: Brief changed; reload before reconciling }
+        "422": { description: Invalid or oversized identity lead }
+  /api/v1/admin/route-briefs/{id}/reconciliation/{record}/sources:
+    get:
+      summary: Page retained source history for a private identity (curators only)
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: record, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, default: 20, maximum: 50 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Private retained provenance, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/ReconciliationSource" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Record is not linked to this brief }
+  /api/v1/admin/route-briefs/{id}/reconciliation/{record}/decision:
+    put:
+      summary: Append a versioned curator identity decision without merging collection rows
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: record, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/IdentityDecisionRequest" } } } }
+      responses:
+        "200": { description: Private decision recorded, content: { application/json: { schema: { $ref: "#/components/schemas/ReconciliationRecord" } } } }
+        "400": { description: Invalid JSON }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Record is not linked to this brief }
+        "409": { description: Decision changed; reload before review }
+        "422": { description: Invalid identity choice or references }
 components:
   securitySchemes:
     bearer:
@@ -759,6 +815,97 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    IdentityFacts:
+      type: object
+      additionalProperties: false
+      properties:
+        city_id: { type: string }
+        place_name: { type: string }
+        aliases: { type: array, maxItems: 20, items: { type: string } }
+        address: { type: string }
+        historical_addresses: { type: array, maxItems: 20, items: { type: string } }
+        moved: { type: boolean }
+        moment_title: { type: string }
+        date_start: { type: string, description: YYYY-MM-DD when known }
+        date_precision: { type: string, enum: [day, month, year, circa] }
+    DiscoveryOrigin:
+      type: object
+      additionalProperties: false
+      properties:
+        provider: { type: string }
+        query: { type: string }
+        url: { type: string }
+        reasons: { type: array, items: { type: string } }
+    DiscoveryItem:
+      type: object
+      additionalProperties: false
+      required: [kind, title]
+      properties:
+        kind: { type: string, enum: [place, moment] }
+        entity_id: { type: string, description: Existing collection identifier, checked locally }
+        title: { type: string, maxLength: 500 }
+        text: { type: string, description: Untrusted private source excerpt; never copied into visitor narration }
+        url: { type: string, maxLength: 2000 }
+        lat: { type: number, minimum: -90, maximum: 90 }
+        lng: { type: number, minimum: -180, maximum: 180 }
+        area: { type: string }
+        evidence: { type: string, description: Untrusted source classification }
+        origins: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/DiscoveryOrigin" } }
+        identity: { $ref: "#/components/schemas/IdentityFacts" }
+    ReconciliationRequest:
+      type: object
+      additionalProperties: false
+      required: [version, item]
+      properties:
+        version: { type: integer, minimum: 1 }
+        item: { $ref: "#/components/schemas/DiscoveryItem", description: At most 32768 encoded bytes }
+    ReconciliationProposal:
+      type: object
+      properties:
+        item: { $ref: "#/components/schemas/DiscoveryItem" }
+        key: { type: string }
+        place_key: { type: string }
+        city_id: { type: string }
+        place_id: { type: string }
+        moment_id: { type: string }
+        outcome: { type: string, enum: [existing_place, existing_place_existing_moment, existing_place_new_moment, new_place, needs_review, rejected] }
+        issues: { type: array, items: { type: string } }
+    IdentityDecisionRequest:
+      type: object
+      additionalProperties: false
+      required: [version, outcome, note]
+      properties:
+        version: { type: integer, minimum: 0, description: Last review_version; zero for first decision }
+        outcome: { type: string, enum: [existing_place, existing_place_existing_moment, existing_place_new_moment, needs_review, rejected] }
+        place_id: { type: string }
+        moment_id: { type: string }
+        aliases: { type: array, maxItems: 20, items: { type: string } }
+        historical_addresses: { type: array, maxItems: 20, items: { type: string } }
+        note: { type: string, minLength: 1, maxLength: 4000 }
+    IdentityDecision:
+      allOf:
+        - $ref: "#/components/schemas/IdentityDecisionRequest"
+        - type: object
+          properties:
+            reviewer_id: { type: string, format: uuid }
+    ReconciliationSource:
+      type: object
+      properties:
+        brief_id: { type: string, format: uuid }
+        run_id: { type: string, nullable: true }
+        proposal: { $ref: "#/components/schemas/ReconciliationProposal" }
+    ReconciliationRecord:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        identity_key: { type: string }
+        proposal: { $ref: "#/components/schemas/ReconciliationProposal", description: Original inference retained unchanged; current curator decision is separate }
+        assessment: { $ref: "#/components/schemas/ReconciliationProposal", description: Latest retained inference; an explicit curator decision takes precedence }
+        place_candidate_id: { type: string, nullable: true }
+        moment_candidate_id: { type: string, nullable: true }
+        review_version: { type: integer }
+        decision: { $ref: "#/components/schemas/IdentityDecision", nullable: true }
+        created_at: { type: string, format: date-time }
     EvidenceRequest:
       type: object
       additionalProperties: false

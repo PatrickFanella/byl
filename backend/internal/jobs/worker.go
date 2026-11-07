@@ -31,6 +31,8 @@ type Worker struct {
 	Research  ResearchProcessor
 	Evidence  sources.EvidenceRetriever
 	Discovery *sources.Discovery
+	// Reconcile enables the local identity stage without requiring a model provider.
+	Reconcile bool
 
 	store    *repository.Store
 	router   routing.Router
