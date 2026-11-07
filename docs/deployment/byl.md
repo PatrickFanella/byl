@@ -563,3 +563,44 @@ Do not restore an older dump over later curator decisions. Never-published tours
 with retained proposals are hidden on deletion rather than physically erased.
 No region-scale import, street router, public sign-in or field validation is
 activated by this migration.
+
+
+## Inspected historical draft proposals, schema 14 unchanged
+
+Historical drafting reuses immutable `source_evidence` records and private
+candidate JSON. No migration or production model provider is added. Exact
+migration checksums and the hook's schema-14 gate remain unchanged. Configure a
+provider only through the existing private runtime settings when authorized;
+provider-free deployments continue to return 503 for drafting.
+
+The curator draft endpoint requires 1–5 inspected evidence IDs and queues only
+those IDs, the candidate ID and its payload SHA-256. It accepts inspected pages
+and catalogue descriptions with retained passages, a retrieval instant and a
+content hash. Failed/uninspected sources are rejected. Provider input includes at
+most 12000 passage runes in total, shared across records; no raw candidate text,
+submitted anecdote or curator narrative is offered as evidence. There is no
+external retrieval from the drafting job.
+
+Both providers use the closed claim/citation schema and retry malformed model
+output once. The worker independently validates custom provider results. Invalid
+citations, unknown actions/fields, missing fields and uncited prose fail without
+changing the candidate. Dates and testimony retain explicit uncertainty and
+attribution. These are structural provenance checks, not historical truth or
+semantic entailment certification. Curator inspection remains necessary.
+
+The worker appends up to five private proposals, each bounded to 32 KiB before
+provenance metadata, within a total 256 KiB candidate payload. It compares pending
+status and the complete prior JSON payload atomically. New curator edits or review
+win over stale completion. Proposals retain source IDs/URLs, retrieval timestamps,
+content hashes and exact quote references; source text stays in its evidence
+record. Editable prose and existing sources are unchanged by generation. Applying
+a proposal in the editor is explicit; approval/publication remain separate.
+
+Legacy jobs without inspected IDs and a captured payload hash fail without
+mutating candidates. Before a prior-image recovery after draft-aware writes,
+stop or drain draft processing: old workers do not enforce these evidence/edit
+guards. Keep schema 14 and later candidate/evidence history; prefer a forward fix
+or read-only recovery. Do not restore an older dump over curator work. No real
+paid-model output or authenticated production drafting is certified by stubbed
+provider, database and browser tests. Automated brief-stage drafting/assembly
+integration, native clients and field-routing qualification remain separate.

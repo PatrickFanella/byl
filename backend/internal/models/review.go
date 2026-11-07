@@ -68,9 +68,16 @@ type ImportSourcePayload struct {
 	Limit   int      `json:"limit,omitempty"`
 }
 
-// DraftCandidatePayload asks the LLM to draft a moment from a candidate's source text.
+// DraftCandidatePayload binds inspected evidence to a captured pending candidate.
 type DraftCandidatePayload struct {
-	CandidateID string `json:"candidate_id"`
+	CandidateID   string   `json:"candidate_id"`
+	EvidenceIDs   []string `json:"evidence_ids"`
+	PayloadSHA256 string   `json:"payload_sha256"`
+}
+
+// DraftCandidateRequest selects immutable inspected snapshots, not submitted prose.
+type DraftCandidateRequest struct {
+	EvidenceIDs []string `json:"evidence_ids"`
 }
 
 // FetchMediaPayload downloads an approved media candidate's file into blob storage.

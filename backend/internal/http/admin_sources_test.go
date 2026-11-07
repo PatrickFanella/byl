@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 
 	"invisible-museum/backend/internal/llm"
@@ -121,16 +122,46 @@ func TestAdminDraftCandidate(t *testing.T) {
 	env := newTestEnvWith(t, withDrafter(&httpFakeDrafter{}))
 	curator := env.signIn(t, "c@example.com", models.AccountRoleCurator)
 	id := createMomentCandidate(t, env, curator)
-	r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/draft", curator, nil)
+	ownerID := env.get(t, "/api/v1/me", curator).body["id"].(string)
+	b, _, err := env.store.CreateRouteBrief(context.Background(), ownerID, models.RouteBriefInput{Topic: "Rail", Area: "Downers Grove"}, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	evidence, err := env.store.QueueSourceEvidence(context.Background(), b.ID, models.EvidenceRequest{Version: 1, URL: "https://archive.example/history", SourceKind: "page"}, "", strings.Repeat("a", 64), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/draft", curator, map[string]any{"evidence_ids": []string{evidence.ID}}); r.status != 422 {
+		t.Fatal("uninspected source queued a model draft")
+	}
+	env.worker.Evidence = httpEvidenceFetcher{}
+	env.drain(t)
+	body := map[string]any{"evidence_ids": []string{evidence.ID}}
+	for _, token := range []string{"", env.signIn(t, "visitor@example.com", "")} {
+		expected := 403
+		if token == "" {
+			expected = 401
+		}
+		if r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/draft", token, body); r.status != expected {
+			t.Fatalf("draft role gate %d", r.status)
+		}
+	}
+	for _, ids := range [][]string{nil, {evidence.ID, evidence.ID}, {"bad-id"}} {
+		if r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/draft", curator, map[string]any{"evidence_ids": ids}); r.status != 422 {
+			t.Fatalf("invalid evidence IDs %d %s", r.status, r.raw)
+		}
+	}
+	r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/draft", curator, body)
 	if r.status != 202 || r.body["job"].(map[string]any)["kind"] != "draft_candidate" {
 		t.Fatalf("%d %s", r.status, r.raw)
 	}
 	if r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/reject", curator, map[string]any{"note": "no"}); r.status != 200 {
 		t.Fatalf("reject: %d", r.status)
 	}
-	if r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/draft", curator, nil); r.status != 409 {
-		t.Fatalf("draft after review: %d %s", r.status, r.raw)
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+id+"/draft", curator, body); r.status != 409 {
+		t.Fatalf("draft after review %d %s", r.status, r.raw)
 	}
+
 	r = env.do(t, http.MethodPost, "/api/v1/admin/candidates", curator, map[string]any{"kind": "place", "payload": map[string]any{"city_id": testdb.SeedCityID, "name": "X", "latitude": 41.8, "longitude": -88}})
 	if r := env.do(t, http.MethodPost, "/api/v1/admin/candidates/"+r.body["id"].(string)+"/draft", curator, nil); r.status != 409 {
 		t.Fatalf("draft place candidate: %d %s", r.status, r.raw)

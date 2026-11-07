@@ -3,6 +3,8 @@ package httpapi
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -15,7 +17,8 @@ import (
 type httpEvidenceFetcher struct{}
 
 func (httpEvidenceFetcher) RetrieveEvidence(context.Context, string, string) (models.EvidenceResult, error) {
-	return models.EvidenceResult{Outcome: "inspected_page", Title: "Depot record", Publisher: "archive.example", Passages: []models.EvidencePassage{{Reference: "paragraph:1", Text: "Private retained source text."}}}, nil
+	hash := sha256.Sum256([]byte("Private retained source text."))
+	return models.EvidenceResult{ContentSHA256: hex.EncodeToString(hash[:]), Outcome: "inspected_page", Title: "Depot record", Publisher: "archive.example", Passages: []models.EvidencePassage{{Reference: "paragraph:1", Text: "Private retained source text."}}}, nil
 }
 
 func (e *testEnv) queueEvidence(t *testing.T, path, token, key string, body any) resp {
