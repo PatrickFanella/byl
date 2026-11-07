@@ -1,0 +1,180 @@
+{
+  "id": "45dba945-2d30-4bd2-a104-034704cb3494",
+  "tour_id": "00000000-0000-4000-8000-00000000e0e1",
+  "mode": "walk",
+  "status": "ready",
+  "provider": "valhalla",
+  "distance_m": 2224.678912751824,
+  "duration_s": 1704,
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [
+        -88.0092,
+        41.7959
+      ],
+      [
+        -88.0099,
+        41.7952
+      ],
+      [
+        -88.0118,
+        41.7944
+      ],
+      [
+        -88.0111,
+        41.8083
+      ],
+      [
+        -88.0092,
+        41.7959
+      ]
+    ]
+  },
+  "legs": [
+    {
+      "from_position": 1,
+      "to_position": 2,
+      "distance_m": 97.08709848118981,
+      "duration_s": 75,
+      "geometry": [
+        [
+          -88.0092,
+          41.7959
+        ],
+        [
+          -88.0099,
+          41.7952
+        ]
+      ]
+    },
+    {
+      "from_position": 2,
+      "to_position": 3,
+      "distance_m": 180.8935734358185,
+      "duration_s": 139,
+      "geometry": [
+        [
+          -88.0099,
+          41.7952
+        ],
+        [
+          -88.0118,
+          41.7944
+        ]
+      ]
+    },
+    {
+      "from_position": 3,
+      "to_position": 4,
+      "distance_m": 1546.698240834816,
+      "duration_s": 1190,
+      "geometry": [
+        [
+          -88.0118,
+          41.7944
+        ],
+        [
+          -88.0111,
+          41.8083
+        ]
+      ]
+    },
+    {
+      "from_position": 4,
+      "to_position": 1,
+      "return": true,
+      "from_stop_id": "e122f1eb-67b8-419e-859a-a5f8ac740aa2",
+      "to_stop_id": "89b478c0-f9a6-476b-9af4-da3b7f655f1c",
+      "navigation_source": "approved_navigation",
+      "distance_m": 400,
+      "duration_s": 300,
+      "geometry": [
+        [
+          -88.0111,
+          41.8083
+        ],
+        [
+          -88.0092,
+          41.7959
+        ]
+      ]
+    }
+  ],
+  "computed_at": "2026-11-04T23:06:39.334423Z",
+  "quality": {
+    "version": 1,
+    "status": "pass",
+    "input_current": true,
+    "issues": [],
+    "checked_at": "2026-11-07T00:00:00Z"
+  },
+  "journey": {
+    "version": 1,
+    "state": "usable",
+    "computation": "ready",
+    "quality": "pass",
+    "usable": true,
+    "issue_codes": [],
+    "travel_distance_m": 2224.678912751824,
+    "travel_duration_s": 1704,
+    "dwell_duration_s": 720,
+    "narration_duration_s": 480,
+    "itinerary_duration_s": 2904,
+    "round_trip_duration_s": 2904,
+    "return_plan": {
+      "status": "included",
+      "distance_m": 400,
+      "duration_s": 300
+    },
+    "segments": [
+      {
+        "id": "trail",
+        "kind": "trail",
+        "reverse": false,
+        "basis": "approved_reference",
+        "surface": "asphalt",
+        "modes": [
+          "walk",
+          "bike"
+        ],
+        "access": "allowed",
+        "source": {
+          "url": "https://example.org/fixture-map",
+          "title": "Synthetic contract reference",
+          "publisher": "Fixture operator",
+          "version": "fixture-v1",
+          "retrieved_on": "2026-11-07",
+          "license": "test-fixture-only",
+          "license_url": "https://example.org/fixture-license"
+        }
+      },
+      {
+        "id": "crossing",
+        "kind": "road_connector",
+        "reverse": false,
+        "basis": "approved_reference",
+        "surface": null,
+        "modes": [
+          "walk",
+          "bike"
+        ],
+        "access": "allowed",
+        "source": {
+          "url": "https://example.org/fixture-map",
+          "title": "Synthetic contract reference",
+          "publisher": "Fixture operator",
+          "version": "fixture-v1",
+          "retrieved_on": "2026-11-07",
+          "license": "test-fixture-only",
+          "license_url": "https://example.org/fixture-license"
+        }
+      }
+    ],
+    "assumptions": [
+      "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+      "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+      "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+    ]
+  }
+}

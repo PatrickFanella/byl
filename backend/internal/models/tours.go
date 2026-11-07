@@ -40,6 +40,7 @@ type RouteSummary struct {
 
 // TourRoute is the full route for one mode.
 type TourRoute struct {
+	Journey    *RouteJourney       `json:"journey,omitempty"`
 	Quality    *PathQualitySummary `json:"quality,omitempty"`
 	ID         string              `json:"id"`
 	TourID     string              `json:"tour_id"`
@@ -122,7 +123,8 @@ type TourStop struct {
 
 // TourDetail is a tour with its stops.
 type TourDetail struct {
-	WorkingCopy bool `json:"-"`
+	WorkingCopy bool                         `json:"-"`
+	Journeys    map[TravelMode]*RouteJourney `json:"journeys,omitempty"`
 	TourSummary
 	Stops    []TourStop        `json:"stops"`
 	Corridor *ApprovedCorridor `json:"corridor,omitempty"`

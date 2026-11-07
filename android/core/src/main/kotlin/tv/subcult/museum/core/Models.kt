@@ -188,7 +188,8 @@ data class TourRoute(
     @SerialName("duration_s") val durationS: Int = 0,
     val geometry: LineString? = null,
     val legs: List<RouteLeg> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val journey: RouteJourney? = null
 )
 
 @Serializable
@@ -237,7 +238,8 @@ data class TourDetail(
     @SerialName("owner_account_id") val ownerAccountId: String? = null,
     @SerialName("stop_count") val stopCount: Int = 0,
     val routes: Map<String, RouteSummary> = emptyMap(),
-    val stops: List<TourStop> = emptyList()
+    val stops: List<TourStop> = emptyList(),
+    val journeys: Map<String, RouteJourney>? = null
 ) {
     val isUserRoute: Boolean get() = ownerAccountId != null
     val summaryOnly: TourSummary
@@ -307,3 +309,53 @@ data class GoogleSignInRequest(@SerialName("id_token") val idToken: String, @Ser
 
 @Serializable
 data class DevSignInRequest(val email: String, @SerialName("display_name") val displayName: String = "")
+
+// Optional on older APIs; no private evidence or provider edge payloads.
+@Serializable
+data class RouteJourney(
+    val version: Int,
+    val state: String,
+    val computation: String,
+    val quality: String,
+    val usable: Boolean,
+    @SerialName("issue_codes") val issueCodes: List<String>,
+    @SerialName("travel_distance_m") val travelDistanceM: Double?,
+    @SerialName("travel_duration_s") val travelDurationS: Int?,
+    @SerialName("dwell_duration_s") val dwellDurationS: Int,
+    @SerialName("narration_duration_s") val narrationDurationS: Int,
+    @SerialName("itinerary_duration_s") val itineraryDurationS: Int?,
+    @SerialName("round_trip_duration_s") val roundTripDurationS: Int?,
+    @SerialName("return_plan") val returnPlan: RouteReturn,
+    val segments: List<JourneySegment>,
+    val assumptions: List<String>
+)
+
+@Serializable
+data class RouteReturn(
+    val status: String,
+    @SerialName("distance_m") val distanceM: Double?,
+    @SerialName("duration_s") val durationS: Int?
+)
+
+@Serializable
+data class JourneySegment(
+    val id: String,
+    val kind: String,
+    val reverse: Boolean,
+    val basis: String,
+    val surface: String?,
+    val modes: List<String>?,
+    val access: String,
+    val source: JourneySource
+)
+
+@Serializable
+data class JourneySource(
+    val url: String,
+    val title: String,
+    val publisher: String,
+    val version: String,
+    @SerialName("retrieved_on") val retrievedOn: String,
+    val license: String,
+    @SerialName("license_url") val licenseURL: String
+)

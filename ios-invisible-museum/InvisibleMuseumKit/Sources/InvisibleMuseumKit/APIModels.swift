@@ -266,6 +266,7 @@ public struct LineString: Codable, Equatable {
 }
 
 public struct TourRoute: Codable, Equatable {
+    public var journey: RouteJourney? = nil
     public let id: String
     public let tourID: String
     public let mode: String
@@ -278,7 +279,7 @@ public struct TourRoute: Codable, Equatable {
     public let error: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, mode, status, provider, geometry, legs, error
+        case id, mode, status, provider, geometry, legs, error, journey
         case tourID = "tour_id"
         case distanceM = "distance_m"
         case durationS = "duration_s"
@@ -329,25 +330,28 @@ public struct TourStop: Codable, Identifiable, Equatable {
 }
 
 public struct TourDetail: Codable, Identifiable, Equatable {
+    public let journeys: [String: RouteJourney]?
     public let tour: TourSummary
     public let stops: [TourStop]
 
     public var id: String { tour.id }
 
     enum CodingKeys: String, CodingKey {
-        case stops
+        case stops, journeys
     }
 
     public init(from decoder: Decoder) throws {
         tour = try TourSummary(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         stops = try container.decodeIfPresent([TourStop].self, forKey: .stops) ?? []
+        journeys = try container.decodeIfPresent([String: RouteJourney].self, forKey: .journeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         try tour.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(stops, forKey: .stops)
+        try container.encodeIfPresent(journeys, forKey: .journeys)
     }
 }
 
@@ -452,5 +456,73 @@ public struct ProgressRequest: Encodable {
         self.visitedPositions = visitedPositions
         self.completed = completed
         self.reset = reset
+    }
+}
+
+// Optional on older APIs. Values explain a retained route without private proof.
+public struct RouteJourney: Codable, Equatable {
+    public let version: Int
+    public let state: String
+    public let computation: String
+    public let quality: String
+    public let usable: Bool
+    public let issueCodes: [String]
+    public let travelDistanceM: Double?
+    public let travelDurationS: Int?
+    public let dwellDurationS: Int
+    public let narrationDurationS: Int
+    public let itineraryDurationS: Int?
+    public let roundTripDurationS: Int?
+    public let returnPlan: RouteReturn
+    public let segments: [JourneySegment]
+    public let assumptions: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case version, state, computation, quality, usable, segments, assumptions
+        case issueCodes = "issue_codes"
+        case travelDistanceM = "travel_distance_m"
+        case travelDurationS = "travel_duration_s"
+        case dwellDurationS = "dwell_duration_s"
+        case narrationDurationS = "narration_duration_s"
+        case itineraryDurationS = "itinerary_duration_s"
+        case roundTripDurationS = "round_trip_duration_s"
+        case returnPlan = "return_plan"
+    }
+}
+
+public struct RouteReturn: Codable, Equatable {
+    public let status: String
+    public let distanceM: Double?
+    public let durationS: Int?
+    enum CodingKeys: String, CodingKey {
+        case status
+        case distanceM = "distance_m"
+        case durationS = "duration_s"
+    }
+}
+
+public struct JourneySegment: Codable, Equatable {
+    public let id: String
+    public let kind: String
+    public let reverse: Bool
+    public let basis: String
+    public let surface: String?
+    public let modes: [String]?
+    public let access: String
+    public let source: JourneySource
+}
+
+public struct JourneySource: Codable, Equatable {
+    public let url: String
+    public let title: String
+    public let publisher: String
+    public let version: String
+    public let retrievedOn: String
+    public let license: String
+    public let licenseURL: String
+    enum CodingKeys: String, CodingKey {
+        case url, title, publisher, version, license
+        case retrievedOn = "retrieved_on"
+        case licenseURL = "license_url"
     }
 }

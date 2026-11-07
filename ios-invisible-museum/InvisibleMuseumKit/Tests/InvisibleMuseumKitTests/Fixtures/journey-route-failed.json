@@ -1,0 +1,80 @@
+{
+  "id": "45dba945-2d30-4bd2-a104-034704cb3494",
+  "tour_id": "00000000-0000-4000-8000-00000000e0e1",
+  "mode": "bike",
+  "status": "failed",
+  "provider": "valhalla",
+  "distance_m": 0,
+  "duration_s": 0,
+  "geometry": null,
+  "legs": [],
+  "computed_at": "2026-11-04T23:06:39.334423Z",
+  "journey": {
+    "version": 1,
+    "state": "failed",
+    "computation": "failed",
+    "quality": "unreviewed",
+    "usable": false,
+    "issue_codes": [],
+    "travel_distance_m": null,
+    "travel_duration_s": null,
+    "dwell_duration_s": 720,
+    "narration_duration_s": 480,
+    "itinerary_duration_s": null,
+    "round_trip_duration_s": null,
+    "return_plan": {
+      "status": "unplanned",
+      "distance_m": null,
+      "duration_s": null
+    },
+    "segments": [
+      {
+        "id": "trail",
+        "kind": "trail",
+        "reverse": false,
+        "basis": "approved_reference",
+        "surface": "asphalt",
+        "modes": [
+          "walk",
+          "bike"
+        ],
+        "access": "unknown",
+        "source": {
+          "url": "https://example.org/fixture-map",
+          "title": "Synthetic contract reference",
+          "publisher": "Fixture operator",
+          "version": "fixture-v1",
+          "retrieved_on": "2026-11-07",
+          "license": "test-fixture-only",
+          "license_url": "https://example.org/fixture-license"
+        }
+      },
+      {
+        "id": "crossing",
+        "kind": "road_connector",
+        "reverse": false,
+        "basis": "approved_reference",
+        "surface": null,
+        "modes": [
+          "walk",
+          "bike"
+        ],
+        "access": "unknown",
+        "source": {
+          "url": "https://example.org/fixture-map",
+          "title": "Synthetic contract reference",
+          "publisher": "Fixture operator",
+          "version": "fixture-v1",
+          "retrieved_on": "2026-11-07",
+          "license": "test-fixture-only",
+          "license_url": "https://example.org/fixture-license"
+        }
+      }
+    ],
+    "assumptions": [
+      "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+      "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+      "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+    ]
+  }
+}

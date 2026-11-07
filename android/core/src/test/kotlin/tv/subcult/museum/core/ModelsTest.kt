@@ -10,6 +10,34 @@ import org.junit.jupiter.api.Test
 
 class ModelsTest {
     @Test
+    fun `shared journey fixtures retain totals partial modes and legacy compatibility`() {
+        val route: TourRoute = Fixtures.decode("journey-route-return")
+        val tour: TourDetail = Fixtures.decode("journey-tour-partial")
+        val journey = requireNotNull(route.journey)
+        assertTrue(journey.usable)
+        assertEquals(2904, journey.itineraryDurationS)
+        assertEquals(2904, journey.roundTripDurationS)
+        assertEquals(300, journey.returnPlan.durationS)
+        assertEquals("asphalt", journey.segments.first().surface)
+        assertNull(journey.segments.last().surface)
+        assertEquals("failed", tour.journeys?.get("bike")?.state)
+        assertNull(tour.journeys?.get("bike")?.travelDurationS)
+        assertEquals(29, tour.routes["walk"]?.estimatedMinutes)
+        assertEquals(route, MuseumJson.decodeFromString<TourRoute>(MuseumJson.encodeToString(route)))
+        assertEquals(tour, MuseumJson.decodeFromString<TourDetail>(MuseumJson.encodeToString(tour)))
+        for (name in listOf("journey-route-pending", "journey-route-failed")) {
+            val unavailable: TourRoute = Fixtures.decode(name)
+            assertNull(unavailable.journey?.itineraryDurationS)
+            assertFalse(unavailable.journey?.usable ?: true)
+        }
+        val unreviewed: TourRoute = Fixtures.decode("journey-route-unreviewed")
+        assertEquals("unreviewed", unreviewed.journey?.state)
+        assertFalse(unreviewed.journey?.usable ?: true)
+        assertNull(Fixtures.decode<TourRoute>("route").journey)
+        assertNull(Fixtures.decode<TourDetail>("tour").journeys)
+    }
+
+    @Test
     fun `decodes the city with topics`() {
         val city: City = Fixtures.decode("city")
         assertEquals("downers-grove", city.slug)

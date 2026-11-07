@@ -32,6 +32,7 @@ type ReferenceLine struct {
 // CorridorSegment has explicit endpoint identities. Geometry crossings create
 // no connection; road connectors must be selected and reviewed explicitly.
 type CorridorSegment struct {
+	Surface  string           `json:"surface,omitempty"`
 	ID       string           `json:"id"`
 	Kind     string           `json:"kind"`
 	FromNode string           `json:"from_node"`
@@ -143,6 +144,9 @@ func (c CorridorIntent) Validate() Fields {
 	nodes := map[string][2]float64{}
 	vertices := 0
 	for _, s := range c.Segments {
+		if utf8.RuneCountInString(s.Surface) > 80 {
+			f["surface"] = "surface must be at most 80 characters"
+		}
 		if err := s.ValidateQualityReference(); err != nil {
 			f["quality_reference"] = err.Error()
 		}

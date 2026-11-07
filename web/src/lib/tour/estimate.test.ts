@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { distanceText, estimateText, modeVerb } from './estimate';
+import { distanceText, estimateText, modeVerb, tripEstimateText } from './estimate';
 
 const route = (over: Record<string, unknown>) => ({
 	mode: 'walk',
@@ -39,5 +39,35 @@ describe('modeVerb', () => {
 	it('names the travel mode', () => {
 		expect(modeVerb('walk')).toBe('walk');
 		expect(modeVerb('bike')).toBe('ride');
+	});
+});
+
+// These canonical response fixtures are also decoded by Swift and Kotlin.
+import returnRoute from '../../../../backend/api/fixtures/route-journeys-v1/route-return.json';
+import failedRoute from '../../../../backend/api/fixtures/route-journeys-v1/route-failed.json';
+import partialTour from '../../../../backend/api/fixtures/route-journeys-v1/tour-partial.json';
+import type { RouteJourney } from './estimate';
+
+describe('shared journey contract', () => {
+	it('keeps legacy travel separate from the complete itinerary', () => {
+		expect(estimateText(partialTour.routes.walk)).toBe('29 min walk');
+		expect(tripEstimateText(returnRoute.journey as RouteJourney)).toBe('49 min including stops');
+		expect(returnRoute.journey.return_plan.duration_s).toBe(300);
+		expect(returnRoute.journey.round_trip_duration_s).toBe(
+			returnRoute.journey.itinerary_duration_s
+		);
+	});
+	it('does not invent an estimate for a failed mode', () => {
+		expect(tripEstimateText(failedRoute.journey as RouteJourney)).toBeNull();
+		expect(partialTour.journeys.bike.usable).toBe(false);
+		expect(partialTour.journeys.walk.usable).toBe(true);
+	});
+	it('states when the return has no plan', () => {
+		const journey = {
+			...returnRoute.journey,
+			return_plan: { status: 'unplanned', distance_m: null, duration_s: null },
+			round_trip_duration_s: null
+		} as RouteJourney;
+		expect(tripEstimateText(journey)).toBe('49 min including stops; return not planned');
 	});
 });
