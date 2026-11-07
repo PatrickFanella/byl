@@ -7,11 +7,40 @@ import (
 
 func setEnv(t *testing.T, kv map[string]string) {
 	t.Helper()
-	for _, k := range []string{"API_ADDR", "DATABASE_URL", "ROUTING_PROVIDER", "NARRATION_PROVIDER", "MEDIA_STORE", "JOB_WORKERS", "SESSION_TTL_HOURS", "APPLE_CLIENT_IDS", "ADMIN_BOOTSTRAP_EMAILS", "DEV_AUTH_ENABLED", "LLM_PROVIDER"} {
+	for _, k := range []string{"API_ADDR", "DATABASE_URL", "ROUTING_PROVIDER", "NARRATION_PROVIDER", "MEDIA_STORE", "JOB_WORKERS", "SESSION_TTL_HOURS", "APPLE_CLIENT_IDS", "ADMIN_BOOTSTRAP_EMAILS", "DEV_AUTH_ENABLED", "LLM_PROVIDER", "BRIEF_DISCOVERY_PROVIDERS", "BRIEF_DISCOVERY_SEED_URLS"} {
 		t.Setenv(k, "")
 	}
 	for k, v := range kv {
 		t.Setenv(k, v)
+	}
+}
+
+func TestDiscoveryPolicy(t *testing.T) {
+	for _, tc := range []struct {
+		name, providers, seeds string
+		valid                  bool
+	}{
+		{"defaults", "", "", true},
+		{"configured", "loc, wikipedia_search", "https://history.example/", true},
+		{"unknown", "url", "", false},
+		{"repeated", "loc,loc", "", false},
+		{"excessive", "loc,wikipedia_search,internet_archive,loc", "", false},
+		{"private", "loc", "http://127.0.0.1/history", false},
+		{"credentials", "loc", "https://user:secret@history.example/", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			setEnv(t, map[string]string{"DATABASE_URL": "postgres://x", "BRIEF_DISCOVERY_PROVIDERS": tc.providers, "BRIEF_DISCOVERY_SEED_URLS": tc.seeds})
+			cfg, err := Load()
+			if (err == nil) != tc.valid {
+				t.Fatalf("policy: %v", err)
+			}
+			if err != nil && strings.Contains(err.Error(), "secret") {
+				t.Fatal("configuration secret leaked")
+			}
+			if tc.name == "defaults" && (len(cfg.DiscoveryProviders) != 3 || len(cfg.DiscoverySeedURLs) != 3) {
+				t.Fatal("discovery defaults missing")
+			}
+		})
 	}
 }
 

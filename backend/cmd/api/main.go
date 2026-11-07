@@ -18,6 +18,7 @@ import (
 	"invisible-museum/backend/internal/jobs"
 	"invisible-museum/backend/internal/providers"
 	"invisible-museum/backend/internal/repository"
+	"invisible-museum/backend/internal/sources"
 )
 
 func main() {
@@ -76,6 +77,7 @@ func main() {
 
 	worker := jobs.New(store, prov.Router, prov.Narrator, prov.Blob, cfg.JobWorkers, log)
 	worker.Sources = prov.Sources
+	worker.Discovery = sources.NewDiscovery(prov.Sources, sources.DiscoveryPolicy{Providers: cfg.DiscoveryProviders, Seeds: cfg.DiscoverySeedURLs})
 	worker.Drafter = prov.Drafter
 	workerDone := make(chan struct{})
 	go func() {

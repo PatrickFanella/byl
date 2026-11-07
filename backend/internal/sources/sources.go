@@ -13,11 +13,12 @@ import (
 
 // Request describes one discovery run.
 type Request struct {
-	CityID  string
-	Center  geo.Point
-	RadiusM float64 // default 2000, max 20000
-	Query   string  // free text for text-search adapters
-	Limit   int     // default 25, max 100
+	CityID      string
+	Center      geo.Point
+	RadiusM     float64 // default 2000, max 20000
+	Query       string  // free text for text-search adapters
+	Limit       int     // default 25, max 100
+	CatalogOnly bool    // discovery retains archive catalog metadata without fetching media details
 }
 
 func (r Request) radius() float64 {

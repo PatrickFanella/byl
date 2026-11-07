@@ -112,6 +112,12 @@ func (a *InternetArchive) Discover(ctx context.Context, req Request) ([]Found, e
 			}
 			f.Text = strings.Join(parts, "\n\n")
 		case "image", "movies":
+			if req.CatalogOnly {
+				f.Kind = models.CandidateKindMedia
+				f.Text = text
+				out = append(out, f)
+				continue
+			}
 			name, mimeType, err := a.primaryFile(ctx, d.Identifier, d.MediaType)
 			if err != nil {
 				if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {

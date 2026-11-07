@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"invisible-museum/backend/internal/sources"
 )
 
 // Config holds every runtime setting for the API and worker.
@@ -43,8 +45,10 @@ type Config struct {
 	LLMAPIKey   string
 	LLMModel    string
 
-	LocalArchiveURLs []string
-	SourcesUserAgent string
+	LocalArchiveURLs   []string
+	SourcesUserAgent   string
+	DiscoveryProviders []string
+	DiscoverySeedURLs  []string
 	// SourcesAllowPrivateHosts lets media downloads reach private networks (development only).
 	SourcesAllowPrivateHosts bool
 
@@ -88,6 +92,8 @@ func Load() (Config, error) {
 		LLMModel:           strings.TrimSpace(os.Getenv("LLM_MODEL")),
 		LocalArchiveURLs:   envList("LOCAL_ARCHIVE_URLS"),
 		SourcesUserAgent:   envOr("SOURCES_USER_AGENT", "InvisibleMuseum/0.2 (+https://github.com/PatrickFanella/invisible-museum)"),
+		DiscoveryProviders: strings.Split(envOr("BRIEF_DISCOVERY_PROVIDERS", "wikipedia_search,loc,internet_archive"), ","),
+		DiscoverySeedURLs:  envList("BRIEF_DISCOVERY_SEED_URLS"),
 
 		SourcesAllowPrivateHosts: envBool("SOURCES_ALLOW_PRIVATE_HOSTS"),
 	}
@@ -116,6 +122,31 @@ func Load() (Config, error) {
 	}
 	if err := oneOf("LLM_PROVIDER", cfg.LLMProvider, llmProviders); err != nil {
 		return Config{}, err
+	}
+	if len(cfg.DiscoveryProviders) > 3 {
+		return Config{}, fmt.Errorf("BRIEF_DISCOVERY_PROVIDERS permits at most three providers")
+	}
+	seen := map[string]bool{}
+	for i, name := range cfg.DiscoveryProviders {
+		name = strings.TrimSpace(name)
+		cfg.DiscoveryProviders[i] = name
+		if !sources.ValidDiscoveryProvider(name) || seen[name] {
+			return Config{}, fmt.Errorf("BRIEF_DISCOVERY_PROVIDERS contains an unknown or repeated provider")
+		}
+		seen[name] = true
+	}
+	if len(cfg.DiscoverySeedURLs) == 0 {
+		cfg.DiscoverySeedURLs = append([]string{}, sources.DefaultDiscoverySeeds...)
+	}
+	if len(cfg.DiscoverySeedURLs) > 4 {
+		return Config{}, fmt.Errorf("BRIEF_DISCOVERY_SEED_URLS permits at most four starting pages")
+	}
+	for i, page := range cfg.DiscoverySeedURLs {
+		normalized, _, _, err := sources.NormalizeEvidenceURL(page)
+		if err != nil {
+			return Config{}, fmt.Errorf("BRIEF_DISCOVERY_SEED_URLS contains an invalid public web URL")
+		}
+		cfg.DiscoverySeedURLs[i] = normalized
 	}
 	if cfg.MediaStore == "s3" && (cfg.S3Endpoint == "" || cfg.S3Bucket == "") {
 		return Config{}, fmt.Errorf("MEDIA_STORE=s3 requires S3_ENDPOINT and S3_BUCKET")

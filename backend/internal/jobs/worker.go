@@ -28,8 +28,9 @@ type Worker struct {
 	Sources *sources.Registry
 	Drafter llm.Drafter
 	// Research is an optional staged processor; absent adapters leave a named research gap.
-	Research ResearchProcessor
-	Evidence sources.EvidenceRetriever
+	Research  ResearchProcessor
+	Evidence  sources.EvidenceRetriever
+	Discovery *sources.Discovery
 
 	store    *repository.Store
 	router   routing.Router
