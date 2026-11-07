@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"invisible-museum/backend/internal/geo"
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/testdb"
 )
@@ -228,10 +229,10 @@ func TestRouteReportUsesCapturedEntranceAfterArrivalChanges(t *testing.T) {
 
 func TestRouteReportAnnotationDistanceUsesSegmentInterior(t *testing.T) {
 	path := [][2]float64{{-88, 41}, {-87.9, 41}}
-	if !nearReportPath([2]float64{-87.95, 41.005}, path, 1000) || nearReportPath([2]float64{-87.95, 41.02}, path, 1000) {
+	if !geo.NearPolyline([2]float64{-87.95, 41.005}, path, 1000) || geo.NearPolyline([2]float64{-87.95, 41.02}, path, 1000) {
 		t.Fatal("segment interior proximity did not bound the affected area")
 	}
-	if !nearReportPath([2]float64{180, 0.005}, [][2]float64{{179.9, 0}, {-179.9, 0}}, 1000) {
+	if !geo.NearPolyline([2]float64{180, 0.005}, [][2]float64{{179.9, 0}, {-179.9, 0}}, 1000) {
 		t.Fatal("longitude wrapping broke a local annotation")
 	}
 }

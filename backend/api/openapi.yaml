@@ -997,6 +997,62 @@ paths:
         "404": { description: Report not found }
         "409": { description: Stale version or invalid lifecycle transition }
         "422": { description: Invalid decision }
+  /api/v1/admin/tours/{id}/corridors:
+    get:
+      summary: List private corridor proposals and completed reviews
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 20 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses:
+        "200": { description: Private review list, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/CorridorProposal" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Tour not found }
+    post:
+      summary: Import a bounded reference and propose corridor intent or removal
+      description: Curator-only private import, with a 256 KiB body and 5000 total coordinate pairs. Source links are recorded, not fetched. Proposal input is immutable. A proposal captures the current tour draft version; approval compares it and the approved intent version. An explicit removal is separately reviewed.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CorridorProposalRequest" } } } }
+      responses:
+        "201": { description: Private pending proposal, content: { application/json: { schema: { $ref: "#/components/schemas/CorridorProposal" } } } }
+        "400": { description: Malformed input or unknown fields }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Tour not found }
+        "409": { description: Approved corridor version changed }
+        "413": { description: Import exceeds 256 KiB }
+        "422": { description: Invalid reference metadata, topology, mode, geometry or story-stop references }
+  /api/v1/admin/tours/{id}/corridors/{proposal}:
+    get:
+      summary: Read a private immutable proposal and its review
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: proposal, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: Private proposal, content: { application/json: { schema: { $ref: "#/components/schemas/CorridorProposal" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Tour/proposal not found }
+  /api/v1/admin/tours/{id}/corridors/{proposal}/review:
+    post:
+      summary: Approve or reject private corridor intent against its base version
+      description: Approval advances only the working intent and draft/route versions, requeues routes and clears legacy auto-release intent. Publish the tour explicitly to release it. A changed draft or approved pointer rejects stale approval; rejection leaves the pointer unchanged. This stores reviewed reference choices; route generation still uses historical sites until the later routing integration.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: proposal, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CorridorReviewRequest" } } } }
+      responses:
+        "200": { description: Completed private review, content: { application/json: { schema: { $ref: "#/components/schemas/CorridorProposal" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Tour/proposal not found }
+        "409": { description: Already reviewed or stale intent/draft version }
+        "422": { description: Invalid decision or version }
 components:
   securitySchemes:
     bearer:
@@ -1004,6 +1060,126 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    CorridorSource:
+      type: object
+      additionalProperties: false
+      required: [url, title, publisher, version, retrieved_on, license, license_url]
+      description: Submitted reference attribution and source version; a URL or license label is not proof of field inspection or access. Curators must review copying rights before releasing reference geometry. Notes are public after publication; keep private rationale in the review note.
+      properties:
+        url: { type: string, format: uri, maxLength: 2000 }
+        title: { type: string, minLength: 1, maxLength: 300 }
+        publisher: { type: string, minLength: 1, maxLength: 200 }
+        version: { type: string, minLength: 1, maxLength: 100 }
+        retrieved_on: { type: string, format: date }
+        license: { type: string, minLength: 1, maxLength: 100 }
+        license_url: { type: string, format: uri, maxLength: 2000 }
+        note: { type: string, maxLength: 1000 }
+    ReferenceLine:
+      type: object
+      additionalProperties: false
+      required: [type, coordinates]
+      properties:
+        type: { type: string, enum: [LineString] }
+        coordinates: { type: array, minItems: 2, maxItems: 5000, items: { type: array, minItems: 2, maxItems: 2, items: { type: number } }, description: "Finite WGS84 [longitude, latitude] pairs; total across the import is at most 5000" }
+    CorridorSegment:
+      type: object
+      additionalProperties: false
+      required: [id, kind, from_node, to_node, branches, modes, geometry]
+      description: Explicit endpoint node identities define connections. Endpoints sharing a node must agree within 20 m. Equal/near coordinates or geometry crossings never create a shared node. Road connectors require their own source context.
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        kind: { type: string, enum: [trail, road_connector] }
+        from_node: { type: string, minLength: 1, maxLength: 100 }
+        to_node: { type: string, minLength: 1, maxLength: 100 }
+        branches: { type: array, minItems: 1, maxItems: 8, items: { type: string, minLength: 1, maxLength: 100 } }
+        modes: { type: array, maxItems: 2, uniqueItems: true, items: { $ref: "#/components/schemas/TravelMode" }, description: "Explicit independently allowed modes; empty is unresolved and cannot be selected" }
+        geometry: { $ref: "#/components/schemas/ReferenceLine" }
+        source: { $ref: "#/components/schemas/CorridorSource", nullable: true }
+    CorridorTraversal:
+      type: object
+      additionalProperties: false
+      required: [segment_id]
+      properties:
+        segment_id: { type: string }
+        reverse: { type: boolean, default: false }
+    ShapingPoint:
+      type: object
+      additionalProperties: false
+      required: [id, segment_id, after_stop_id, before_stop_id, latitude, longitude]
+      description: Routing intent only; creates no exhibit or arrival event. Ties a selected traversal occurrence to adjacent ordered stable story-stop IDs. Must be within 50 m of its selected reference segment. Arrays follow traversal/itinerary order.
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        segment_id: { type: string }
+        traversal_index: { type: integer, minimum: 0, maximum: 63, default: 0 }
+        after_stop_id: { type: string, format: uuid }
+        before_stop_id: { type: string, format: uuid }
+        latitude: { type: number, minimum: -90, maximum: 90 }
+        longitude: { type: number, minimum: -180, maximum: 180 }
+        note: { type: string, maxLength: 500 }
+    ModeCorridor:
+      type: object
+      additionalProperties: false
+      required: [mode, branch, direction, path]
+      properties:
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        branch: { type: string, minLength: 1, maxLength: 100 }
+        direction: { type: string, minLength: 1, maxLength: 100, description: "Explicit direction in the submitted reference; path traversals record actual orientation" }
+        path: { type: array, minItems: 1, maxItems: 64, items: { $ref: "#/components/schemas/CorridorTraversal" }, description: "Connected by explicit node IDs; segments may repeat with an explicit traversal occurrence" }
+        allowed_connectors: { type: array, maxItems: 16, uniqueItems: true, items: { type: string }, description: "Explicit sourced road connector IDs allowed for this branch/mode; no inferred adjacent roads" }
+        shaping_points: { type: array, maxItems: 60, items: { $ref: "#/components/schemas/ShapingPoint" } }
+    CorridorIntent:
+      type: object
+      additionalProperties: false
+      required: [key, name, source, segments, routes]
+      properties:
+        key: { type: string, minLength: 1, maxLength: 100 }
+        name: { type: string, minLength: 1, maxLength: 300 }
+        source: { $ref: "#/components/schemas/CorridorSource" }
+        segments: { type: array, minItems: 1, maxItems: 64, items: { $ref: "#/components/schemas/CorridorSegment" } }
+        routes: { type: array, minItems: 1, maxItems: 2, items: { $ref: "#/components/schemas/ModeCorridor" }, description: "At most one independent selection per tour mode; no fallback from another mode" }
+    CorridorProposalRequest:
+      type: object
+      additionalProperties: false
+      required: [version]
+      description: Supply a non-null intent or explicit remove=true with null/omitted intent. The proposal captures the tour draft version server-side and keeps immutable input.
+      properties:
+        version: { type: integer, format: int64, minimum: 0 }
+        intent: { $ref: "#/components/schemas/CorridorIntent", nullable: true }
+        remove: { type: boolean, default: false }
+    CorridorReviewRequest:
+      type: object
+      additionalProperties: false
+      required: [version, action, note]
+      properties:
+        version: { type: integer, format: int64, minimum: 0, description: "The proposal base_version; approval also compares its captured draft_version" }
+        action: { type: string, enum: [approve, reject] }
+        note: { type: string, minLength: 1, maxLength: 4000, description: "Private rationale; review topology and reference copying/access context before approval" }
+    ApprovedCorridor:
+      type: object
+      required: [id, version, intent, content_sha256, reviewed_at]
+      description: Public only inside a released tour snapshot; author IDs and private review notes are excluded. An approved removal has null intent but retains its version.
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer, format: int64, minimum: 1 }
+        intent: { $ref: "#/components/schemas/CorridorIntent", nullable: true }
+        content_sha256: { type: string, description: "SHA-256 of canonical typed intent JSON; null for removal is hashed as JSON null" }
+        reviewed_at: { type: string, format: date-time }
+    CorridorProposal:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        tour_id: { type: string, format: uuid }
+        base_version: { type: integer, format: int64, minimum: 0 }
+        draft_version: { type: integer, format: int64, minimum: 0 }
+        intent: { $ref: "#/components/schemas/CorridorIntent", nullable: true }
+        remove: { type: boolean }
+        content_sha256: { type: string }
+        status: { type: string, enum: [pending, approved, rejected] }
+        created_by: { type: string, format: uuid }
+        reviewed_by: { type: string, format: uuid, nullable: true }
+        review_note: { type: string }
+        created_at: { type: string, format: date-time }
+        reviewed_at: { type: string, format: date-time, nullable: true }
     ReportLocation:
       type: object
       additionalProperties: false
@@ -1079,6 +1255,14 @@ components:
           properties:
             modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
             coordinate_source: { type: string, enum: [historical_site] }
+            corridor:
+              type: object
+              description: Optional released intent reference; full reference geometry and mode choices are in tour.corridor. Does not claim current generated geometry follows this intent.
+              required: [id, version, content_sha256]
+              properties:
+                id: { type: string, format: uuid }
+                version: { type: integer, format: int64, minimum: 1 }
+                content_sha256: { type: string }
             stops: { type: array, items: { type: object, properties: { stop_id: { type: string }, place_id: { type: string }, latitude: { type: number }, longitude: { type: number }, arrival_point: { $ref: "#/components/schemas/ApprovedArrival", nullable: true } } } }
     TourRevision:
       type: object
@@ -1637,6 +1821,7 @@ components:
         - $ref: "#/components/schemas/TourSummary"
         - type: object
           properties:
+            corridor: { $ref: "#/components/schemas/ApprovedCorridor", readOnly: true, description: "Working approved intent in editing reads; frozen released intent in public/revision reads. Omitted before any approved intent." }
             stops: { type: array, items: { $ref: "#/components/schemas/TourStop" } }
     TourProgress:
       type: object

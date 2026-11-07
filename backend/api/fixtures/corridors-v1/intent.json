@@ -1,0 +1,227 @@
+{
+  "key": "prairie-path-fixture",
+  "name": "Synthetic Prairie Path branch selection",
+  "source": {
+    "url": "https://example.org/fixtures/prairie-path.json",
+    "title": "Synthetic Prairie Path topology fixture, not a real map",
+    "publisher": "Byl test fixture",
+    "version": "fixture-1",
+    "retrieved_on": "2026-11-07",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "note": "Synthetic graph only; no field or legal-access claim."
+  },
+  "segments": [
+    {
+      "id": "main",
+      "kind": "trail",
+      "from_node": "station",
+      "to_node": "junction",
+      "branches": [
+        "elgin",
+        "aurora"
+      ],
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -88.0092,
+            41.7959
+          ],
+          [
+            -88.0093,
+            41.7956
+          ]
+        ]
+      },
+      "source": null
+    },
+    {
+      "id": "elgin",
+      "kind": "trail",
+      "from_node": "junction",
+      "to_node": "elgin-end",
+      "branches": [
+        "elgin"
+      ],
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -88.0093,
+            41.7956
+          ],
+          [
+            -88.0099,
+            41.7952
+          ]
+        ]
+      },
+      "source": null
+    },
+    {
+      "id": "aurora",
+      "kind": "trail",
+      "from_node": "junction",
+      "to_node": "aurora-end",
+      "branches": [
+        "aurora"
+      ],
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -88.0093,
+            41.7956
+          ],
+          [
+            -88.0098,
+            41.7959
+          ]
+        ]
+      },
+      "source": null
+    },
+    {
+      "id": "connector",
+      "kind": "road_connector",
+      "from_node": "elgin-end",
+      "to_node": "road-end",
+      "branches": [
+        "elgin"
+      ],
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -88.0099,
+            41.7952
+          ],
+          [
+            -88.0096,
+            41.7951
+          ]
+        ]
+      },
+      "source": {
+        "url": "https://example.org/fixtures/connector.json",
+        "title": "Synthetic Prairie Path topology fixture, not a real map",
+        "publisher": "Byl test fixture",
+        "version": "fixture-1",
+        "retrieved_on": "2026-11-07",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "note": "Synthetic graph only; no field or legal-access claim."
+      }
+    },
+    {
+      "id": "adjacent-road",
+      "kind": "road_connector",
+      "from_node": "road-a",
+      "to_node": "road-b",
+      "branches": [
+        "elgin"
+      ],
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -88.00919,
+            41.7959
+          ],
+          [
+            -88.00929,
+            41.7956
+          ]
+        ]
+      },
+      "source": {
+        "url": "https://example.org/fixtures/connector.json",
+        "title": "Synthetic Prairie Path topology fixture, not a real map",
+        "publisher": "Byl test fixture",
+        "version": "fixture-1",
+        "retrieved_on": "2026-11-07",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "note": "Synthetic graph only; no field or legal-access claim."
+      }
+    },
+    {
+      "id": "upper-crossing",
+      "kind": "trail",
+      "from_node": "upper-a",
+      "to_node": "upper-b",
+      "branches": [
+        "elgin"
+      ],
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -88.01,
+            41.7955
+          ],
+          [
+            -88.009,
+            41.7955
+          ]
+        ]
+      },
+      "source": null
+    }
+  ],
+  "routes": [
+    {
+      "mode": "walk",
+      "branch": "elgin",
+      "direction": "toward Elgin in the synthetic reference",
+      "path": [
+        {
+          "segment_id": "main",
+          "reverse": false
+        },
+        {
+          "segment_id": "elgin",
+          "reverse": false
+        }
+      ],
+      "allowed_connectors": [],
+      "shaping_points": [
+        {
+          "id": "elgin-shape",
+          "segment_id": "elgin",
+          "traversal_index": 1,
+          "after_stop_id": "0152ed8c-ef31-483a-81da-fd0c1fc9ad7a",
+          "before_stop_id": "e4a59171-be43-4b6b-8689-94eb6f8a795c",
+          "latitude": 41.7954,
+          "longitude": -88.0096,
+          "note": "Reference shaping point; never a story stop."
+        }
+      ]
+    }
+  ]
+}

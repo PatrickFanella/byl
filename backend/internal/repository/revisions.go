@@ -209,6 +209,13 @@ func (s *Store) publishRequestedRevisionTx(ctx context.Context, tourID string) e
 	if requested == nil || *requested != version || status != "published" {
 		return nil
 	}
+	var corridorReleased bool
+	if err := s.pool.QueryRow(ctx, `SELECT byl_corridor_is_released($1)`, tourID).Scan(&corridorReleased); err != nil {
+		return err
+	}
+	if !corridorReleased {
+		return nil
+	}
 	blockers, err := s.TourPublishBlockers(ctx, tourID)
 	if err != nil {
 		return err
@@ -238,7 +245,11 @@ func (s *Store) ServedTour(ctx context.Context, working *models.TourDetail, acco
 		}
 	}
 	if id == nil {
-		return working, nil
+		// The legacy pending initial view must not expose a newly reviewed
+		// corridor before the owner/curator explicitly publishes its first release.
+		pending := *working
+		pending.Corridor = nil
+		return &pending, nil
 	}
 	r, err := s.GetTourRevision(ctx, working.ID, *id)
 	if err != nil {

@@ -400,3 +400,52 @@ creating duplicates. Quotas and bounded bodies limit intake.
 This adds API and client fixtures for later report forms. It leaves ordinary
 new-tour public intake closed and does not configure public sign-in, create
 historical drafts or grant contribution consent.
+
+
+## Trail branches, connectors and shaping points
+
+Reviewed corridor intent records where a curator wants the route to go without
+turning every bend into a historical exhibit. Curators import a `CorridorIntent`
+with source/version/retrieval and license metadata through
+`POST /api/v1/admin/tours/{id}/corridors`. A proposal is private and leaves the
+current published tour unchanged. Review source copying rights, mode permissions,
+branch identity, topology and connectors before approving. Source notes become
+public after tour publication; keep private rationale in the review note.
+
+The reference consists of identified LineString segments. Each gives explicit
+`from_node`/`to_node`, branch memberships and independently allowed modes. Empty
+modes mean unresolved access. A road connector has kind `road_connector`, its own
+source context, and must be listed in that mode's `allowed_connectors` before the
+path may use it. Each mode independently selects a branch, direction and ordered
+segment traversals, with explicit reversal where needed. Another branch, nearby
+road or visual crossing cannot be substituted automatically. A connection exists
+only through the declared endpoint identities; review grade separation rather
+than equating coordinate overlap with a traversable junction.
+
+A shaping point is tied to a particular traversal occurrence and lies between
+adjacent stable story-stop IDs. It shapes future routing without creating a
+place, moment, narrated stop or arrival event. Its order is separate from the
+story-stop list. A later stop reorder can invalidate these references; approve a
+replacement or explicit removal before publishing that draft. Recompute preserves
+the choices, and earlier published revisions retain their reference/selection.
+
+`POST /api/v1/admin/tours/{id}/corridors/{proposal}/review` takes the proposal's
+`base_version` as `version`, an `approve` or `reject` action and a private note.
+Approval also compares the captured working draft version. A stale approval
+returns 409 and requires a fresh proposal. Approval changes the working intent
+and routing generation; it does not release a new public tour, including for a
+personal route. Publish explicitly after reviewing the ready working routes.
+Later recompute and legacy metadata saves keep that release gate closed until
+the current intent version has been explicitly published. A pending first tour
+view also omits the unreleased corridor.
+Approved removals retain their intent version with null intent. Completed reviews
+and input remain immutable.
+
+The released tour's optional `corridor` holds full reference geometry and chosen
+mode paths; `routing_intent.corridor` pins its ID/version/checksum. Private author
+IDs and review notes are absent. The checksum covers canonical typed intent JSON,
+not a remotely downloaded file. Import limits and coordinate tolerances are in
+the OpenAPI/operator contract. Source links are recorded without fetching them.
+Current route generation still uses historical sites; applying this intent to
+actual geometry is later work. No trail/access or on-site claim follows from the
+synthetic topology fixture or from storing an approved reference.

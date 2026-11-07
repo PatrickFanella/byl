@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 13, then saves a PostgreSQL
+changed migration files or a schema version other than 14, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -495,3 +495,71 @@ one end within 100 m of that anchor. When a revision lacks approved arrival data
 the historical location only bounds the private observation; it does not become
 a navigation entrance. A nearby coordinate or visual crossing establishes no
 access or traversable junction. Review is still required before any route change.
+
+
+## Reviewed corridor intent, migration 14
+
+Migration 14 adds `tour_corridor_proposals` and `tour_corridor_current`, with
+immutable proposal inputs and completed reviews. It wraps the admitted snapshot
+and route-input hash functions while retaining their prior implementations.
+Existing snapshots and every existing table row remain unchanged. With no corridor
+history, hashes remain byte-for-byte identical, preserving ready route caches.
+Approved intent/removal versions enter the hash and routing generation fences.
+Previously admitted migrations 1–13 retain their exact checksums.
+
+Before admission, restore a fresh schema-13 production backup into isolated
+PostgreSQL. Apply the exact accepted SQL, compare all existing table fingerprints,
+ready input hashes, public catalogue/revision/story/geometry responses and previous
+API reads. With no approved corridor, public responses omit the new optional field.
+Independently restore the actual operator backup before production SQL, verify the
+media archive and recheck live fingerprints under the receiver lock. Apply as
+operator and admit the exact fourteen-file manifest/source hook expecting 14.
+CI applies no production SQL. Retain backups, prior images, manifests and receipts.
+
+Curators import reference data through
+`POST /api/v1/admin/tours/{id}/corridors`, then review it through
+`POST /{proposal}/review`. Listing/detail routes remain private. Input is at most
+256 KiB, with 64 reference segments, 5000 coordinate pairs in total and two
+independent mode selections. Each mode allows 64 traversals, 16 explicit road
+connectors and 60 shaping points. Source metadata records URL/title, publisher,
+version, retrieval date, license and license URL. Road connectors need their own
+source context. The server retains a SHA-256 of canonical typed intent JSON;
+this is not a claim that a remote source file was downloaded or independently
+hash-verified. Importing an HTTP(S) reference never fetches it.
+
+A selected path connects only through explicit endpoint node IDs. One node's
+endpoints must agree within 20 m; equal/near coordinates with different node IDs,
+interior crossings and adjacent roads imply no connection. Segments must name the
+selected branch and independently allowed mode. An empty allowed-mode list remains
+unresolved and cannot be selected. Reference direction is recorded explicitly;
+ordered traversals encode orientation. The synthetic Prairie Path fixture is not
+an official map or evidence of a traversable crossing.
+
+Shaping points identify a selected traversal occurrence and adjacent ordered
+story-stop UUIDs. They must lie within 50 m of their reference segment. They
+never insert a place, story, tour stop or arrival event. Changing stops/modes may
+make approved intent obsolete; publication then requires a reviewed replacement
+or removal. A removal is proposed with `remove: true` and null/omitted `intent`.
+Approval compares both the proposal's base intent version and captured draft
+version, increments the working draft/route generations, requeues routes and
+clears legacy personal auto-release. Explicit tour publication releases it.
+Recompute and legacy saves cannot reopen automatic release until the current
+intent version is explicitly published; an initial pending public view omits it.
+Recompute retains the approved pointer; old published snapshots keep their full
+reference geometry and choices. Snapshots expose no author IDs/private rationale.
+
+This is durable reference/selection data. Current routing still uses historical
+site coordinates, as recorded in `routing_intent.coordinate_source`; it does not
+yet apply corridor/shaping data to geometry. That integration belongs to issue 27.
+Source/mode labels and a curator approval are not a legal-access or field
+certificate. Curators must review reference copying rights and access context
+before publication; do not infer permission from a map link or crossing.
+
+Automatic down refuses to discard intent/history. Retain schema 14 during image
+recovery. Prior APIs can read existing snapshots with the additive schema, but do
+not enforce the new working-intent reference guards. After intent-aware writes,
+prefer a forward fix or restrict prior-image recovery to read-only operation.
+Do not restore an older dump over later curator decisions. Never-published tours
+with retained proposals are hidden on deletion rather than physically erased.
+No region-scale import, street router, public sign-in or field validation is
+activated by this migration.
