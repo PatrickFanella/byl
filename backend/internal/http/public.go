@@ -207,7 +207,7 @@ func (d Deps) getTopic(w http.ResponseWriter, r *http.Request) {
 }
 
 // visibleTour loads a tour and enforces visibility for the current account.
-func (d Deps) visibleTour(w http.ResponseWriter, r *http.Request) (*models.TourDetail, bool) {
+func (d Deps) visibleTourBase(w http.ResponseWriter, r *http.Request) (*models.TourDetail, bool) {
 	a := accountFrom(r.Context())
 	privileged := a != nil && a.Role.AtLeast(models.AccountRoleCurator)
 	tour, err := d.Store.GetTour(r.Context(), chi.URLParam(r, "tour"), !privileged)
@@ -222,7 +222,33 @@ func (d Deps) visibleTour(w http.ResponseWriter, r *http.Request) (*models.TourD
 	return tour, true
 }
 
+func (d Deps) visibleTour(w http.ResponseWriter, r *http.Request) (*models.TourDetail, bool) {
+	tour, ok := d.visibleTourBase(w, r)
+	if !ok {
+		return nil, false
+	}
+	if tour.Status != models.EntityStatusPublished {
+		return tour, true
+	}
+	account := ""
+	if a := accountFrom(r.Context()); a != nil {
+		account = a.ID
+	}
+	served, err := d.Store.ServedTour(r.Context(), tour, account)
+	if err != nil {
+		d.fail(w, err)
+		return nil, false
+	}
+	if !canSeeTour(&served.TourSummary, accountFrom(r.Context())) {
+		writeError(w, http.StatusNotFound, "not_found", "not found")
+		return nil, false
+	}
+	return served, true
+}
+
 func (d Deps) getTour(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Vary", "Authorization")
 	tour, ok := d.visibleTour(w, r)
 	if !ok {
 		return
@@ -231,6 +257,8 @@ func (d Deps) getTour(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) getTourRoute(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Vary", "Authorization")
 	tour, ok := d.visibleTour(w, r)
 	if !ok {
 		return
@@ -243,7 +271,22 @@ func (d Deps) getTourRoute(w http.ResponseWriter, r *http.Request) {
 		writeValidation(w, map[string]string{"mode": "must be walk or bike"})
 		return
 	}
-	route, err := d.Store.GetTourRoute(r.Context(), tour.ID, mode)
+	var route *models.TourRoute
+	var err error
+	if !tour.WorkingCopy && tour.RevisionID != nil {
+		var revision *models.TourRevision
+		revision, err = d.Store.GetTourRevision(r.Context(), tour.ID, *tour.RevisionID)
+		if err == nil {
+			value, exists := revision.Snapshot.Routes[mode]
+			if !exists {
+				err = repository.ErrNotFound
+			} else {
+				route = &value
+			}
+		}
+	} else {
+		route, err = d.Store.GetTourRoute(r.Context(), tour.ID, mode)
+	}
 	if err != nil {
 		d.fail(w, err)
 		return

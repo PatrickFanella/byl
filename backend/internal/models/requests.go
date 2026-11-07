@@ -232,6 +232,7 @@ func (r UpdateMomentRequest) Validate() Fields {
 
 // StopInput is one stop in a stops list.
 type StopInput struct {
+	ID               string  `json:"stop_id,omitempty"`
 	PlaceID          string  `json:"place_id"`
 	FeaturedMomentID *string `json:"featured_moment_id"`
 	Note             string  `json:"note"`
@@ -239,7 +240,8 @@ type StopInput struct {
 
 // StopsRequest replaces a tour's stops.
 type StopsRequest struct {
-	Stops []StopInput `json:"stops"`
+	DraftVersion *int64      `json:"draft_version,omitempty"`
+	Stops        []StopInput `json:"stops"`
 }
 
 func (r StopsRequest) Validate() Fields {
@@ -277,12 +279,13 @@ func (r CreateTourRequest) Validate() Fields {
 
 // UpdateTourRequest patches a tour.
 type UpdateTourRequest struct {
-	Title       *string         `json:"title"`
-	Summary     *string         `json:"summary"`
-	TopicID     *string         `json:"topic_id"`
-	Modes       []TravelMode    `json:"modes"`
-	HeroMediaID *string         `json:"hero_media_id"`
-	Visibility  *TourVisibility `json:"visibility"`
+	DraftVersion *int64          `json:"draft_version,omitempty"`
+	Title        *string         `json:"title"`
+	Summary      *string         `json:"summary"`
+	TopicID      *string         `json:"topic_id"`
+	Modes        []TravelMode    `json:"modes"`
+	HeroMediaID  *string         `json:"hero_media_id"`
+	Visibility   *TourVisibility `json:"visibility"`
 }
 
 func (r UpdateTourRequest) Validate() Fields {
@@ -318,11 +321,12 @@ func (r CreateUserTourRequest) Validate() Fields {
 
 // UpdateUserTourRequest patches a user route.
 type UpdateUserTourRequest struct {
-	Title      *string         `json:"title"`
-	Summary    *string         `json:"summary"`
-	Modes      []TravelMode    `json:"modes"`
-	Visibility *TourVisibility `json:"visibility"`
-	Stops      []StopInput     `json:"stops"`
+	DraftVersion *int64          `json:"draft_version,omitempty"`
+	Title        *string         `json:"title"`
+	Summary      *string         `json:"summary"`
+	Modes        []TravelMode    `json:"modes"`
+	Visibility   *TourVisibility `json:"visibility"`
+	Stops        []StopInput     `json:"stops"`
 }
 
 func (r UpdateUserTourRequest) Validate() Fields {

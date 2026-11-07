@@ -88,6 +88,8 @@ func NewRouter(d Deps) http.Handler {
 		r.Get("/topics/{id}", d.getTopic)
 		r.Get("/tours/{tour}", d.getTour)
 		r.Get("/tours/{tour}/route", d.getTourRoute)
+		r.Get("/tours/{tour}/revisions", d.listTourRevisions)
+		r.Get("/tours/{tour}/revisions/{revision}", d.getTourRevision)
 		r.Get("/media/{id}", d.getMedia)
 		r.Post("/auth/dev", d.devSignIn)
 		r.Get("/auth/dev", func(w http.ResponseWriter, r *http.Request) {
@@ -98,6 +100,9 @@ func NewRouter(d Deps) http.Handler {
 
 		r.Group(func(r chi.Router) {
 			r.Use(d.requireAuth)
+			r.Get("/me/progress/{tour}/revisions/{revision}", d.revisionProgress(false))
+			r.Put("/me/progress/{tour}/revisions/{revision}", d.revisionProgress(true))
+			r.Post("/me/tours/{id}/publish", d.publishMyTour)
 			r.Get("/me", d.me)
 			r.Get("/me/route-briefs", d.listRouteBriefs(false))
 			r.Post("/me/route-briefs", d.routeBriefIntakeDisabled)

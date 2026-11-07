@@ -45,19 +45,25 @@ type CreateTourInput struct {
 
 // UpdateTourInput patches a tour. Nil pointers and nil slices leave fields unchanged.
 type UpdateTourInput struct {
-	Title       *string
-	Summary     *string
-	TopicID     *string
-	ClearTopic  bool
-	Modes       []models.TravelMode
-	HeroMediaID *string
-	Visibility  *models.TourVisibility
+	ExpectedVersion    *int64
+	DeferLegacyRelease bool
+	Title              *string
+	Summary            *string
+	TopicID            *string
+	ClearTopic         bool
+	Modes              []models.TravelMode
+	HeroMediaID        *string
+	Visibility         *models.TourVisibility
 }
 
 const tourCols = `t.id, t.city_id,
 	ARRAY(SELECT city_id::text FROM (SELECT t.city_id UNION SELECT p.city_id FROM tour_stops ts JOIN places p ON p.id=ts.place_id WHERE ts.tour_id=t.id) coverage ORDER BY city_id),
 	t.slug, t.title, t.summary, t.topic_id, t.modes::text[], t.hero_media_id, t.status, t.visibility, t.owner_account_id,
-	(SELECT count(*) FROM tour_stops ts WHERE ts.tour_id = t.id), t.created_at, t.updated_at`
+	(SELECT count(*) FROM tour_stops ts WHERE ts.tour_id = t.id), t.created_at, t.updated_at,
+ COALESCE((SELECT draft_version FROM tour_revision_state WHERE tour_id=t.id),0),
+ COALESCE((SELECT route_version FROM tour_revision_state WHERE tour_id=t.id),0),
+ (SELECT current_revision_id FROM tour_revision_state WHERE tour_id=t.id),
+ COALESCE((SELECT r.number FROM tour_revision_state st JOIN tour_revisions r ON r.id=st.current_revision_id WHERE st.tour_id=t.id),0)`
 
 type tourRow struct {
 	models.TourSummary
@@ -67,7 +73,7 @@ type tourRow struct {
 func scanTour(row interface{ Scan(...any) error }) (tourRow, error) {
 	var r tourRow
 	var modes []string
-	err := row.Scan(&r.ID, &r.CityID, &r.CityIDs, &r.Slug, &r.Title, &r.Summary, &r.TopicID, &modes, &r.heroMediaID, &r.Status, &r.Visibility, &r.OwnerAccountID, &r.StopCount, &r.CreatedAt, &r.UpdatedAt)
+	err := row.Scan(&r.ID, &r.CityID, &r.CityIDs, &r.Slug, &r.Title, &r.Summary, &r.TopicID, &modes, &r.heroMediaID, &r.Status, &r.Visibility, &r.OwnerAccountID, &r.StopCount, &r.CreatedAt, &r.UpdatedAt, &r.DraftVersion, &r.RouteVersion, &r.RevisionID, &r.RevisionNumber)
 	if err != nil {
 		return r, err
 	}
@@ -98,7 +104,7 @@ func modesArg(modes []models.TravelMode) []string {
 
 // queryTours loads tour summaries with topics, hero media, and route summaries.
 func (s *Store) queryTours(ctx context.Context, q dbtx, where string, args ...any) ([]models.TourSummary, error) {
-	rows, err := q.Query(ctx, `SELECT `+tourCols+` FROM tours t `+where, args...)
+	rows, err := q.Query(ctx, `SELECT `+tourCols+` FROM tours t `+strings.Replace(where, "WHERE ", "WHERE NOT EXISTS(SELECT 1 FROM tour_revision_state ds WHERE ds.tour_id=t.id AND ds.deleted_at IS NOT NULL) AND ", 1), args...)
 	if err != nil {
 		return nil, mapErr(err)
 	}
@@ -193,6 +199,9 @@ func (s *Store) routeSummaries(ctx context.Context, q dbtx, tourIDs []string) (m
 
 // ListTours returns tour summaries and the next cursor.
 func (s *Store) ListTours(ctx context.Context, f TourFilter) ([]models.TourSummary, string, error) {
+	if f.PublicOnly {
+		return s.listPublishedTours(ctx, f)
+	}
 	where := []string{"TRUE"}
 	args := []any{}
 	add := func(v any) int { args = append(args, v); return len(args) }
@@ -242,9 +251,9 @@ func (s *Store) ResolveTourID(ctx context.Context, ref string) (string, error) {
 	var id string
 	var err error
 	if isUUID(ref) {
-		err = s.pool.QueryRow(ctx, `SELECT id FROM tours WHERE id = $1`, ref).Scan(&id)
+		err = s.pool.QueryRow(ctx, `SELECT id FROM tours WHERE id = $1 AND NOT EXISTS(SELECT 1 FROM tour_revision_state ds WHERE ds.tour_id=tours.id AND ds.deleted_at IS NOT NULL)`, ref).Scan(&id)
 	} else {
-		err = s.pool.QueryRow(ctx, `SELECT id FROM tours WHERE slug = $1`, ref).Scan(&id)
+		err = s.pool.QueryRow(ctx, `SELECT id FROM tours WHERE slug = $1 AND NOT EXISTS(SELECT 1 FROM tour_revision_state ds WHERE ds.tour_id=tours.id AND ds.deleted_at IS NOT NULL)`, ref).Scan(&id)
 	}
 	return id, mapErr(err)
 }
@@ -267,7 +276,7 @@ func (s *Store) GetTour(ctx context.Context, ref string, publicOnly bool) (*mode
 	if err != nil {
 		return nil, err
 	}
-	return &models.TourDetail{TourSummary: tours[0], Stops: stops}, nil
+	return &models.TourDetail{TourSummary: tours[0], Stops: stops, WorkingCopy: true}, nil
 }
 
 func (s *Store) tourStops(ctx context.Context, tourID string, publicOnly bool) ([]models.TourStop, error) {
@@ -381,7 +390,10 @@ func (s *Store) CreateTour(ctx context.Context, in CreateTourInput) (*models.Tou
 		if err := replaceStopsTx(ctx, tx, id, in.Stops); err != nil {
 			return err
 		}
-		return syncRoutesTx(ctx, tx, id, modes, true)
+		if err := syncRoutesTx(ctx, tx, id, modes, true); err != nil {
+			return err
+		}
+		return (&Store{pool: transactionDB{tx}, rawPool: s.rawPool}).publishRequestedRevisionTx(ctx, id)
 	})
 	if err != nil {
 		return nil, mapErr(err)
@@ -395,6 +407,9 @@ func (s *Store) UpdateTour(ctx context.Context, id string, in UpdateTourInput) (
 		// Existing tour writes take the tour lock before any topic lock, like ReplaceStops.
 		var lockedID string
 		if err := tx.QueryRow(ctx, `SELECT id FROM tours WHERE id=$1 FOR UPDATE`, id).Scan(&lockedID); err != nil {
+			return err
+		}
+		if err := bumpTourDraftTx(ctx, tx, id, in.Modes != nil, in.ExpectedVersion); err != nil {
 			return err
 		}
 		if !in.ClearTopic && in.TopicID != nil && *in.TopicID != "" {
@@ -421,9 +436,14 @@ func (s *Store) UpdateTour(ctx context.Context, id string, in UpdateTourInput) (
 			return err
 		}
 		if in.Modes != nil {
-			return syncRoutesTx(ctx, tx, id, modesArg(in.Modes), false)
+			if err := syncRoutesTx(ctx, tx, id, modesArg(in.Modes), false); err != nil {
+				return err
+			}
 		}
-		return nil
+		if in.DeferLegacyRelease {
+			return nil
+		}
+		return (&Store{pool: transactionDB{tx}, rawPool: s.rawPool}).publishRequestedRevisionTx(ctx, id)
 	})
 	if err != nil {
 		return nil, mapErr(err)
@@ -433,9 +453,17 @@ func (s *Store) UpdateTour(ctx context.Context, id string, in UpdateTourInput) (
 
 // ReplaceStops sets the stop list and requeues every route.
 func (s *Store) ReplaceStops(ctx context.Context, tourID string, stops []models.StopInput) error {
+	return s.ReplaceStopsVersioned(ctx, tourID, stops, nil)
+}
+
+// ReplaceStopsVersioned rejects stale editors and retains stable stop identities.
+func (s *Store) ReplaceStopsVersioned(ctx context.Context, tourID string, stops []models.StopInput, expected *int64) error {
 	return mapErr(s.withTx(ctx, func(tx pgx.Tx) error {
 		var modes []string
 		if err := tx.QueryRow(ctx, `SELECT modes::text[] FROM tours WHERE id = $1 FOR UPDATE`, tourID).Scan(&modes); err != nil {
+			return err
+		}
+		if err := bumpTourDraftTx(ctx, tx, tourID, true, expected); err != nil {
 			return err
 		}
 		if err := replaceStopsTx(ctx, tx, tourID, stops); err != nil {
@@ -451,6 +479,29 @@ func replaceStopsTx(ctx context.Context, tx pgx.Tx, tourID string, stops []model
 	if err := tx.QueryRow(ctx, `SELECT city_id,owner_account_id FROM tours WHERE id = $1 FOR UPDATE`, tourID).Scan(&cityID, &ownerID); err != nil {
 		return err
 	}
+	type previousStop struct {
+		id, place string
+		moment    *string
+	}
+	previous := []previousStop{}
+	rows, err := tx.Query(ctx, `SELECT id,place_id,featured_moment_id FROM tour_stops WHERE tour_id=$1 ORDER BY position`, tourID)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var p previousStop
+		if err := rows.Scan(&p.id, &p.place, &p.moment); err != nil {
+			rows.Close()
+			return err
+		}
+		previous = append(previous, p)
+	}
+	err = rows.Err()
+	rows.Close()
+	if err != nil {
+		return err
+	}
+	used := map[string]bool{}
 	if _, err := tx.Exec(ctx, `DELETE FROM tour_stops WHERE tour_id = $1`, tourID); err != nil {
 		return err
 	}
@@ -482,8 +533,20 @@ func replaceStopsTx(ctx context.Context, tx pgx.Tx, tourID string, stops []model
 			}
 			featured = *st.FeaturedMomentID
 		}
-		if _, err := tx.Exec(ctx, `INSERT INTO tour_stops (tour_id, position, place_id, featured_moment_id, note) VALUES ($1,$2,$3,$4,$5)`,
-			tourID, i+1, st.PlaceID, featured, st.Note); err != nil {
+		stable := ""
+		for _, p := range previous {
+			if !used[p.id] && p.place == st.PlaceID && sameOptionalID(p.moment, st.FeaturedMomentID) && (st.ID == "" || st.ID == p.id) {
+				stable = p.id
+				break
+			}
+		}
+		if st.ID != "" && stable == "" {
+			return fmt.Errorf("%w: stop ID does not match this tour/place/story", ErrInvalidReference)
+		}
+		if stable != "" {
+			used[stable] = true
+		}
+		if _, err := tx.Exec(ctx, `INSERT INTO tour_stops(id,tour_id,position,place_id,featured_moment_id,note) VALUES(COALESCE(NULLIF($1,'')::uuid,gen_random_uuid()),$2,$3,$4,$5,$6)`, stable, tourID, i+1, st.PlaceID, featured, st.Note); err != nil {
 			return err
 		}
 	}
@@ -505,6 +568,10 @@ func requireTourTopicCities(ctx context.Context, q dbtx, tourID string) error {
 // syncRoutesTx makes tour_routes match modes. New modes get a pending row and a job; when
 // requeueAll is set every mode is reset to pending and re-enqueued.
 func syncRoutesTx(ctx context.Context, tx pgx.Tx, tourID string, modes []string, requeueAll bool) error {
+	var version int64
+	if err := tx.QueryRow(ctx, `SELECT route_version FROM tour_revision_state WHERE tour_id=$1`, tourID).Scan(&version); err != nil {
+		return err
+	}
 	if _, err := tx.Exec(ctx, `DELETE FROM tour_routes WHERE tour_id = $1 AND NOT (mode::text = ANY($2))`, tourID, modes); err != nil {
 		return err
 	}
@@ -514,13 +581,21 @@ func syncRoutesTx(ctx context.Context, tx pgx.Tx, tourID string, modes []string,
 			return err
 		}
 		inserted := tag.RowsAffected() == 1
-		if requeueAll && !inserted {
+		requeue := requeueAll
+		if !inserted && !requeue {
+			var reusable bool
+			if err := tx.QueryRow(ctx, `SELECT r.status='ready' AND COALESCE(i.input_hash=byl_route_input_hash($1,$2),false) FROM tour_routes r LEFT JOIN tour_route_inputs i ON i.tour_id=r.tour_id AND i.mode=r.mode WHERE r.tour_id=$1 AND r.mode=$2`, tourID, m).Scan(&reusable); err != nil {
+				return err
+			}
+			requeue = !reusable
+		}
+		if requeue && !inserted {
 			if _, err := tx.Exec(ctx, `UPDATE tour_routes SET status = 'pending', error = '', updated_at = now() WHERE tour_id = $1 AND mode = $2`, tourID, m); err != nil {
 				return err
 			}
 		}
-		if inserted || requeueAll {
-			if err := enqueueTx(ctx, tx, models.JobKindComputeRoute, models.ComputeRoutePayload{TourID: tourID, Mode: models.TravelMode(m)}); err != nil {
+		if inserted || requeue {
+			if err := enqueueTx(ctx, tx, models.JobKindComputeRoute, models.ComputeRoutePayload{TourID: tourID, Mode: models.TravelMode(m), RouteVersion: version}); err != nil {
 				return err
 			}
 		}
@@ -528,16 +603,27 @@ func syncRoutesTx(ctx context.Context, tx pgx.Tx, tourID string, modes []string,
 	return nil
 }
 
-// DeleteTour removes a tour and its stops, routes, and progress.
+// DeleteTour hides retained releases; only never-published tours are removed.
 func (s *Store) DeleteTour(ctx context.Context, id string) error {
-	tag, err := s.pool.Exec(ctx, `DELETE FROM tours WHERE id = $1`, id)
-	if err != nil {
-		return mapErr(err)
-	}
-	if tag.RowsAffected() == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return s.Transaction(ctx, func(tx *Store) error {
+		var found string
+		if err := tx.pool.QueryRow(ctx, `SELECT id FROM tours WHERE id=$1 FOR UPDATE`, id).Scan(&found); err != nil {
+			return mapErr(err)
+		}
+		var retained bool
+		if err := tx.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_revisions WHERE tour_id=$1)`, id).Scan(&retained); err != nil {
+			return err
+		}
+		if !retained {
+			_, err := tx.pool.Exec(ctx, `DELETE FROM tours WHERE id=$1`, id)
+			return mapErr(err)
+		}
+		if _, err := tx.pool.Exec(ctx, `UPDATE tour_revision_state SET deleted_at=now(),release_requested_version=NULL WHERE tour_id=$1`, id); err != nil {
+			return err
+		}
+		_, err := tx.pool.Exec(ctx, `UPDATE tours SET status='draft',visibility='private',updated_at=now() WHERE id=$1`, id)
+		return err
+	})
 }
 
 // SetTourStatus changes a tour's status.
@@ -596,16 +682,20 @@ func (s *Store) TourPublishBlockers(ctx context.Context, id string) ([]string, e
 	if stopCount == 0 {
 		out = append(out, "tour has no stops")
 	}
-	rrows, err := s.pool.Query(ctx, `SELECT m::text, COALESCE(r.status::text, 'missing'), COALESCE(r.error, '') FROM unnest((SELECT modes FROM tours WHERE id = $1)) AS m
-		LEFT JOIN tour_routes r ON r.tour_id = $1 AND r.mode = m ORDER BY m`, id)
+	rrows, err := s.pool.Query(ctx, `SELECT m::text, COALESCE(r.status::text, 'missing'), COALESCE(r.error, ''), COALESCE(i.input_hash=byl_route_input_hash($1,m),false) FROM unnest((SELECT modes FROM tours WHERE id = $1)) AS m
+ LEFT JOIN tour_routes r ON r.tour_id=$1 AND r.mode=m LEFT JOIN tour_route_inputs i ON i.tour_id=$1 AND i.mode=m ORDER BY m`, id)
 	if err != nil {
 		return nil, mapErr(err)
 	}
 	defer rrows.Close()
 	for rrows.Next() {
 		var mode, status, errText string
-		if err := rrows.Scan(&mode, &status, &errText); err != nil {
+		var fresh bool
+		if err := rrows.Scan(&mode, &status, &errText, &fresh); err != nil {
 			return nil, err
+		}
+		if status == string(models.RouteStatusReady) && !fresh {
+			out = append(out, "route for "+mode+" inputs changed; recompute before publication")
 		}
 		if status != string(models.RouteStatusReady) {
 			msg := fmt.Sprintf("route for %s is %s", mode, status)
@@ -669,6 +759,12 @@ func (s *Store) UpsertRoute(ctx context.Context, r models.TourRoute) error {
 		ON CONFLICT (tour_id, mode) DO UPDATE SET status = EXCLUDED.status, provider = EXCLUDED.provider, distance_m = EXCLUDED.distance_m,
 			duration_s = EXCLUDED.duration_s, geometry = EXCLUDED.geometry, legs = EXCLUDED.legs, error = EXCLUDED.error, computed_at = EXCLUDED.computed_at, updated_at = now()`,
 		r.TourID, r.Mode, r.Status, r.Provider, r.DistanceM, r.DurationS, geom, legs, r.Error, computedAt)
+	if err != nil {
+		return mapErr(err)
+	}
+	if r.Status == models.RouteStatusReady {
+		_, err = s.pool.Exec(ctx, `INSERT INTO tour_route_inputs(tour_id,mode,input_hash) VALUES($1,$2,byl_route_input_hash($1,$2)) ON CONFLICT(tour_id,mode) DO UPDATE SET input_hash=excluded.input_hash`, r.TourID, r.Mode)
+	}
 	return mapErr(err)
 }
 
@@ -694,7 +790,10 @@ func (s *Store) TourStopPoints(ctx context.Context, tourID string) ([]geo.Point,
 func (s *Store) RecomputeRoutes(ctx context.Context, tourID string) error {
 	return mapErr(s.withTx(ctx, func(tx pgx.Tx) error {
 		var modes []string
-		if err := tx.QueryRow(ctx, `SELECT modes::text[] FROM tours WHERE id = $1`, tourID).Scan(&modes); err != nil {
+		if err := tx.QueryRow(ctx, `SELECT modes::text[] FROM tours WHERE id = $1 FOR UPDATE`, tourID).Scan(&modes); err != nil {
+			return err
+		}
+		if err := bumpTourDraftTx(ctx, tx, tourID, true, nil); err != nil {
 			return err
 		}
 		return syncRoutesTx(ctx, tx, tourID, modes, true)
@@ -703,8 +802,10 @@ func (s *Store) RecomputeRoutes(ctx context.Context, tourID string) error {
 
 // PublishedCuratedToursUsingPlace returns slugs of published curated (ownerless) tours that stop at the place.
 func (s *Store) PublishedCuratedToursUsingPlace(ctx context.Context, placeID string) ([]string, error) {
-	rows, err := s.pool.Query(ctx, `SELECT DISTINCT t.slug FROM tours t JOIN tour_stops ts ON ts.tour_id = t.id
-		WHERE ts.place_id = $1 AND t.status = 'published' AND t.owner_account_id IS NULL ORDER BY t.slug`, placeID)
+	rows, err := s.pool.Query(ctx, `SELECT DISTINCT t.slug FROM tours t JOIN tour_revision_state st ON st.tour_id=t.id LEFT JOIN tour_revisions r ON r.id=st.current_revision_id
+ WHERE t.status='published' AND t.owner_account_id IS NULL AND st.deleted_at IS NULL AND
+ ((r.id IS NOT NULL AND EXISTS(SELECT 1 FROM jsonb_array_elements(r.snapshot->'tour'->'stops') stop WHERE stop->'place'->>'id'=($1::uuid)::text)) OR
+ (r.id IS NULL AND EXISTS(SELECT 1 FROM tour_stops ts WHERE ts.tour_id=t.id AND ts.place_id=$1::uuid))) ORDER BY t.slug`, placeID)
 	if err != nil {
 		return nil, mapErr(err)
 	}

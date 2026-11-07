@@ -1,0 +1,487 @@
+{
+  "draft_version": 0,
+  "id": "57467d07-921d-4705-bef7-6e1b8800c4e2",
+  "number": 1,
+  "published_at": "2026-11-07T04:02:00.42149-06:00",
+  "snapshot": {
+    "moments": {
+      "00000000-0000-4000-8000-00000000d0d1": {
+        "body": "The arrival of the Chicago, Burlington \u0026 Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop became an organizing point for the village: shops, streets, houses and everyday journeys gathered around the tracks. The railway was both a connection to the city and a reason for a town center to develop here.\n\nThat change did not begin on empty ground. The Encyclopedia of Chicago describes a community of farming families already established around the grove. Samuel Curtiss laid out a subdivision in 1863, the year before the railroad arrived. The settlement incorporated as a village in 1873. Reading those dates together shows a sequence of land development, transportation investment and local government, rather than a town created in a single dramatic moment.\n\nThe railway also helps explain the shape of the wider community. Growth developed near the Main Street, Belmont and East Grove stations. A rail siding and access to Chicago later made Downers Grove a destination for mail-order houses supplied by Sears, Roebuck \u0026 Co. between 1908 and 1940. Building materials and commuters moved along the same corridor, connecting domestic life with a much larger regional economy.\n\nPassenger traffic eventually needed a different arrangement from freight handling. In 1911 a new passenger station replaced the original depot, which continued as a freight facility before being demolished. The Historical Society identifies the surviving building as Classical Revival with Beaux Arts influences. Its symmetrical front, pilasters and terra-cotta detailing belong to a station built almost half a century after the line arrived. Damage from the 1947 train wreck led to repairs using original bricks, giving the building itself evidence of successive periods of use and rebuilding.",
+        "created_at": "2026-11-07T10:01:58.703602Z",
+        "date_display": "1864",
+        "date_end": "1873-12-31",
+        "date_precision": "year",
+        "date_start": "1864-01-01",
+        "excerpt": "The arrival of the Chicago, Burlington \u0026 Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop…",
+        "has_narration": false,
+        "hero_media": {
+          "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
+          "created_at": "2026-11-07T10:01:58.738561Z",
+          "credit": "David Wilson",
+          "duration_seconds": null,
+          "external": false,
+          "height": 960,
+          "id": "00000000-0000-4000-8000-00000000f0f1",
+          "kind": "image",
+          "license": "CC-BY-2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0",
+          "mime_type": "image/jpeg",
+          "public_url": "https://byl.subcult.tv/media/files/library/images/main-street-station.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:20040511_29_Metra_Downers_Grove,_IL.jpg",
+          "status": "published",
+          "updated_at": "2026-11-07T10:01:58.738561Z",
+          "width": 1280
+        },
+        "id": "00000000-0000-4000-8000-00000000d0d1",
+        "media": [
+          {
+            "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
+            "created_at": "2026-11-07T10:01:58.738561Z",
+            "credit": "David Wilson",
+            "duration_seconds": null,
+            "external": false,
+            "height": 960,
+            "id": "00000000-0000-4000-8000-00000000f0f1",
+            "kind": "image",
+            "license": "CC-BY-2.0",
+            "license_url": "https://creativecommons.org/licenses/by/2.0",
+            "mime_type": "image/jpeg",
+            "public_url": "https://byl.subcult.tv/media/files/library/images/main-street-station.jpg",
+            "source_url": "https://commons.wikimedia.org/wiki/File:20040511_29_Metra_Downers_Grove,_IL.jpg",
+            "status": "published",
+            "updated_at": "2026-11-07T10:01:58.738561Z",
+            "width": 1280
+          }
+        ],
+        "narration": null,
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "slug": "the-burlington-arrives",
+        "sources": [
+          {
+            "license": "",
+            "note": "Railroad arrival, incorporation and mail-order housing.",
+            "publisher": "Encyclopedia of Chicago",
+            "retrieved_at": "2026-11-06",
+            "title": "Downers Grove, IL",
+            "url": "https://www.encyclopedia.chicagohistory.org/pages/389.html"
+          },
+          {
+            "license": "",
+            "note": "Original 1864 station and surviving 1911 passenger station. Historical ridership ranking is not repeated.",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-06",
+            "title": "Main Street Train Station",
+            "url": "https://dghistory.org/main-street-train-station/"
+          }
+        ],
+        "status": "published",
+        "title": "The Burlington Arrives",
+        "topic_ids": null,
+        "topics": [
+          {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "city_ids": [
+              "00000000-0000-4000-8000-0000000000c1"
+            ],
+            "description": "How the Chicago, Burlington \u0026 Quincy line turned a farm settlement into a railroad suburb, and how the daily commute still shapes downtown.",
+            "id": "00000000-0000-4000-8000-00000000a0a1",
+            "moment_count": 0,
+            "name": "Rail and the Commuter Town",
+            "slug": "rail-and-the-commuter-town"
+          }
+        ],
+        "updated_at": "2026-11-07T10:01:58.738561Z"
+      },
+      "00000000-0000-4000-8000-00000000d0d5": {
+        "body": "The 1846 house at the museum campus belonged to Israel and Avis Blodgett, abolitionists whose home offered shelter and help to people escaping slavery. Its history connects an ordinary domestic building in Downers Grove with a much wider struggle over freedom, law and human rights. The National Park Service identifies the house as a station on the Underground Railroad, with the family's activity likely extending from the early 1840s until Israel's death in 1861.\n\nThe Blodgetts came from Massachusetts and established a farm and blacksmithing business in the area. Their house replaced an earlier log cabin. Its simple Greek Revival form belongs to the period when settlers were building more permanent homes, but architecture alone does not explain its significance. The important history also concerns what the family did inside the house and the assistance they provided beyond it.\n\nThe National Park Service cites first-hand accounts from the Blodgetts' children and a daughter-in-law, as well as a contemporary antislavery newspaper. Those sources describe aid and shelter at the family home and secret nighttime transport toward the home of Philo Carpenter in Chicago. The house was accepted into the National Underground Railroad Network to Freedom in 2023. This is a documented association, rather than simply a local tradition awaiting its first supporting evidence.\n\nThe house has also had a history of relocation and preservation. It was moved when Charles Blodgett built a later family home in 1892, and it returned to the museum campus in 2008 after a preservation campaign. The building's survival required decisions made long after the events for which it is remembered. Visiting it today means encountering both a nineteenth-century home and the result of a modern effort to preserve evidence of that past.",
+        "created_at": "2026-11-07T10:01:58.703602Z",
+        "date_display": "1846",
+        "date_end": "1846-12-31",
+        "date_precision": "year",
+        "date_start": "1846-01-01",
+        "excerpt": "The 1846 house at the museum campus belonged to Israel and Avis Blodgett, abolitionists whose home offered shelter and help to people escaping slavery. Its history connects an ordinary domestic building in Downers Grove with a much wider…",
+        "has_narration": false,
+        "hero_media": {
+          "caption": "Family portrait: Henry Williams Blodgett, son of Israel and Avis, painted in 1875 by Alden Finney Brooks. Smithsonian National Portrait Gallery. Resized by Wikimedia.",
+          "created_at": "2026-11-07T10:01:58.738561Z",
+          "credit": "Alden Finney Brooks (1840-c. 1938)",
+          "duration_seconds": null,
+          "external": false,
+          "height": 1461,
+          "id": "00000000-0000-4000-8000-00000000f0f4",
+          "kind": "image",
+          "license": "CC0-1.0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+          "mime_type": "image/jpeg",
+          "public_url": "https://byl.subcult.tv/media/files/library/images/blodgett-family.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg",
+          "status": "published",
+          "updated_at": "2026-11-07T10:01:58.738561Z",
+          "width": 1280
+        },
+        "id": "00000000-0000-4000-8000-00000000d0d5",
+        "media": [
+          {
+            "caption": "Family portrait: Henry Williams Blodgett, son of Israel and Avis, painted in 1875 by Alden Finney Brooks. Smithsonian National Portrait Gallery. Resized by Wikimedia.",
+            "created_at": "2026-11-07T10:01:58.738561Z",
+            "credit": "Alden Finney Brooks (1840-c. 1938)",
+            "duration_seconds": null,
+            "external": false,
+            "height": 1461,
+            "id": "00000000-0000-4000-8000-00000000f0f4",
+            "kind": "image",
+            "license": "CC0-1.0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "mime_type": "image/jpeg",
+            "public_url": "https://byl.subcult.tv/media/files/library/images/blodgett-family.jpg",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg",
+            "status": "published",
+            "updated_at": "2026-11-07T10:01:58.738561Z",
+            "width": 1280
+          },
+          {
+            "caption": "History Happens Here: The 1846 Blodgett House",
+            "created_at": "2026-11-07T10:01:58.84753Z",
+            "credit": "Jim Toth / Node Films, with Downers Grove Museum and Downers Grove Historical Society",
+            "duration_seconds": null,
+            "external": true,
+            "height": null,
+            "id": "00000000-0000-4000-8000-00000000f1f5",
+            "kind": "video",
+            "license": "",
+            "license_url": "",
+            "mime_type": "",
+            "public_url": "https://www.youtube.com/watch?v=HD62Tk7lySY",
+            "source_url": "https://dghistory.org/videos/",
+            "status": "published",
+            "updated_at": "2026-11-07T10:01:58.84753Z",
+            "width": null
+          }
+        ],
+        "narration": null,
+        "place_id": "00000000-0000-4000-8000-00000000b0b4",
+        "slug": "blodgett-house",
+        "sources": [
+          {
+            "license": "",
+            "note": "Underground Railroad evidence, family accounts and Network to Freedom designation.",
+            "publisher": "National Park Service",
+            "retrieved_at": "2026-11-06",
+            "title": "Israel and Avis Blodgett House",
+            "url": "https://www.nps.gov/places/illinois-israel-and-avis-blodgett-house.htm"
+          },
+          {
+            "license": "",
+            "note": "Separate 1846 and 1892 buildings; relocation and museum interpretation.",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-06",
+            "title": "History Walk: Blodgett Homes and Museum",
+            "url": "https://dghistory.org/history-walk-6-blodgett-homes-museum/"
+          },
+          {
+            "license": "",
+            "note": "2008 relocation of the 1846 house; 1977 museum opening.",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-06",
+            "title": "Timeline of Downers Grove",
+            "url": "https://dghistory.org/dg-timeline/page/3/"
+          },
+          {
+            "license": "",
+            "note": "Painting by Alden Finney Brooks. Contextual family portrait, not a photograph of the museum buildings.",
+            "publisher": "Smithsonian National Portrait Gallery / Wikimedia Commons",
+            "retrieved_at": "2026-11-06",
+            "title": "Henry Williams Blodgett, 1875 portrait",
+            "url": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg"
+          }
+        ],
+        "status": "published",
+        "title": "Israel and Avis Blodgett and the Underground Railroad",
+        "topic_ids": null,
+        "topics": [
+          {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "city_ids": [
+              "00000000-0000-4000-8000-0000000000c1"
+            ],
+            "description": "The settlers, blacksmiths, and architects whose buildings survive, and the stories those buildings carry.",
+            "id": "00000000-0000-4000-8000-00000000a0a4",
+            "moment_count": 0,
+            "name": "Houses and Builders",
+            "slug": "houses-and-builders"
+          }
+        ],
+        "updated_at": "2026-11-07T10:01:58.738561Z"
+      }
+    },
+    "routes": {
+      "bike": {
+        "computed_at": "2026-11-07T10:02:00.422294Z",
+        "distance_m": 1387.7824910259208,
+        "duration_s": 308,
+        "geometry": {
+          "coordinates": [
+            [
+              -88.0092,
+              41.7959
+            ],
+            [
+              -88.0111,
+              41.8083
+            ]
+          ],
+          "type": "LineString"
+        },
+        "id": "8bf52cc3-d3ef-4562-b483-a45500c0894c",
+        "legs": [
+          {
+            "distance_m": 1387.7824910259208,
+            "duration_s": 308,
+            "from_position": 1,
+            "geometry": [
+              [
+                -88.0092,
+                41.7959
+              ],
+              [
+                -88.0111,
+                41.8083
+              ]
+            ],
+            "to_position": 2
+          }
+        ],
+        "mode": "bike",
+        "provider": "straightline",
+        "status": "ready",
+        "tour_id": "b61b2ac5-306e-4e4c-b68e-74a3dc8d2a4b"
+      },
+      "walk": {
+        "computed_at": "2026-11-07T10:02:00.347809Z",
+        "distance_m": 1387.7824910259208,
+        "duration_s": 1068,
+        "geometry": {
+          "coordinates": [
+            [
+              -88.0092,
+              41.7959
+            ],
+            [
+              -88.0111,
+              41.8083
+            ]
+          ],
+          "type": "LineString"
+        },
+        "id": "151800d0-ab5c-49f1-bfbd-9ddb6d9dc4c7",
+        "legs": [
+          {
+            "distance_m": 1387.7824910259208,
+            "duration_s": 1068,
+            "from_position": 1,
+            "geometry": [
+              [
+                -88.0092,
+                41.7959
+              ],
+              [
+                -88.0111,
+                41.8083
+              ]
+            ],
+            "to_position": 2
+          }
+        ],
+        "mode": "walk",
+        "provider": "straightline",
+        "status": "ready",
+        "tour_id": "b61b2ac5-306e-4e4c-b68e-74a3dc8d2a4b"
+      }
+    },
+    "routing_intent": {
+      "coordinate_source": "historical_site",
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "stops": [
+        {
+          "arrival_point": null,
+          "latitude": 41.7959,
+          "longitude": -88.0092,
+          "place_id": "00000000-0000-4000-8000-00000000b0b1",
+          "stop_id": "0152ed8c-ef31-483a-81da-fd0c1fc9ad7a"
+        },
+        {
+          "arrival_point": null,
+          "latitude": 41.8083,
+          "longitude": -88.0111,
+          "place_id": "00000000-0000-4000-8000-00000000b0b4",
+          "stop_id": "e4a59171-be43-4b6b-8689-94eb6f8a795c"
+        }
+      ]
+    },
+    "tour": {
+      "city_id": "00000000-0000-4000-8000-0000000000c1",
+      "city_ids": [
+        "00000000-0000-4000-8000-0000000000c1"
+      ],
+      "created_at": "2026-11-07T10:02:00.049228Z",
+      "draft_version": 0,
+      "hero_media": null,
+      "id": "b61b2ac5-306e-4e4c-b68e-74a3dc8d2a4b",
+      "modes": [
+        "walk",
+        "bike"
+      ],
+      "owner_account_id": "b5e4fe4c-e456-4233-889c-f3ead6b7fc93",
+      "revision_id": "57467d07-921d-4705-bef7-6e1b8800c4e2",
+      "revision_number": 1,
+      "route_version": 0,
+      "routes": {
+        "bike": {
+          "computed_at": "2026-11-07T10:02:00.422294Z",
+          "distance_m": 1387.7824910259208,
+          "duration_s": 308,
+          "estimated_minutes": 6,
+          "mode": "bike",
+          "status": "ready"
+        },
+        "walk": {
+          "computed_at": "2026-11-07T10:02:00.347809Z",
+          "distance_m": 1387.7824910259208,
+          "duration_s": 1068,
+          "estimated_minutes": 18,
+          "mode": "walk",
+          "status": "ready"
+        }
+      },
+      "slug": "wucr5b4fb2",
+      "status": "published",
+      "stop_count": 2,
+      "stops": [
+        {
+          "featured_moment": {
+            "date_display": "1864",
+            "date_end": "1873-12-31",
+            "date_precision": "year",
+            "date_start": "1864-01-01",
+            "excerpt": "The arrival of the Chicago, Burlington \u0026 Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop…",
+            "has_narration": false,
+            "hero_media": {
+              "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
+              "created_at": "2026-11-07T10:01:58.738561Z",
+              "credit": "David Wilson",
+              "duration_seconds": null,
+              "external": false,
+              "height": 960,
+              "id": "00000000-0000-4000-8000-00000000f0f1",
+              "kind": "image",
+              "license": "CC-BY-2.0",
+              "license_url": "https://creativecommons.org/licenses/by/2.0",
+              "mime_type": "image/jpeg",
+              "public_url": "https://byl.subcult.tv/media/files/library/images/main-street-station.jpg",
+              "source_url": "https://commons.wikimedia.org/wiki/File:20040511_29_Metra_Downers_Grove,_IL.jpg",
+              "status": "published",
+              "updated_at": "2026-11-07T10:01:58.738561Z",
+              "width": 1280
+            },
+            "id": "00000000-0000-4000-8000-00000000d0d1",
+            "place_id": "00000000-0000-4000-8000-00000000b0b1",
+            "slug": "the-burlington-arrives",
+            "status": "published",
+            "title": "The Burlington Arrives",
+            "topic_ids": null
+          },
+          "featured_moment_id": null,
+          "id": "0152ed8c-ef31-483a-81da-fd0c1fc9ad7a",
+          "note": "",
+          "place": {
+            "address": "5001 Main St, Downers Grove, IL",
+            "arrival_point": null,
+            "arrival_radius_m": 50,
+            "arrival_version": 0,
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "created_at": "2026-11-07T10:01:58.703602Z",
+            "id": "00000000-0000-4000-8000-00000000b0b1",
+            "kind": "station",
+            "latitude": 41.7959,
+            "longitude": -88.0092,
+            "moment_count": 3,
+            "name": "Main Street Station",
+            "primary_moment_id": "00000000-0000-4000-8000-00000000d0d1",
+            "slug": "main-street-station",
+            "status": "published",
+            "summary": "A downtown railway stop shaped by the 1864 arrival of the Burlington line, the surviving 1911 passenger station, and generations of commuter travel.",
+            "updated_at": "2026-11-07T10:01:58.703602Z"
+          },
+          "position": 1
+        },
+        {
+          "featured_moment": {
+            "date_display": "1846",
+            "date_end": "1846-12-31",
+            "date_precision": "year",
+            "date_start": "1846-01-01",
+            "excerpt": "The 1846 house at the museum campus belonged to Israel and Avis Blodgett, abolitionists whose home offered shelter and help to people escaping slavery. Its history connects an ordinary domestic building in Downers Grove with a much wider…",
+            "has_narration": false,
+            "hero_media": {
+              "caption": "Family portrait: Henry Williams Blodgett, son of Israel and Avis, painted in 1875 by Alden Finney Brooks. Smithsonian National Portrait Gallery. Resized by Wikimedia.",
+              "created_at": "2026-11-07T10:01:58.738561Z",
+              "credit": "Alden Finney Brooks (1840-c. 1938)",
+              "duration_seconds": null,
+              "external": false,
+              "height": 1461,
+              "id": "00000000-0000-4000-8000-00000000f0f4",
+              "kind": "image",
+              "license": "CC0-1.0",
+              "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+              "mime_type": "image/jpeg",
+              "public_url": "https://byl.subcult.tv/media/files/library/images/blodgett-family.jpg",
+              "source_url": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg",
+              "status": "published",
+              "updated_at": "2026-11-07T10:01:58.738561Z",
+              "width": 1280
+            },
+            "id": "00000000-0000-4000-8000-00000000d0d5",
+            "place_id": "00000000-0000-4000-8000-00000000b0b4",
+            "slug": "blodgett-house",
+            "status": "published",
+            "title": "Israel and Avis Blodgett and the Underground Railroad",
+            "topic_ids": null
+          },
+          "featured_moment_id": null,
+          "id": "e4a59171-be43-4b6b-8689-94eb6f8a795c",
+          "note": "",
+          "place": {
+            "address": "831 Maple Ave, Downers Grove, IL",
+            "arrival_point": null,
+            "arrival_radius_m": 60,
+            "arrival_version": 0,
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "created_at": "2026-11-07T10:01:58.703602Z",
+            "id": "00000000-0000-4000-8000-00000000b0b4",
+            "kind": "site",
+            "latitude": 41.8083,
+            "longitude": -88.0111,
+            "moment_count": 2,
+            "name": "Downers Grove Museum",
+            "primary_moment_id": "00000000-0000-4000-8000-00000000d0d5",
+            "slug": "downers-grove-museum",
+            "status": "published",
+            "summary": "A local-history campus with two distinct Blodgett houses: the 1846 home associated with the Underground Railroad and the 1892 Charles Blodgett house.",
+            "updated_at": "2026-11-07T10:01:58.703602Z"
+          },
+          "position": 2
+        }
+      ],
+      "summary": "",
+      "title": "Synthetic revision compatibility trip",
+      "topic": null,
+      "topic_id": null,
+      "updated_at": "2026-11-07T10:02:00.42149Z",
+      "visibility": "unlisted"
+    }
+  },
+  "tour_id": "b61b2ac5-306e-4e4c-b68e-74a3dc8d2a4b"
+}

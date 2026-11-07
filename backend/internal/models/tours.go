@@ -55,6 +55,10 @@ func (r TourRoute) Summary() RouteSummary {
 
 // TourSummary is a tour without stops.
 type TourSummary struct {
+	DraftVersion   int64                       `json:"draft_version"`
+	RouteVersion   int64                       `json:"route_version"`
+	RevisionID     *string                     `json:"revision_id"`
+	RevisionNumber int64                       `json:"revision_number"`
 	ID             string                      `json:"id"`
 	CityID         string                      `json:"city_id"`
 	CityIDs        []string                    `json:"city_ids"`
@@ -86,12 +90,14 @@ type TourStop struct {
 
 // TourDetail is a tour with its stops.
 type TourDetail struct {
+	WorkingCopy bool `json:"-"`
 	TourSummary
 	Stops []TourStop `json:"stops"`
 }
 
 // TourProgress records a visitor's progress through a tour.
 type TourProgress struct {
+	RevisionID       string     `json:"revision_id,omitempty"`
 	AccountID        string     `json:"account_id"`
 	TourID           string     `json:"tour_id"`
 	Mode             TravelMode `json:"mode"`

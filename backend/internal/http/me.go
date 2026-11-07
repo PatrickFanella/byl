@@ -120,15 +120,23 @@ func (d Deps) updateMyTour(w http.ResponseWriter, r *http.Request) {
 			req.Stops[i].FeaturedMomentID = nil
 		}
 	}
-	if _, err := d.Store.UpdateTour(r.Context(), tour.ID, repository.UpdateTourInput{Title: req.Title, Summary: req.Summary, Modes: req.Modes, Visibility: req.Visibility}); err != nil {
+	expected := req.DraftVersion
+	if expected == nil {
+		expected = &tour.DraftVersion
+	}
+	err := d.Store.Transaction(r.Context(), func(tx *repository.Store) error {
+		updated, err := tx.UpdateTour(r.Context(), tour.ID, repository.UpdateTourInput{Title: req.Title, Summary: req.Summary, Modes: req.Modes, Visibility: req.Visibility, ExpectedVersion: expected, DeferLegacyRelease: req.Stops != nil})
+		if err != nil {
+			return err
+		}
+		if req.Stops != nil {
+			return tx.ReplaceStopsVersioned(r.Context(), tour.ID, req.Stops, &updated.DraftVersion)
+		}
+		return nil
+	})
+	if err != nil {
 		d.fail(w, err)
 		return
-	}
-	if req.Stops != nil {
-		if err := d.Store.ReplaceStops(r.Context(), tour.ID, req.Stops); err != nil {
-			d.fail(w, err)
-			return
-		}
 	}
 	updated, err := d.Store.GetTour(r.Context(), tour.ID, false)
 	if err != nil {

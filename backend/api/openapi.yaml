@@ -90,12 +90,13 @@ paths:
   /api/v1/tours/{tour}:
     get:
       summary: Get a tour with stops, featured moments, and route summaries
-      description: Public and unlisted published tours are visible to everyone; private tours only to their owner; unpublished tours to their owner and curators.
+      description: Public and unlisted published tours are visible to everyone; private tours only to their owner; unpublished tours to their owner and curators. Published reads serve the current immutable revision, or an authenticated legacy trip's pinned revision until progress reset. Attach the bearer token when resuming a trip. Editing endpoints return the working copy.
       parameters: [{ name: tour, in: path, required: true, schema: { type: string }, description: Tour id or slug }]
       responses: { "200": { description: OK }, "404": { description: Not found } }
   /api/v1/tours/{tour}/route:
     get:
       summary: Get the full route geometry for a mode
+      description: Uses the same published or authenticated legacy trip revision as the tour read. Geometry in an existing revision does not change after recomputation.
       parameters:
         - { name: tour, in: path, required: true, schema: { type: string } }
         - { name: mode, in: query, schema: { type: string, enum: [walk, bike], default: walk } }
@@ -424,8 +425,10 @@ paths:
   /api/v1/admin/tours/{id}/publish:
     post:
       summary: "Publish a tour; refuses unless every place is published and every route is ready"
+      description: Atomically snapshot an expected draft and advance its published pointer. An omitted body uses the server-loaded versions for older clients; revision-aware clients send both expected values. Current site coordinates must match the route input digest.
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: false, content: { application/json: { schema: { $ref: "#/components/schemas/PublishRevisionRequest" } } } }
       responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: Conflict }, "401": { description: Unauthorized } }
   /api/v1/admin/tours/{id}/unpublish:
     post:
@@ -863,6 +866,61 @@ paths:
         "404": { description: Proposal not found under this place }
         "409": { description: Already reviewed or a newer arrival was approved }
         "422": { description: Invalid review or source context }
+  /api/v1/tours/{tour}/revisions:
+    get:
+      summary: List immutable published tour revision metadata
+      description: Current tour visibility still applies. Private historical releases are visible only to the owner or curators.
+      parameters:
+        - { name: tour, in: path, required: true, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, default: 20, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Retained release metadata without snapshot bodies, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/TourRevision" } } } } } } }
+        "404": { description: Visible tour not found }
+  /api/v1/tours/{tour}/revisions/{revision}:
+    get:
+      summary: Read a pinned itinerary, reviewed story text, input intent and full geometry
+      description: Snapshot content is immutable. Current visibility revocation and deletion still apply, as does visibility of this historical release. Media references and rights metadata are pinned; this is not a promise of perpetual remote file availability.
+      parameters:
+        - { name: tour, in: path, required: true, schema: { type: string } }
+        - { name: revision, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: Immutable tour release, content: { application/json: { schema: { $ref: "#/components/schemas/TourRevision" } } } }
+        "404": { description: Visible revision not found under this tour }
+  /api/v1/me/progress/{tour}/revisions/{revision}:
+    parameters:
+      - { name: tour, in: path, required: true, schema: { type: string } }
+      - { name: revision, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      summary: Read this account's progress on one immutable itinerary
+      security: [{ bearer: [] }]
+      responses:
+        "200": { description: Private revision-scoped progress, content: { application/json: { schema: { $ref: "#/components/schemas/RevisionProgress" } } } }
+        "401": { description: Authentication required }
+        "404": { description: Visible revision or this account's progress not found }
+    put:
+      summary: Merge stable stop visits within exactly one revision
+      description: No position-based or cross-revision inheritance. Stop IDs must belong to this snapshot. Reset clears this revision's trip and cannot include visits or completion. Neither navigation progress nor a reset grants contribution consent.
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RevisionProgressRequest" } } } }
+      responses:
+        "200": { description: Private progress updated, content: { application/json: { schema: { $ref: "#/components/schemas/RevisionProgress" } } } }
+        "400": { description: Invalid JSON or unknown fields }
+        "401": { description: Authentication required }
+        "404": { description: Visible revision not found under this tour }
+        "422": { description: Invalid mode, reset or stop identity }
+  /api/v1/me/tours/{id}/publish:
+    post:
+      summary: Explicitly release an owned tour draft as a new immutable revision
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: false, content: { application/json: { schema: { $ref: "#/components/schemas/PublishRevisionRequest" } } } }
+      responses:
+        "200": { description: Released latest-tour view, content: { application/json: { schema: { $ref: "#/components/schemas/TourDetail" } } } }
+        "401": { description: Authentication required }
+        "404": { description: Owned tour not found }
+        "409": { description: Stale draft/published pointer, unready routes, changed routing inputs or publication blockers }
+        "422": { description: Invalid expected version }
 components:
   securitySchemes:
     bearer:
@@ -870,6 +928,54 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    PublishRevisionRequest:
+      type: object
+      additionalProperties: false
+      required: [draft_version, current_revision_id]
+      properties:
+        draft_version: { type: integer, format: int64, minimum: 0 }
+        current_revision_id: { type: string, format: uuid, nullable: true, description: Null before first release; compare the current published pointer as well as the working draft }
+    TourSnapshot:
+      type: object
+      properties:
+        tour: { $ref: "#/components/schemas/TourDetail" }
+        moments: { type: object, additionalProperties: { $ref: "#/components/schemas/MomentDetail" }, description: Full reviewed selected stories and source/media metadata as captured at release }
+        routes: { type: object, additionalProperties: { $ref: "#/components/schemas/TourRoute" } }
+        routing_intent:
+          type: object
+          properties:
+            modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
+            coordinate_source: { type: string, enum: [historical_site] }
+            stops: { type: array, items: { type: object, properties: { stop_id: { type: string }, place_id: { type: string }, latitude: { type: number }, longitude: { type: number }, arrival_point: { $ref: "#/components/schemas/ApprovedArrival", nullable: true } } } }
+    TourRevision:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        tour_id: { type: string, format: uuid }
+        number: { type: integer, format: int64, minimum: 1 }
+        draft_version: { type: integer, format: int64, minimum: 0 }
+        published_at: { type: string, format: date-time }
+        snapshot: { $ref: "#/components/schemas/TourSnapshot", description: Omitted on the paginated metadata list }
+    RevisionProgressRequest:
+      type: object
+      additionalProperties: false
+      required: [mode]
+      properties:
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        visited_stop_ids: { type: array, maxItems: 30, items: { type: string, format: uuid }, description: Stable IDs from this revision's stops }
+        completed: { type: boolean, default: false }
+        reset: { type: boolean, default: false }
+    RevisionProgress:
+      type: object
+      properties:
+        account_id: { type: string, format: uuid }
+        tour_id: { type: string, format: uuid }
+        revision_id: { type: string, format: uuid }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        visited_stop_ids: { type: array, items: { type: string, format: uuid } }
+        started_at: { type: string, format: date-time }
+        completed_at: { type: string, format: date-time, nullable: true }
+        updated_at: { type: string, format: date-time }
     ArrivalAccess:
       type: object
       additionalProperties: false
@@ -1362,6 +1468,10 @@ components:
       type: object
       required: [id, city_id, slug, title, summary, modes, status, visibility, stop_count, routes, created_at, updated_at]
       properties:
+        draft_version: { type: integer, format: int64, minimum: 0, description: Editable working-copy generation; snapshot reads return their captured generation }
+        route_version: { type: integer, format: int64, minimum: 0 }
+        revision_id: { type: string, nullable: true, description: Current release for editing views; served revision for public views }
+        revision_number: { type: integer, format: int64, minimum: 0 }
         id: { type: string, format: uuid }
         city_id: { type: string, format: uuid, description: Original discovery city retained for older clients; stops retain their actual municipalities }
         city_ids: { type: array, items: { type: string, format: uuid }, uniqueItems: true, readOnly: true, description: Original city plus municipalities of the current stops. Optional on older API versions. }
@@ -1399,6 +1509,7 @@ components:
       type: object
       required: [account_id, tour_id, mode, visited_positions, started_at, updated_at]
       properties:
+        revision_id: { type: string, format: uuid, description: Legacy positions refer only to this pinned snapshot until explicit reset }
         account_id: { type: string, format: uuid }
         tour_id: { type: string, format: uuid }
         mode: { $ref: "#/components/schemas/TravelMode" }
@@ -1463,6 +1574,7 @@ components:
       type: object
       required: [place_id]
       properties:
+        stop_id: { type: string, format: uuid, description: Optional existing stop identity from this tour with the same place and featured story; omit for a new stop. Legacy requests retain matching identities automatically. }
         place_id: { type: string, format: uuid }
         featured_moment_id: { type: string, format: uuid, nullable: true, description: Ignored for user routes }
         note: { type: string }
@@ -1479,6 +1591,7 @@ components:
     UpdateUserTourRequest:
       type: object
       properties:
+        draft_version: { type: integer, format: int64, minimum: 0 }
         title: { type: string }
         summary: { type: string }
         modes: { type: array, items: { $ref: "#/components/schemas/TravelMode" } }
@@ -1632,6 +1745,7 @@ components:
     UpdateTourRequest:
       type: object
       properties:
+        draft_version: { type: integer, format: int64, minimum: 0, description: Expected working draft version; legacy omissions use the server-loaded version }
         title: { type: string }
         summary: { type: string }
         topic_id: { type: string, format: uuid, description: Empty string clears }
@@ -1642,6 +1756,7 @@ components:
       type: object
       required: [stops]
       properties:
+        draft_version: { type: integer, format: int64, minimum: 0 }
         stops: { type: array, minItems: 1, maxItems: 30, items: { $ref: "#/components/schemas/StopInput" } }
     CreateCandidateRequest:
       type: object

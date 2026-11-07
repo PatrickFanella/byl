@@ -172,7 +172,11 @@ func (w *Worker) dispatch(ctx context.Context, job *models.Job) (string, error) 
 		if err := json.Unmarshal(job.Payload, &p); err != nil {
 			return "", fmt.Errorf("decode payload: %w", err)
 		}
-		return "", w.computeRoute(ctx, p)
+		err := w.computeRoute(ctx, p)
+		if errors.Is(err, repository.ErrRouteSuperseded) {
+			return "route_superseded", nil
+		}
+		return "", err
 	case models.JobKindGenerateNarration:
 		var p models.GenerateNarrationPayload
 		if err := json.Unmarshal(job.Payload, &p); err != nil {
@@ -232,5 +236,13 @@ func (w *Worker) onFinalFailure(ctx context.Context, job *models.Job, runErr err
 	if err := json.Unmarshal(job.Payload, &p); err != nil {
 		return nil
 	}
-	return w.store.UpsertRoute(ctx, models.TourRoute{TourID: p.TourID, Mode: p.Mode, Status: models.RouteStatusFailed, Error: runErr.Error()})
+	var inputFailure routeInputFailure
+	if !errors.As(runErr, &inputFailure) {
+		return nil
+	}
+	err := w.store.UpsertRouteVersioned(ctx, models.TourRoute{TourID: p.TourID, Mode: p.Mode, Status: models.RouteStatusFailed, Error: runErr.Error()}, p.RouteVersion, inputFailure.digest)
+	if errors.Is(err, repository.ErrRouteSuperseded) || errors.Is(err, repository.ErrNotFound) {
+		return nil
+	}
+	return err
 }

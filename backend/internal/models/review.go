@@ -81,8 +81,9 @@ type FetchMediaPayload struct {
 
 // ComputeRoutePayload is the payload of a compute_route job.
 type ComputeRoutePayload struct {
-	TourID string     `json:"tour_id"`
-	Mode   TravelMode `json:"mode"`
+	RouteVersion int64      `json:"route_version"`
+	TourID       string     `json:"tour_id"`
+	Mode         TravelMode `json:"mode"`
 }
 
 // GenerateNarrationPayload is the payload of a generate_narration job.

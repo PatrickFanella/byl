@@ -63,22 +63,22 @@ func TestUnpublishPlaceOnPublishedTourRefused(t *testing.T) {
 	}
 }
 
-// Finding 2: stop and route changes on a published curated tour are refused; user routes stay editable.
-func TestStopChangesOnPublishedCuratedTourRefused(t *testing.T) {
+// Published working-copy edits cannot replace the released geometry or stops.
+func TestStopChangesKeepPublishedCuratedSnapshot(t *testing.T) {
 	env := newTestEnv(t)
 	curator := env.signIn(t, "c@example.com", models.AccountRoleCurator)
 	env.drain(t)
 	body := map[string]any{"stops": []map[string]any{{"place_id": testdb.SeedPlaceStationID}, {"place_id": testdb.SeedPlaceMuseumID}}}
-	if r := env.do(t, http.MethodPut, "/api/v1/admin/tours/"+testdb.SeedTourID+"/stops", curator, body); r.status != 409 {
+	if r := env.do(t, http.MethodPut, "/api/v1/admin/tours/"+testdb.SeedTourID+"/stops", curator, body); r.status != 200 {
 		t.Fatalf("stops on published tour: %d %s", r.status, r.raw)
 	}
-	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+testdb.SeedTourID+"/routes/recompute", curator, nil); r.status != 409 {
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+testdb.SeedTourID+"/routes/recompute", curator, nil); r.status != 202 {
 		t.Fatalf("recompute on published tour: %d %s", r.status, r.raw)
 	}
-	if r := env.do(t, http.MethodPatch, "/api/v1/admin/tours/"+testdb.SeedTourID, curator, map[string]any{"modes": []string{"walk"}}); r.status != 409 {
+	if r := env.do(t, http.MethodPatch, "/api/v1/admin/tours/"+testdb.SeedTourID, curator, map[string]any{"modes": []string{"walk"}}); r.status != 200 {
 		t.Fatalf("mode change on published tour: %d %s", r.status, r.raw)
 	}
-	if r := env.get(t, "/api/v1/tours/downtown-memory-loop", ""); r.body["routes"].(map[string]any)["walk"].(map[string]any)["status"] != "ready" {
+	if r := env.get(t, "/api/v1/tours/downtown-memory-loop", ""); len(r.body["stops"].([]any)) != 4 || r.body["routes"].(map[string]any)["walk"].(map[string]any)["status"] != "ready" {
 		t.Fatalf("published tour must keep its geometry: %s", r.raw)
 	}
 	env.do(t, http.MethodPost, "/api/v1/admin/tours/"+testdb.SeedTourID+"/unpublish", curator, nil)

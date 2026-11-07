@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 11, then saves a PostgreSQL
+changed migration files or a schema version other than 12, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -397,3 +397,45 @@ This is the access-data and selection foundation for subsequent routing work.
 The current route worker and existing web/native clients do not adopt these points
 yet; route intent, recomputation fences and client adoption belong to their own
 issues. Existing computed geometry is not certified as legal/public access.
+
+
+## Immutable tour revisions, migration 12
+
+Migration 12 adds immutable `tour_revisions`, `tour_revision_state`, route-input
+digests, revision progress and legacy trip pins. Existing published tours receive
+revision 1. Legacy progress positions map only to stop IDs in that snapshot;
+out-of-range positions are omitted from the projection. Original `tour_progress`
+rows remain unchanged for recovery, including their original timestamps and
+invalid positions. Existing working tours, stops, routes and historical site
+coordinates remain unchanged. Published snapshots retain content and geometry
+when those working records change.
+
+Before admission, restore a fresh schema-11 production backup into an isolated
+database and apply the exact accepted migration. Compare all preexisting table
+fingerprints, publication counts, snapshot content/geometry and progress mappings.
+Check the previous API's catalogue reads against the expanded schema. Require
+published routes to be ready and the production route queue to be quiescent
+before capturing the backfill. Exercise concurrent publication/editing, stable
+stop identities, progress isolation/reset and stale route success/failure commits
+on disposable fixtures. Route jobs carry a routing version and a digest of actual
+mode, ordered stop IDs and site coordinates; neither a superseded result nor its
+last failure may overwrite the current working route.
+
+Under the receiver lock, take and independently restore a fresh database backup,
+archive media, then apply migration 12 as operator. Admit the exact twelve-file
+manifest and source hook expecting schema 12. CI applies no production SQL.
+Retain prior images, hook, manifest, table fingerprints, dumps and deployment
+receipts. Check the final image's SQL hashes against that admitted source before
+activation, then verify the live build, published snapshots, private API gates
+and existing public assets.
+
+Automatic down refuses to delete revision history. Retain schema 12 during image
+rollback. The previous API can read the expanded working tables, but its writes
+do not maintain revision pointers or progress: after revision-aware writes begin,
+use a forward fix or restrict a rollback to read-only recovery. Do not serve an
+old writable API as an equivalent revision-aware release or restore an older dump
+over later curator data. Physical deletion of accounts/tours referenced by
+immutable releases requires a separate reviewed retention/anonymization procedure;
+the ordinary tour delete operation hides the retained record. This migration
+does not activate public sign-in, telemetry, a routing provider or client update
+prompts, and does not certify geometry as legal public access.

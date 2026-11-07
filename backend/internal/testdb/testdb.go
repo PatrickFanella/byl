@@ -22,6 +22,11 @@ import (
 // Open returns a pool bound to a fresh schema with migrations applied.
 // The schema is dropped when the test finishes.
 func Open(t *testing.T) *pgxpool.Pool {
+	return OpenVersion(t, 0)
+}
+
+// OpenVersion prepares an older schema for forward-migration tests; zero applies all migrations.
+func OpenVersion(t *testing.T, version int64) *pgxpool.Pool {
 	t.Helper()
 	base := os.Getenv("TEST_DATABASE_URL")
 	if base == "" {
@@ -45,7 +50,7 @@ func Open(t *testing.T) *pgxpool.Pool {
 		t.Fatal(err)
 	}
 
-	if err := migrate(scoped); err != nil {
+	if err := migrate(scoped, version); err != nil {
 		_, _ = admin.Exec(ctx, fmt.Sprintf(`DROP SCHEMA %q CASCADE`, schema))
 		admin.Close()
 		t.Fatalf("testdb: migrate: %v", err)
@@ -70,7 +75,7 @@ func MigrationsDir() string {
 	return filepath.Join(filepath.Dir(file), "..", "..", "migrations")
 }
 
-func migrate(dsn string) error {
+func migrate(dsn string, version int64) error {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return err
@@ -79,6 +84,9 @@ func migrate(dsn string) error {
 	goose.SetLogger(goose.NopLogger())
 	if err := goose.SetDialect("postgres"); err != nil {
 		return err
+	}
+	if version > 0 {
+		return goose.UpTo(db, MigrationsDir(), version)
 	}
 	return goose.Up(db, MigrationsDir())
 }
