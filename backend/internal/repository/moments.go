@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"time"
 
@@ -343,6 +344,18 @@ func replaceSources(ctx context.Context, q dbtx, momentID string, sources []mode
 }
 
 func replaceTopics(ctx context.Context, q dbtx, momentID string, topicIDs []string) error {
+	var cityID string
+	if err := q.QueryRow(ctx, `SELECT p.city_id FROM moments m JOIN places p ON p.id=m.place_id WHERE m.id=$1`, momentID).Scan(&cityID); err != nil {
+		return err
+	}
+	topicIDs = append([]string{}, topicIDs...)
+	slices.Sort(topicIDs)
+	topicIDs = slices.Compact(topicIDs)
+	for _, id := range topicIDs {
+		if err := requireTopicCities(ctx, q, id, []string{cityID}); err != nil {
+			return err
+		}
+	}
 	if _, err := q.Exec(ctx, `DELETE FROM moment_topics WHERE moment_id = $1`, momentID); err != nil {
 		return err
 	}

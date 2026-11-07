@@ -48,9 +48,8 @@
 		<div class="flex flex-wrap gap-2">
 			<button class={chip(topic === '')} onclick={() => (topic = '')}>All topics</button>
 			{#each city.current.topics as t (t.id)}
-				<button
-					class={chip(topic === t.slug)}
-					onclick={() => (topic = topic === t.slug ? '' : t.slug)}>{t.name}</button
+				<button class={chip(topic === t.id)} onclick={() => (topic = topic === t.id ? '' : t.id)}
+					>{t.name}</button
 				>
 			{/each}
 		</div>

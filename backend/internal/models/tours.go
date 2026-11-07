@@ -57,6 +57,7 @@ func (r TourRoute) Summary() RouteSummary {
 type TourSummary struct {
 	ID             string                      `json:"id"`
 	CityID         string                      `json:"city_id"`
+	CityIDs        []string                    `json:"city_ids"`
 	Slug           string                      `json:"slug"`
 	Title          string                      `json:"title"`
 	Summary        string                      `json:"summary"`

@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 8, then saves a PostgreSQL
+changed migration files or a schema version other than 9, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -242,6 +242,50 @@ Media reuse stays `unresolved`: inspecting text or a page license does not clear
 images, video or documents for copying. No media is downloaded by evidence jobs.
 These manual curator retrieval limits are separate from the automatic research-
 run budget described below. Historical drafting remains a separate roadmap issue.
+
+## Regional topics and curated tours, migration 9
+
+Migration 9 adds `topic_cities` and its city lookup index. It backfills each
+topic's original city and existing moment/tour municipality references; it changes
+no existing place, topic, tour, stop, account or route row. Topic coverage is
+public catalogue metadata. Review any existing cross-city topic references in a
+restored snapshot before admitting their coverage. Current single-city seed
+references keep their IDs, slugs and original municipalities.
+
+Before activation, restore a fresh production snapshot, apply the exact reviewed
+SQL and compare existing table fingerprints. Run the previous API against that
+copy and compare representative public city/place/tour responses. Back up the
+live database/media, apply migration 9 as operator under the receiver lock, then
+install the exact nine-file migration manifest and version-9 source hook. CI
+applies no SQL and refuses a release with unadmitted migrations. Retain the old
+images, manifest/hook, backups and rollback receipt. Image rollback retains
+schema 9 and later regional associations; automatic down refuses to remove them.
+
+Tour `city_id` remains its original discovery anchor. New `city_ids` is derived
+from that city plus current stop municipalities. Each stop's `place.city_id`
+retains the actual location. Published public tours appear in every represented
+city's discovery results without duplicates; private/unlisted rules still apply.
+Only curated tours gain cross-city stop writes. Existing personal-route requests
+and visitor builders keep their single-city limits.
+
+Topic creation accepts optional `city_ids`; update replaces that coverage when
+the array is supplied. The original city is always included. Omitted/null updates
+leave coverage unchanged, and an empty array retains only the original city.
+Unknown references, more than thirty municipalities, uncovered moment/tour
+references and removing a municipality still in use return 422. Coverage edits
+serialize with dependent writes and roll back together with scalar edits on
+failure. Original local topic slugs retain precedence; ambiguous shared slugs
+return 409 and require a topic ID. Shared topics keep a total published-moment
+count across municipalities.
+
+`city_ids` is an additive response field and is optional in the OpenAPI schema
+for older API versions. Existing Swift Codable readers ignore unknown fields,
+Android's JSON configuration ignores unknown keys, and the web readers continue
+to use the unchanged ordered stops and IDs. An older client may show the original
+city label while displaying the full spanning tour. This PR does not add regional
+editing controls to those clients or qualify real route geometry/access. An old
+API image can read the expanded schema but retains its prior city-limited tour
+write behavior; regional editing requires the current API.
 
 ## Private brief discovery policy
 

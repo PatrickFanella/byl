@@ -89,6 +89,10 @@ func (d Deps) adminUpdateTopic(w http.ResponseWriter, r *http.Request) {
 	if !decodeOrFail(w, r, &req) {
 		return
 	}
+	if f := req.Validate(); len(f) > 0 {
+		writeValidation(w, f)
+		return
+	}
 	topic, err := d.Store.UpdateTopic(r.Context(), chi.URLParam(r, "id"), req)
 	if err != nil {
 		d.fail(w, err)

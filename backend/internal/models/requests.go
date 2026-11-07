@@ -88,23 +88,36 @@ type UpdateCityRequest struct {
 
 // CreateTopicRequest creates a topic.
 type CreateTopicRequest struct {
-	CityID      string `json:"city_id"`
-	Slug        string `json:"slug"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	CityID      string   `json:"city_id"`
+	CityIDs     []string `json:"city_ids,omitempty"`
+	Slug        string   `json:"slug"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
 }
 
 func (r CreateTopicRequest) Validate() Fields {
 	f := Fields{}
 	required(f, "city_id", r.CityID)
 	required(f, "name", r.Name)
+	if len(r.CityIDs) > 30 {
+		f.set("city_ids", "must contain at most 30 municipalities")
+	}
 	return f
 }
 
 // UpdateTopicRequest patches a topic.
 type UpdateTopicRequest struct {
-	Name        *string `json:"name"`
-	Description *string `json:"description"`
+	Name        *string  `json:"name"`
+	Description *string  `json:"description"`
+	CityIDs     []string `json:"city_ids"`
+}
+
+func (r UpdateTopicRequest) Validate() Fields {
+	f := Fields{}
+	if len(r.CityIDs) > 30 {
+		f.set("city_ids", "must contain at most 30 municipalities")
+	}
+	return f
 }
 
 // CreatePlaceRequest creates a place.

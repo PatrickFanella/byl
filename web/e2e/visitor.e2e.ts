@@ -118,3 +118,83 @@ test('the tours page removes tours that do not match the selected travel mode an
 		await request.delete(`${apiUrl}/api/v1/admin/tours/${fixture.id}`, { headers });
 	}
 });
+
+test('shared topics with the same slug filter tours by their distinct IDs', async ({
+	page,
+	request
+}) => {
+	const login = await request.post(`${apiUrl}/api/v1/auth/dev`, {
+		data: { email: 'admin@example.com' }
+	});
+	expect(login.ok()).toBeTruthy();
+	const headers = { Authorization: `Bearer ${(await login.json()).token}` };
+	const suffix = Date.now();
+	const cityResponse = await request.post(`${apiUrl}/api/v1/admin/cities`, {
+		headers,
+		data: {
+			name: `Lisle fixture ${suffix}`,
+			center_lat: 41.8,
+			center_lng: -88.1,
+			bbox_min_lat: 41.7,
+			bbox_max_lat: 41.9,
+			bbox_min_lng: -88.2,
+			bbox_max_lng: -88
+		}
+	});
+	expect(cityResponse.ok()).toBeTruthy();
+	const city = await cityResponse.json();
+	const original = await request.get(`${apiUrl}/api/v1/cities/downers-grove`);
+	const local = (await original.json()).topics.find(
+		(t: { id: string }) => t.id === '00000000-0000-4000-8000-00000000a0a1'
+	);
+	const name = `Regional rail ${suffix}`;
+	const topicResponse = await request.post(`${apiUrl}/api/v1/admin/topics`, {
+		headers,
+		data: {
+			city_id: city.id,
+			city_ids: ['00000000-0000-4000-8000-0000000000c1'],
+			slug: local.slug,
+			name
+		}
+	});
+	expect(topicResponse.ok()).toBeTruthy();
+	const shared = await topicResponse.json();
+	const title = `Regional fixture ${suffix}`;
+	const created = await request.post(`${apiUrl}/api/v1/admin/tours`, {
+		headers,
+		data: {
+			city_id: '00000000-0000-4000-8000-0000000000c1',
+			topic_id: shared.id,
+			title,
+			modes: ['walk'],
+			stops: [
+				{ place_id: '00000000-0000-4000-8000-00000000b0b1' },
+				{ place_id: '00000000-0000-4000-8000-00000000b0b2' }
+			]
+		}
+	});
+	expect(created.ok()).toBeTruthy();
+	const fixture = await created.json();
+	try {
+		await expect(async () => {
+			const published = await request.post(`${apiUrl}/api/v1/admin/tours/${fixture.id}/publish`, {
+				headers
+			});
+			expect(published.ok()).toBeTruthy();
+		}).toPass({ timeout: 30_000, intervals: [1000] });
+		await page.goto('/tours');
+		const selected = page.waitForRequest((r) => {
+			const url = new URL(r.url());
+			return url.pathname.endsWith('/tours') && url.searchParams.has('topic');
+		});
+		await page.getByRole('button', { name, exact: true }).click();
+		expect(new URL((await selected).url()).searchParams.get('topic')).toBe(shared.id);
+		await expect(page.getByRole('link', { name: new RegExp(title) })).toBeVisible();
+		await expect(page.getByRole('link', { name: /downtown memory loop/i })).toHaveCount(0);
+		await page.getByRole('button', { name: local.name, exact: true }).click();
+		await expect(page.getByRole('link', { name: /downtown memory loop/i })).toBeVisible();
+		await expect(page.getByRole('link', { name: new RegExp(title) })).toHaveCount(0);
+	} finally {
+		await request.delete(`${apiUrl}/api/v1/admin/tours/${fixture.id}`, { headers });
+	}
+});
