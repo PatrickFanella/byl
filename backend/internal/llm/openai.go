@@ -38,12 +38,9 @@ func (o *OpenAI) DraftMoment(ctx context.Context, req DraftRequest) (MomentDraft
 		if err != nil {
 			return &requestFailure{err}
 		}
-		var d MomentDraft
-		if err := json.Unmarshal([]byte(raw), &d); err != nil {
-			return fmt.Errorf("llm: decode draft: %w", err)
-		}
-		if _, err := d.Check(); err != nil {
-			return fmt.Errorf("llm: %w", err)
+		d, err := decodeDraft(raw, req)
+		if err != nil {
+			return err
 		}
 		out = d
 		return nil

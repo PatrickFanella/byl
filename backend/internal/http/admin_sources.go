@@ -11,6 +11,7 @@ import (
 
 	"invisible-museum/backend/internal/llm"
 	"invisible-museum/backend/internal/models"
+	"invisible-museum/backend/internal/repository"
 )
 
 func (d Deps) adminListSources(w http.ResponseWriter, r *http.Request) {
@@ -79,6 +80,7 @@ func (d Deps) adminCreateImport(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) adminDraftCandidate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	if !d.drafterAvailable() {
 		writeError(w, http.StatusServiceUnavailable, "unavailable", "no LLM provider is configured (set LLM_PROVIDER)")
 		return
@@ -96,7 +98,15 @@ func (d Deps) adminDraftCandidate(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusConflict, "conflict", "candidate is already reviewed")
 		return
 	}
-	job, err := d.Store.EnqueueReturning(r.Context(), models.JobKindDraftCandidate, models.DraftCandidatePayload{CandidateID: c.ID})
+	var in models.DraftCandidateRequest
+	if !decodeOrFail(w, r, &in) {
+		return
+	}
+	if _, err := d.Store.DraftEvidence(r.Context(), in.EvidenceIDs); err != nil {
+		d.fail(w, err)
+		return
+	}
+	job, err := d.Store.EnqueueReturning(r.Context(), models.JobKindDraftCandidate, models.DraftCandidatePayload{CandidateID: c.ID, EvidenceIDs: in.EvidenceIDs, PayloadSHA256: repository.CandidatePayloadHash(c.Payload)})
 	if err != nil {
 		d.fail(w, err)
 		return

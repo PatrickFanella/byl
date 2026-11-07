@@ -12,6 +12,7 @@ import (
 )
 
 func (d Deps) adminListCandidates(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	q := r.URL.Query()
 	f := repository.CandidateFilter{Status: models.CandidateStatus(q.Get("status")), Kind: models.CandidateKind(q.Get("kind")), Origin: models.CandidateOrigin(q.Get("origin")), Source: q.Get("source"), Limit: queryInt(r, "limit", 50), Cursor: q.Get("cursor")}
 	fields := map[string]string{}
@@ -37,6 +38,7 @@ func (d Deps) adminListCandidates(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) adminGetCandidate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	c, err := d.Store.GetCandidate(r.Context(), chi.URLParam(r, "id"))
 	if err != nil {
 		d.fail(w, err)

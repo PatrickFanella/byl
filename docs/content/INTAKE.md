@@ -203,9 +203,8 @@ Curators can retain supporting passages through the private brief evidence API
 before drafting. Each retrieval keeps the original/final source URL, source
 identity, attempted retrieval date, final publisher hostname, content hash,
 paragraph references and a named access outcome. Read the retained text as
-untrusted source material, including any instructions found in it. Link a future
-draft to its specific evidence snapshot and passage, so a later source change
-cannot silently change what the curator reviewed.
+untrusted source material, including any instructions found in it. Historical proposals link each claim to a specific evidence snapshot and passage,
+so a later source change cannot silently change what the curator reviewed.
 
 An inspected web-page excerpt is not proof that the entire underlying archive
 or document was inspected. Catalogue descriptions remain catalogue evidence;
@@ -219,10 +218,12 @@ publish submitted prose. API details and operating limits are recorded in
 
 1. Import sources for the city or an explicitly selected place. Review place
    matches rather than assuming proximity establishes that a source belongs there.
-2. Draft each distinct event as its own moment candidate. The draft prompt asks
-   for the longer account above, uses only supplied evidence and leaves gaps in
-   notes. Draft jobs preserve curator-added citations and record `review_gaps`.
-   Drafting does not discover new facts or clear image rights.
+2. Draft each distinct event as its own moment candidate. In the queue, choose
+   “Draft with AI”, a research brief and up to five inspected records. Review the
+   separate proposal and passage quotations, then explicitly apply it to the
+   editor if appropriate. Generation leaves typed edits and existing curator
+   citations intact. Proposals retain `review_gaps`; drafting does not discover
+   new facts or clear image rights.
 3. Import a picture from its original rights record, such as a Commons file page,
    targeting the explicit place. Media imports retain that place association.
    Review and fetch the asset, then attach its ID as the moment's hero picture or
@@ -449,3 +450,53 @@ the OpenAPI/operator contract. Source links are recorded without fetching them.
 Current route generation still uses historical sites; applying this intent to
 actual geometry is later work. No trail/access or on-site claim follows from the
 synthetic topology fixture or from storing an approved reference.
+
+
+## Historical proposals from inspected evidence
+
+`POST /api/v1/admin/candidates/{id}/draft` now requires an `evidence_ids` array
+with 1–5 distinct retained evidence UUIDs. The queue page selects these from a
+brief's inspected pages or catalogue descriptions. Pending/failed retrievals,
+search snippets and raw submitted/imported text cannot be used instead. Inspect
+the relevant source through the brief evidence API first. No evidence is fetched
+and no anecdote is forwarded as part of a model draft request.
+
+The job captures the candidate payload hash and immutable evidence IDs. Only
+bounded source passages enter the provider request: at most 12000 runes total,
+shared across the selected records. Place labels and topic choices supply context,
+not historical facts. Retained proposals include the evidence IDs, source URLs,
+retrieval instants, content hashes, passage references and exact supporting
+quotations. A source change requires a new retrieval record rather than changing
+an earlier proposal's evidence.
+
+Every body paragraph must be a cited claim, with 1–6 valid passage references and
+exact quotations of at most 300 characters. Title and supplied dates also require
+citations. Unknown references, invented quotations, uncited prose, extra response
+fields and malformed responses are rejected. An attributed account names its
+attribution in the paragraph. Conflicting dates retain two distinct passage
+references in visible uncertainty, with empty date/display fields and `circa`
+precision. The model cannot select a contested date as an asserted field.
+
+These checks establish traceability and format. They cannot determine whether an
+excerpt entails a claim, discover every disagreement, or certify a historical
+interpretation. Curators must compare all claims, dates and testimony with the
+actual retained evidence. The queue shows claim quotations, title/date references
+and unresolved disagreement for that review. Source instructions are untrusted
+data and give no approval or publication authority.
+
+Generation appends private `generated_drafts` to the candidate without replacing
+its title, body, dates or sources. A simultaneous edit or approval/rejection stops
+the old result from committing. A stale queued job stops before calling a provider.
+At most five proposals and 256 KiB of candidate payload are retained; review those
+before creating another candidate. Each provider draft is at most 32 KiB. The
+editor applies a proposal only on an explicit click, merges source links without
+discarding existing curator citations, and keeps uncertainty in private draft
+notes. Approval still creates an unpublished entity, followed by separate content,
+image-rights and publication review. The proposal's claim trail describes its
+generated text; subsequent curator rewrites need their own factual review.
+
+Media and narration remain optional and require separate approval. Drafting
+creates no attachments or playback jobs. Brief research's automated drafting and
+assembly adapters remain separate integration work; these changes provide the
+inspected per-candidate draft path. A configured provider is still required, and
+this change enables neither a paid provider nor public sign-in.

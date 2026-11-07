@@ -20,28 +20,28 @@ type TopicOption struct {
 	Description string `json:"description"`
 }
 
-// DraftRequest carries everything the model may use. RawText must already be capped by the caller.
+// DraftRequest offers inspected evidence and context labels only. Submitted
+// anecdotes and candidate prose have no field in this provider boundary.
 type DraftRequest struct {
-	PlaceName       string
-	PlaceSummary    string
-	SourceTitle     string
-	SourceURL       string
-	SourcePublisher string
-	SourceLicense   string
-	RawText         string
-	Topics          []TopicOption
+	PlaceName string
+	Topics    []TopicOption
+	Evidence  []DraftEvidence
 }
 
 // MomentDraft is the model's proposal.
 type MomentDraft struct {
-	Title         string   `json:"title"`
-	Body          string   `json:"body"`
-	DateStart     string   `json:"date_start"`
-	DateEnd       string   `json:"date_end"`
-	DatePrecision string   `json:"date_precision"`
-	DateDisplay   string   `json:"date_display"`
-	TopicSlugs    []string `json:"topic_slugs"`
-	Notes         string   `json:"notes"`
+	Title          string             `json:"title"`
+	Body           string             `json:"body"`
+	DateStart      string             `json:"date_start"`
+	DateEnd        string             `json:"date_end"`
+	DatePrecision  string             `json:"date_precision"`
+	DateDisplay    string             `json:"date_display"`
+	TopicSlugs     []string           `json:"topic_slugs"`
+	Notes          string             `json:"notes"`
+	Claims         []DraftClaim       `json:"claims"`
+	TitleCitations []DraftCitation    `json:"title_citations"`
+	DateCitations  []DraftCitation    `json:"date_citations"`
+	Uncertainties  []DraftUncertainty `json:"uncertainties"`
 }
 
 // MomentOption is a moment the model may rank.

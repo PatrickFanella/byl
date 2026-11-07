@@ -528,10 +528,12 @@ paths:
       responses: { "202": { description: Job queued }, "404": { description: Unknown city or place }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
   /api/v1/admin/candidates/{id}/draft:
     post:
-      summary: "Queue an LLM draft for a pending moment candidate"
+      summary: Queue a private historical proposal from inspected evidence
+      description: Curators select 1–5 immutable inspected_page/catalog_only records. Search snippets, unavailable records and submitted anecdotes are not evidence. The job captures the candidate payload hash; stale work cannot overwrite later edits or review. Drafting appends a private proposal and never replaces editable prose or publishes content.
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
-      responses: { "202": { description: Job queued }, "404": { description: Not found }, "409": { description: Not a pending moment candidate }, "503": { description: No LLM provider configured }, "401": { description: Unauthorized } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/DraftCandidateRequest" } } } }
+      responses: { "202": { description: Job queued with evidence IDs and payload hash only }, "400": { description: Malformed request }, "404": { description: Candidate or evidence not found }, "409": { description: Not a pending moment candidate }, "422": { description: Invalid or uninspected evidence }, "503": { description: No LLM provider configured }, "401": { description: Unauthorized }, "403": { description: Curator role required } }
   /api/v1/admin/tours/{id}/stops/{position}/suggest:
     post:
       summary: "Rank a stop's published moments against the tour topic"
@@ -1060,6 +1062,72 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    DraftCandidateRequest:
+      type: object
+      additionalProperties: false
+      required: [evidence_ids]
+      properties:
+        evidence_ids: { type: array, minItems: 1, maxItems: 5, uniqueItems: true, items: { type: string, format: uuid } }
+    DraftCitation:
+      type: object
+      required: [evidence_id, passage, quote]
+      properties:
+        evidence_id: { type: string, format: uuid }
+        passage: { type: string, description: Exact reference from the offered immutable snapshot }
+        quote: { type: string, minLength: 1, maxLength: 300, description: Exact substring of the offered passage; traceability does not certify that it entails a claim }
+    HistoricalDraft:
+      type: object
+      required: [title, body, date_start, date_end, date_precision, date_display, topic_ids, sources, notes, title_citations, date_citations, claims, uncertainties, evidence_manifest, generated_at, base_payload_sha256, review_gaps]
+      description: Private generated proposal. Body equals cited claim paragraphs joined by two newlines. Selected excerpts total at most 12000 runes; each provider draft is at most 32 KiB. At most five proposals and 256 KiB of candidate payload are retained. A curator must inspect factual meaning and copying rights.
+      properties:
+        title: { type: string, maxLength: 160 }
+        body: { type: string, maxLength: 12000 }
+        date_start: { type: string }
+        date_end: { type: string }
+        date_precision: { type: string, enum: [day, month, year, circa] }
+        date_display: { type: string }
+        topic_ids: { type: array, items: { type: string, format: uuid } }
+        sources: { type: array, items: { $ref: "#/components/schemas/Source" } }
+        notes: { type: string, maxLength: 4000 }
+        title_citations: { type: array, minItems: 1, maxItems: 6, items: { $ref: "#/components/schemas/DraftCitation" } }
+        date_citations: { type: array, maxItems: 6, items: { $ref: "#/components/schemas/DraftCitation" }, description: Required when any date/display is supplied }
+        claims:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            type: object
+            properties:
+              text: { type: string, maxLength: 2000 }
+              kind: { type: string, enum: [fact, testimony] }
+              attribution: { type: string, maxLength: 200, description: Testimony must name its attribution within text }
+              citations: { type: array, minItems: 1, maxItems: 6, items: { $ref: "#/components/schemas/DraftCitation" } }
+        uncertainties:
+          type: array
+          maxItems: 8
+          items:
+            type: object
+            properties:
+              kind: { type: string, enum: [conflicting_dates, research_gap] }
+              text: { type: string, maxLength: 1000 }
+              citations: { type: array, maxItems: 6, items: { $ref: "#/components/schemas/DraftCitation" } }
+          description: Conflicting dates require two distinct passage references and empty date/display fields with circa precision. They remain unresolved for review.
+        evidence_manifest:
+          type: array
+          maxItems: 5
+          items:
+            type: object
+            properties:
+              id: { type: string, format: uuid }
+              url: { type: string, format: uri }
+              title: { type: string }
+              publisher: { type: string }
+              outcome: { type: string, enum: [inspected_page, catalog_only] }
+              retrieved_at: { type: string, format: date-time }
+              content_sha256: { type: string }
+        generated_at: { type: string, format: date-time }
+        base_payload_sha256: { type: string }
+        review_gaps: { type: array, items: { type: string } }
     CorridorSource:
       type: object
       additionalProperties: false
@@ -1865,7 +1933,11 @@ components:
         submitted_by_account_id: { type: string, format: uuid, nullable: true }
         target_place_id: { type: string, format: uuid, nullable: true }
         target_moment_id: { type: string, format: uuid, nullable: true }
-        payload: { type: object, description: Shaped like the create request for the kind }
+        payload:
+          type: object
+          description: Editable create-request fields plus private import/review context. Drafting appends generated_drafts without replacing title/body/dates/sources. These proposals are never public entities.
+          properties:
+            generated_drafts: { type: array, maxItems: 5, items: { $ref: "#/components/schemas/HistoricalDraft" } }
         status: { type: string, enum: [pending, approved, rejected] }
         reviewer_account_id: { type: string, format: uuid, nullable: true }
         review_note: { type: string }

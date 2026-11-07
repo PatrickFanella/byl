@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"invisible-museum/backend/internal/models"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -12,11 +13,10 @@ import (
 )
 
 func draftReq() DraftRequest {
-	return DraftRequest{PlaceName: "Tivoli Theatre", SourceTitle: "Tivoli Theatre (Downers Grove, Illinois)", SourceURL: "https://en.wikipedia.org/wiki/Tivoli", SourcePublisher: "Wikipedia", SourceLicense: "CC-BY-SA-4.0",
-		RawText: "The Tivoli opened on December 25, 1928.", Topics: []TopicOption{{Slug: "downtown-after-dark", Name: "Downtown After Dark"}}}
+	return DraftRequest{PlaceName: "Tivoli Theatre", Topics: []TopicOption{{Slug: "downtown-after-dark", Name: "Downtown After Dark"}}, Evidence: []DraftEvidence{{ID: "e1", Passages: []models.EvidencePassage{{Reference: "paragraph:1", Text: "The Tivoli opened on December 25, 1928."}}}}}
 }
 
-const goodDraft = `{"title":"Built for the Talkies","body":"The Tivoli opened on Christmas Day 1928.","date_start":"1928-12-25","date_end":"1928-12-25","date_precision":"day","date_display":"December 25, 1928","topic_slugs":["downtown-after-dark"],"notes":""}`
+const goodDraft = `{"title":"Built for the Talkies","body":"The Tivoli opened on Christmas Day 1928.","date_start":"1928-12-25","date_end":"1928-12-25","date_precision":"day","date_display":"December 25, 1928","topic_slugs":["downtown-after-dark"],"notes":"","claims":[{"text":"The Tivoli opened on Christmas Day 1928.","kind":"fact","attribution":"","citations":[{"evidence_id":"e1","passage":"paragraph:1","quote":"The Tivoli opened on December 25, 1928."}]}],"title_citations":[{"evidence_id":"e1","passage":"paragraph:1","quote":"Tivoli"}],"date_citations":[{"evidence_id":"e1","passage":"paragraph:1","quote":"December 25, 1928"}],"uncertainties":[]}`
 
 func openAIServer(t *testing.T, bodies []string) (*httptest.Server, *[]map[string]any, *atomic.Int32) {
 	t.Helper()

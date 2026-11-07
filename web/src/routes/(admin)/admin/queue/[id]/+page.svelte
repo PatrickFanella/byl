@@ -11,6 +11,11 @@
 		draftCandidate,
 		getCandidate,
 		getJob,
+		listRouteBriefs,
+		listBriefEvidence,
+		type RouteBrief,
+		type SourceEvidence,
+		type HistoricalDraft,
 		sleep
 	} from '#lib/admin.ts';
 	import { ApiError } from '#lib/api/index.ts';
@@ -31,10 +36,24 @@
 	let rejectOpen = $state(false);
 	let rejectNote = $state('');
 	let approvedId: string | null = $state(null);
+	let draftOpen = $state(false);
+	let loadingSources = $state(false);
+	let briefs = $state<RouteBrief[]>([]);
+	let evidence = $state<SourceEvidence[]>([]);
+	let briefId = $state('');
+	let selectedEvidence = $state<string[]>([]);
+	let newProposal = $state<HistoricalDraft | null>(null);
+	let proposalExtras = $state<Record<string, unknown>>({});
+	const storedProposals = $derived(
+		Array.isArray(payload.generated_drafts) ? (payload.generated_drafts as HistoricalDraft[]) : []
+	);
+	const proposal = $derived(newProposal ?? storedProposals.at(-1) ?? null);
 
 	const rawText = $derived(String(payload.raw_text ?? ''));
 	const readOnly = $derived(
-		readOnlyEntries(candidate.kind, payload).filter(([k]) => k !== 'raw_text')
+		readOnlyEntries(candidate.kind, { ...payload, ...proposalExtras }).filter(
+			([k]) => k !== 'raw_text'
+		)
 	);
 	const isPending = $derived(candidate.status === 'pending');
 
@@ -52,7 +71,10 @@
 		notice = { kind: 'info', message: '' };
 		fieldErrors = {};
 		try {
-			const edited = applyFields(placeId ? { ...payload, place_id: placeId } : payload, fields);
+			const edited = applyFields(
+				{ ...payload, ...proposalExtras, ...(placeId ? { place_id: placeId } : {}) },
+				fields
+			);
 			const result = await approveCandidate(candidate.id, edited);
 			approvedId = result.approved_entity_id ?? null;
 			notice = {
@@ -81,11 +103,46 @@
 		}
 	}
 
-	async function draft() {
-		busy = 'draft';
-		notice = { kind: 'info', message: 'Asking the model for a draft…' };
+	async function openDraft() {
+		draftOpen = true;
+		loadingSources = true;
+		notice = { kind: 'info', message: '' };
 		try {
-			const queued = await draftCandidate(candidate.id);
+			briefs = (await listRouteBriefs()).items;
+		} catch (e) {
+			fail(e, 'Could not load research briefs.');
+		} finally {
+			loadingSources = false;
+		}
+	}
+	async function loadEvidence() {
+		selectedEvidence = [];
+		evidence = [];
+		if (!briefId) return;
+		const selectedBrief = briefId;
+		loadingSources = true;
+		try {
+			const result = await listBriefEvidence(selectedBrief);
+			if (briefId === selectedBrief)
+				evidence = result.items.filter(
+					(e) =>
+						['inspected_page', 'catalog_only'].includes(e.result?.outcome ?? '') &&
+						!!e.result?.passages?.length &&
+						!!e.result?.content_sha256
+				);
+		} catch (e) {
+			fail(e, 'Could not load inspected sources.');
+		} finally {
+			loadingSources = false;
+		}
+	}
+	async function draft() {
+		if (!selectedEvidence.length || selectedEvidence.length > 5) return;
+		busy = 'draft';
+		draftOpen = false;
+		notice = { kind: 'info', message: 'Preparing a proposal from the selected inspected sources…' };
+		try {
+			const queued = await draftCandidate(candidate.id, selectedEvidence);
 			for (let i = 0; i < 45; i++) {
 				await sleep(2000);
 				const job = await getJob(queued.job.id);
@@ -96,27 +153,65 @@
 					};
 					return;
 				}
-				const fresh = await getCandidate(candidate.id);
-				if (fresh.origin === 'draft' && fresh.updated_at !== candidate.updated_at) {
-					await invalidateAll();
-					notice = { kind: 'success', message: 'Draft ready. Review the text before approving.' };
+				if (job.status === 'done') {
+					const fresh = await getCandidate(candidate.id);
+					const history = (fresh.payload as Record<string, unknown>)?.generated_drafts;
+					if (Array.isArray(history) && history.length) {
+						newProposal = history.at(-1) as HistoricalDraft;
+						notice = {
+							kind: 'success',
+							message:
+								'Proposal ready below. Your editor text is unchanged; compare the evidence before applying it.'
+						};
+					} else
+						notice = {
+							kind: 'error',
+							message: 'No draft proposal was retained. Check Jobs before retrying.'
+						};
 					return;
 				}
 			}
 			notice = {
 				kind: 'info',
-				message: 'The draft is still running; reload this page in a minute or check Jobs.'
+				message:
+					'The proposal is still running; check Jobs. Save or copy your editor text before reloading.'
 			};
 		} catch (e) {
-			if (e instanceof ApiError && e.status === 503)
-				notice = {
-					kind: 'error',
-					message: 'No LLM provider is configured on the server (LLM_PROVIDER).'
-				};
-			else fail(e, 'Could not queue the draft.');
+			fail(e, 'Could not queue the inspected draft.');
 		} finally {
 			busy = '';
 		}
+	}
+	function applyProposal() {
+		if (!proposal) return;
+		const current = applyFields({ ...payload, ...proposalExtras }, fields);
+		const sources = Array.isArray(current.sources) ? [...current.sources] : [];
+		for (const source of proposal.sources) {
+			if (!sources.some((s) => s.url === source.url)) sources.push(source);
+		}
+		proposalExtras = { sources, topic_ids: proposal.topic_ids };
+		const notes = [
+			current.draft_notes,
+			proposal.notes,
+			...proposal.uncertainties.map((u) => u.text)
+		]
+			.filter(Boolean)
+			.join('\n');
+		fields = fieldsFor(candidate.kind, {
+			...current,
+			title: proposal.title,
+			body: proposal.body,
+			date_start: proposal.date_start,
+			date_end: proposal.date_end,
+			date_precision: proposal.date_precision,
+			date_display: proposal.date_display,
+			draft_notes: notes
+		});
+		notice = {
+			kind: 'info',
+			message:
+				'Proposal applied to the editor. Review and edit it before approval; it is still unpublished.'
+		};
 	}
 
 	function entityLink(): string {
@@ -180,6 +275,84 @@
 			</label>
 		{/if}
 		<PayloadForm bind:fields errors={fieldErrors} />
+		{#if proposal}
+			<section
+				class="min-w-0 rounded-lg border border-byl-border bg-byl-background p-4 text-sm break-words"
+				aria-label="Generated proposal"
+			>
+				<h2 class="text-lg font-semibold">Generated proposal</h2>
+				<p class="mt-1 text-byl-muted">
+					Compare these claims with their inspected passages. Citation checks do not establish
+					historical truth or image rights.
+				</p>
+				<h3 class="mt-3 font-semibold">{proposal.title}</h3>
+				<p class="text-byl-muted">{proposal.date_display || 'Date unresolved'}</p>
+				<details class="mt-2 text-byl-muted">
+					<summary class="cursor-pointer">Title and date evidence</summary>
+					{#each [...proposal.title_citations, ...proposal.date_citations] as citation, i (i)}
+						{@const source = proposal.evidence_manifest.find((e) => e.id === citation.evidence_id)}
+						<blockquote class="mt-2 border-l-2 border-byl-border pl-3">
+							<p>{citation.quote}</p>
+							<p>
+								<a class="underline" href={source?.url} target="_blank" rel="noreferrer"
+									>{source?.title || 'Inspected source'}</a
+								>
+								· {citation.passage}
+							</p>
+						</blockquote>
+					{/each}
+				</details>
+				{#each proposal.claims as claim, i (i)}
+					<div class="mt-4">
+						<p>{claim.text}</p>
+						{#if claim.kind === 'testimony'}<p class="mt-1 text-byl-muted">
+								Attributed account: {claim.attribution}
+							</p>{/if}
+						{#each claim.citations as citation, j (j)}
+							{@const source = proposal.evidence_manifest.find(
+								(e) => e.id === citation.evidence_id
+							)}
+							<blockquote class="mt-2 border-l-2 border-byl-border pl-3 text-byl-muted">
+								<p>{citation.quote}</p>
+								<p>
+									<a class="underline" href={source?.url} target="_blank" rel="noreferrer"
+										>{source?.title || 'Inspected source'}</a
+									>
+									· {citation.passage}
+								</p>
+							</blockquote>
+						{/each}
+					</div>
+				{/each}
+				{#if proposal.uncertainties.length || proposal.notes}
+					<h3 class="mt-4 font-semibold">Uncertainty and research gaps</h3>
+					{#each proposal.uncertainties as uncertainty, i (i)}
+						<p class="mt-2">{uncertainty.text}</p>
+						{#each uncertainty.citations ?? [] as citation, j (j)}
+							{@const source = proposal.evidence_manifest.find(
+								(e) => e.id === citation.evidence_id
+							)}
+							<blockquote class="mt-2 border-l-2 border-byl-border pl-3 text-byl-muted">
+								<p>{citation.quote}</p>
+								<p>
+									<a class="underline" href={source?.url} target="_blank" rel="noreferrer"
+										>{source?.title || 'Inspected source'}</a
+									>
+									· {citation.passage}
+								</p>
+							</blockquote>
+						{/each}
+					{/each}
+					<p class="mt-2 whitespace-pre-wrap text-byl-muted">{proposal.notes}</p>
+				{/if}
+				<button
+					class="mt-4 rounded-md border border-byl-border-control px-3 py-1.5 disabled:opacity-50"
+					disabled={!isPending || !!busy}
+					onclick={applyProposal}>Apply proposal to editor</button
+				>
+			</section>
+		{/if}
+
 		{#if readOnly.length}
 			<details class="rounded-md border border-byl-border bg-byl-background p-3 text-sm">
 				<summary class="cursor-pointer">Other payload fields</summary>
@@ -233,7 +406,7 @@
 					<button
 						class="rounded-md border border-byl-info bg-byl-info-surface px-3 py-1.5 text-sm text-byl-info disabled:opacity-50"
 						disabled={!isPending || !!busy}
-						onclick={draft}>{busy === 'draft' ? 'Drafting…' : 'Draft with AI'}</button
+						onclick={openDraft}>{busy === 'draft' ? 'Drafting…' : 'Draft with AI'}</button
 					>
 				{/if}
 			</div>
@@ -243,7 +416,7 @@
 		</div>
 		{#if rawText}
 			<div class="rounded-lg border border-byl-border bg-byl-background p-4">
-				<h2 class="text-sm font-semibold">Source text</h2>
+				<h2 class="text-sm font-semibold">Submitted or imported text</h2>
 				<pre
 					class="mt-2 max-h-[32rem] overflow-auto text-xs whitespace-pre-wrap text-byl-text">{rawText}</pre>
 			</div>
@@ -276,6 +449,66 @@
 			class="rounded-md bg-byl-action px-3 py-1.5 text-sm text-byl-action-text"
 			onclick={reject}
 			disabled={!!busy}>Reject</button
+		>
+	</div>
+</Dialog>
+
+<Dialog bind:open={draftOpen} title="Choose inspected sources">
+	<p class="mb-3 text-sm text-byl-muted">
+		Select up to five inspected records from a research brief. Submitted notes and search snippets
+		are excluded.
+	</p>
+	<label class="block text-sm"
+		>Research brief
+		<select
+			class="mt-1 w-full rounded-md border-byl-border-control"
+			bind:value={briefId}
+			onchange={loadEvidence}
+			disabled={loadingSources}
+		>
+			<option value="">Choose a brief</option>
+			{#each briefs as brief (brief.id)}<option value={brief.id}
+					>{brief.submitted?.topic} · {brief.submitted?.area}</option
+				>{/each}
+		</select>
+	</label>
+	{#if briefId && !loadingSources && !evidence.length}
+		<p class="mt-3 text-sm">
+			No inspected passages are available. <a class="underline" href="/admin/briefs/{briefId}"
+				>Inspect source pages in this brief</a
+			> before drafting.
+		</p>
+	{/if}
+	{#if loadingSources}<p class="mt-3 text-sm" role="status">Loading research records…</p>{/if}
+	<div class="mt-3 max-h-72 space-y-3 overflow-auto">
+		{#each evidence as source (source.id)}
+			<label class="flex items-start gap-2 text-sm">
+				<input
+					type="checkbox"
+					value={source.id}
+					bind:group={selectedEvidence}
+					disabled={!!busy ||
+						(selectedEvidence.length >= 5 && !selectedEvidence.includes(source.id ?? ''))}
+				/>
+				<span
+					>{source.result?.title || source.url}<span class="block text-xs text-byl-muted"
+						>{source.result?.outcome === 'catalog_only'
+							? 'Catalogue description'
+							: 'Inspected page'} · {when(source.result?.retrieved_at)}</span
+					></span
+				>
+			</label>
+		{/each}
+	</div>
+	<div class="mt-4 flex justify-end gap-2">
+		<button
+			class="rounded-md border border-byl-border-control px-3 py-1.5"
+			onclick={() => (draftOpen = false)}>Cancel</button
+		>
+		<button
+			class="rounded-md bg-byl-action px-3 py-1.5 text-byl-action-text disabled:opacity-50"
+			disabled={loadingSources || !selectedEvidence.length}
+			onclick={draft}>Generate proposal</button
 		>
 	</div>
 </Dialog>

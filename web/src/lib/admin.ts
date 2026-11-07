@@ -32,8 +32,8 @@ export const approveCandidate = (id: string, payload: unknown, note = '') =>
 	api.post<Candidate>(`/api/v1/admin/candidates/${id}/approve`, { note, payload });
 export const rejectCandidate = (id: string, note: string) =>
 	api.post<Candidate>(`/api/v1/admin/candidates/${id}/reject`, { note });
-export const draftCandidate = (id: string) =>
-	api.post<{ job: Job }>(`/api/v1/admin/candidates/${id}/draft`);
+export const draftCandidate = (id: string, evidence_ids: string[]) =>
+	api.post<{ job: Job }>(`/api/v1/admin/candidates/${id}/draft`, { evidence_ids });
 export const createImport = (body: Record<string, unknown>) =>
 	api.post<{ job: Job }>('/api/v1/admin/imports', body);
 
@@ -152,3 +152,39 @@ export const createMediaLink = (body: {
 }) => api.post<MediaAsset>('/api/v1/admin/media/links', body);
 export const setPlaceMedia = (id: string, media_ids: string[]) =>
 	api.put<PlaceDetail>(`/api/v1/admin/places/${id}/media`, { media_ids });
+
+export type SourceEvidence = Schemas['SourceEvidence'];
+export const listBriefEvidence = (id: string) =>
+	api.list<SourceEvidence>(
+		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/evidence?limit=50`
+	);
+export type HistoricalDraftCitation = { evidence_id: string; passage: string; quote: string };
+export type HistoricalDraft = {
+	title_citations: HistoricalDraftCitation[];
+	date_citations: HistoricalDraftCitation[];
+	title: string;
+	body: string;
+	date_start: string;
+	date_end: string;
+	date_precision: string;
+	date_display: string;
+	notes: string;
+	topic_ids: string[];
+	sources: Source[];
+	review_gaps: string[];
+	claims: {
+		text: string;
+		kind: string;
+		attribution: string;
+		citations: { evidence_id: string; passage: string; quote: string }[];
+	}[];
+	uncertainties: { kind: string; text: string; citations?: HistoricalDraftCitation[] }[];
+	evidence_manifest: {
+		id: string;
+		url: string;
+		title: string;
+		retrieved_at: string;
+		content_sha256: string;
+		outcome: string;
+	}[];
+};

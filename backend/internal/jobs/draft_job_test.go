@@ -2,144 +2,182 @@ package jobs
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
-	"strings"
-	"testing"
-
+	"errors"
 	"invisible-museum/backend/internal/llm"
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/narration"
+	"invisible-museum/backend/internal/repository"
 	"invisible-museum/backend/internal/routing"
 	"invisible-museum/backend/internal/testdb"
+	"strings"
+	"testing"
 )
 
 type fakeDrafter struct {
-	last  llm.DraftRequest
-	draft llm.MomentDraft
-	calls int
+	last   llm.DraftRequest
+	calls  int
+	change func(*llm.MomentDraft)
+	during func()
 }
 
 func (f *fakeDrafter) DraftMoment(_ context.Context, req llm.DraftRequest) (llm.MomentDraft, error) {
 	f.calls++
 	f.last = req
-	return f.draft, nil
+	if f.during != nil {
+		f.during()
+	}
+	cite := llm.DraftCitation{EvidenceID: req.Evidence[0].ID, Passage: req.Evidence[0].Passages[0].Reference, Quote: "A train derailed in 1940."}
+	d := llm.MomentDraft{Title: "A documented derailment", Body: "The archive records a derailment in 1940.", DatePrecision: "circa", TopicSlugs: []string{"rail-and-the-commuter-town", "ghost-stories"}, Notes: "Find further records.", TitleCitations: []llm.DraftCitation{cite}, Claims: []llm.DraftClaim{{Text: "The archive records a derailment in 1940.", Kind: "fact", Citations: []llm.DraftCitation{cite}}}}
+	if f.change != nil {
+		f.change(&d)
+	}
+	return d, nil
 }
-
 func (f *fakeDrafter) RankMoments(context.Context, llm.RankRequest) (llm.Ranking, error) {
 	return llm.Ranking{}, nil
 }
 
+type draftEvidenceFetcher struct{}
+
+func (draftEvidenceFetcher) RetrieveEvidence(context.Context, string, string) (models.EvidenceResult, error) {
+	text := strings.Repeat("A train derailed in 1940. ", 700)
+	h := sha256.Sum256([]byte(text))
+	return models.EvidenceResult{Outcome: "inspected_page", FinalURL: "https://archive.example/history", Title: "Depot record", Publisher: "Local archive", ContentSHA256: hex.EncodeToString(h[:]), Passages: []models.EvidencePassage{{Reference: "paragraph:1", Text: text}}}, nil
+}
+func inspectedDraftEvidence(t *testing.T, w *Worker, ctx context.Context) string {
+	t.Helper()
+	a, err := w.store.UpsertAccount(ctx, models.AuthProviderDev, "draft-evidence", "archive@example.com", "", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, _, err := w.store.CreateRouteBrief(ctx, a.ID, models.RouteBriefInput{Topic: "Rail", Area: "Downers Grove"}, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	e, err := w.store.QueueSourceEvidence(ctx, b.ID, models.EvidenceRequest{Version: 1, URL: "https://archive.example/history", SourceKind: "page"}, "", strings.Repeat("a", 64), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	w.Evidence = draftEvidenceFetcher{}
+	drain(t, w, ctx)
+	return e.ID
+}
 func momentCandidate(t *testing.T, w *Worker, place *string) models.Candidate {
 	t.Helper()
-	src, ext := "wikipedia", "wikipedia:1:moment"
-	payload, _ := json.Marshal(map[string]any{
-		"title": "Downers Grove train wreck", "raw_text": strings.Repeat("On 1940-01-01 a train derailed near the station. ", 400),
-		"source_url": "https://en.wikipedia.org/wiki/Downers_Grove_train_wreck", "source_title": "Downers Grove train wreck",
-		"source_publisher": "Wikipedia contributors", "source_license": "CC-BY-SA-4.0",
-	})
-	c, err := w.store.CreateCandidate(context.Background(), models.Candidate{Kind: models.CandidateKindMoment, Origin: models.CandidateOriginImport, SourceName: &src, ExternalID: &ext, TargetPlaceID: place, Payload: payload})
+	payload, _ := json.Marshal(map[string]any{"title": "Curator title", "body": "Curator text", "raw_text": "UNSUPPORTED_USER_ANECDOTE", "sources": []map[string]any{{"title": "Curator archive", "url": "https://curator.example/record"}}})
+	c, err := w.store.CreateCandidate(context.Background(), models.Candidate{Kind: models.CandidateKindMoment, Origin: models.CandidateOriginImport, TargetPlaceID: place, Payload: payload})
 	if err != nil {
 		t.Fatal(err)
 	}
 	return *c
 }
-
-func TestDraftJobMergesDraftIntoCandidate(t *testing.T) {
-	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
-	drain(t, w, ctx)
-	fd := &fakeDrafter{draft: llm.MomentDraft{Title: "The 1940 Wreck", Body: "A freight train left the rails beside the depot.", DateStart: "1940-01-01", DatePrecision: "day", DateDisplay: "January 1, 1940", TopicSlugs: []string{"rail-and-the-commuter-town", "ghost-stories"}, Notes: "Casualty count not in source."}}
-	w.Drafter = fd
-	place := testdb.SeedPlaceStationID
-	cand := momentCandidate(t, w, &place)
-	if err := store.Enqueue(ctx, models.JobKindDraftCandidate, models.DraftCandidatePayload{CandidateID: cand.ID}); err != nil {
+func inspectedDraftPayload(t *testing.T, s *repository.Store, ctx context.Context, id, evidence string) models.DraftCandidatePayload {
+	t.Helper()
+	c, err := s.GetCandidate(ctx, id)
+	if err != nil {
 		t.Fatal(err)
 	}
-	if n := drain(t, w, ctx); n != 1 {
-		t.Fatalf("processed %d", n)
+	return models.DraftCandidatePayload{CandidateID: id, EvidenceIDs: []string{evidence}, PayloadSHA256: repository.CandidatePayloadHash(c.Payload)}
+}
+func TestDraftJobKeepsCuratorFieldsAndAppendsInspectedProposal(t *testing.T) {
+	w, s, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+	drain(t, w, ctx)
+	eid := inspectedDraftEvidence(t, w, ctx)
+	f := &fakeDrafter{}
+	w.Drafter = f
+	place := testdb.SeedPlaceStationID
+	c := momentCandidate(t, w, &place)
+	p := inspectedDraftPayload(t, s, ctx, c.ID, eid)
+	if err := w.draftCandidate(ctx, p); err != nil {
+		t.Fatal(err)
 	}
-	if fd.calls != 1 || fd.last.PlaceName != "Main Street Station" || len(fd.last.RawText) > 12000 || len(fd.last.Topics) != 4 || fd.last.SourceURL == "" {
-		t.Fatalf("draft request: calls=%d place=%q raw=%d topics=%d url=%q", fd.calls, fd.last.PlaceName, len(fd.last.RawText), len(fd.last.Topics), fd.last.SourceURL)
+	if f.calls != 1 || f.last.PlaceName != "Main Street Station" || len([]rune(f.last.Evidence[0].Passages[0].Text)) > 12000 || len(f.last.Topics) != 4 {
+		t.Fatalf("request %+v", f.last)
 	}
-	got, _ := store.GetCandidate(ctx, cand.ID)
-	if got.Origin != models.CandidateOriginDraft || got.Status != models.CandidateStatusPending {
-		t.Fatalf("candidate after draft: %+v", got)
+	requestJSON, _ := json.Marshal(f.last)
+	if strings.Contains(string(requestJSON), "UNSUPPORTED_USER_ANECDOTE") || strings.Contains(string(requestJSON), "Curator text") {
+		t.Fatal("uninspected candidate text reached provider")
 	}
+	got, _ := s.GetCandidate(ctx, c.ID)
 	var payload map[string]any
 	_ = json.Unmarshal(got.Payload, &payload)
-	if payload["title"] != "The 1940 Wreck" || payload["body"] == nil || payload["date_start"] != "1940-01-01" || payload["date_precision"] != "day" || payload["place_id"] != testdb.SeedPlaceStationID {
-		t.Fatalf("payload %v", payload)
+	if got.Status != models.CandidateStatusPending || payload["body"] != "Curator text" || payload["title"] != "Curator title" || payload["sources"].([]any)[0].(map[string]any)["url"] != "https://curator.example/record" {
+		t.Fatal("curator fields changed")
 	}
-	topicIDs, _ := payload["topic_ids"].([]any)
-	if len(topicIDs) != 1 || topicIDs[0] != testdb.SeedTopicRailID {
-		t.Fatalf("topic_ids should resolve the known slug only: %v", payload["topic_ids"])
+	proposal := payload["generated_drafts"].([]any)[0].(map[string]any)
+	if proposal["title"] != "A documented derailment" || len(proposal["topic_ids"].([]any)) != 1 || len(proposal["review_gaps"].([]any)) < 2 || !strings.Contains(proposal["notes"].(string), "ghost-stories") {
+		t.Fatalf("proposal %+v", proposal)
 	}
-	sourcesList, _ := payload["sources"].([]any)
-	if len(sourcesList) != 1 || sourcesList[0].(map[string]any)["url"] != "https://en.wikipedia.org/wiki/Downers_Grove_train_wreck" || sourcesList[0].(map[string]any)["license"] != "CC-BY-SA-4.0" {
-		t.Fatalf("sources %v", payload["sources"])
+	if proposal["evidence_manifest"].([]any)[0].(map[string]any)["id"] != eid || len(proposal["claims"].([]any)) != 1 {
+		t.Fatal("lost evidence trail")
 	}
-	notes, _ := payload["draft_notes"].(string)
-	if !strings.Contains(notes, "Casualty count") || !strings.Contains(notes, "ghost-stories") {
-		t.Fatalf("draft_notes should keep the model note and name the dropped slug: %q", notes)
+	if err := w.draftCandidate(ctx, p); !errors.Is(err, ErrNoRetry) || f.calls != 1 {
+		t.Fatal("a stale queued draft spent another provider call")
 	}
-	if payload["raw_text"] == nil || payload["source_url"] == nil {
-		t.Fatal("original payload keys must survive the merge")
+	for range 4 {
+		if err := w.draftCandidate(ctx, inspectedDraftPayload(t, s, ctx, c.ID, eid)); err != nil {
+			t.Fatal(err)
+		}
 	}
-}
-
-func TestDraftJobFailsWithoutRetryWhenNotDraftable(t *testing.T) {
-	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
-	drain(t, w, ctx)
-	w.Drafter = &fakeDrafter{draft: llm.MomentDraft{Title: "x", Body: "y", DatePrecision: "circa"}}
-	reviewer, _ := store.UpsertAccount(ctx, models.AuthProviderDev, "r", "r@example.com", "", true)
-	cand := momentCandidate(t, w, nil)
-	if _, err := store.ReviewCandidate(ctx, cand.ID, reviewer.ID, models.CandidateStatusRejected, "no", nil); err != nil {
-		t.Fatal(err)
-	}
-	_ = store.Enqueue(ctx, models.JobKindDraftCandidate, models.DraftCandidatePayload{CandidateID: cand.ID})
-	drain(t, w, ctx)
-	failed, _ := store.ListJobs(ctx, models.JobStatusFailed, 10, 0)
-	if len(failed) != 1 || failed[0].Attempts != 1 || !strings.Contains(failed[0].LastError, "pending") {
-		t.Fatalf("reviewed candidate must fail once: %+v", failed)
-	}
-
-	w2, store2, ctx2 := newWorker(t, routing.NewStraightLine(), narration.None{})
-	drain(t, w2, ctx2)
-	w2.Drafter = llm.None{}
-	c2 := momentCandidate(t, w2, nil)
-	_ = store2.Enqueue(ctx2, models.JobKindDraftCandidate, models.DraftCandidatePayload{CandidateID: c2.ID})
-	drain(t, w2, ctx2)
-	failed2, _ := store2.ListJobs(ctx2, models.JobStatusFailed, 10, 0)
-	if len(failed2) != 1 || failed2[0].Attempts != 1 || !strings.Contains(failed2[0].LastError, "no provider") {
-		t.Fatalf("no provider must fail once without retry: %+v", failed2)
-	}
-	c2after, _ := store2.GetCandidate(ctx2, c2.ID)
-	if c2after.Origin != models.CandidateOriginImport {
-		t.Fatal("a failed draft must leave the candidate untouched")
+	if err := w.draftCandidate(ctx, inspectedDraftPayload(t, s, ctx, c.ID, eid)); !errors.Is(err, ErrNoRetry) {
+		t.Fatal("unbounded proposal history")
 	}
 }
-
-func TestRedraftPreservesCuratorCitationsAndReportsResearchGaps(t *testing.T) {
-	w, store, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+func TestDraftJobRejectsUnsupportedCitationAndNoEvidence(t *testing.T) {
+	w, s, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
 	drain(t, w, ctx)
-	w.Drafter = &fakeDrafter{draft: llm.MomentDraft{Title: "Evidence is thin", Body: "Only one fact is documented.", DatePrecision: "circa", Notes: "Find more records."}}
-	place := testdb.SeedPlaceStationID
-	candidate := momentCandidate(t, w, &place)
-	var payload map[string]any
-	_ = json.Unmarshal(candidate.Payload, &payload)
-	payload["sources"] = []map[string]any{{"title": "Curator's archive", "url": "https://archive.example.org/item", "publisher": "Local archive"}}
-	encoded, _ := json.Marshal(payload)
-	if err := store.UpdateCandidatePayload(ctx, candidate.ID, encoded, nil); err != nil {
-		t.Fatal(err)
+	eid := inspectedDraftEvidence(t, w, ctx)
+	f := &fakeDrafter{change: func(d *llm.MomentDraft) { d.Claims[0].Citations[0].Quote = "UNSUPPORTED_USER_ANECDOTE" }}
+	w.Drafter = f
+	c := momentCandidate(t, w, nil)
+	p := inspectedDraftPayload(t, s, ctx, c.ID, eid)
+	if err := w.draftCandidate(ctx, p); !errors.Is(err, ErrNoRetry) {
+		t.Fatal("unsupported citation accepted")
 	}
-	if err := w.draftCandidate(ctx, models.DraftCandidatePayload{CandidateID: candidate.ID}); err != nil {
-		t.Fatal(err)
+	got, _ := s.GetCandidate(ctx, c.ID)
+	if repository.CandidatePayloadHash(got.Payload) != p.PayloadSHA256 {
+		t.Fatal("invalid result changed candidate")
 	}
-	got, _ := store.GetCandidate(ctx, candidate.ID)
-	_ = json.Unmarshal(got.Payload, &payload)
-	if payload["sources"].([]any)[0].(map[string]any)["url"] != "https://archive.example.org/item" {
-		t.Fatal("redraft discarded curator evidence")
+	p.EvidenceIDs = nil
+	if err := w.draftCandidate(ctx, p); !errors.Is(err, ErrNoRetry) || f.calls != 1 {
+		t.Fatal("uninspected text reached provider")
 	}
-	if got.Status != models.CandidateStatusPending || len(payload["review_gaps"].([]any)) < 2 {
-		t.Fatal("incomplete generated text escaped review")
+	w.Drafter = llm.None{}
+	if err := w.draftCandidate(ctx, p); !errors.Is(err, ErrNoRetry) {
+		t.Fatal("missing provider retried")
+	}
+}
+func TestDraftCompletionFencesConcurrentCuratorEditAndReview(t *testing.T) {
+	for _, action := range []string{"edit", "review"} {
+		t.Run(action, func(t *testing.T) {
+			w, s, ctx := newWorker(t, routing.NewStraightLine(), narration.None{})
+			drain(t, w, ctx)
+			eid := inspectedDraftEvidence(t, w, ctx)
+			c := momentCandidate(t, w, nil)
+			p := inspectedDraftPayload(t, s, ctx, c.ID, eid)
+			f := &fakeDrafter{during: func() {
+				if action == "edit" {
+					if err := s.UpdateCandidatePayload(ctx, c.ID, json.RawMessage(`{"body":"New curator edit"}`), nil); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					a, _ := s.UpsertAccount(ctx, models.AuthProviderDev, "reviewer", "review@example.com", "", true)
+					if _, err := s.ReviewCandidate(ctx, c.ID, a.ID, models.CandidateStatusRejected, "Curator decision", nil); err != nil {
+						t.Fatal(err)
+					}
+				}
+			}}
+			w.Drafter = f
+			if err := w.draftCandidate(ctx, p); !errors.Is(err, ErrNoRetry) {
+				t.Fatalf("stale completion %v", err)
+			}
+			got, _ := s.GetCandidate(ctx, c.ID)
+			if strings.Contains(string(got.Payload), "generated_drafts") {
+				t.Fatal("draft overwrote newer work")
+			}
+		})
 	}
 }
