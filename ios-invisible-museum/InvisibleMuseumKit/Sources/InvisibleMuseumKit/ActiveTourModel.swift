@@ -145,12 +145,12 @@ public final class ActiveTourModel: Identifiable {
     public var pastLegs: [RouteLeg] {
         guard let legs = route?.legs else { return [] }
         guard let next = nextStop else { return legs }
-        return legs.filter { $0.toPosition < next.position }
+        return legs.filter { $0.fromPosition < $0.toPosition && $0.toPosition < next.position }
     }
 
     public var futureLegs: [RouteLeg] {
         guard let legs = route?.legs, let next = nextStop else { return [] }
-        return legs.filter { $0.toPosition > next.position }
+        return legs.filter { $0.toPosition > next.position || $0.toPosition < $0.fromPosition }
     }
 
     // MARK: Stops and arrival

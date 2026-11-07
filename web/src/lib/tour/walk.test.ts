@@ -150,6 +150,20 @@ describe('ActiveWalk', () => {
 		expect(w.activeLeg?.to_position).toBe(3);
 	});
 
+	it('keeps closing travel ahead while story stops remain', async () => {
+		const d = deps(storage);
+		const closing = { ...route.legs[0], from_position: 4, to_position: 1, return: true };
+		d.fetchRoute = async () => ({ ...route, legs: [...route.legs, closing] });
+		const w = new ActiveWalk('loop', 'walk', d);
+		await w.load();
+		expect(w.futureLegs).toContainEqual(closing);
+		for (const i of [0, 1, 2]) w.handleFix(at(i));
+		expect(w.nextStop?.position).toBe(4);
+		expect(w.pastLegs.map((l) => l.to_position)).toEqual([2, 3]);
+		expect(w.activeLeg?.to_position).toBe(4);
+		expect(w.futureLegs).toEqual([closing]);
+	});
+
 	it('ignores a poor fix and tracks distance', async () => {
 		const w = new ActiveWalk('loop', 'walk', deps(storage));
 		await w.load();

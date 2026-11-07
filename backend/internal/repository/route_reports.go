@@ -178,19 +178,36 @@ func validateReportLocation(revision *models.TourRevision, in models.RouteReport
 		from, fromOK := stops[a.FromStopID]
 		to, toOK := stops[a.ToStopID]
 		delta := to.Position - from.Position
-		if !fromOK || !toOK || (delta != 1 && delta != -1) || (in.Direction == "forward" && delta != 1) || (in.Direction == "reverse" && delta != -1) {
+		if !fromOK || !toOK || from.ID == to.ID {
 			return bad
 		}
-		for _, leg := range revision.Snapshot.Routes[in.Mode].Legs {
-			if leg.FromPosition == min(from.Position, to.Position) && leg.ToPosition == max(from.Position, to.Position) {
-				path = slices.Clone(leg.Geometry)
-				break
+		legs := revision.Snapshot.Routes[in.Mode].Legs
+		index, reverse := -1, false
+		if in.Direction != "reverse" {
+			index = slices.IndexFunc(legs, func(leg models.RouteLeg) bool {
+				return leg.FromPosition == from.Position && leg.ToPosition == to.Position
+			})
+		}
+		if index < 0 && in.Direction != "forward" {
+			index = slices.IndexFunc(legs, func(leg models.RouteLeg) bool {
+				return leg.FromPosition == to.Position && leg.ToPosition == from.Position
+			})
+			reverse = index >= 0
+		}
+		if index >= 0 {
+			path = slices.Clone(legs[index].Geometry)
+			if reverse {
+				slices.Reverse(path)
 			}
+			if len(path) < 2 && legs[index].NavigationSource != "" {
+				return bad
+			}
+		}
+		if index < 0 && ((delta != 1 && delta != -1) || in.Direction == "forward" && delta != 1 || in.Direction == "reverse" && delta != -1) {
+			return bad
 		}
 		if len(path) < 2 {
 			path = [][2]float64{{from.Place.Longitude, from.Place.Latitude}, {to.Place.Longitude, to.Place.Latitude}}
-		} else if delta == -1 {
-			slices.Reverse(path)
 		}
 	} else {
 		stop, ok := stops[a.StopID]

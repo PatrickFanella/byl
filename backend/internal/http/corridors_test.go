@@ -1,15 +1,22 @@
 package httpapi
 
 import (
+	"context"
 	"encoding/json"
 	"io"
+	"log/slog"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"invisible-museum/backend/internal/geo"
+	"invisible-museum/backend/internal/jobs"
 	"invisible-museum/backend/internal/models"
+	"invisible-museum/backend/internal/narration"
+	"invisible-museum/backend/internal/routing"
 	"invisible-museum/backend/internal/testdb"
 )
 
@@ -23,10 +30,24 @@ func corridorRequest(t *testing.T, tour map[string]any, version int) map[string]
 	if err := json.Unmarshal(raw, &in); err != nil {
 		t.Fatal(err)
 	}
-	shape := in["routes"].([]any)[0].(map[string]any)["shaping_points"].([]any)[0].(map[string]any)
 	stops := tour["stops"].([]any)
-	shape["after_stop_id"] = stops[0].(map[string]any)["id"]
-	shape["before_stop_id"] = stops[1].(map[string]any)["id"]
+	coordinates := []any{}
+	for i, stop := range stops {
+		place := stop.(map[string]any)["place"].(map[string]any)
+		point := []float64{place["longitude"].(float64), place["latitude"].(float64)}
+		coordinates = append(coordinates, point)
+		if i == 0 {
+			next := stops[1].(map[string]any)["place"].(map[string]any)
+			coordinates = append(coordinates, []float64{(point[0] + next["longitude"].(float64)) / 2, (point[1] + next["latitude"].(float64)) / 2})
+		}
+	}
+	midpoint := coordinates[1].([]float64)
+	in["segments"] = []any{map[string]any{"id": "synthetic-itinerary", "kind": "trail", "from_node": "start", "to_node": "end", "branches": []string{"fixture"}, "modes": []string{"walk", "bike"}, "geometry": map[string]any{"type": "LineString", "coordinates": coordinates}}}
+	routes := []any{}
+	for _, mode := range []string{"walk", "bike"} {
+		routes = append(routes, map[string]any{"mode": mode, "branch": "fixture", "direction": "synthetic itinerary order", "path": []any{map[string]any{"segment_id": "synthetic-itinerary", "reverse": false}}, "allowed_connectors": []string{}, "shaping_points": []any{map[string]any{"id": "fixture-shape", "segment_id": "synthetic-itinerary", "traversal_index": 0, "after_stop_id": stops[0].(map[string]any)["id"], "before_stop_id": stops[1].(map[string]any)["id"], "latitude": midpoint[1], "longitude": midpoint[0], "note": "Synthetic control, not a story"}}})
+	}
+	in["routes"] = routes
 	return map[string]any{"version": version, "intent": in}
 }
 
@@ -38,6 +59,7 @@ func TestCorridorHTTPReviewAndExplicitPublication(t *testing.T) {
 	public := "/api/v1/tours/" + testdb.SeedTourID
 	admin := "/api/v1/admin/tours/" + testdb.SeedTourID
 	tour := e.get(t, public, "").body
+	e.approveCorridorFixtureArrivals(t, curator, tour)
 	body := corridorRequest(t, tour, 0)
 	for _, tc := range []struct {
 		token  string
@@ -118,6 +140,7 @@ func TestCorridorReviewDoesNotTriggerPersonalLegacyRelease(t *testing.T) {
 	id := r.body["id"].(string)
 	e.drain(t)
 	tour := e.get(t, "/api/v1/me/tours/"+id, owner).body
+	e.approveCorridorFixtureArrivals(t, curator, tour)
 	admin := "/api/v1/admin/tours/" + id
 	r = e.do(t, http.MethodPost, admin+"/corridors", curator, corridorRequest(t, tour, 0))
 	if r.status != 201 {
@@ -157,6 +180,7 @@ func TestCorridorPendingInitialViewRequiresExplicitRelease(t *testing.T) {
 	id := r.body["id"].(string)
 	admin := "/api/v1/admin/tours/" + id
 	tour := e.get(t, "/api/v1/me/tours/"+id, owner).body
+	e.approveCorridorFixtureArrivals(t, curator, tour)
 	r = e.do(t, http.MethodPost, admin+"/corridors", curator, corridorRequest(t, tour, 0))
 	if r.status != 201 {
 		t.Fatal(r.raw)
@@ -172,4 +196,50 @@ func TestCorridorPendingInitialViewRequiresExplicitRelease(t *testing.T) {
 	if r := e.do(t, http.MethodPost, "/api/v1/me/tours/"+id+"/publish", owner, nil); r.status != 200 || r.body["revision_id"] == nil || r.body["corridor"] == nil {
 		t.Fatalf("explicit first release %d %s", r.status, r.raw)
 	}
+}
+
+// The HTTP review tests use a provider stub with explicit controlled capability;
+// the development straight-line provider itself never receives that capability.
+type corridorFixtureRouter struct{ routing.Router }
+
+func (corridorFixtureRouter) RouteControlled(_ context.Context, _ models.TravelMode, request routing.ControlledRequest) (routing.Route, error) {
+	controls := request.Controls
+	result := routing.Route{Provider: "controlled-test-stub"}
+	leg := routing.Leg{}
+	for i, p := range controls {
+		coordinate := [2]float64{p.Lng, p.Lat}
+		result.Geometry = append(result.Geometry, coordinate)
+		leg.Geometry = append(leg.Geometry, coordinate)
+		if i > 0 {
+			leg.DistanceM += geo.DistanceMeters(controls[i-1].Lat, controls[i-1].Lng, p.Lat, p.Lng)
+		}
+		if i > 0 && p.Break {
+			leg.DurationS = int(math.Ceil(leg.DistanceM / 1.3))
+			result.DistanceM += leg.DistanceM
+			result.DurationS += leg.DurationS
+			result.Legs = append(result.Legs, leg)
+			leg = routing.Leg{Geometry: [][2]float64{coordinate}}
+		}
+	}
+	return result, nil
+}
+func (e *testEnv) approveCorridorFixtureArrivals(t *testing.T, curator string, tour map[string]any) {
+	t.Helper()
+	for _, stop := range tour["stops"].([]any) {
+		place := stop.(map[string]any)["place"].(map[string]any)
+		base := "/api/v1/admin/places/" + place["id"].(string) + "/arrivals"
+		lat, lng := place["latitude"].(float64), place["longitude"].(float64)
+		in := models.ArrivalProposalRequest{Point: models.ArrivalPoint{Name: "Synthetic controlled-route entrance", Kind: "entrance", Latitude: &lat, Longitude: &lng}}
+		for _, mode := range models.AllTravelModes {
+			in.Point.Access = append(in.Point.Access, models.ArrivalAccess{Mode: mode, Status: "allowed", Surface: "unknown", SourceURL: "https://example.org/synthetic-access", SourceTitle: "Synthetic fixture access", RetrievedAt: "2026-11-07"})
+		}
+		proposal := e.do(t, http.MethodPost, base, curator, in)
+		if proposal.status != 201 {
+			t.Fatalf("arrival %d %s", proposal.status, proposal.raw)
+		}
+		if r := e.do(t, http.MethodPost, base+"/"+proposal.body["id"].(string)+"/review", curator, models.ArrivalReviewRequest{Action: "approve", Note: "Synthetic source context"}); r.status != 200 {
+			t.Fatalf("arrival review %d %s", r.status, r.raw)
+		}
+	}
+	e.worker = jobs.New(e.store, corridorFixtureRouter{routing.NewStraightLine()}, narration.None{}, e.blob, 1, slog.New(slog.NewTextHandler(io.Discard, nil)))
 }
