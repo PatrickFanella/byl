@@ -171,8 +171,8 @@ func TestUpdateTourModesAdjustsRoutes(t *testing.T) {
 	if err != nil || len(tour.Routes) != 2 {
 		t.Fatalf("widening: %v %+v", err, tour.Routes)
 	}
-	if countJobs(t, s, ctx, models.JobKindComputeRoute)-before != 1 {
-		t.Fatal("widening should enqueue a job for the new mode only")
+	if countJobs(t, s, ctx, models.JobKindComputeRoute)-before != 2 {
+		t.Fatal("widening must enqueue the new mode and replace the pending old-version walk job")
 	}
 	if _, err := s.GetTourRoute(ctx, testdb.SeedTourID, models.TravelModeBike); err != nil {
 		t.Fatalf("route row for bike should exist pending: %v", err)

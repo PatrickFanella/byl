@@ -305,3 +305,50 @@ modes receive null. Historical coordinates remain in the ordinary place response
 Clients and route recomputation still need their later roadmap integration before
 visitors use this selection automatically. The Downer burial entrance used in
 backend tests is a synthetic fixture lead, not an inspected real-world entrance.
+
+
+## Publishing a fixed tour revision
+
+A published tour now has an immutable revision containing its ordered stops,
+selected full stories, citations and media references, reviewed arrival context,
+routing inputs and computed geometry. Editing the working copy leaves that
+revision visible until another publication succeeds. Standalone place and story
+pages continue to show their current content; a client displaying a pinned tour
+story must read it from the revision's `snapshot.moments` map. Media URLs and
+rights metadata are retained as references, not a promise that a remote file
+will remain available.
+
+Curator editing endpoints return the working `draft_version`, `route_version`
+and current `revision_id`. Send `draft_version` with edits to detect a stale
+editor. Keep a stop's `stop_id` when reordering it; the server also retains IDs
+for unchanged place/story pairs when older clients omit them. A different place
+or explicitly selected story receives a new stop identity. Repeated visits can
+use explicit IDs to distinguish them.
+
+Publish through `POST /api/v1/admin/tours/{id}/publish`, supplying
+`draft_version` and `current_revision_id` from the loaded working copy. The
+server compares both under a tour lock, rechecks publication requirements and
+creates the revision atomically. A stale request returns 409. Publication still
+requires ready routes computed from the current ordered sites. Changed site
+coordinates require recomputation even if no tour field changed. Curated tours
+require explicit publication. A personal route's existing save/share behavior
+retains an exact-version release request and fulfills it when its routes become
+ready; `/api/v1/me/tours/{id}/publish` also supports explicit owner publication.
+
+`GET /api/v1/tours/{tour}/revisions` lists release metadata;
+`GET /api/v1/tours/{tour}/revisions/{revision}` returns the frozen content.
+Current visibility and historical private visibility both restrict access.
+Unpublishing, making a tour private or deleting it revokes public access to its
+retained revisions. Deleting a previously published tour hides it while keeping
+history; it does not erase snapshots or progress.
+
+New clients store progress with stable `visited_stop_ids` through
+`GET`/`PUT /api/v1/me/progress/{tour}/revisions/{revision}`. A new revision starts
+with no inherited visits. Existing position-based progress endpoints project
+positions against the trip's pinned revision. Authenticated tour and route reads
+then resume that same revision until the visitor explicitly resets progress,
+which moves the legacy trip to the current published revision. Clients must
+attach their bearer token to those reads; anonymous reads show the current
+public release. A personal route with its first routes still pending has no
+published revision yet, so progress returns 409 until it is ready. Client update
+prompts and full adoption of the revision endpoints remain separate work.

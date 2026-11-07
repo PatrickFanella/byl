@@ -117,65 +117,23 @@ func (s *Store) Unsave(ctx context.Context, accountID, tourID string) error {
 // ListSaved returns an account's bookmarked tours.
 func (s *Store) ListSaved(ctx context.Context, accountID string) ([]models.TourSummary, error) {
 	tours, _, err := s.ListTours(ctx, TourFilter{SavedByAccountID: accountID, IncludeUnpublished: true})
-	return tours, err
-}
-
-const progressCols = `account_id, tour_id, mode, visited_positions, started_at, completed_at, updated_at`
-
-func scanProgress(row interface{ Scan(...any) error }) (models.TourProgress, error) {
-	var p models.TourProgress
-	err := row.Scan(&p.AccountID, &p.TourID, &p.Mode, &p.VisitedPositions, &p.StartedAt, &p.CompletedAt, &p.UpdatedAt)
-	if p.VisitedPositions == nil {
-		p.VisitedPositions = []int{}
-	}
-	return p, err
-}
-
-// ListProgress returns every progress row for an account.
-func (s *Store) ListProgress(ctx context.Context, accountID string) ([]models.TourProgress, error) {
-	rows, err := s.pool.Query(ctx, `SELECT `+progressCols+` FROM tour_progress WHERE account_id = $1 ORDER BY updated_at DESC`, accountID)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	out := []models.TourProgress{}
-	for rows.Next() {
-		p, err := scanProgress(rows)
+	out := []models.TourSummary{}
+	for _, tour := range tours {
+		working, err := s.GetTour(ctx, tour.ID, false)
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, p)
+		served, err := s.ServedTour(ctx, working, accountID)
+		if err != nil {
+			return nil, err
+		}
+		if served.Visibility == models.TourVisibilityPrivate && (served.OwnerAccountID == nil || *served.OwnerAccountID != accountID) {
+			continue
+		}
+		out = append(out, served.TourSummary)
 	}
-	return out, rows.Err()
-}
-
-// GetProgress returns progress on one tour.
-func (s *Store) GetProgress(ctx context.Context, accountID, tourID string) (*models.TourProgress, error) {
-	if !isUUID(tourID) {
-		return nil, ErrNotFound
-	}
-	p, err := scanProgress(s.pool.QueryRow(ctx, `SELECT `+progressCols+` FROM tour_progress WHERE account_id = $1 AND tour_id = $2`, accountID, tourID))
-	if err != nil {
-		return nil, mapErr(err)
-	}
-	return &p, nil
-}
-
-// PutProgress atomically merges progress, or explicitly resets it for a new walk.
-func (s *Store) PutProgress(ctx context.Context, in models.TourProgress, reset bool) (*models.TourProgress, error) {
-	if in.VisitedPositions == nil {
-		in.VisitedPositions = []int{}
-	}
-	p, err := scanProgress(s.pool.QueryRow(ctx, `INSERT INTO tour_progress (account_id, tour_id, mode, visited_positions, completed_at)
-		VALUES ($1, $2, $3, ARRAY(SELECT DISTINCT p FROM unnest($4::integer[]) AS p ORDER BY p), $5)
-		ON CONFLICT (account_id, tour_id) DO UPDATE SET mode = EXCLUDED.mode,
-			visited_positions = CASE WHEN $6 THEN EXCLUDED.visited_positions ELSE
-				ARRAY(SELECT DISTINCT p FROM unnest(tour_progress.visited_positions || EXCLUDED.visited_positions) AS p ORDER BY p) END,
-			completed_at = CASE WHEN $6 THEN EXCLUDED.completed_at ELSE COALESCE(tour_progress.completed_at, EXCLUDED.completed_at) END,
-			started_at = CASE WHEN $6 THEN now() ELSE tour_progress.started_at END, updated_at = now()
-		RETURNING `+progressCols, in.AccountID, in.TourID, in.Mode, in.VisitedPositions, in.CompletedAt, reset))
-	if err != nil {
-		return nil, mapErr(err)
-	}
-	return &p, nil
+	return out, nil
 }

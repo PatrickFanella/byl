@@ -200,8 +200,8 @@ func TestAdminTourPublishing(t *testing.T) {
 	if r := env.get(t, "/api/v1/cities/downers-grove/tours?topic=downtown-after-dark", ""); len(items(t, r)) != 1 {
 		t.Fatalf("public listing after publish: %s", r.raw)
 	}
-	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/routes/recompute", curator, nil); r.status != 409 {
-		t.Fatalf("recompute on a published tour must be refused: %d %s", r.status, r.raw)
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/tours/"+tourID+"/routes/recompute", curator, nil); r.status != 202 {
+		t.Fatalf("published working-copy recompute: %d %s", r.status, r.raw)
 	}
 	if r := env.do(t, http.MethodPatch, "/api/v1/admin/tours/"+tourID, curator, map[string]any{"title": "Night Walk II"}); r.status != 200 || r.body["title"] != "Night Walk II" {
 		t.Fatalf("title change on a published tour is fine: %d %s", r.status, r.raw)

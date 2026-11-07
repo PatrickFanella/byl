@@ -38,15 +38,6 @@ func (d Deps) adminTour(w http.ResponseWriter, r *http.Request) (*models.TourDet
 	return tour, true
 }
 
-// lockedForEditing reports whether a published curated tour would lose its geometry; writes 409 when so.
-func lockedForEditing(w http.ResponseWriter, tour *models.TourDetail) bool {
-	if tour.Status == models.EntityStatusPublished && tour.OwnerAccountID == nil {
-		writeError(w, http.StatusConflict, "conflict", "tour is published; unpublish it before changing stops, modes, or routes")
-		return true
-	}
-	return false
-}
-
 func (d Deps) adminGetTour(w http.ResponseWriter, r *http.Request) {
 	tour, ok := d.adminTour(w, r)
 	if !ok {
@@ -88,10 +79,11 @@ func (d Deps) adminUpdateTour(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	if req.Modes != nil && lockedForEditing(w, existing) {
-		return
+	expected := req.DraftVersion
+	if expected == nil {
+		expected = &existing.DraftVersion
 	}
-	in := repository.UpdateTourInput{Title: req.Title, Summary: req.Summary, Modes: req.Modes, HeroMediaID: req.HeroMediaID, Visibility: req.Visibility}
+	in := repository.UpdateTourInput{ExpectedVersion: expected, Title: req.Title, Summary: req.Summary, Modes: req.Modes, HeroMediaID: req.HeroMediaID, Visibility: req.Visibility}
 	if req.TopicID != nil {
 		if strings.TrimSpace(*req.TopicID) == "" {
 			in.ClearTopic = true
@@ -117,10 +109,14 @@ func (d Deps) adminSetTourStops(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	existing, ok := d.adminTour(w, r)
-	if !ok || lockedForEditing(w, existing) {
+	if !ok {
 		return
 	}
-	if err := d.Store.ReplaceStops(r.Context(), existing.ID, req.Stops); err != nil {
+	expected := req.DraftVersion
+	if expected == nil {
+		expected = &existing.DraftVersion
+	}
+	if err := d.Store.ReplaceStopsVersioned(r.Context(), existing.ID, req.Stops, expected); err != nil {
 		d.fail(w, err)
 		return
 	}
@@ -141,21 +137,7 @@ func (d Deps) adminPublishTour(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	id := tour.ID
-	blockers, err := d.Store.TourPublishBlockers(r.Context(), id)
-	if err != nil {
-		d.fail(w, err)
-		return
-	}
-	if len(blockers) > 0 {
-		writeError(w, http.StatusConflict, "conflict", "cannot publish: "+strings.Join(blockers, "; "))
-		return
-	}
-	if err := d.Store.SetTourStatus(r.Context(), id, models.EntityStatusPublished); err != nil {
-		d.fail(w, err)
-		return
-	}
-	d.respondTour(w, r, id)
+	d.publishTourRevision(w, r, tour)
 }
 
 func (d Deps) adminUnpublishTour(w http.ResponseWriter, r *http.Request) {
@@ -185,7 +167,7 @@ func (d Deps) adminDeleteTour(w http.ResponseWriter, r *http.Request) {
 
 func (d Deps) adminRecomputeRoutes(w http.ResponseWriter, r *http.Request) {
 	tour, ok := d.adminTour(w, r)
-	if !ok || lockedForEditing(w, tour) {
+	if !ok {
 		return
 	}
 	if err := d.Store.RecomputeRoutes(r.Context(), tour.ID); err != nil {
