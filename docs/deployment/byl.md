@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 12, then saves a PostgreSQL
+changed migration files or a schema version other than 13, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -447,3 +447,51 @@ immutable releases requires a separate reviewed retention/anonymization procedur
 the ordinary tour delete operation hides the retained record. This migration
 does not activate public sign-in, telemetry, a routing provider or client update
 prompts, and does not certify geometry as legal public access.
+
+
+## Private versioned route reports, migration 13
+
+Migration 13 adds only `route_reports`, its indexes and an input-immutability
+trigger. It changes no existing tour, snapshot, progress, account or historical
+place row. The report keeps a composite foreign key to its exact tour revision.
+Submission/owner/target/hash/creation fields cannot be updated; curator disposition
+uses an expected version and the existing private brief lifecycle. Acceptance
+never edits route intent, entrance access, geometry or historical text.
+
+Rehearse the exact accepted SQL on a fresh restored schema-12 production backup.
+Compare every existing table fingerprint and representative public tour/revision,
+story and geometry responses from the previous API. Independently restore the
+actual operator database backup before SQL application; verify the media archive.
+Under the receiver lock, recheck live fingerprints, apply as operator, then admit
+the exact thirteen-file manifest and source hook expecting schema 13. The already
+admitted migrations 1–12 must retain their checksums. CI applies no production
+SQL. Keep previous images, manifest, hook, dump and receipts. Automatic down
+refuses to delete private reports; image recovery retains schema 13 and later
+submissions, with the schema-12 revision-write recovery constraints above.
+
+`POST /api/v1/me/route-reports` requires a session and accepts operational
+observations about a visible immutable tour revision. It does not open the
+ordinary public route-brief intake or configure Google/Apple sign-in. Owner
+list/get APIs restrict records in SQL; curator list/get/disposition APIs require
+the curator role. Responses use no-store. Notes, dates, coordinates and decisions
+remain private to the submitter and curators. New submissions on a withdrawn
+route are refused; the submitter can still read an existing report or retry its
+original key after withdrawal.
+
+Bodies are at most 32 KiB, details 4000 characters, improvement meaning 1000,
+source links 2000 bytes and retry keys 128 printable non-space ASCII bytes.
+An account may create 10 reports per rolling 24 hours and retain at most 20
+unresolved reports. An optional account-scoped `Idempotency-Key` replays the
+original submission without another quota slot; changed input returns 409.
+Missing keys represent new submissions. Dispositions do not change the original
+submission hash. No background jobs, source retrieval, telemetry collection,
+photo upload or automatic route mutation are started by these APIs.
+
+A map annotation is one explicit WGS84 point near the affected frozen location.
+An optional alternative is a 2–64-point LineString; all points stay within 1 km
+of the affected stop/entrance or segment path. Segment endpoints must connect
+within 100 m of its ordered frozen endpoints; a stop/entrance alternative needs
+one end within 100 m of that anchor. When a revision lacks approved arrival data,
+the historical location only bounds the private observation; it does not become
+a navigation entrance. A nearby coordinate or visual crossing establishes no
+access or traversable junction. Review is still required before any route change.

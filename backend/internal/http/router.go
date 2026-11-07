@@ -104,6 +104,9 @@ func NewRouter(d Deps) http.Handler {
 			r.Put("/me/progress/{tour}/revisions/{revision}", d.revisionProgress(true))
 			r.Post("/me/tours/{id}/publish", d.publishMyTour)
 			r.Get("/me", d.me)
+			r.Post("/me/route-reports", d.createRouteReport)
+			r.Get("/me/route-reports", d.listRouteReports(false))
+			r.Get("/me/route-reports/{id}", d.getRouteReport(false))
 			r.Get("/me/route-briefs", d.listRouteBriefs(false))
 			r.Post("/me/route-briefs", d.routeBriefIntakeDisabled)
 			r.Get("/me/route-briefs/{id}", d.getRouteBrief(false))
@@ -125,6 +128,9 @@ func NewRouter(d Deps) http.Handler {
 
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(d.requireAuth, requireRole(models.AccountRoleCurator))
+			r.Get("/route-reports", d.listRouteReports(true))
+			r.Get("/route-reports/{id}", d.getRouteReport(true))
+			r.Post("/route-reports/{id}/state", d.adminSetRouteReportState)
 			r.Get("/route-briefs", d.listRouteBriefs(true))
 			r.Post("/route-briefs", d.adminCreateRouteBrief)
 			r.Get("/route-briefs/{id}", d.getRouteBrief(true))
