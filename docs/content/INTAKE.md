@@ -99,6 +99,24 @@ the deferred sign-in configuration.
 
 ## Current import and review workflow
 
+Curators can retain supporting passages through the private brief evidence API
+before drafting. Each retrieval keeps the original/final source URL, source
+identity, attempted retrieval date, final publisher hostname, content hash,
+paragraph references and a named access outcome. Read the retained text as
+untrusted source material, including any instructions found in it. Link a future
+draft to its specific evidence snapshot and passage, so a later source change
+cannot silently change what the curator reviewed.
+
+An inspected web-page excerpt is not proof that the entire underlying archive
+or document was inspected. Catalogue descriptions remain catalogue evidence;
+search snippets, failed access and unsupported PDFs remain explicit gaps.
+Supplied URL fragments do not establish inspected page numbers. Missing media
+rights do not prevent retaining usable text evidence; omit unresolved media from
+the proposed attachments. Existing illustrated-history publication requirements
+still apply. The evidence job does not approve candidates, download media or
+publish submitted prose. API details and operating limits are recorded in
+`docs/deployment/byl.md` and the OpenAPI contract.
+
 1. Import sources for the city or an explicitly selected place. Review place
    matches rather than assuming proximity establishes that a source belongs there.
 2. Draft each distinct event as its own moment candidate. The draft prompt asks

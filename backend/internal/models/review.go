@@ -48,6 +48,7 @@ const (
 	JobKindDraftCandidate    = "draft_candidate"
 	JobKindFetchMedia        = "fetch_media"
 	JobKindResearchBrief     = "research_brief"
+	JobKindFetchEvidence     = "fetch_evidence"
 )
 
 // ResearchBriefPayload references durable private checkpoints rather than source text.

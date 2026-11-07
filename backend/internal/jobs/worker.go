@@ -29,6 +29,7 @@ type Worker struct {
 	Drafter llm.Drafter
 	// Research is an optional staged processor; absent adapters leave a named research gap.
 	Research ResearchProcessor
+	Evidence sources.EvidenceRetriever
 
 	store    *repository.Store
 	router   routing.Router
@@ -112,11 +113,12 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 // uses a context that survives cancellation so a shutdown mid-job still leaves the row queued
 // or done rather than stuck in running.
 func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runErr error) error {
+	fenced := job.Kind == models.JobKindResearchBrief || job.Kind == models.JobKindFetchEvidence
 	wctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 15*time.Second)
 	defer cancel()
 	if runErr == nil {
-		if job.Kind == models.JobKindResearchBrief {
-			return w.store.FinishResearchJob(wctx, job, note, nil, false)
+		if fenced {
+			return w.store.FinishClaimedJob(wctx, job, note, nil, false)
 		}
 		if err := w.store.CompleteJob(wctx, job.ID); err != nil {
 			return err
@@ -131,14 +133,14 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runEr
 	w.log.Warn("job failed", "id", job.ID, "kind", job.Kind, "attempt", job.Attempts, "final", final, "interrupted", interrupted, "error", runErr)
 	if final {
 		if err := w.onFinalFailure(wctx, job, runErr); err != nil {
-			if job.Kind == models.JobKindResearchBrief {
+			if fenced {
 				// Keep the claim recoverable until the private brief outcome is durable.
 				return err
 			}
 			w.log.Error("record final failure", "id", job.ID, "error", err)
 		}
-		if job.Kind == models.JobKindResearchBrief {
-			return w.store.FinishResearchJob(wctx, job, runErr.Error(), nil, true)
+		if fenced {
+			return w.store.FinishClaimedJob(wctx, job, runErr.Error(), nil, true)
 		}
 		return w.store.FailJob(wctx, job.ID, runErr.Error(), nil)
 	}
@@ -146,11 +148,11 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runEr
 	if interrupted {
 		retry = w.now()
 	}
-	if job.Kind == models.JobKindResearchBrief {
+	if fenced {
 		if retry.After(w.now().Add(30 * time.Second)) {
 			retry = w.now().Add(30 * time.Second)
 		}
-		return w.store.FinishResearchJob(wctx, job, runErr.Error(), &retry, false)
+		return w.store.FinishClaimedJob(wctx, job, runErr.Error(), &retry, false)
 	}
 	return w.store.FailJob(wctx, job.ID, runErr.Error(), &retry)
 }
@@ -158,6 +160,8 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runEr
 // dispatch runs the job and returns its completion note (empty for most kinds) or error.
 func (w *Worker) dispatch(ctx context.Context, job *models.Job) (string, error) {
 	switch job.Kind {
+	case models.JobKindFetchEvidence:
+		return w.fetchEvidence(ctx, job)
 	case models.JobKindResearchBrief:
 		return w.researchBrief(ctx, job)
 	case models.JobKindComputeRoute:
@@ -196,6 +200,17 @@ func (w *Worker) dispatch(ctx context.Context, job *models.Job) (string, error) 
 }
 
 func (w *Worker) onFinalFailure(ctx context.Context, job *models.Job, runErr error) error {
+	if job.Kind == models.JobKindFetchEvidence {
+		var p models.FetchEvidencePayload
+		if err := json.Unmarshal(job.Payload, &p); err != nil {
+			return nil
+		}
+		err := w.store.CompleteSourceEvidence(ctx, p.EvidenceID, job, models.EvidenceResult{Outcome: "worker_failed"})
+		if errors.Is(err, repository.ErrResearchInactive) {
+			return nil
+		}
+		return err
+	}
 	if job.Kind == models.JobKindResearchBrief {
 		var p models.ResearchBriefPayload
 		if err := json.Unmarshal(job.Payload, &p); err != nil {

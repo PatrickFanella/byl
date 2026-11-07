@@ -111,8 +111,8 @@ func (s *Store) RetryJob(ctx context.Context, id string) error {
 	return nil
 }
 
-// FinishResearchJob fences completion/retry from cancelled or reclaimed claims.
-func (s *Store) FinishResearchJob(ctx context.Context, job *models.Job, note string, retryAfter *time.Time, failed bool) error {
+// FinishClaimedJob fences completion/retry from cancelled or reclaimed claims.
+func (s *Store) FinishClaimedJob(ctx context.Context, job *models.Job, note string, retryAfter *time.Time, failed bool) error {
 	status := "done"
 	if failed {
 		status = "failed"
