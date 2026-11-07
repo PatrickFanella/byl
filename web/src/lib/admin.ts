@@ -195,3 +195,14 @@ export const getPathQuality = (tour: string, mode: 'walk' | 'bike', report_id?: 
 	api.get<{ report: PathQualityReport | null }>(
 		`/api/v1/admin/tours/${encodeURIComponent(tour)}/routes/quality${qs({ mode, report_id })}`
 	);
+
+export type BriefItinerary = Schemas['BriefItinerary'];
+export const getBriefItinerary = (id: string, run_id?: string) =>
+	api.get<BriefItinerary>(
+		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/itinerary${qs({ run_id })}`
+	);
+export const startBriefResearch = (id: string, version: number) =>
+	api.post<Schemas['ResearchRun']>(
+		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/research`,
+		{ version }
+	);

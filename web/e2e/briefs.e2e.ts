@@ -212,3 +212,130 @@ test('signed-out and visitor accounts cannot load the curator workspace or its r
 	await expect(page.getByRole('heading', { name: /needs the curator role/i })).toBeVisible();
 	expect(adminCalls).toEqual([]);
 });
+
+test('a curator inspects a private itinerary without losing unsaved brief edits', async ({
+	page,
+	request
+}, info) => {
+	const auth = await token(request);
+	const created = await request.post(`${apiUrl}/api/v1/admin/route-briefs`, {
+		headers: { Authorization: `Bearer ${auth}` },
+		data: {
+			topic: 'Rail workers',
+			area: 'Downers Grove',
+			trip_shape: 'out_and_back',
+			duration_minutes: 30
+		}
+	});
+	expect(created.ok()).toBeTruthy();
+	const brief = await created.json();
+	const seed = await request.get(`${apiUrl}/api/v1/tours/downtown-memory-loop`);
+	const tour = await seed.json();
+	const stops = tour.stops.slice(0, 2).map(
+		(
+			stop: {
+				place: { id: string; name: string; city_id: string; latitude: number; longitude: number };
+				featured_moment: { id: string; title: string };
+			},
+			i: number
+		) => ({
+			material: {
+				record_id: `00000000-0000-4000-8000-00000000000${i}`,
+				review_version: 0,
+				place_id: stop.place.id,
+				place_name: stop.place.name,
+				city_id: stop.place.city_id,
+				latitude: stop.place.latitude,
+				longitude: stop.place.longitude,
+				moment_id: stop.featured_moment.id,
+				moment_title: stop.featured_moment.title,
+				narrative: 'Retained source-linked historical paragraph for this browser fixture.',
+				evidence_kind: 'curated_record',
+				content_sha256: 'a'.repeat(64),
+				source_urls: ['https://example.org/fixture'],
+				evidence_ids: []
+			},
+			theme_reason: 'Matched requested theme: rail',
+			what_to_notice: 'Curator research question: which traces remain visible today?',
+			transition:
+				i === 0 ? 'Continue the theme at the next researched place; the path needs review.' : '',
+			planned_dwell_minutes: 3,
+			planned_narration_minutes: 1
+		})
+	);
+	// Only proposal transport is a fixture. Worker source capture, B5 validation,
+	// no-publication and replay behavior run independently against PostgreSQL.
+	await page.route(`**/api/v1/admin/route-briefs/${brief.id}/itinerary`, (route) =>
+		route.fulfill({
+			json: {
+				run_id: '00000000-0000-4000-8000-000000000011',
+				source_version: 1,
+				brief_version: 2,
+				proposal: {
+					version: 1,
+					status: 'draft',
+					created_at: new Date().toISOString(),
+					title: 'Private rail proposal',
+					introduction: 'A private selection of researched histories.',
+					requested_shape: 'out_and_back',
+					trip_shape: 'out_and_back',
+					modes: ['walk', 'bike'],
+					target_duration_minutes: 30,
+					travel_minutes: null,
+					travel_state: 'not_computed',
+					planned_dwell_minutes: 6,
+					planned_narration_minutes: 2,
+					stops,
+					travel_sequence: [0, 1, 0],
+					excluded: [],
+					research_gaps: [
+						{
+							code: 'viewing_guidance',
+							detail: 'Current visible features still need source review.'
+						}
+					],
+					assumptions: ['Actual travel and access require separate review.']
+				}
+			}
+		})
+	);
+	await page.route(`**/api/v1/admin/route-briefs/${brief.id}/research`, (route) =>
+		route.fulfill({
+			status: 202,
+			json: { id: '00000000-0000-4000-8000-000000000011', status: 'active' }
+		})
+	);
+	await signIn(page);
+	await page.goto(`/admin/briefs/${brief.id}`);
+	await expect(page.getByLabel('Trip shape')).toHaveValue('out_and_back');
+	await page
+		.getByLabel('Submitted notes')
+		.fill('Unsaved curator wording must survive research and readback.');
+	const queued = page.waitForRequest(
+		(r) => r.url().endsWith(`/route-briefs/${brief.id}/research`) && r.method() === 'POST'
+	);
+	await page.getByRole('button', { name: 'Start research from saved brief', exact: true }).click();
+	expect((await queued).postDataJSON()).toEqual({ version: 1 });
+	await expect(page.getByLabel('Submitted notes')).toHaveValue(
+		'Unsaved curator wording must survive research and readback.'
+	);
+	await expect(page.getByText('State: research requested', { exact: true })).toBeVisible();
+	await expect(
+		page.getByRole('button', { name: 'Inspect itinerary proposal', exact: true })
+	).toBeEnabled();
+	await page.getByRole('button', { name: 'Inspect itinerary proposal', exact: true }).focus();
+	await page.keyboard.press('Enter');
+	await expect(page.getByRole('heading', { name: 'Private rail proposal' })).toBeVisible();
+	await expect(page.getByText('Not computed', { exact: true })).toBeVisible();
+	await expect(page.getByText('Travel sequence:', { exact: true })).toBeVisible();
+	await expect(page.getByText('Current visible features still need source review.')).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Source 1', exact: true })).toHaveCount(2);
+	await expect(page.getByLabel('Submitted notes')).toHaveValue(
+		'Unsaved curator wording must survive research and readback.'
+	);
+	await page.setViewportSize({ width: 390, height: 844 });
+	expect(
+		await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+	).toBeTruthy();
+	await page.screenshot({ path: info.outputPath('itinerary-mobile.png'), fullPage: true });
+});

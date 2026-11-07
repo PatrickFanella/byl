@@ -281,6 +281,19 @@ func (s *Store) ChangeBriefResearch(ctx context.Context, briefID string, in mode
 // BeginResearchStage durably reserves work before invoking a provider. It returns
 // false for an already completed stage or a run stopped by a named budget.
 func (s *Store) BeginResearchStage(ctx context.Context, runID, stage string, claim *models.Job) (bool, error) {
+	return s.beginResearchStage(ctx, runID, stage, claim, true)
+}
+
+// BeginLocalResearchStage retains claim/deadline/attempt fences without charging
+// external-request or model reservations for local material capture and assembly.
+func (s *Store) BeginLocalResearchStage(ctx context.Context, runID, stage string, claim *models.Job) (bool, error) {
+	if stage != "drafting" && stage != "assembly" {
+		return false, ErrInvalidReference
+	}
+	return s.beginResearchStage(ctx, runID, stage, claim, false)
+}
+
+func (s *Store) beginResearchStage(ctx context.Context, runID, stage string, claim *models.Job, external bool) (bool, error) {
 	started := false
 	err := s.Transaction(ctx, func(tx *Store) error {
 		r, b, err := tx.lockResearch(ctx, runID, claim)
@@ -306,9 +319,9 @@ func (s *Store) BeginResearchStage(ctx context.Context, runID, stage string, cla
 			code = "elapsed_budget"
 		case attempts >= 3:
 			code = "retry_budget"
-		case r.RequestsUsed >= r.RequestLimit:
+		case external && r.RequestsUsed >= r.RequestLimit:
 			code = "request_budget"
-		case r.TokensReserved+ResearchTokenReservation > r.TokenLimit:
+		case external && r.TokensReserved+ResearchTokenReservation > r.TokenLimit:
 			code = "model_budget"
 		}
 		if code != "" {
@@ -317,8 +330,10 @@ func (s *Store) BeginResearchStage(ctx context.Context, runID, stage string, cla
 			}
 			return tx.stopResearchTx(ctx, r, b, "needs_research", code)
 		}
-		if _, err := tx.pool.Exec(ctx, `UPDATE brief_research_runs SET requests_used=requests_used+1,tokens_reserved=tokens_reserved+$2,updated_at=now() WHERE id=$1`, runID, ResearchTokenReservation); err != nil {
-			return err
+		if external {
+			if _, err := tx.pool.Exec(ctx, `UPDATE brief_research_runs SET requests_used=requests_used+1,tokens_reserved=tokens_reserved+$2,updated_at=now() WHERE id=$1`, runID, ResearchTokenReservation); err != nil {
+				return err
+			}
 		}
 		if _, err := tx.pool.Exec(ctx, `UPDATE brief_research_attempts SET status='interrupted',reason='worker_reclaimed',finished_at=now() WHERE run_id=$1 AND stage=$2 AND status='running'`, runID, stage); err != nil {
 			return err

@@ -67,13 +67,19 @@ func (w *Worker) researchBrief(ctx context.Context, job *models.Job) (string, er
 		if completed {
 			continue
 		}
-		if w.Research == nil && (stage != "research" || w.Discovery == nil) && (stage != "reconciliation" || !w.Reconcile) {
+		localAssembly := w.Assemble && (stage == "drafting" || stage == "assembly")
+		if !localAssembly && w.Research == nil && (stage != "research" || w.Discovery == nil) && (stage != "reconciliation" || !w.Reconcile) {
 			if err := w.store.StopBriefResearch(ctx, run.ID, job, "processor_unavailable"); err != nil && !errors.Is(err, repository.ErrResearchInactive) {
 				return "", errors.New("research checkpoint unavailable")
 			}
 			return "needs_research: processor_unavailable", nil
 		}
-		started, err := w.store.BeginResearchStage(ctx, run.ID, stage, job)
+		var started bool
+		if localAssembly {
+			started, err = w.store.BeginLocalResearchStage(ctx, run.ID, stage, job)
+		} else {
+			started, err = w.store.BeginResearchStage(ctx, run.ID, stage, job)
+		}
 		if errors.Is(err, repository.ErrResearchInactive) {
 			return "research_stopped", nil
 		}
@@ -90,7 +96,9 @@ func (w *Worker) researchBrief(ctx context.Context, job *models.Job) (string, er
 		stageCtx, cancel := context.WithDeadline(ctx, deadline)
 		var out models.ResearchOutput
 		var runErr error
-		if stage == "research" && w.Discovery != nil {
+		if localAssembly {
+			out, runErr = w.assembleBrief(stageCtx, run, stage, previous["drafting"])
+		} else if stage == "research" && w.Discovery != nil {
 			out, runErr = w.discoverBrief(stageCtx, run, job)
 		} else if stage == "reconciliation" && w.Reconcile {
 			out, runErr = w.reconcileBrief(stageCtx, run, previous["research"])

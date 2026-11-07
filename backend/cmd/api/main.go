@@ -79,6 +79,7 @@ func main() {
 	worker.Sources = prov.Sources
 	worker.Discovery = sources.NewDiscovery(prov.Sources, sources.DiscoveryPolicy{Providers: cfg.DiscoveryProviders, Seeds: cfg.DiscoverySeedURLs})
 	worker.Reconcile = true
+	worker.Assemble = true
 	worker.Drafter = prov.Drafter
 	workerDone := make(chan struct{})
 	go func() {

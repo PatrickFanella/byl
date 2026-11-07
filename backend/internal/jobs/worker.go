@@ -33,6 +33,8 @@ type Worker struct {
 	Discovery *sources.Discovery
 	// Reconcile enables the local identity stage without requiring a model provider.
 	Reconcile bool
+	// Assemble enables local reuse of historical drafts and private itinerary proposals.
+	Assemble bool
 
 	store    *repository.Store
 	router   routing.Router
