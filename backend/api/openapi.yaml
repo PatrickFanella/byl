@@ -808,6 +808,61 @@ paths:
         "404": { description: Record is not linked to this brief }
         "409": { description: Decision changed; reload before review }
         "422": { description: Invalid identity choice or references }
+  /api/v1/places/{place}/arrival:
+    get:
+      summary: Select a reviewed public navigation point independently for walking or biking
+      description: Unknown, restricted and closed access return a null navigation_point. The historical site coordinate, nearby road or another mode is never substituted. Source retrieval context is evidence for review, not an accessibility or legal-access guarantee. Legacy places return explicit unknown access.
+      parameters:
+        - { name: place, in: path, required: true, schema: { type: string } }
+        - { name: city, in: query, schema: { type: string } }
+        - { name: mode, in: query, schema: { type: string, enum: [walk, bike], default: walk } }
+      responses:
+        "200": { description: Reviewed point or explicit access gap, content: { application/json: { schema: { $ref: "#/components/schemas/ArrivalSelection" } } } }
+        "404": { description: Published place not found }
+        "409": { description: Ambiguous place slug; provide city }
+        "422": { description: Invalid mode }
+  /api/v1/admin/places/{id}/arrivals:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      summary: Page private arrival proposal and review history (curators only)
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, default: 20, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Private arrival history, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/ArrivalProposal" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Place not found }
+    post:
+      summary: Propose an entrance or viewpoint without changing the approved point
+      description: Immutable input. Version is the current approved arrival_version (zero for legacy places). Source context and independent walk/bike eligibility are public only after explicit curator approval. Unknown access must be represented explicitly.
+      security: [{ bearer: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ArrivalProposalRequest" } } } }
+      responses:
+        "201": { description: Private pending arrival proposal, content: { application/json: { schema: { $ref: "#/components/schemas/ArrivalProposal" } } } }
+        "400": { description: Invalid JSON }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Place not found }
+        "409": { description: Approved arrival changed; reload before proposing }
+        "422": { description: Invalid coordinates, modes or missing source context }
+  /api/v1/admin/places/{id}/arrivals/{arrival}/review:
+    post:
+      summary: Explicitly approve or reject an immutable arrival proposal
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: arrival, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ArrivalReviewRequest" } } } }
+      responses:
+        "200": { description: Review recorded; approval atomically advances the public pointer, content: { application/json: { schema: { $ref: "#/components/schemas/ArrivalProposal" } } } }
+        "400": { description: Invalid JSON }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Proposal not found under this place }
+        "409": { description: Already reviewed or a newer arrival was approved }
+        "422": { description: Invalid review or source context }
 components:
   securitySchemes:
     bearer:
@@ -815,6 +870,72 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    ArrivalAccess:
+      type: object
+      additionalProperties: false
+      required: [mode, status, surface]
+      properties:
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        status: { type: string, enum: [unknown, allowed, restricted, closed] }
+        surface: { type: string, enum: [unknown, paved, unpaved, mixed, steps, other] }
+        source_url: { type: string, maxLength: 2000, description: HTTP/HTTPS reference without credentials; not fetched by this API }
+        source_title: { type: string, maxLength: 500 }
+        retrieved_at: { type: string, description: YYYY-MM-DD; cannot be in the future }
+        notes: { type: string, maxLength: 2000 }
+    ArrivalPoint:
+      type: object
+      additionalProperties: false
+      required: [name, kind, latitude, longitude, access]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 300 }
+        kind: { type: string, enum: [entrance, viewpoint] }
+        latitude: { type: number, minimum: -90, maximum: 90 }
+        longitude: { type: number, minimum: -180, maximum: 180 }
+        access: { type: array, minItems: 2, maxItems: 2, items: { $ref: "#/components/schemas/ArrivalAccess" }, description: Exactly one walk and one bike assessment; known access/surface requires source URL, title and retrieval date }
+        notes: { type: string, maxLength: 4000, description: Public location/context notes after approval; no accessibility guarantee }
+    ArrivalProposalRequest:
+      type: object
+      additionalProperties: false
+      required: [version, point]
+      properties:
+        version: { type: integer, minimum: 0 }
+        point: { $ref: "#/components/schemas/ArrivalPoint" }
+    ArrivalReviewRequest:
+      type: object
+      additionalProperties: false
+      required: [version, action, note]
+      properties:
+        version: { type: integer, minimum: 0, description: Proposal base_version }
+        action: { type: string, enum: [approve, reject] }
+        note: { type: string, minLength: 1, maxLength: 4000, description: Private review rationale }
+    ApprovedArrival:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer, minimum: 1 }
+        point: { $ref: "#/components/schemas/ArrivalPoint" }
+        reviewed_at: { type: string, format: date-time }
+    ArrivalProposal:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        place_id: { type: string, format: uuid }
+        base_version: { type: integer, minimum: 0 }
+        point: { $ref: "#/components/schemas/ArrivalPoint" }
+        status: { type: string, enum: [pending, approved, rejected] }
+        created_by: { type: string, format: uuid }
+        reviewed_by: { type: string, nullable: true }
+        review_note: { type: string }
+        created_at: { type: string, format: date-time }
+        reviewed_at: { type: string, format: date-time, nullable: true }
+    ArrivalSelection:
+      type: object
+      properties:
+        place_id: { type: string, format: uuid }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        eligibility: { type: string, enum: [unknown, allowed, restricted, closed] }
+        navigation_point: { type: object, nullable: true, properties: { lat: { type: number }, lng: { type: number } } }
+        arrival: { $ref: "#/components/schemas/ApprovedArrival", nullable: true }
     IdentityFacts:
       type: object
       additionalProperties: false
@@ -1140,6 +1261,8 @@ components:
         latitude: { type: number }
         longitude: { type: number }
         arrival_radius_m: { type: number }
+        arrival_point: { $ref: "#/components/schemas/ApprovedArrival", nullable: true, description: Null when public access has not been reviewed }
+        arrival_version: { type: integer, minimum: 0, description: Zero for legacy places without an approved arrival }
         address: { type: string }
         status: { $ref: "#/components/schemas/EntityStatus" }
         primary_moment_id: { type: string, format: uuid, nullable: true }

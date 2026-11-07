@@ -18,7 +18,7 @@ already accepted for that revision.
 The pinned `fleet-deploy` receiver on NUC accepts only Byl's `api` and `web`
 services. It requires current main, matching source/revision labels, unchanged
 runtime settings and the operator-owned pre-deployment hook. The hook refuses
-changed migration files or a schema version other than 10, then saves a PostgreSQL
+changed migration files or a schema version other than 11, then saves a PostgreSQL
 custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
@@ -367,3 +367,33 @@ the private checkpoint retains its 256 KiB cap. This stage makes no external
 requests and uses no model provider. The coordinator's conservative stage budget
 reservation remains charged. Historical drafting and itinerary assembly still
 pause with `processor_unavailable` until their adapters are implemented.
+
+## Reviewed public arrival points, migration 11
+
+Migration 11 adds `place_arrival_proposals` and `place_arrival_current`. It changes
+no existing place, account or tour row. Proposal input and completed reviews are
+immutable, including at the database layer. The current pointer advances only
+through an explicit curator approval under a place-row lock and expected version.
+Concurrent proposals against an old version cannot replace a newer reviewed point.
+
+Restore a fresh production snapshot and apply the exact accepted-image SQL first.
+Compare existing table fingerprints and representative responses from the previous
+API. Under the receiver lock, back up live database/media, admit migration 11 as
+operator, then install the exact eleven-file manifest and source hook expecting
+schema 11. CI applies no production SQL. Keep the prior images, hook, manifest,
+backups and receipts. Image rollback retains this additive schema and subsequent
+arrival decisions; automatic down refuses to remove retained evidence.
+
+Existing clients continue to receive the historical `latitude`/`longitude` and
+`arrival_radius_m`. Additive `arrival_point` is null and `arrival_version` is zero
+until review. No existing centroid is backfilled as a legal entrance. The new
+public `/api/v1/places/{place}/arrival?mode=walk|bike` endpoint selects only an
+independently allowed mode and otherwise returns a null `navigation_point`.
+Public responses exclude curator IDs and private review rationales. Source context
+and public point/access notes are visible after approval. Source links are not
+fetched by arrival APIs and do not prove an on-site inspection or accessibility.
+
+This is the access-data and selection foundation for subsequent routing work.
+The current route worker and existing web/native clients do not adopt these points
+yet; route intent, recomputation fences and client adoption belong to their own
+issues. Existing computed geometry is not certified as legal/public access.

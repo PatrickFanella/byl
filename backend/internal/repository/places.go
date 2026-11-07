@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -24,15 +25,22 @@ type PlaceFilter struct {
 }
 
 const placeCols = `p.id, p.city_id, p.slug, p.name, p.summary, p.kind, p.latitude, p.longitude, p.arrival_radius_m, p.address, p.status, p.primary_moment_id,
-	(SELECT count(*) FROM moments m WHERE m.place_id = p.id AND m.status = 'published'), p.created_at, p.updated_at`
+	(SELECT count(*) FROM moments m WHERE m.place_id = p.id AND m.status = 'published'), p.created_at, p.updated_at,
+	COALESCE((SELECT jsonb_build_object('id',a.id,'version',c.version,'point',a.point,'reviewed_at',a.reviewed_at) FROM place_arrival_current c JOIN place_arrival_proposals a ON a.id=c.proposal_id AND a.place_id=c.place_id WHERE c.place_id=p.id AND a.status='approved'),'null'::jsonb),
+	COALESCE((SELECT version FROM place_arrival_current WHERE place_id=p.id),0)`
 
 func scanPlace(row interface{ Scan(...any) error }, withDistance bool) (models.PlaceSummary, error) {
 	var p models.PlaceSummary
+	var arrival []byte
 	dest := []any{&p.ID, &p.CityID, &p.Slug, &p.Name, &p.Summary, &p.Kind, &p.Latitude, &p.Longitude, &p.ArrivalRadiusM, &p.Address, &p.Status, &p.PrimaryMomentID, &p.MomentCount, &p.CreatedAt, &p.UpdatedAt}
+	dest = append(dest, &arrival, &p.ArrivalVersion)
 	if withDistance {
 		dest = append(dest, &p.DistanceM)
 	}
 	err := row.Scan(dest...)
+	if err == nil {
+		err = json.Unmarshal(arrival, &p.ArrivalPoint)
+	}
 	return p, err
 }
 
