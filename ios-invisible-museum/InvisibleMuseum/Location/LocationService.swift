@@ -19,6 +19,7 @@ final class MuseumLocationService: NSObject, CLLocationManagerDelegate {
     var lastErrorMessage: String?
     /// Called on the main actor for every new fix.
     var onLocation: ((CLLocation) -> Void)?
+    var onAuthorizationChange: ((AuthorizationState) -> Void)?
 
     private var wantsUpdates = false
 
@@ -84,5 +85,6 @@ final class MuseumLocationService: NSObject, CLLocationManagerDelegate {
         @unknown default:
             authorizationState = .unknown
         }
+        onAuthorizationChange?(authorizationState)
     }
 }

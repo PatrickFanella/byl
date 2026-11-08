@@ -17,6 +17,7 @@ struct InvisibleMuseumApp: App {
                 .task { await model.bootstrap() }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { model.didBecomeActive() }
+                    else { model.didLeaveForeground() }
                 }
                 .onOpenURL { url in
                     // invisiblemuseum://tour/{slug} and https://museum-api.subcult.tv/t/{slug}
