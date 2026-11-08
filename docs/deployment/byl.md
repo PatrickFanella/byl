@@ -137,9 +137,12 @@ Migration 6 adds only `route_briefs` and its indexes. It does not alter existing
 content or account records. Submitted notes, unresolved place/event names and
 links live in the private `submitted` object; intake creates no evidence,
 candidates, tours or public prose. Curators use `/api/v1/admin/route-briefs`.
-Owners can read their own records through `/api/v1/me/route-briefs`, but visitor
-creation and edits return `403 intake_disabled`. There is deliberately no
-environment switch that opens public intake before the publication flow is ready.
+Owners can read their own records through `/api/v1/me/route-briefs`. Visitor
+creation is controlled by `PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED`, false by default;
+visitor edits remain unavailable. The web suggestion/status flow and intake
+rollout checks are described in [Web tour suggestions](../product/web-route-suggestions.md).
+Enabling creation stores private research leads for curator triage; it does not
+start research or grant publication authority.
 
 Creation allows 10 new briefs per rolling 24 hours and 20 unresolved briefs per
 account, serialized in PostgreSQL. An optional `Idempotency-Key` header (up to

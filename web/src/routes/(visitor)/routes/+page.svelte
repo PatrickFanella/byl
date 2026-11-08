@@ -43,6 +43,12 @@
 <p class="mt-1 max-w-2xl text-byl-muted">
 	Order the places you love into a walk or ride and share it by link.
 </p>
+<p class="mt-3 text-sm text-byl-muted">
+	Have an idea for a curated public tour? <a
+		href="/routes/suggestions"
+		class="text-byl-action underline underline-offset-4">Tour suggestions</a
+	> has a separate research and review process.
+</p>
 
 <div class="mt-6 space-y-4">
 	{#if !$current}
