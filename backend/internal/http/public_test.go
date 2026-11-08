@@ -90,8 +90,14 @@ func TestPlacesNearAndFilters(t *testing.T) {
 		t.Fatalf("topic slug filter: %d %s", r.status, r.raw)
 	}
 	r = env.get(t, "/api/v1/cities/downers-grove/places?bbox=-88.02,41.79,-88.00,41.80", "")
-	if r.status != 200 || len(items(t, r)) != 3 {
+	if r.status != 200 || len(items(t, r)) != 4 {
 		t.Fatalf("bbox: %d %s", r.status, r.raw)
+	}
+	// The corrected Museum coordinate is inside the wider downtown box and
+	// south of this narrower box; both public filter outcomes matter.
+	r = env.get(t, "/api/v1/cities/downers-grove/places?bbox=-88.02,41.793,-88.00,41.80", "")
+	if r.status != 200 || len(items(t, r)) != 3 {
+		t.Fatalf("narrow bbox: %d %s", r.status, r.raw)
 	}
 	r = env.get(t, "/api/v1/cities/downers-grove/places?limit=2", "")
 	if r.status != 200 || len(items(t, r)) != 2 || r.body["next_cursor"] == "" {
