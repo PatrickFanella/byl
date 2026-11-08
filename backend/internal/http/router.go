@@ -144,6 +144,7 @@ func NewRouter(d Deps) http.Handler {
 
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(d.requireAuth, requireRole(models.AccountRoleCurator))
+			r.Get("/route-contribution-reviews", d.adminContributionReviews)
 			r.Get("/route-reports", d.listRouteReports(true))
 			r.Get("/route-reports/{id}", d.getRouteReport(true))
 			r.Post("/route-reports/{id}/state", d.adminSetRouteReportState)
