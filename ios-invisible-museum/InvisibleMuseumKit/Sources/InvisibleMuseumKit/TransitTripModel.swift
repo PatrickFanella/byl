@@ -25,6 +25,7 @@ public final class TransitTripModel {
     private var gateGeneration = 0
     private var closed = false
     private var storageBlocked = false
+    public var requiresRemoval: Bool { storageBlocked }
     private var admittedAt: Date?
     private let now: () -> Date
 
@@ -51,6 +52,7 @@ public final class TransitTripModel {
             enabled = gate.scheduledTransitV1
             admittedAt = enabled == true ? now() : nil
             if enabled == false { message = "Scheduled transit is disabled. The retained trip is readable; directions are suspended." }
+            else if message == "Scheduled transit is disabled. The retained trip is readable; directions are suspended." || message == "Could not confirm scheduled transit availability. Directions are suspended." { message = nil }
         } catch {
             guard !closed, current(), request == gateGeneration else { return }
             enabled = nil; admittedAt = nil

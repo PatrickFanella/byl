@@ -192,8 +192,8 @@ import XCTest
         try Data("{invalid".utf8).write(to: file)
         let c = try controller(); stub(try plan())
         await c.request(departure: transitDate(try plan().requestedDepartureAt)!)
-        XCTAssertNil(c.proposed); XCTAssertNotNil(c.message)
-        try c.remove(); await c.request(departure: transitDate(try plan().requestedDepartureAt)!)
+        XCTAssertNil(c.proposed); XCTAssertNotNil(c.message); XCTAssertTrue(c.requiresRemoval)
+        try c.remove(); XCTAssertFalse(c.requiresRemoval); await c.request(departure: transitDate(try plan().requestedDepartureAt)!)
         XCTAssertNotNil(c.proposed)
     }
     func testEndWhilePlanRequestInFlightPreventsLateProposal() async throws {

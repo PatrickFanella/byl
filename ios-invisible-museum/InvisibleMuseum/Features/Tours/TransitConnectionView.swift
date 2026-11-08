@@ -33,6 +33,9 @@ struct TransitConnectionView: View {
                             Button("Walking directions after alighting") { handoffBoarding = false; showHandoff = true }
                                 .buttonStyle(.museum(.secondary))
                         }
+
+                    }
+                    if trip.selected != nil || trip.requiresRemoval {
                         Button("Remove retained transit choice", role: .destructive) {
                             do { try trip.remove(); error = nil } catch { self.error = error.localizedDescription }
                         }.buttonStyle(.museum(.ghost))
