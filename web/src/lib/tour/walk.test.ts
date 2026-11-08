@@ -127,6 +127,22 @@ describe('ActiveWalk', () => {
 		expect(offline.route?.legs).toHaveLength(3);
 	});
 
+	it('does not start an unpinned cached walk when the server forbids an unsupported itinerary', async () => {
+		await new ActiveWalk('loop', 'walk', deps(storage)).load();
+		const d = deps(storage);
+		d.fetchTour = async () => {
+			throw new ApiError(403, 'unsupported_itinerary', 'Client support required');
+		};
+		d.fetchRoute = vi.fn(async () => route);
+		const blocked = new ActiveWalk('loop', 'walk', d);
+		await blocked.load();
+		expect(blocked.status).toBe('error');
+		expect(blocked.tour).toBeNull();
+		expect(blocked.route).toBeNull();
+		expect(d.fetchRoute).not.toHaveBeenCalled();
+		expect(storage.getItem('invisible-museum.tour.loop')).not.toBeNull();
+	});
+
 	it('reports an error when there is neither network nor cache', async () => {
 		const w = new ActiveWalk('loop', 'walk', deps(storage, true));
 		await w.load();

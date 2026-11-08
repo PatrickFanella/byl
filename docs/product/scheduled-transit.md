@@ -86,7 +86,9 @@ a walking line. Other modes and older revision rows are unchanged.
 `GET /api/v1/itinerary-capabilities` reports public admission. Public mixed-tour
 requests additionally require `X-Byl-Capabilities: scheduled-transit-v1`.
 Discovery filters mixed tours for unsupported/disabled clients; direct mixed
-detail, revision, route and progress requests return `unsupported_itinerary`.
+detail, revision, route and progress requests return HTTP 403
+`unsupported_itinerary`. This authoritative refusal stops existing clients from
+falling back to an older unpinned cached walking tour.
 An older active trip pinned to an ordinary revision can still read that revision
 and its walking geometry. A capable client must request a transit plan instead
 of a continuous walking route. Responses are `no-store` and vary on Authorization

@@ -1032,7 +1032,7 @@ paths:
   /api/v1/itinerary-capabilities:
     get:
       summary: Read the independent scheduled-transit capability gate
-      description: Defaults off. TRANSIT_PROVIDER=cta configures private curator verification; SCHEDULED_TRANSIT_ENABLED separately admits public clients. Requests for mixed tours must also send X-Byl-Capabilities with the token scheduled-transit-v1. Unsupported/disabled public discovery excludes those tours; mixed detail, route, revision and progress requests return 409 rather than walking geometry. Older pinned ordinary revisions remain accessible. Responses are no-store and vary on Authorization and X-Byl-Capabilities.
+      description: Defaults off. TRANSIT_PROVIDER=cta configures private curator verification; SCHEDULED_TRANSIT_ENABLED separately admits public clients. Requests for mixed tours must also send X-Byl-Capabilities with the token scheduled-transit-v1. Unsupported/disabled public discovery excludes those tours; mixed detail, route, revision and progress requests return authoritative 403 unavailability, preventing legacy clients from starting an older unpinned cached walking tour. Older pinned ordinary revisions remain accessible. Responses are no-store and vary on Authorization and X-Byl-Capabilities.
       responses:
         "200":
           description: Supported contract and current public admission
@@ -1103,7 +1103,7 @@ paths:
         "200": { description: Scheduled mixed segments or an explicit unavailable state, content: { application/json: { schema: { $ref: "#/components/schemas/ScheduledTransitPlan" } } } }
         "400": { description: Malformed, oversized or unexpected fields }
         "404": { description: Accessible tour/revision/transit selection not found }
-        "409": { description: Public feature disabled or client does not advertise support }
+        "403": { description: Public feature disabled or client does not advertise support }
         "422": { description: Invalid version/departure, departure in the past/beyond seven days, or public draft_version supplied }
   /api/v1/route-contribution-intake:
     get:

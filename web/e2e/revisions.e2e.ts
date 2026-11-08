@@ -127,6 +127,48 @@ test('an unavailable pinned revision cannot silently fall forward to the latest 
 	await expect(page.getByRole('button', { name: "I'm here", exact: true })).toHaveCount(0);
 });
 
+test('an unsupported mixed tour cannot start an older unpinned cached walk', async ({
+	page,
+	request
+}, info) => {
+	const f = await releases(page, request);
+	await page.goto('/');
+	await page.evaluate(
+		({ tour, revision }) => {
+			localStorage.setItem('invisible-museum.tour.downtown-memory-loop', JSON.stringify(tour));
+			localStorage.setItem(
+				`invisible-museum.route.${tour.id}.walk`,
+				JSON.stringify(revision.snapshot.routes.walk)
+			);
+			localStorage.setItem(
+				`invisible-museum.revision.anonymous.${tour.id}.${revision.id}`,
+				JSON.stringify(revision)
+			);
+		},
+		{ tour: f.original.snapshot.tour, revision: f.original }
+	);
+	// Transport fixture isolates legacy fallback. The authoritative 403 response
+	// and unchanged old-pin access are independently tested against PostgreSQL.
+	await page.route('**/api/v1/tours/downtown-memory-loop', (route) =>
+		route.fulfill({
+			status: 403,
+			json: { error: { code: 'unsupported_itinerary', message: 'Enabled client support required' } }
+		})
+	);
+	let oldRevisionReads = 0;
+	page.on('request', (request) => {
+		if (request.url().endsWith(`/revisions/${f.original.id}`)) oldRevisionReads++;
+	});
+	await page.goto('/tours/downtown-memory-loop/walk?mode=walk');
+	await expect(
+		page.getByText('This tour is no longer available online.', { exact: true })
+	).toBeVisible();
+	await expect(page.getByRole('button', { name: "I'm here", exact: true })).toHaveCount(0);
+	expect(oldRevisionReads).toBe(0);
+	await page.setViewportSize({ width: 390, height: 844 });
+	await page.screenshot({ path: info.outputPath('unsupported-transit-mobile.png') });
+});
+
 test('unsupported modes are refused, and signed-in visits use the exact revision and stable stop ID', async ({
 	page,
 	request
