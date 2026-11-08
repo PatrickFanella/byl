@@ -1060,6 +1060,63 @@ paths:
         "404": { description: Report not found }
         "409": { description: Stale version or invalid lifecycle transition }
         "422": { description: Invalid decision }
+  /api/v1/admin/route-reports/{id}/related:
+    get:
+      summary: Find related private observations on the exact frozen reference
+      description: Matches revision, mode, direction and affected reference only. Similarity is not independent corroboration. Returns no-store with Vary Authorization.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Matching observations, content: { application/json: { schema: { type: object, required: [items], properties: { items: { type: array, items: { $ref: "#/components/schemas/RouteReport" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Report not found }
+  /api/v1/admin/route-reports/{id}/investigations:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      summary: List retained private before/after investigations
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Checkpoints with private reports and source snapshots, content: { application/json: { schema: { type: object, required: [items], properties: { items: { type: array, items: { $ref: "#/components/schemas/RouteInvestigation" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Report not found }
+    post:
+      summary: Queue a private researched alternative without changing the route
+      description: Captures selected report versions, creates a draft sourcing brief and queues distinct safe source URLs through the existing bounded evidence retriever. Uses brief quotas (10 per day, 20 unresolved) and at most 20 distinct URLs. Only the seed report's alternative or entrance annotation guides computation; related alternatives remain separate observations. Source access does not prove a claim or grant media reuse. Maximum request is 64 KiB. Responses are no-store with Vary Authorization.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: Idempotency-Key, in: header, schema: { type: string, maxLength: 128, pattern: '^[!-~]+$' }, description: Optional curator-scoped retry key; changed request returns 409 }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RouteInvestigationRequest" } } } }
+      responses:
+        "202": { description: Durable investigation and jobs, or existing checkpoint for retry key, content: { application/json: { schema: { $ref: "#/components/schemas/RouteInvestigation" } } } }
+        "400": { description: Malformed, oversized JSON or unknown fields }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Report or related report not found }
+        "409": { description: Stale seed report version or changed idempotency request }
+        "422": { description: Invalid input, duplicate selection, incompatible scope or too many source URLs }
+        "429": { description: Sourcing brief quota reached }
+  /api/v1/admin/route-reports/{id}/investigations/{investigation}:
+    get:
+      summary: Read one immutable private investigation under its seed report
+      description: Result is null until the worker checkpoints its comparison. The result retains partial or failed research and cannot approve access, accept a report or publish a revision. Returns no-store with Vary Authorization.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: investigation, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: Private investigation, content: { application/json: { schema: { $ref: "#/components/schemas/RouteInvestigation" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Investigation not found under this report }
   /api/v1/admin/tours/{id}/corridors:
     get:
       summary: List private corridor proposals and completed reviews
@@ -1432,6 +1489,58 @@ components:
         review_note: { type: string }
         created_at: { type: string, format: date-time }
         reviewed_at: { type: string, format: date-time, nullable: true }
+    RouteInvestigationRequest:
+      type: object
+      additionalProperties: false
+      required: [version]
+      properties:
+        version: { type: integer, minimum: 1 }
+        related_report_ids: { type: array, maxItems: 19, uniqueItems: true, items: { type: string, format: uuid } }
+        research: { $ref: "#/components/schemas/RouteBriefInput", description: Optional new place or historical leads; enters the existing private sourcing workflow, never public story text }
+    InvestigationObservation:
+      type: object
+      required: [report]
+      properties:
+        report: { $ref: "#/components/schemas/RouteReport" }
+        duplicate_of: { type: string, format: uuid, description: Conservative transitive group sharing an account, normalized source URL or matching submitted content; never a count of independent witnesses }
+    RouteInvestigationInput:
+      type: object
+      required: [observations, brief_id, evidence_ids]
+      properties:
+        observations: { type: array, minItems: 1, maxItems: 20, items: { $ref: "#/components/schemas/InvestigationObservation" } }
+        brief_id: { type: string, format: uuid }
+        evidence_ids: { type: array, maxItems: 20, items: { type: string, format: uuid } }
+        research: { $ref: "#/components/schemas/RouteBriefInput" }
+    RouteInvestigationResult:
+      type: object
+      required: [status, comparison_direction, before, after, distance_change_m, duration_change_s, affected_stop_ids, arrivals, evidence, issues, stories_preserved, independent_corroboration, checked_at]
+      properties:
+        status: { type: string, enum: [review, needs_research] }
+        comparison_direction: { type: string, const: published, description: The retained published direction; reverse and unknown report directions remain explicit review questions }
+        before: { $ref: "#/components/schemas/TourRoute" }
+        after: { $ref: "#/components/schemas/TourRoute", nullable: true, description: Private computed proposal replacing only affected legs; null if no complete proposal is available }
+        distance_change_m: { type: number, nullable: true, description: Signed proposed total minus retained total; null without a complete alternative }
+        duration_change_s: { type: integer, nullable: true }
+        affected_stop_ids: { type: array, items: { type: string, format: uuid } }
+        arrivals: { type: array, items: { $ref: "#/components/schemas/ArrivalSelection" }, description: Frozen mode-specific eligibility; a reported entrance is not promoted to an approved arrival }
+        reviewed_corridor: { $ref: "#/components/schemas/ApprovedCorridor", description: Retained mode/access reference, when present }
+        evidence: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/SourceEvidence" } }
+        quality: { $ref: "#/components/schemas/PathQualityReport" }
+        issues: { type: array, items: { $ref: "#/components/schemas/PathQualityIssue" } }
+        stories_preserved: { type: boolean, const: true }
+        independent_corroboration: { type: boolean, const: false }
+        checked_at: { type: string, format: date-time }
+    RouteInvestigation:
+      type: object
+      required: [id, report_id, job_id, created_by, input, result, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        report_id: { type: string, format: uuid }
+        job_id: { type: string, format: uuid }
+        created_by: { type: string, format: uuid }
+        input: { $ref: "#/components/schemas/RouteInvestigationInput" }
+        result: { $ref: "#/components/schemas/RouteInvestigationResult", nullable: true }
+        created_at: { type: string, format: date-time }
     ReportLocation:
       type: object
       additionalProperties: false

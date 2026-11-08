@@ -23,6 +23,12 @@ custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
 
+The repository hook now targets schema 17 for private route-report
+investigations. The installed schema-16 hook and manifest continue to refuse that
+image until migration admission is completed. See
+[the investigation rollout gate](../product/route-report-investigation.md#validation-and-rollout)
+for migration, retained-data and worker rollback constraints.
+
 The receiver replaces only API/web images and checks Docker health, exact public
 HTML and `/release.json` bytes from the image, API health, seeded city/tour
 responses, and disabled development sign-in. Failed activation restores the
