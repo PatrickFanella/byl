@@ -11,6 +11,7 @@
 		saveTour,
 		unsaveTour,
 		type TourDetail,
+		type TourRevision,
 		type TourRoute
 	} from '#lib/visitor.ts';
 	import { distanceText, estimateText, modeLabel } from '#lib/tour/estimate.ts';
@@ -20,14 +21,20 @@
 	import TourCard from '#lib/components/visitor/TourCard.svelte';
 	import SignInPrompt from '#lib/components/visitor/SignInPrompt.svelte';
 	import Map from '#lib/components/Map.svelte';
+	import { validTransitSelection } from '#lib/tour/transit.ts';
+	import TransitPanel from '#lib/components/visitor/TransitPanel.svelte';
 	import JourneySummary from '#lib/components/visitor/JourneySummary.svelte';
 
 	const current = session.store;
 	const ref = $derived(page.params.ref ?? '');
 	const tour = new Loader<TourDetail>(() => getTour(ref));
 	let route = $state<TourRoute | null>(null);
+	let retained = $state<TourRevision | null>(null);
 	let saved = $state(false);
 	let saveBusy = $state(false);
+	const mixedReady = $derived(
+		!tour.data?.transit || (!!retained && validTransitSelection(retained))
+	);
 	let saveError = $state('');
 	let wantSave = $state(false);
 
@@ -38,13 +45,18 @@
 	$effect(() => {
 		const t = tour.data;
 		if (!t) return;
-		const mode = t.modes.find((m) => t.routes?.[m]?.status === 'ready');
+		route = null;
+		retained = null;
+		const mode = t.transit ? 'walk' : t.modes.find((m) => t.routes?.[m]?.status === 'ready');
 		if (!mode) {
 			route = null;
 			return;
 		}
 		(t.revision_id
-			? getTourRevision(t.id, t.revision_id).then((r) => r.snapshot?.routes[mode] ?? null)
+			? getTourRevision(t.id, t.revision_id).then((r) => {
+					if (tour.data === t) retained = r;
+					return r.snapshot?.routes[mode] ?? null;
+				})
 			: getRoute(t.id, mode)
 		)
 			.then((r) => {
@@ -108,46 +120,60 @@
 						</p>{/if}
 					{#if t.summary}<p class="text-byl-muted">{t.summary}</p>{/if}
 
-					<div class="rounded-lg border border-byl-border bg-byl-surface p-4">
-						<div class="text-xs font-bold tracking-normal text-byl-action">Getting around</div>
-						<ul class="mt-2 space-y-1 text-sm">
-							{#each t.modes as mode (mode)}
-								{@const r = t.routes?.[mode]}
-								<li class="flex justify-between gap-3">
-									<span class="font-semibold">{modeLabel(mode)}</span>
-									<span class="text-byl-muted">
-										{#if estimateText(r)}
-											{estimateText(r)} · {distanceText(r?.distance_m ?? 0)}
-										{:else if r?.status === 'failed'}
-											<span class="text-byl-danger">Route unavailable</span>
-										{:else}
-											Route being computed
-										{/if}
-									</span>
-								</li>
-							{/each}
-						</ul>
-						{#each ['walk', 'bike'].filter((m) => !t.modes.includes(m as 'walk' | 'bike')) as unavailable (unavailable)}<p
-								class="mt-2 text-sm text-byl-muted"
-							>
-								{modeLabel(unavailable)} is not offered on this revision.
-							</p>{/each}
-						{#each t.modes as mode (mode)}<JourneySummary
-								{mode}
-								journey={t.journeys?.[mode]}
-							/>{/each}
-					</div>
-
+					{#if !t.transit || t.modes.some((m) => m !== 'walk')}
+						<div class="rounded-lg border border-byl-border bg-byl-surface p-4">
+							<div class="text-xs font-bold tracking-normal text-byl-action">Getting around</div>
+							<ul class="mt-2 space-y-1 text-sm">
+								{#each t.modes.filter((m) => !t.transit || m !== 'walk') as mode (mode)}
+									{@const r = t.routes?.[mode]}
+									<li class="flex justify-between gap-3">
+										<span class="font-semibold">{modeLabel(mode)}</span>
+										<span class="text-byl-muted">
+											{#if estimateText(r)}
+												{estimateText(r)} · {distanceText(r?.distance_m ?? 0)}
+											{:else if r?.status === 'failed'}
+												<span class="text-byl-danger">Route unavailable</span>
+											{:else}
+												Route being computed
+											{/if}
+										</span>
+									</li>
+								{/each}
+							</ul>
+							{#each ['walk', 'bike'].filter((m) => !t.modes.includes(m as 'walk' | 'bike')) as unavailable (unavailable)}<p
+									class="mt-2 text-sm text-byl-muted"
+								>
+									{modeLabel(unavailable)} is not offered on this revision.
+								</p>{/each}
+							{#each t.modes.filter((m) => !t.transit || m !== 'walk') as mode (mode)}<JourneySummary
+									{mode}
+									journey={t.journeys?.[mode]}
+								/>{/each}
+						</div>
+					{/if}
+					{#if retained?.snapshot?.tour.transit && mixedReady}
+						{#key `${retained.id}:${$current?.account.id ?? 'anonymous'}`}<TransitPanel
+								revision={retained}
+							/>{/key}
+					{/if}
+					{#if t.transit && !mixedReady}<p role="status" class="text-sm text-byl-warning">
+							The retained scheduled connection is unavailable or unsupported. Reconnect to review
+							it before opening this mixed trip.
+						</p>{/if}
 					<div class="flex flex-wrap gap-2">
 						{#if t.status === 'published'}
 							{#each t.modes as mode (mode)}
-								{#if t.journeys?.[mode]?.state !== 'blocked'}
+								{#if t.journeys?.[mode]?.state !== 'blocked' && mixedReady}
 									<a
 										href="/tours/{t.slug}/walk?mode={mode}"
 										class="rounded-lg px-4 py-2 text-sm font-semibold {mode === t.modes[0]
 											? 'bg-byl-action text-byl-action-text'
 											: 'border border-byl-border hover:bg-byl-surface'}"
-										>{mode === 'bike' ? 'Start riding' : 'Start walking'}</a
+										>{t.transit && mode === 'walk'
+											? 'Open mixed trip'
+											: mode === 'bike'
+												? 'Start riding'
+												: 'Start walking'}</a
 									>
 								{/if}
 							{/each}
@@ -156,11 +182,11 @@
 								onclick={toggleSave}
 								disabled={saveBusy}>{saved ? '♥ Saved' : '♡ Save for later'}</button
 							>
-							<a
-								href="invisiblemuseum://tour/{t.slug}"
-								class="rounded-lg border border-byl-border px-4 py-2 text-sm text-byl-muted hover:bg-byl-surface"
-								>Open in the app</a
-							>
+							{#if !t.transit}<a
+									href="invisiblemuseum://tour/{t.slug}"
+									class="rounded-lg border border-byl-border px-4 py-2 text-sm text-byl-muted hover:bg-byl-surface"
+									>Open in the app</a
+								>{/if}
 						{/if}
 					</div>
 					{#if t.revision_id}<p class="text-sm">
@@ -189,9 +215,20 @@
 				</div>
 				<aside class="space-y-3">
 					<div class="overflow-hidden rounded-lg border border-byl-border">
-						<Map markers={stopMarkers} {line} height="24rem" />
+						<Map
+							markers={stopMarkers}
+							line={t.transit ? [] : line}
+							legs={(t.transit?.walking_legs ?? []).map((l) => ({
+								coords: l.geometry as [number, number][],
+								state: 'future' as const
+							}))}
+							height="24rem"
+						/>
 					</div>
-					{#if !route}
+					{#if t.transit}<p class="text-xs text-byl-muted">
+							Only retained ordinary walking sections are drawn. Station walks need an explicit
+							directions handoff; the rail ride is not a walking line.
+						</p>{:else if !route}
 						<p class="text-xs text-byl-muted">
 							The route line appears once the route has been computed.
 						</p>

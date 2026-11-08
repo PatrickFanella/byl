@@ -5,6 +5,8 @@
 	import { goto } from '$app/navigation';
 	import { session } from '#lib/auth.ts';
 	import {
+		itineraryCapabilities,
+		requestTransitPlan,
 		getMoment,
 		getRoute,
 		getTour,
@@ -24,6 +26,7 @@
 	import Map from '#lib/components/Map.svelte';
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
 	import ArrivalPanel from '#lib/components/visitor/ArrivalPanel.svelte';
+	import TransitPanel from '#lib/components/visitor/TransitPanel.svelte';
 	import JourneySummary from '#lib/components/visitor/JourneySummary.svelte';
 	import ContributionPanel from '#lib/components/visitor/ContributionPanel.svelte';
 	import { contributionClient } from '#lib/tour/contribution-api.ts';
@@ -45,6 +48,11 @@
 	});
 
 	const walk: ActiveWalk = new ActiveWalk(ref, mode, {
+		transit: {
+			base: import.meta.env.VITE_API_BASE_URL || window.location.origin,
+			enabled: async () => (await itineraryCapabilities()).scheduled_transit_v1,
+			plan: requestTransitPlan
+		},
 		fetchTour: getTour,
 		fetchRoute: getRoute,
 		fetchRevision: getTourRevision,
@@ -357,8 +365,31 @@
 			{/if}
 			<details class="rounded-lg border border-byl-border bg-byl-background p-3">
 				<summary class="cursor-pointer text-sm">Path readiness and trip timing</summary
-				><JourneySummary {mode} journey={walk.route?.journey ?? walk.tour?.journeys?.[mode]} />
+				>{#if walk.isMixed}<p class="mt-2 text-sm">
+						The map shows retained ordinary walking sections only. Platform walks and scheduled rail
+						timing are reviewed separately below.
+					</p>{:else}<JourneySummary
+						{mode}
+						journey={walk.route?.journey ?? walk.tour?.journeys?.[mode]}
+					/>{/if}
 			</details>
+			{#if walk.revision && walk.transit}
+				<details class="rounded-lg border border-byl-border bg-byl-background p-3 text-sm">
+					<summary class="cursor-pointer font-semibold"
+						>CTA connection · {walk.transit.selected
+							? 'Review retained timetable'
+							: 'Choose a timetable'}</summary
+					>
+					{#if walk.transitInterval}<p class="mt-2">
+							The next section includes scheduled rail. Review the timetable and platform directions
+							here; it is not a walking leg.
+						</p>{/if}
+					{#key walk.revision.id}<TransitPanel
+							revision={walk.revision}
+							controller={walk.transit}
+						/>{/key}
+				</details>
+			{/if}
 			<ContributionPanel {contributions} signedIn={$current !== null} trip />
 			{#if walk.nextStop}
 				{@const next = walk.nextStop}
@@ -405,23 +436,26 @@
 								walk.markArrived();
 							}}>I'm here</button
 						>
-						<a
-							class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
-							href={mapsURL(
-								next.place.arrival_point?.point?.latitude ?? next.place.latitude,
-								next.place.arrival_point?.point?.longitude ?? next.place.longitude,
-								mode,
-								ua
-							)}
-							target="_blank"
-							rel="noreferrer">Directions</a
-						>
+						{#if !walk.transitInterval}
+							<a
+								class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
+								href={mapsURL(
+									next.place.arrival_point?.point?.latitude ?? next.place.latitude,
+									next.place.arrival_point?.point?.longitude ?? next.place.longitude,
+									mode,
+									ua
+								)}
+								target="_blank"
+								rel="noreferrer">Directions</a
+							>{/if}
 					</div>
 				</div>
 			{:else}
 				<div class="rounded-lg border border-byl-border bg-byl-background p-4">
 					<div class="text-xs font-bold tracking-normal text-byl-success">Tour complete</div>
-					<div class="text-lg font-semibold">You walked every stop of {walk.tour?.title}.</div>
+					<div class="text-lg font-semibold">
+						You {walk.tour?.transit ? 'visited' : 'walked'} every stop of {walk.tour?.title}.
+					</div>
 					{#if !$current}
 						<p class="mt-1 text-sm text-byl-muted">Sign in to keep this on your account.</p>
 					{/if}

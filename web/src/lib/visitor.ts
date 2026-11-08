@@ -1,5 +1,11 @@
 // Typed calls for the visitor site: public content plus the signed-in /me routes.
 import { api, ApiClient } from '#lib/api/index.ts';
+import { session } from '#lib/auth.ts';
+const itineraryAPI = new ApiClient({
+	baseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
+	token: () => session.token(),
+	headers: { 'X-Byl-Capabilities': 'scheduled-transit-v1' }
+});
 import type { components } from '#lib/api/types.ts';
 
 type Schemas = components['schemas'];
@@ -47,19 +53,21 @@ function qs(params: Record<string, string | number | undefined | null>): string 
 export const listCities = () => api.list<City>('/api/v1/cities');
 export const getCity = (ref: string) => api.get<City>(`/api/v1/cities/${encodeURIComponent(ref)}`);
 export const listTours = (city: string, topic?: string, mode?: string) =>
-	api.list<TourSummary>(`/api/v1/cities/${encodeURIComponent(city)}/tours${qs({ topic, mode })}`);
+	itineraryAPI.list<TourSummary>(
+		`/api/v1/cities/${encodeURIComponent(city)}/tours${qs({ topic, mode })}`
+	);
 export const getTour = (ref: string) =>
-	api.get<TourDetail>(`/api/v1/tours/${encodeURIComponent(ref)}`);
+	itineraryAPI.get<TourDetail>(`/api/v1/tours/${encodeURIComponent(ref)}`);
 export const getRoute = (tour: string, mode: string) =>
-	api.get<TourRoute>(`/api/v1/tours/${encodeURIComponent(tour)}/route${qs({ mode })}`);
+	itineraryAPI.get<TourRoute>(`/api/v1/tours/${encodeURIComponent(tour)}/route${qs({ mode })}`);
 export const getTourRevision = (tour: string, revision: string) =>
-	api.get<TourRevision>(
+	itineraryAPI.get<TourRevision>(
 		`/api/v1/tours/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`
 	);
 export const listTourRevisions = (tour: string) =>
 	api.list<TourRevision>(`/api/v1/tours/${encodeURIComponent(tour)}/revisions?limit=20`);
 export const getRevisionProgress = (tour: string, revision: string) =>
-	api.get<RevisionProgress>(
+	itineraryAPI.get<RevisionProgress>(
 		`/api/v1/me/progress/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`
 	);
 export const putRevisionProgress = (
@@ -67,7 +75,7 @@ export const putRevisionProgress = (
 	revision: string,
 	body: { mode: 'walk' | 'bike'; visited_stop_ids: string[]; completed: boolean; reset?: boolean }
 ) =>
-	api.put<RevisionProgress>(
+	itineraryAPI.put<RevisionProgress>(
 		`/api/v1/me/progress/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`,
 		{ ...body, reset: body.reset ?? false }
 	);
@@ -144,3 +152,13 @@ export const getRouteReport = (id: string) =>
 	api.get<RouteReport>(`/api/v1/me/route-reports/${encodeURIComponent(id)}`);
 export const getRouteCorrectionOutcome = (id: string) =>
 	api.get<RouteCorrectionOutcome>(`/api/v1/me/route-reports/${encodeURIComponent(id)}/correction`);
+
+export type ScheduledTransitPlan = Schemas['ScheduledTransitPlan'];
+export type ApprovedTransit = Schemas['ApprovedTransit'];
+export const itineraryCapabilities = () =>
+	itineraryAPI.get<{ scheduled_transit_v1: boolean }>('/api/v1/itinerary-capabilities');
+export const requestTransitPlan = (tour: string, revision: string, departure: string) =>
+	itineraryAPI.post<ScheduledTransitPlan>(
+		`/api/v1/tours/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}/transit-plan`,
+		{ version: 1, departure_at: departure }
+	);

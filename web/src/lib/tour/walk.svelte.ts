@@ -1,6 +1,8 @@
 // The walk in progress: tour and route (cached for offline), the next stop, arrival by GPS or
 // by hand, progress, and the legs split for the map. Pages render this; it owns no DOM.
 import type { TourDetail, TourRoute, TourStop, TourRevision, MomentDetail } from '#lib/visitor.ts';
+import { validTransitSelection } from './transit';
+import { TransitTrip, type TransitDeps } from './transit-trip.svelte';
 import { ApiError } from '#lib/api/index.ts';
 import { SvelteSet } from 'svelte/reactivity';
 import { ArrivalMonitor, type Fix } from './arrival';
@@ -8,6 +10,7 @@ import { ProgressStore, type ProgressApi } from './progress';
 import { RevisionProgressStore, type RevisionProgressApi } from './revision-progress';
 
 export interface WalkDeps {
+	transit?: TransitDeps;
 	fetchTour(ref: string): Promise<TourDetail>;
 	fetchRoute(tourID: string, mode: string): Promise<TourRoute>;
 	storage: Storage;
@@ -57,6 +60,7 @@ export class ActiveWalk {
 	routeMessage = $state('');
 	fromCache = $state(false);
 	visited = new SvelteSet<string>();
+	transit = $state<TransitTrip | null>(null);
 	revision = $state<TourRevision | null>(null);
 	latestRevision = $state<TourRevision | null>(null);
 	updateMessage = $state('');
@@ -80,6 +84,8 @@ export class ActiveWalk {
 
 	/** Loads tour and route, caching both; falls back to the cache when the network fails. */
 	async load(): Promise<void> {
+		this.transit?.end();
+		this.transit = null;
 		this.status = 'loading';
 		this.message = '';
 		this.routeMessage = '';
@@ -192,7 +198,13 @@ export class ActiveWalk {
 			cached = true;
 		}
 		try {
-			this.installRevision(revision, tourID, revisionID);
+			this.installRevision(
+				revision,
+				tourID,
+				revisionID,
+				false,
+				await this.transitAdmission(revision)
+			);
 			this.fromCache = cached;
 			void this.checkForUpdate();
 		} catch (e) {
@@ -204,7 +216,8 @@ export class ActiveWalk {
 		revision: TourRevision,
 		tourID: string,
 		revisionID: string,
-		adopt = false
+		adopt = false,
+		transitGate: boolean | null = null
 	) {
 		const snapshot = revision.snapshot;
 		if (
@@ -228,6 +241,17 @@ export class ActiveWalk {
 			throw new Error(
 				'This travel mode is not available in the pinned revision. Choose a supported mode from the tour page.'
 			);
+		if (snapshot.tour.transit && !validTransitSelection(revision))
+			throw Error(
+				'This retained transit selection is unsupported or invalid. No walking path was substituted.'
+			);
+		if (
+			snapshot.tour.transit?.intent.mode === this.mode &&
+			(!this.deps.transit || this.mode !== 'walk' || transitGate === false)
+		)
+			throw Error(
+				'Scheduled transit is unavailable in this client or server. No walking path was substituted.'
+			);
 		const route = snapshot.routes[this.mode];
 		if (route && (route.tour_id !== tourID || route.mode !== this.mode))
 			throw new Error('This saved path does not match the pinned itinerary.');
@@ -237,16 +261,31 @@ export class ActiveWalk {
 			);
 		if (!this.deps.revisionProgressApi)
 			throw new Error('Revision progress is unavailable in this client.');
+		this.transit?.end();
+		this.transit =
+			snapshot.tour.transit?.intent.mode === this.mode && this.deps.transit
+				? new TransitTrip(
+						revision,
+						this.deps.transit,
+						this.deps.storage,
+						this.account,
+						() => this.sameAccount(),
+						transitGate
+					)
+				: null;
 		this.revision = revision;
 		this.tour = snapshot.tour;
-		this.route = route ?? null;
-		this.routeMessage = !route
-			? 'No path retained for this mode'
-			: route.journey && !route.journey.usable
-				? `Path ${route.journey.state.replaceAll('_', ' ')}`
-				: route.status === 'ready'
-					? ''
-					: 'Route unavailable';
+		this.route = snapshot.tour.transit?.intent.mode === this.mode ? null : (route ?? null);
+		this.routeMessage =
+			snapshot.tour.transit?.intent.mode === this.mode
+				? ''
+				: !route
+					? 'No path retained for this mode'
+					: route.journey && !route.journey.usable
+						? `Path ${route.journey.state.replaceAll('_', ' ')}`
+						: route.status === 'ready'
+							? ''
+							: 'Route unavailable';
 		this.arrivedStop = null;
 		this.progress = new RevisionProgressStore(
 			tourID,
@@ -279,6 +318,18 @@ export class ActiveWalk {
 			if (this.progress === progress) this.refreshFromProgress();
 		});
 	}
+	private async transitAdmission(revision: TourRevision): Promise<boolean | null> {
+		if (revision.snapshot?.tour.transit && !validTransitSelection(revision))
+			throw Error('This retained transit selection is unsupported or invalid.');
+		if (revision.snapshot?.tour.transit?.intent.mode !== this.mode) return null;
+		if (!this.deps.transit || this.mode !== 'walk')
+			throw Error('This mixed itinerary requires scheduled-transit support.');
+		try {
+			return await this.deps.transit.enabled();
+		} catch {
+			return null;
+		}
+	}
 	async checkForUpdate() {
 		if (
 			!this.revision ||
@@ -309,6 +360,8 @@ export class ActiveWalk {
 			}
 		} catch (e) {
 			if (this.unavailable(e)) {
+				this.transit?.end();
+				this.transit = null;
 				this.status = 'error';
 				this.message = 'This tour is no longer available online. Your saved progress is retained.';
 				this.tour = null;
@@ -333,7 +386,13 @@ export class ActiveWalk {
 		try {
 			await this.flush();
 			const revision = await this.deps.fetchRevision(this.tour.id, latest.id);
-			this.installRevision(revision, this.tour.id, latest.id, true);
+			this.installRevision(
+				revision,
+				this.tour.id,
+				latest.id,
+				true,
+				await this.transitAdmission(revision)
+			);
 			this.latestRevision = null;
 			this.fromCache = false;
 			this.updateMessage = '';
@@ -374,10 +433,25 @@ export class ActiveWalk {
 		return this.visited.has(stop.id);
 	}
 
+	get isMixed(): boolean {
+		return !!this.tour?.transit && this.tour.transit.intent.mode === this.mode;
+	}
+	get walkingLegs(): Leg[] {
+		return this.isMixed ? (this.tour!.transit!.walking_legs ?? []) : (this.route?.legs ?? []);
+	}
+	get transitInterval(): boolean {
+		const intent = this.tour?.transit?.intent;
+		return (
+			this.isMixed &&
+			!!intent &&
+			this.nextStop?.id === intent.to_stop_id &&
+			this.visited.has(intent.from_stop_id)
+		);
+	}
 	/** The leg being travelled now: from the last visited stop to the next one. */
 	get activeLeg(): Leg | null {
 		const next = this.nextStop;
-		const legs = this.route?.legs ?? [];
+		const legs = this.walkingLegs;
 		if (!next) return null;
 		return (
 			legs.find(
@@ -389,7 +463,7 @@ export class ActiveWalk {
 	}
 
 	get pastLegs(): Leg[] {
-		const legs = this.route?.legs ?? [];
+		const legs = this.walkingLegs;
 		const next = this.nextStop;
 		return next
 			? legs.filter((l) => l.from_position < l.to_position && l.to_position < next.position)
@@ -399,7 +473,7 @@ export class ActiveWalk {
 	get futureLegs(): Leg[] {
 		const next = this.nextStop;
 		if (!next) return [];
-		return (this.route?.legs ?? []).filter(
+		return this.walkingLegs.filter(
 			(l) => l.to_position > next.position || l.to_position < l.from_position
 		);
 	}
@@ -439,6 +513,7 @@ export class ActiveWalk {
 
 	/** Ends the walk; with `reset` the next visit starts from stop 1. */
 	end(reset: boolean): void {
+		this.transit?.end();
 		if (reset) {
 			this.progress?.reset();
 			this.visited.clear();
@@ -472,6 +547,8 @@ export class ActiveWalk {
 		if ((this.deps.accountID?.() ?? 'anonymous') === this.account) return true;
 		this.status = 'error';
 		this.message = 'Your account changed. Reopen this trip to continue.';
+		this.transit?.end();
+		this.transit = null;
 		this.tour = null;
 		this.route = null;
 		this.revision = null;
