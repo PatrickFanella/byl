@@ -142,7 +142,7 @@ func TestTransitHTTPDefaultGateAndLegacyRevisionCompatibility(t *testing.T) {
 	for _, path := range []string{base, base + "/route?mode=walk", base + "/revisions/" + f.newRevision} {
 		for _, capable := range []bool{false, true} {
 			r := e.transitRequest(t, "GET", path, "", capable, nil)
-			if r.status != 409 || r.body["error"].(map[string]any)["code"] != "unsupported_itinerary" || bytes.Contains(r.raw, []byte("coordinates")) {
+			if r.status != 403 || r.body["error"].(map[string]any)["code"] != "unsupported_itinerary" || bytes.Contains(r.raw, []byte("coordinates")) {
 				t.Fatalf("legacy/disabled route leaked: %d %s", r.status, r.raw)
 			}
 		}
@@ -159,7 +159,7 @@ func TestTransitHTTPDefaultGateAndLegacyRevisionCompatibility(t *testing.T) {
 	if r := e.get(t, "/api/v1/me/progress/"+testdb.SeedTourID, f.owner); r.status != 200 || r.body["revision_id"] != f.oldRevision {
 		t.Fatal("ordinary pinned progress changed")
 	}
-	if r := e.do(t, "PUT", "/api/v1/me/progress/"+testdb.SeedTourID, f.owner, map[string]any{"mode": "walk", "reset": true}); r.status != 409 || r.body["error"].(map[string]any)["code"] != "unsupported_itinerary" {
+	if r := e.do(t, "PUT", "/api/v1/me/progress/"+testdb.SeedTourID, f.owner, map[string]any{"mode": "walk", "reset": true}); r.status != 403 || r.body["error"].(map[string]any)["code"] != "unsupported_itinerary" {
 		t.Fatalf("legacy reset adopted disabled mixed revision: %d %s", r.status, r.raw)
 	}
 	if r := e.get(t, base, f.owner); r.status != 200 || r.body["revision_id"] != f.oldRevision {
@@ -177,7 +177,7 @@ func TestTransitHTTPSupportedPlanContainsExplicitSegmentsAndNoRailWalkingLine(t 
 	f := newTransitHTTPFixture(t, true)
 	e := f.e
 	base := "/api/v1/tours/" + testdb.SeedTourID
-	if r := e.get(t, base, ""); r.status != 409 {
+	if r := e.get(t, base, ""); r.status != 403 {
 		t.Fatal("legacy client received mixed itinerary")
 	}
 	if r := e.transitRequest(t, "GET", base, "", true, nil); r.status != 200 || r.body["transit"] == nil {
@@ -226,7 +226,7 @@ func TestTransitHTTPSupportedPlanContainsExplicitSegmentsAndNoRailWalkingLine(t 
 		t.Fatal("schedule presented as live")
 	}
 	progress := "/api/v1/me/progress/" + testdb.SeedTourID + "/revisions/" + f.newRevision
-	if r := e.do(t, "PUT", progress, f.owner, map[string]any{"mode": "walk", "visited_stop_ids": []string{f.intent.FromStopID}}); r.status != 409 {
+	if r := e.do(t, "PUT", progress, f.owner, map[string]any{"mode": "walk", "visited_stop_ids": []string{f.intent.FromStopID}}); r.status != 403 {
 		t.Fatal("legacy progress entered mixed revision")
 	}
 	if r := e.transitRequest(t, "PUT", progress, f.owner, true, map[string]any{"mode": "walk", "visited_stop_ids": []string{f.intent.FromStopID}}); r.status != 200 || r.body["revision_id"] != f.newRevision {
@@ -286,7 +286,7 @@ func TestTransitHTTPCuratorBoundaryStrictRequestsAndDisabledRemoval(t *testing.T
 	if r := e.do(t, "PUT", admin+"/transit", f.curator, map[string]any{"draft_version": version, "remove": true, "review_note": "Explicit removal while public transit remains disabled"}); r.status != 200 || r.body["transit"] != nil {
 		t.Fatalf("disabled removal: %d %s", r.status, r.raw)
 	}
-	if r := e.get(t, "/api/v1/tours/"+testdb.SeedTourID, ""); r.status != 409 {
+	if r := e.get(t, "/api/v1/tours/"+testdb.SeedTourID, ""); r.status != 403 {
 		t.Fatal("unpublished removal changed retained revision")
 	}
 	// A client downgrade can leave a mixed legacy pin. An explicit reset back to
@@ -296,7 +296,7 @@ func TestTransitHTTPCuratorBoundaryStrictRequestsAndDisabledRemoval(t *testing.T
 		t.Fatal(err)
 	}
 	e.publishFixture(t, testdb.SeedTourID)
-	if r := e.get(t, "/api/v1/tours/"+testdb.SeedTourID, f.owner); r.status != 409 {
+	if r := e.get(t, "/api/v1/tours/"+testdb.SeedTourID, f.owner); r.status != 403 {
 		t.Fatal("old mixed pin was silently replaced")
 	}
 	if r := e.do(t, "PUT", "/api/v1/me/progress/"+testdb.SeedTourID, f.owner, map[string]any{"mode": "walk", "reset": true}); r.status != 200 || r.body["revision_id"] == f.newRevision {
