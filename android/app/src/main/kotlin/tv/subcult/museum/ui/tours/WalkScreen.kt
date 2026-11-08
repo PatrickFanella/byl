@@ -3,6 +3,9 @@
 package tv.subcult.museum.ui.tours
 
 import tv.subcult.museum.ui.places.HappeningsSection
+import tv.subcult.museum.ui.profile.ContributionControls
+import tv.subcult.museum.core.DeviationDetector
+import kotlinx.coroutines.delay
 
 import android.Manifest
 import android.content.ActivityNotFoundException
@@ -83,9 +86,11 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     var confirmUpdate by remember(active) { mutableStateOf(false) }
     var updateBusy by remember(active) { mutableStateOf(false) }
     var updateError by remember(active) { mutableStateOf<String?>(null) }
+    var showContributions by remember(active) { mutableStateOf(false) }
+    val contributions = app.contributions
     val scope = rememberCoroutineScope()
     if (!active.canUse) {
-        LaunchedEffect(active, state.revoked, app.session) { model.container.narration.stop(); model.container.location.stop() }
+        LaunchedEffect(active, state.revoked, app.session) { contributions?.lifecycle(DeviationDetector.Control.END); contributions?.setForeground(false); model.container.narration.stop(); model.container.location.stop() }
         Column(Modifier.fillMaxSize().background(Museum.background).statusBarsPadding().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(if (state.revoked) "This revision is no longer available to this account." else "This trip belongs to a different session. Its saved revision is kept for the account that started it.", color = Museum.text)
             state.syncError?.let { Text(it, color = Museum.danger) }
@@ -102,7 +107,36 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         if (!granted) permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
     }
     LocationWhileStarted(model, granted)
-    LaunchedEffect(fix, active) { fix?.let { active.handleFix(it) } }
+    LaunchedEffect(fix, active) { fix?.let {
+        active.handleFix(it)
+        when {
+            !active.canUse || active.state.value.isComplete -> contributions?.lifecycle(DeviationDetector.Control.END)
+            active.state.value.arrivedStop != null -> contributions?.lifecycle(DeviationDetector.Control.MANUAL_ARRIVAL)
+            else -> contributions?.observe(it, model.container.location.hasPermission())
+        }
+    } }
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    val contributionVisible = !showEnd && !showReview && !showReport && state.arrivedStop == null && !state.isComplete
+    DisposableEffect(contributions, lifecycle, contributionVisible) {
+        fun update() {
+            val visible = contributionVisible && lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
+            contributions?.setForeground(visible)
+            if (visible) scope.launch { contributions?.refresh() }
+        }
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, _ -> update() }
+        lifecycle.addObserver(observer); update()
+        onDispose { lifecycle.removeObserver(observer); contributions?.setForeground(false) }
+    }
+    LaunchedEffect(contributions) {
+        while (true) {
+            if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) contributions?.refresh()
+            delay(30_000)
+        }
+    }
+    LaunchedEffect(granted) { if (!granted) contributions?.lifecycle(DeviationDetector.Control.PERMISSION_LOST) }
+    LaunchedEffect(state.arrivedStop?.id) {
+        contributions?.lifecycle(if (state.arrivedStop == null) DeviationDetector.Control.RESUME else DeviationDetector.Control.MANUAL_ARRIVAL)
+    }
     // Arrival: with the guide on, play the featured moment once per announcement. The sheet is
     // driven by state.arrivedStop and cleared through acknowledgeArrival, so rotation does not replay it.
     LaunchedEffect(state.arrivedStop?.id) {
@@ -125,6 +159,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         }
 
         Column(Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Pill(onClick = { showContributions = true }) { Text("Route improvement", color = Museum.text) }
             if (state.legacyResume) Pill { Text("Older saved trip · Cached itinerary and local progress. End it to start a reviewed revision.", color = Museum.muted, style = MaterialTheme.typography.bodySmall) }
             if (state.availableUpdate != null) Pill(onClick = { showReview = true }) { Text("New revision available · Review update", color = Museum.text) }
             if (state.routeFromCache) Pill { Text("Using the saved route", style = MaterialTheme.typography.bodySmall, color = Museum.muted) }
@@ -150,7 +185,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                         }
                         state.syncError?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = Museum.danger) }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { active.markArrived() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("I'm here") }
+                            Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { contributions?.lifecycle(DeviationDetector.Control.MANUAL_ARRIVAL); active.markArrived() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("I'm here") }
                             OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                                 val nav = active.navigationUri()?.let { Intent(Intent.ACTION_VIEW, Uri.parse(it)) }
                                 try {
@@ -179,6 +214,14 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         val dismiss = { active.acknowledgeArrival(); model.container.narration.stop() }
         ModalBottomSheet(onDismissRequest = dismiss, containerColor = Museum.background) {
             ArrivalSheet(model, active, stop, isLast = state.isComplete, playing = playing, onOpenMoment = { active.acknowledgeArrival(); onOpenMoment(it) }, onContinue = dismiss)
+        }
+    }
+
+    if (showContributions) ModalBottomSheet(onDismissRequest = { showContributions = false }, containerColor = Museum.background) {
+        Column(Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding()) {
+            contributions?.let { ContributionControls(it, allowOptIn = true) }
+            app.contributionError?.let { Text(it, color = Museum.danger, modifier = Modifier.padding(12.dp)) }
+            TextButton(onClick = { showContributions = false }) { Text("Done") }
         }
     }
 

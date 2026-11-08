@@ -37,8 +37,10 @@ data class ApprovedArrival(
 data class ReviewedCorridor(val intent: Intent? = null) {
     @Serializable data class Reference(val note: String = "")
     @Serializable data class Access(val mode: String, val notes: String = "")
-    @Serializable data class Segment(val id: String, val access: List<Access> = emptyList())
-    @Serializable data class Traversal(@SerialName("segment_id") val segmentId: String)
+    @Serializable data class Segment(val id: String, val access: List<Access> = emptyList(),
+        val geometry: kotlinx.serialization.json.JsonElement? = null,
+        @SerialName("signal_references") val signalReferences: kotlinx.serialization.json.JsonElement? = null)
+    @Serializable data class Traversal(@SerialName("segment_id") val segmentId: String, val reverse: Boolean = false)
     @Serializable data class Selection(val mode: String, val path: List<Traversal> = emptyList())
     @Serializable data class Intent(val source: Reference, val segments: List<Segment>, val routes: List<Selection>)
 

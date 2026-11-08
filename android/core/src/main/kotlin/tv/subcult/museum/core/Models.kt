@@ -248,7 +248,8 @@ data class TourDetail(
     val journeys: Map<String, RouteJourney>? = null,
     @SerialName("revision_id") val revisionId: String? = null,
     @SerialName("revision_number") val revisionNumber: Int? = null,
-    val corridor: ReviewedCorridor? = null
+    val corridor: ReviewedCorridor? = null,
+    val transit: kotlinx.serialization.json.JsonElement? = null
 ) {
     val isUserRoute: Boolean get() = ownerAccountId != null
     val summaryOnly: TourSummary

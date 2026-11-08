@@ -19,6 +19,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +43,19 @@ import tv.subcult.museum.ui.theme.Museum
 fun ProfileScreen(model: AppViewModel) {
     val appearance = LocalAppearance.current
     val app by model.state.collectAsStateWithLifecycle()
+    val contributions = remember(app.session, model.container.client.baseUrl) { model.contributionModel() }
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    val scope = rememberCoroutineScope()
+    DisposableEffect(contributions, lifecycle) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) { contributions?.setForeground(true); scope.launch { contributions?.refresh() } }
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_PAUSE) contributions?.setForeground(false)
+        }
+        lifecycle.addObserver(observer)
+        if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) contributions?.setForeground(true)
+        onDispose { lifecycle.removeObserver(observer); contributions?.setForeground(false) }
+    }
+    LaunchedEffect(contributions) { contributions?.refresh() }
     var baseUrl by remember { mutableStateOf(model.container.resolveBaseUrl()) }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -85,6 +102,9 @@ fun ProfileScreen(model: AppViewModel) {
                 }
             }
         }
+
+        contributions?.let { controller -> Card { ContributionControls(controller, allowOptIn = false) } }
+        app.contributionError?.let { Text(it, color = Museum.danger) }
 
         if (BuildConfig.DEBUG) Card {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
