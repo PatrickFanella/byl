@@ -54,6 +54,10 @@ final class PinnedTourTests: XCTestCase {
         try JSONSerialization.data(withJSONObject: ["account_id": owner, "tour_id": revision.tourID, "revision_id": revision.id, "mode": "walk", "visited_stop_ids": ids, "completed_at": NSNull()])
     }
 
+    private func metadata(_ revision: TourRevision) throws -> Data {
+        try JSONSerialization.data(withJSONObject: ["items": [["id": revision.id, "tour_id": revision.tourID, "number": revision.number, "published_at": revision.publishedAt]], "next_cursor": ""])
+    }
+
     func testSharedCaptureRetainsStableIDsAcrossReorderWithoutClaimingReadiness() throws {
         let first = try JSONDecoder().decode(TourRevision.self, from: fixtureData("tour-revision-1"))
         let second = try JSONDecoder().decode(TourRevision.self, from: fixtureData("tour-revision-2"))
@@ -193,18 +197,36 @@ final class PinnedTourTests: XCTestCase {
         XCTAssertEqual(body["visited_stop_ids"] as? [String], [])
     }
 
+    func testAbsentRemoteProgressIsNotASyncFailureOrAnEmptyPut() async throws {
+        let first = try revision()
+        StubURLProtocol.handler = { _, _ in (404, fixtureData("error_not_found")) }
+        let model = try start(first, signedIn: true)
+
+        await model.loadRemoteProgress()
+
+        XCTAssertNil(model.syncError)
+        XCTAssertFalse(model.needsSync)
+        XCTAssertFalse(StubURLProtocol.requests.contains { $0.method == "PUT" })
+    }
+
     func testUpdateRequiresExplicitTransitionAndReconcilesReorderedIDs() async throws {
         let first = try revision()
         let second = try revision(2)
         let model = try start(first)
         model.markArrivedAtNextStop()
         let oldIDs = model.visitedStopIDs
-        let latest = try JSONEncoder().encode(second.snapshot!.tour)
         let full = try JSONEncoder().encode(second)
-        StubURLProtocol.handler = { _, path in (200, path.contains("/revisions/") ? full : latest) }
+        let metadata = try metadata(second)
+        let legacyCurrent = try JSONEncoder().encode(first.snapshot!.tour)
+        StubURLProtocol.handler = { _, path in
+            if path.hasSuffix("/revisions") { return (200, metadata) }
+            if path.contains("/revisions/") { return (200, full) }
+            return (200, legacyCurrent)
+        }
         await model.checkForUpdate()
         XCTAssertEqual(model.revision?.id, first.id)
         XCTAssertEqual(model.visited, [1])
+        XCTAssertNil(model.updateError)
         XCTAssertEqual(model.availableUpdate?.id, second.id)
         let adopted = try model.adoptingUpdate()
         XCTAssertEqual(adopted.revision?.id, second.id)
@@ -213,6 +235,35 @@ final class PinnedTourTests: XCTestCase {
         XCTAssertEqual(adopted.nextStop?.position, 1)
         let oldAgain = try start(first)
         XCTAssertEqual(oldAgain.visited, [1])
+    }
+
+    func testNestedSnapshotRevisionIdentityIsRequiredForStartRestoreAndAdoption() async throws {
+        let malformed = try revision(2) { raw in
+            var snapshot = raw["snapshot"] as! [String: Any]
+            var tour = snapshot["tour"] as! [String: Any]
+            tour["revision_id"] = "other-revision"
+            tour["revision_number"] = 99
+            snapshot["tour"] = tour
+            raw["snapshot"] = snapshot
+        }
+        XCTAssertThrowsError(try start(malformed))
+
+        try cache.savePrivate(malformed, key: ActiveTourModel.revisionKey(api: api, accountID: "alice", revisionID: malformed.id))
+        try cache.savePrivate(ActiveTourRecord(tourID: malformed.tourID, mode: "walk", accountID: "alice", revisionID: malformed.id, origin: api.client.baseURL.absoluteString), key: ActiveTourRecord.key)
+        XCTAssertNil(ActiveTourModel.restore(api: api, cache: cache, isSignedIn: { true }, accountID: "alice"))
+
+        let current = try revision()
+        let model = try start(current)
+        let revisionList = try metadata(malformed)
+        let full = try JSONEncoder().encode(malformed)
+        StubURLProtocol.handler = { _, path in
+            if path.hasSuffix("/revisions") { return (200, revisionList) }
+            if path.contains("/revisions/") { return (200, full) }
+            return (500, Data())
+        }
+        await model.checkForUpdate()
+        XCTAssertNotNil(model.updateError)
+        XCTAssertThrowsError(try model.adoptingUpdate())
     }
 
     func testChangedEntranceDoesNotCarryTheOldVisit() async throws {
@@ -229,8 +280,8 @@ final class PinnedTourTests: XCTestCase {
             tour["stops"] = stops; snapshot["tour"] = tour; raw["snapshot"] = snapshot
         }
         let full = try JSONEncoder().encode(changed)
-        let latest = try JSONEncoder().encode(changed.snapshot!.tour)
-        StubURLProtocol.handler = { _, path in (200, path.contains("/revisions/") ? full : latest) }
+        let revisionList = try metadata(changed)
+        StubURLProtocol.handler = { _, path in (200, path.hasSuffix("/revisions") ? revisionList : full) }
         await model.checkForUpdate()
         XCTAssertTrue(try model.adoptingUpdate().visited.isEmpty)
     }
@@ -244,8 +295,8 @@ final class PinnedTourTests: XCTestCase {
             snapshot["routes"] = routes; raw["snapshot"] = snapshot
         }
         let full = try JSONEncoder().encode(failed)
-        let latest = try JSONEncoder().encode(failed.snapshot!.tour)
-        StubURLProtocol.handler = { _, path in (200, path.contains("/revisions/") ? full : latest) }
+        let revisionList = try metadata(failed)
+        StubURLProtocol.handler = { _, path in (200, path.hasSuffix("/revisions") ? revisionList : full) }
         await model.checkForUpdate()
         XCTAssertNotNil(model.updateError)
         XCTAssertThrowsError(try model.adoptingUpdate())

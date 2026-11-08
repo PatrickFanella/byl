@@ -113,6 +113,19 @@ test('field errors and stale saves retain unsaved edits', async ({ page, request
 		headers: { Authorization: `Bearer ${auth}` }
 	});
 	expect((await saved.json()).submitted.notes).toBe('Saved in another tab');
+	await page.getByRole('button', { name: 'Reload saved brief' }).click();
+	await expect(page.getByLabel('Submitted notes')).toHaveValue(
+		'Keep this unsaved research question.'
+	);
+	// Reloading metadata must not lend the editor a newer version and allow it
+	// to overwrite another curator's saved fields with preserved local values.
+	await page.getByRole('button', { name: 'Save changes' }).click();
+	await expect(page.getByRole('alert')).toContainText('changed since you opened it');
+	await page.getByRole('button', { name: 'Replace editor with saved brief' }).click();
+	await expect(page.getByLabel('Submitted notes')).toHaveValue('Saved in another tab');
+	await page.getByLabel('Submitted notes').fill('Explicitly edited after comparison.');
+	await page.getByRole('button', { name: 'Save changes' }).click();
+	await expect(page.getByText('Version 3', { exact: false })).toBeVisible();
 });
 
 test('retrying after a lost creation response resumes the same saved brief', async ({

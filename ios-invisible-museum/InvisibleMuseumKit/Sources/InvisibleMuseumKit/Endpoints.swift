@@ -66,6 +66,13 @@ public struct Endpoints {
         try await client.get("/api/v1/tours/\(tour)/revisions/\(revision)")
     }
 
+    /// Revision metadata is ordered newest-first and stays authoritative even while a legacy
+    /// progress pin makes the generic tour endpoint serve an older itinerary.
+    public func revisions(tour: String, limit: Int = 20) async throws -> [TourRevision] {
+        let page: ListPage<TourRevision> = try await client.get("/api/v1/tours/\(tour)/revisions", query: ["limit": String(max(1, limit))])
+        return page.items
+    }
+
     public func revisionProgress(tour: String, revision: String) async throws -> RevisionProgress? {
         try await client.get("/api/v1/me/progress/\(tour)/revisions/\(revision)")
     }

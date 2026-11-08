@@ -216,13 +216,14 @@ public final class ActiveTourModel: Identifiable {
         updateError = nil
         defer { checkingUpdate = false }
         do {
-            let latest = try await api.tour(tour.id)
-            guard latest.id == tour.id, let id = latest.tour.revisionID else {
+            guard let latest = try await api.revisions(tour: tour.id, limit: 1).first,
+                  latest.tourID == tour.id else {
                 throw APIError(status: 0, code: "revision_unavailable", message: "The latest reviewed revision could not be read.")
             }
-            if id == revision.id { availableUpdate = nil; return }
-            let candidate = try await api.revision(tour: tour.id, revision: id)
-            guard candidate.id == id, candidate.tourID == tour.id, candidate.number > revision.number, !revoked else {
+            if latest.id == revision.id { availableUpdate = nil; return }
+            let candidate = try await api.revision(tour: tour.id, revision: latest.id)
+            guard candidate.id == latest.id, candidate.tourID == tour.id, candidate.number == latest.number,
+                  candidate.number > revision.number, !revoked else {
                 throw APIError(status: 0, code: "revision_unavailable", message: "The update could not be confirmed.")
             }
             availableUpdate = candidate
@@ -418,6 +419,10 @@ public final class ActiveTourModel: Identifiable {
                 if !positions.isSubset(of: visited) { visited.formUnion(positions); recordVisited() }
                 if positions == visited { progress.syncedAt = Date(); saveProgress() }
                 else { sync() }
+            } catch let error as APIError where error.status == 404 {
+                // A missing row is normal until this account reaches a first stop. Route loading
+                // separately handles a revision that is no longer visible.
+                syncError = nil
             } catch {
                 if !revoked && isSignedIn() { syncError = "Could not read progress for this revision." }
             }

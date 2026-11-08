@@ -209,8 +209,26 @@ class RouteSuggestions(
                 val result = api.submitSuggestion(attempt.input, attempt.key)
                 if (!current()) return null
                 if (result.ownerAccountId != accountId) throw ApiException(0, "unconfirmed", "Submission not confirmed.")
-                store.remove(key)
-                _state.update { if (!current()) it else it.copy(fields = SuggestionFields(), pending = null, busy = false, selectedId = result.id, selected = result, detailLoading = false, detailError = null, message = "Suggestion saved privately. Curators review it before any publication.") }
+                val cleanupMessage = try {
+                    store.remove(key)
+                    null
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    "Saved on the server. The local draft could not be cleared; retrying uses the same suggestion."
+                }
+                _state.update {
+                    if (!current()) it else it.copy(
+                        fields = if (cleanupMessage == null) SuggestionFields() else it.fields,
+                        pending = if (cleanupMessage == null) null else it.pending,
+                        busy = false,
+                        selectedId = result.id,
+                        selected = result,
+                        detailLoading = false,
+                        detailError = null,
+                        message = cleanupMessage ?: "Suggestion saved privately. Curators review it before any publication."
+                    )
+                }
                 result
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
