@@ -1,0 +1,114 @@
+[
+  {
+    "id": "tivoli",
+    "url": "https://dghistory.org/tivoli-theater/",
+    "title": "Tivoli Theatre",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The society identifies the 1928 Tivoli at 5021 Highland Avenue.",
+      "It describes a building combining the cinema with other entertainment, commercial and residential uses."
+    ],
+    "quote": "The building was intended to be a one-stop entertainment venue for the whole family.",
+    "limits": [
+      "Do not repeat the national second-theatre ranking without independent support.",
+      "A historical account is not current building-entry or exterior-arrival approval."
+    ]
+  },
+  {
+    "id": "mochel",
+    "url": "https://dghistory.org/mochel-hardware-store/",
+    "title": "Mochel Hardware Store",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The account identifies 36 S Main as the former address of the building later numbered 5122 Main Street.",
+      "It describes an 1884 opening and later expansions and storefront changes."
+    ],
+    "quote": "Date built: 1884",
+    "limits": [
+      "Retain old and current addresses as attributed identity evidence.",
+      "Present sidewalk, crossing and viewing access need separate review."
+    ]
+  },
+  {
+    "id": "bank",
+    "url": "https://dghistory.org/farmers-and-merchants-bank/",
+    "title": "Farmers and Merchants Bank",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The page identifies the bank building at 5135 Main Street and dates its opening to 1892.",
+      "It describes multiple uses, later commercial occupants and a 1944 exterior modernization that removed the turret."
+    ],
+    "quote": "In 1944, the exterior of the building underwent a modernization effort, eliminating many original features.",
+    "limits": [
+      "Browser retrieval timed out twice; a direct HTTPS status probe returned 200 and the primary page body was then retrieved and inspected.",
+      "Historical corner entrances and current commercial use do not establish public access or a safe crossing."
+    ]
+  },
+  {
+    "id": "penner",
+    "url": "https://dghistory.org/penner-building/",
+    "title": "Penner Building",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The society locates the building at 5219–5221 Main Street and dates it circa 1894.",
+      "The harness business moved there around 1920, later diversifying into tires and shoe repair."
+    ],
+    "quote": "Date built: circa 1894",
+    "limits": [
+      "Separate construction from the later arrival of the named business.",
+      "Do not infer present storefront entry or crossing conditions."
+    ]
+  },
+  {
+    "id": "brick-streets",
+    "url": "https://dghistory.org/historic-brick-streets/",
+    "title": "Historic Brick Streets",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The page describes early twentieth-century brick paving and later preservation and restoration.",
+      "Its location is broad northwest Downers Grove, not an exact reviewed visitor segment."
+    ],
+    "quote": "Location: Northwest Downers Grove",
+    "limits": [
+      "No precise segment selected.",
+      "Current surface identity, viewing position, connectivity and public access remain unverified.",
+      "Do not add a street exhibit merely to increase stop count."
+    ]
+  },
+  {
+    "id": "station-walk",
+    "url": "https://dghistory.org/history-walk-12-main-street-train-station/",
+    "title": "History Walk 12: Main Street Train Station",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The guide distinguishes the 1911 Classical Revival passenger station from the earlier 1864 station.",
+      "It describes later repair and partial rebuilding after the 1947 crash."
+    ],
+    "quote": "The north elevation’s central pavilion was rebuilt and slightly simplified",
+    "limits": [
+      "Use architectural station context rather than substituting a general rail-arrival story.",
+      "The historical walking guide does not certify current entrance coordinates or crossings."
+    ]
+  },
+  {
+    "id": "station-minutes",
+    "url": "https://agendadocs.downers.us/public/docs/agendas/2016/05-17-16/MIN_2016-6827.pdf",
+    "title": "Village Council minutes, May 10, 2016, p. 3",
+    "publisher": "Village of Downers Grove",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The minutes identify the Main Street station landmark request as 1000 Burlington Avenue and describe a 1911 Classical Revival building."
+    ],
+    "quote": "The building is a Classical Revival building.",
+    "limits": [
+      "Record 1000 Burlington Avenue alongside the catalogue’s 5001 Main Street identity; do not silently replace either address.",
+      "Landmark status is not a current public-arrival/access approval."
+    ]
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "provider": "Valhalla/FOSSGIS public development demo",
+  "retrieved_at": "2026-11-08T21:11:03.005881+00:00",
+  "api_endpoint": "https://valhalla1.openstreetmap.de/route",
+  "request": {
+    "locations": [
+      {
+        "lat": 41.7959,
+        "lon": -88.0092,
+        "type": "break"
+      },
+      {
+        "lat": 41.7952,
+        "lon": -88.0099,
+        "type": "break"
+      },
+      {
+        "lat": 41.7942861,
+        "lon": -88.0104387,
+        "type": "break"
+      },
+      {
+        "lat": 41.7938999,
+        "lon": -88.010128,
+        "type": "break"
+      },
+      {
+        "lat": 41.7921213,
+        "lon": -88.0099546,
+        "type": "break"
+      },
+      {
+        "lat": 41.7959,
+        "lon": -88.0092,
+        "type": "break"
+      }
+    ],
+    "costing": "pedestrian",
+    "units": "kilometers",
+    "language": "en-US"
+  },
+  "original_response_sha256": "1a6d269c09a5e37ccfe84ba0d5efb86d008b25be3235d124525d7945dea5046b",
+  "fixture_sha256": "85d093f7b9d14f4ed9712f50d0e69853a67bcdeb746df6645aa5206920127134",
+  "fixture_transformation": "Original encoded shapes and summary metrics only; no geometry edits.",
+  "trip_shape": "loop",
+  "return_to_first": true,
+  "distance_m": 1246.0,
+  "walking_seconds": 886.065,
+  "planned_dwell_minutes": 15,
+  "planned_narration_minutes": 7,
+  "conditional_total_minutes": 36.77,
+  "public_qualification": "needs_research",
+  "limitations": [
+    "Location/address leads, not approved public arrivals.",
+    "Existing Tivoli narrative retained, not replaced by its selection note.",
+    "Brick street excluded until exact segment/material/public viewing evidence.",
+    "No inspected network attribution, current crossing inspection or field proof.",
+    "The closing travel leg returns to the station without another narrated story."
+  ],
+  "attribution": "© OpenStreetMap contributors; routing by Valhalla/FOSSGIS public development demo",
+  "data_license": "ODbL-1.0",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "source_credit_url": "https://www.openstreetmap.org/copyright"
+}

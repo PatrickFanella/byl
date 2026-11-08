@@ -1,0 +1,45 @@
+{
+  "trip": {
+    "summary": {
+      "length": 1.246,
+      "time": 886.065
+    },
+    "legs": [
+      {
+        "summary": {
+          "length": 0.222,
+          "time": 154.864
+        },
+        "shape": "wr_vnAv~szfDiCD@|C?vG@tx@pE]jDU~@DtGYtAGlAGhAEl@@~Hc@rG_A@oU"
+      },
+      {
+        "summary": {
+          "length": 0.149,
+          "time": 107.568
+        },
+        "shape": "wd~unAxiuzfDAnU|COpDOFbGDfFzPe@bYs@"
+      },
+      {
+        "summary": {
+          "length": 0.084,
+          "time": 60.062
+        },
+        "shape": "{m|unAzkvzfDj^_A[uFWsEoDJ"
+      },
+      {
+        "summary": {
+          "length": 0.228,
+          "time": 170.243
+        },
+        "shape": "su{unA|{uzfDnDKVrE~BInCIfm@qBK_FvWy@r[aAGcE"
+      },
+      {
+        "summary": {
+          "length": 0.561,
+          "time": 393.327
+        },
+        "shape": "{cxunA~luzfDFbEs[`AwWx@mm@lBPbFoCH_CHsd@rA{Qj@oDJuKZuDLcXt@iADmAB{Qh@eERGoDAux@?wGA}ChCE"
+      }
+    ]
+  }
+}
