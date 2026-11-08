@@ -69,11 +69,15 @@
 				.slice(2)
 				.some((field) => Boolean(values[field.key]) || Boolean(errors[field.key]))
 	);
-	function persist() {
+	function persist(nextValues = values, nextPending = pending): boolean {
 		try {
-			sessionStorage.setItem(storageKey, JSON.stringify({ values, pending }));
+			sessionStorage.setItem(
+				storageKey,
+				JSON.stringify({ values: nextValues, pending: nextPending })
+			);
+			return true;
 		} catch {
-			/* The current page still retains input. */
+			return false;
 		}
 	}
 	$effect(() => {
@@ -84,8 +88,13 @@
 		form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
 	}
 	function discard() {
+		const cleared = emptySuggestion();
+		if (!persist(cleared, null)) {
+			message = 'We could not clear the saved retry data. Your draft has been kept.';
+			return;
+		}
 		pending = null;
-		values = emptySuggestion();
+		values = cleared;
 		errors = {};
 		message = '';
 	}
@@ -94,8 +103,9 @@
 		if (busy || closed || needsSignIn || session.account()?.id !== ownerID) return;
 		errors = {};
 		message = '';
-		if (!pending) {
-			pending = {
+		let attempt = pending;
+		if (!attempt) {
+			attempt = {
 				key: crypto.randomUUID(),
 				submitted: {
 					topic: values.topic.trim(),
@@ -110,11 +120,14 @@
 					pilot_id: ''
 				}
 			};
+			pending = attempt;
 		}
 		// Persist the exact body/key pair before sending, including across reloads.
-		persist();
-		const attempt = pending;
-		if (!attempt) return;
+		if (!persist(values, attempt)) {
+			message =
+				'We could not save the retry details in this browser. Submission was not sent. Try again after storage is available.';
+			return;
+		}
 		busy = true;
 		try {
 			const saved = await submitRouteSuggestion(attempt.submitted, attempt.key);
@@ -142,6 +155,11 @@
 				error.status < 500 &&
 				error.status !== 409
 			) {
+				if (!persist(values, null)) {
+					message =
+						'We could not clear the saved retry data. Your input and retry identity have been kept.';
+					return;
+				}
 				pending = null;
 				errors = error.fields;
 				message = Object.keys(errors).length
