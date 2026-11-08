@@ -81,7 +81,9 @@ class ActiveTour(
     private val scope: CoroutineScope,
     val accountId: String? = null,
     val revision: TourRevision? = null,
-    private val isCurrent: () -> Boolean = { true }
+    private val isCurrent: () -> Boolean = { true },
+    private val transitEnabled: Boolean? = null,
+    private val restoringTransit: Boolean = false
 ) {
     private val _state = MutableStateFlow(ActiveTourState())
     val state: StateFlow<ActiveTourState> = _state
@@ -100,11 +102,15 @@ class ActiveTour(
     @Volatile private var revoked = false
     private var legacyResume = false
     val canUse: Boolean get() = !ended && !revoked && isCurrent()
+    val isMixed: Boolean get() = revision?.isMixed(mode) == true
+    val transit: TransitTrip? = if (isMixed) TransitTrip(api, revision!!, store, accountId, { canUse }) else null
+    val transitInterval: Boolean get() = isMixed && tour.approvedTransit?.intent?.let { choice -> _state.value.nextStop?.id == choice.toStopId && choice.fromStopId in visitedStopIds } == true
     private fun canSync() = !revoked && !legacyResume && signedIn() && isCurrent()
 
     init {
         if (revision != null) {
             revision.unavailableReason(mode)?.let { throw ApiException(0, "revision_unavailable", it) }
+            if (isMixed && transitEnabled != true && !restoringTransit) throw ApiException(0, "transit_disabled", "Confirm enabled scheduled transit before starting this mixed trip.")
             if (revision.snapshot?.tour != tour) throw ApiException(0, "revision_unavailable", "The retained tour does not match this revision.")
             store.putJson(snapshotKey, revision)
         }
@@ -114,7 +120,7 @@ class ActiveTour(
             val ids = if (progress.tourId == tour.id && progress.revisionId == revision.id) progress.visitedStopIds.toSet() else emptySet()
             val visited = stops.filter { it.id in ids }.map { it.position }.toSet()
             progress = progress.copy(tourId = tour.id, revisionId = revision.id, visitedStopIds = stops.filter { it.position in visited }.map { it.id }, visitedPositions = visited.sorted(), completedAt = progress.completedAt.takeIf { visited.size == stops.size })
-            _state.value = ActiveTourState(visited = visited, route = revision.snapshot!!.routes[mode], routeStatus = LoadStatus.READY, routeFromCache = true)
+            _state.value = ActiveTourState(visited = visited, route = if (isMixed) null else revision.snapshot!!.routes[mode], routeStatus = LoadStatus.READY, routeFromCache = true)
         } else {
             store.putJson(tourKey(tour.id), tour)
             _state.update { it.copy(visited = progress.visitedPositions.toSet()) }
@@ -166,10 +172,12 @@ class ActiveTour(
     suspend fun adoptingUpdate(): ActiveTour {
         val target = _state.value.availableUpdate ?: throw ApiException(0, "unavailable", "Check for a reviewed update first.")
         val confirmed = api.revision(tour.id, target.id)
+        val admitted = if (target.isMixed(mode)) api.itineraryCapabilities().scheduledTransitV1 else null
         flush()
         synchronized(lock) {
             if (!canUse || _state.value.availableUpdate?.id != target.id || confirmed.id != target.id || confirmed.tourId != tour.id || confirmed.unavailableReason(mode) != null || target.unavailableReason(mode) != null)
                 throw ApiException(0, "unavailable", "The trip, session or update changed. Review it again.")
+            if (target.isMixed(mode) && admitted != true) throw ApiException(0, "transit_disabled", "Scheduled transit is disabled.")
             val nextStops = target.snapshot!!.tour.stops
             val oldById = stops.associateBy { it.id }
             val carry = nextStops.filter { stop ->
@@ -183,7 +191,7 @@ class ActiveTour(
             val ids = existing + carry
             val changed = maxOf(System.currentTimeMillis(), (old?.updatedAt ?: 0) + 1)
             store.putJson(key, (old ?: LocalProgress(tour.id, mode)).copy(revisionId = target.id, visitedStopIds = ids.sorted(), visitedPositions = nextStops.filter { it.id in ids }.map { it.position }.sorted(), updatedAt = changed, syncedAt = null, completedAt = if (ids == known) changed else null))
-            return startPinned(api, target, mode, store, signedIn, scope, accountId, isCurrent)
+            return startPinned(api, target, mode, store, signedIn, scope, accountId, isCurrent, admitted)
         }
     }
 
@@ -204,6 +212,8 @@ class ActiveTour(
     suspend fun loadRoute() {
         if (!canUse) return
         if (revision != null) {
+            transit?.refreshGate()
+            if (!canUse) return
             try {
                 val retained = api.revision(tour.id, revision.id)
                 if (!canUse) return
@@ -327,7 +337,7 @@ class ActiveTour(
     }
 
     private fun recomputeLegs() {
-        val legs = _state.value.route?.legs ?: emptyList()
+        val legs = (if (isMixed) tour.approvedTransit?.walkingLegs else _state.value.route?.legs) ?: emptyList()
         val next = _state.value.nextStop
         val visited = _state.value.visited
         _state.update {
@@ -457,6 +467,7 @@ class ActiveTour(
 
     /** Ends the walk: the tour is no longer resumed on launch (only if the record still names this walk). Progress stays. */
     fun end(): Boolean {
+        transit?.invalidate()
         try {
             val record = store.getJson<ActiveTourRecord>(ActiveTourRecord.KEY)
             if (record == null || (record.tourId == tour.id && record.mode == mode && record.accountId == accountId && record.revisionId == revision?.id && (record.origin == null || record.origin == origin))) store.remove(ActiveTourRecord.KEY)
@@ -483,9 +494,9 @@ class ActiveTour(
     }
 
     /** Turn-by-turn to the next stop in Google Maps; the app falls back to a geo: URI. */
-    fun navigationUri(): String? = _state.value.nextStop?.let { stop -> navigationPoint(stop)?.let { navigationUri(it.lat, it.lng, mode) } }
+    fun navigationUri(): String? = if (transitInterval) null else _state.value.nextStop?.let { stop -> navigationPoint(stop)?.let { navigationUri(it.lat, it.lng, mode) } }
 
-    fun geoUri(): String? = _state.value.nextStop?.let { stop -> navigationPoint(stop)?.let { geoUri(it.lat, it.lng, stop.place.name) } }
+    fun geoUri(): String? = if (transitInterval) null else _state.value.nextStop?.let { stop -> navigationPoint(stop)?.let { geoUri(it.lat, it.lng, stop.place.name) } }
 
     private fun saveProgress() {
         try {
@@ -507,9 +518,12 @@ class ActiveTour(
         fun revisionKey(api: Endpoints, accountId: String?, revisionId: String) = "revision.v1.${namespace(api, accountId)}.$revisionId"
         private fun progressKey(api: Endpoints, accountId: String?, revisionId: String) = "progress.v3.${namespace(api, accountId)}.$revisionId"
 
-        fun startPinned(api: Endpoints, revision: TourRevision, mode: String, store: KeyValueStore, signedIn: () -> Boolean, scope: CoroutineScope, accountId: String? = null, isCurrent: () -> Boolean = { true }): ActiveTour {
+        fun startPinned(api: Endpoints, revision: TourRevision, mode: String, store: KeyValueStore, signedIn: () -> Boolean, scope: CoroutineScope, accountId: String? = null, isCurrent: () -> Boolean = { true }): ActiveTour =
+            startPinned(api, revision, mode, store, signedIn, scope, accountId, isCurrent, null)
+
+        fun startPinned(api: Endpoints, revision: TourRevision, mode: String, store: KeyValueStore, signedIn: () -> Boolean, scope: CoroutineScope, accountId: String? = null, isCurrent: () -> Boolean = { true }, transitEnabled: Boolean?, restoringTransit: Boolean = false): ActiveTour {
             revision.unavailableReason(mode)?.let { throw ApiException(0, "revision_unavailable", it) }
-            return ActiveTour(api, revision.snapshot!!.tour, mode, store, signedIn, scope, accountId, revision, isCurrent)
+            return ActiveTour(api, revision.snapshot!!.tour, mode, store, signedIn, scope, accountId, revision, isCurrent, transitEnabled, restoringTransit)
         }
 
         /** Rebuilds the tour that was active when the app last ran, from the cached detail alone. */
@@ -519,7 +533,7 @@ class ActiveTour(
             if (record.revisionId != null) {
                 val revision = store.getJson<TourRevision>(revisionKey(api, accountId, record.revisionId)) ?: return null
                 if (revision.id != record.revisionId || revision.tourId != record.tourId) return null
-                return runCatching { startPinned(api, revision, record.mode, store, signedIn, scope, accountId, isCurrent) }.getOrNull()
+                return runCatching { startPinned(api, revision, record.mode, store, signedIn, scope, accountId, isCurrent, transitEnabled = null, restoringTransit = true) }.getOrNull()
             }
             val tour = store.getJson<TourDetail>(tourKey(record.tourId)) ?: return null
             return ActiveTour(api, tour, record.mode, store, signedIn, scope, accountId, isCurrent = isCurrent).also {

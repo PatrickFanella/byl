@@ -251,6 +251,7 @@ data class TourDetail(
     val corridor: ReviewedCorridor? = null,
     val transit: kotlinx.serialization.json.JsonElement? = null
 ) {
+    val approvedTransit: ApprovedTransit? get() = transit?.let { runCatching { MuseumJson.decodeFromString<ApprovedTransit>(it.toString()) }.getOrNull() }
     val isUserRoute: Boolean get() = ownerAccountId != null
     val summaryOnly: TourSummary
         get() = TourSummary(id, cityId, slug, title, summary, topicId, topic, modes, heroMedia, status, visibility, ownerAccountId, stopCount, routes, revisionId, revisionNumber)

@@ -178,7 +178,9 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         val revision = api.revision(tour.id, revisionId)
         if (!sameSession(owner, origin) || _state.value.active != null || revision.id != revisionId || revision.tourId != tour.id)
             throw ApiException(0, "trip_changed", "The trip or session changed. Open the tour again before starting.")
-        val active = ActiveTour.startPinned(api, revision, mode, container.store, { owner != null && sameSession(owner, origin) }, container.scope, accountId) { sameSession(owner, origin) }
+        val admitted = if (revision.isMixed(mode)) api.itineraryCapabilities().scheduledTransitV1 else null
+        if (!sameSession(owner, origin) || _state.value.active != null) throw ApiException(0, "trip_changed", "The trip or session changed. Open the tour again.")
+        val active = ActiveTour.startPinned(api, revision, mode, container.store, { owner != null && sameSession(owner, origin) }, container.scope, accountId, { sameSession(owner, origin) }, admitted)
         if (!sameSession(owner, origin)) throw ApiException(0, "trip_changed", "The session changed before this trip could open.")
         attach(active)
     }

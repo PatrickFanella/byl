@@ -1,0 +1,120 @@
+{
+	"version": 1,
+	"tour_id": "00000000-0000-4000-8000-00000000e0e1",
+	"revision_id": "a1f10ed0-80bd-49f0-91de-b055d0a2a2c7",
+	"connector_version": 1,
+	"state": "scheduled",
+	"requested_departure_at": "2026-11-08T20:59:23.025375081Z",
+	"departure_context_stop_id": "c77fc1fd-f196-4501-bf9b-1a7b47d20242",
+	"service": {
+		"state": "scheduled",
+		"scheduled": true,
+		"live": false,
+		"source": {
+			"url": "https://www.transitchicago.com/downloads/sch_data/google_transit.zip",
+			"publisher": "Chicago Transit Authority",
+			"sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			"retrieved_at": "2026-11-08T19:59:23.03127321Z",
+			"license_url": "https://www.transitchicago.com/developers/terms/",
+			"timezone": "America/Chicago"
+		},
+		"board": {
+			"id": "30374",
+			"name": "Clark/Lake (Subway)",
+			"parent_id": "40380",
+			"latitude": 41.885737,
+			"longitude": -87.630886
+		},
+		"alight": {
+			"id": "30077",
+			"name": "Forest Park",
+			"parent_id": "40390",
+			"latitude": 41.874257,
+			"longitude": -87.817318
+		},
+		"trip_id": "synthetic-api-trip",
+		"route_id": "Blue",
+		"headsign": "Forest Park",
+		"departure_at": "2026-11-08T21:12:23.025375081Z",
+		"arrival_at": "2026-11-08T21:52:23.025375081Z",
+		"issues": ["synthetic_provider_fixture"]
+	},
+	"segments": [
+		{
+			"kind": "walk_to_stop",
+			"from_stop_id": "c77fc1fd-f196-4501-bf9b-1a7b47d20242",
+			"to_platform_id": "30374",
+			"duration_s": 300,
+			"departure_at": "2026-11-08T20:59:23.025375081Z",
+			"arrival_at": "2026-11-08T21:04:23.025375081Z",
+			"basis": "curator_walking_estimate",
+			"navigation": "external_directions_required"
+		},
+		{
+			"kind": "boarding_wait",
+			"from_platform_id": "30374",
+			"to_platform_id": "30374",
+			"duration_s": 480,
+			"departure_at": "2026-11-08T21:04:23.025375081Z",
+			"arrival_at": "2026-11-08T21:12:23.025375081Z",
+			"basis": "schedule_and_curator_buffer",
+			"navigation": "check_station_signs_and_alerts"
+		},
+		{
+			"kind": "transit",
+			"from_platform_id": "30374",
+			"to_platform_id": "30077",
+			"duration_s": 2400,
+			"departure_at": "2026-11-08T21:12:23.025375081Z",
+			"arrival_at": "2026-11-08T21:52:23.025375081Z",
+			"basis": "cta_static_schedule",
+			"navigation": "scheduled_rail"
+		},
+		{
+			"kind": "walk_from_stop",
+			"to_stop_id": "09e36a5e-672b-4ef1-8166-54c7ae96816c",
+			"from_platform_id": "30077",
+			"duration_s": 600,
+			"departure_at": "2026-11-08T21:52:23.025375081Z",
+			"arrival_at": "2026-11-08T22:02:23.025375081Z",
+			"basis": "curator_walking_estimate",
+			"navigation": "external_directions_required"
+		},
+		{
+			"kind": "walk",
+			"from_stop_id": "09e36a5e-672b-4ef1-8166-54c7ae96816c",
+			"to_stop_id": "2c67cd61-1ce7-4cdb-bb2e-cc78b99f883e",
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [
+					[-88.0099, 41.7952],
+					[-88.0118, 41.7944]
+				]
+			},
+			"duration_s": 139,
+			"basis": "retained_qualified_walking_route",
+			"navigation": "in_app_walking"
+		},
+		{
+			"kind": "walk",
+			"from_stop_id": "2c67cd61-1ce7-4cdb-bb2e-cc78b99f883e",
+			"to_stop_id": "7cb0a95c-d655-4da1-b30b-2384100594f0",
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [
+					[-88.0118, 41.7944],
+					[-88.0111, 41.8083]
+				]
+			},
+			"duration_s": 1190,
+			"basis": "retained_qualified_walking_route",
+			"navigation": "in_app_walking"
+		}
+	],
+	"assumptions": [
+		"Explicit synthetic time assumptions; not evidence of real station access.",
+		"Plan for the time you expect to leave the selected story stop after finishing its stories.",
+		"CTA times follow the published timetable. Check current arrivals and service alerts before boarding.",
+		"Station locations come from the timetable. Use station signs or external directions to find public entrances; walking times are curator estimates."
+	]
+}

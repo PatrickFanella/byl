@@ -63,6 +63,8 @@ data class TourRevision(
     @SerialName("published_at") val publishedAt: String,
     val snapshot: TourSnapshot? = null
 ) {
+    fun isMixed(mode: String) = snapshot?.tour?.approvedTransit?.intent?.mode == mode
+
     /** A computed line alone cannot authorize a reviewed trip. */
     fun unavailableReason(mode: String): String? {
         val retained = snapshot
@@ -71,6 +73,15 @@ data class TourRevision(
         val stops = retained.tour.stops
         if (stops.size !in 2..30 || stops.any { it.id.isBlank() } || stops.map { it.id }.toSet().size != stops.size || stops.map { it.position }.toSet() != (1..stops.size).toSet())
             return "The reviewed stop identities could not be read."
+        if (retained.tour.transit != null) {
+            val choice = retained.tour.approvedTransit
+            if (choice == null || !choice.valid(retained.tour)) return "The retained transit selection is unsupported or needs review."
+            if (choice.intent.mode == mode) {
+                if (stops.any { it.place.arrivalPoint?.navigationPoint(mode) == null } || stops.any { stop -> stop.featuredMoment?.let { retained.moments[it.id]?.id != it.id } == true })
+                    return "A reviewed arrival point or retained story is missing."
+                return null
+            }
+        }
         val route = retained.routes[mode]
         val journey = route?.journey
         val geometry = route?.geometry
