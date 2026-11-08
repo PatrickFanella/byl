@@ -42,7 +42,7 @@ import tv.subcult.museum.ui.theme.Museum
 
 /** The visitor's own routes: build, share, edit, delete. Signed-in only. */
 @Composable
-fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Unit, onOpenTour: (String) -> Unit) {
+fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Unit, onOpenTour: (String) -> Unit, onSuggestions: () -> Unit) {
     val app by model.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -66,6 +66,7 @@ fun RoutesScreen(model: AppViewModel, onNew: () -> Unit, onEdit: (String) -> Uni
         Overline("Your routes")
         Text("Curate your own gallery", style = MaterialTheme.typography.headlineLarge, color = Museum.text)
         Text("Order the places you love into a walk or ride and share it by link.", color = Museum.muted, style = MaterialTheme.typography.bodyLarge)
+        TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = onSuggestions) { Text("Tour suggestions · separate curator review", color = Museum.action) }
         if (!app.isSignedIn) {
             SignInPrompt("Sign in to build routes that follow you to every device.") { model.showSignIn(true) }
         } else {
