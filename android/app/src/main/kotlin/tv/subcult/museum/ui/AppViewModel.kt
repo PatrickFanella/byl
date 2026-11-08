@@ -32,6 +32,8 @@ data class AppState(
     val citiesMessage: String = "",
     val savedTourIds: Set<String> = emptySet(),
     val active: ActiveTour? = null,
+    val contributions: tv.subcult.museum.core.TripContributions? = null,
+    val contributionError: String? = null,
     val pendingTourSlug: String? = null,
     val showSignIn: Boolean = false,
     val audioEnabled: Boolean = false
@@ -51,7 +53,7 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
 
     init {
         container.client.onUnauthorized = { token -> handleUnauthorized(token) }
-        viewModelScope.launch { container.session.state.collect { s -> _state.update { it.copy(session = s) } } }
+        viewModelScope.launch { container.session.state.collect { s -> _state.value.contributions?.identityChanged(); _state.update { it.copy(session = s) } } }
         // Disk only, before any network: an interrupted walk is back before the first frame.
         container.session.restore()
         resumeActiveTour()
@@ -213,8 +215,28 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         return Endpoints(client)
     }
 
+    fun contributionModel(tour: ActiveTour? = null): tv.subcult.museum.core.TripContributions? {
+        return try {
+            val session = container.session.state.value
+            val owner = if (tour == null) session?.account?.id else tour.accountId
+            val origin = tour?.origin ?: container.client.baseUrl.trimEnd('/')
+            val token = session?.token
+            tv.subcult.museum.core.TripContributions(container.contributionStore,
+                tv.subcult.museum.core.ContributionHttpApi(origin, token), owner, origin, tour?.revision, tour?.mode ?: "walk", {
+                    val current = container.session.state.value
+                    owner != null && current?.account?.id == owner && current.token == token && container.client.baseUrl.trimEnd('/') == origin && (tour == null || tour.canUse)
+                }).also { _state.update { it.copy(contributionError = null) } }
+        } catch (_: Exception) {
+            _state.update { it.copy(contributionError = "Private contribution storage is unavailable. Route improvement is off; navigation still works.") }
+            null
+        }
+    }
+
     private fun attach(tour: ActiveTour) {
-        _state.update { it.copy(active = tour) }
+        _state.value.contributions?.lifecycle(tv.subcult.museum.core.DeviationDetector.Control.END)
+        _state.value.contributions?.setForeground(false)
+        val contributions = contributionModel(tour)
+        _state.update { it.copy(active = tour, contributions = contributions) }
         viewModelScope.launch {
             tour.loadRoute()
             if (tour.state.value.revoked) container.narration.stop()
@@ -227,11 +249,13 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     /** Ends the walk now (state and resume record first) and lets any pending PUT finish behind it. */
     fun endTour(reset: Boolean): Boolean {
         val tour = _state.value.active ?: return true
+        _state.value.contributions?.lifecycle(tv.subcult.museum.core.DeviationDetector.Control.END)
+        _state.value.contributions?.setForeground(false)
         if (reset) tour.resetProgress()
         if (!tour.end()) return false
         narrationJob?.cancel()
         container.narration.stop()
-        _state.update { if (it.active === tour) it.copy(active = null) else it }
+        _state.update { if (it.active === tour) it.copy(active = null, contributions = null) else it }
         if (signInAfterTour) {
             signInAfterTour = false
             _state.update { it.copy(showSignIn = true) }
@@ -252,6 +276,7 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     /** The activity left the foreground: no narration and no GPS until it is back. */
     fun onStop() {
         foreground = false
+        _state.value.contributions?.setForeground(false)
         narrationJob?.cancel()
         container.narration.stop()
         container.location.stop()
