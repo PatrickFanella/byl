@@ -212,6 +212,8 @@ class RouteSuggestions(
                 val cleanupMessage = try {
                     store.remove(key)
                     null
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (_: Exception) {
                     "Saved on the server. The local draft could not be cleared; retrying uses the same suggestion."
                 }
