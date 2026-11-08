@@ -1,0 +1,129 @@
+[
+  {
+    "id": "downer-biography",
+    "url": "https://dghistory.org/pierce-downer/",
+    "title": "Pierce Downer",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The biography gives 1832 for Pierce Downer’s arrival.",
+      "It links his house, well and family burial ground."
+    ],
+    "quote": "In 1832 at the age of 50, Pierce traveled to Fort Dearborn Chicago to see his son",
+    "limits": [
+      "Retain the date conflict with the Park District.",
+      "Its colonial-settlement framing does not mean the land was previously uninhabited."
+    ]
+  },
+  {
+    "id": "burial-access",
+    "url": "https://www.dgparks.org/location/downer-burial-place",
+    "title": "Downer Burial Place",
+    "publisher": "Downers Grove Park District",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The district gives 1833 for the first encampment.",
+      "It describes dawn-to-dusk visiting and a signed shared driveway off Linscott Avenue."
+    ],
+    "quote": "Access to the burial site is currently by way of a paved driveway that is shared with the adjacent home owner to the south.",
+    "limits": [
+      "No reviewed entrance coordinates or current field inspection.",
+      "A shared driveway does not authorize adjoining private property access."
+    ]
+  },
+  {
+    "id": "downer-house",
+    "url": "https://dghistory.org/the-pierce-downer-house/",
+    "title": "The Pierce Downer House",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The house is identified at 4437 Seeley Avenue and dated to the early 1840s.",
+      "The account distinguishes the original house position from its changed front-door orientation after the street was built."
+    ],
+    "quote": "The Pierce Downer home is currently situated at its original location on the property.",
+    "limits": [
+      "A landmark listing does not establish visitor entry or an allowed public viewpoint."
+    ]
+  },
+  {
+    "id": "downer-well",
+    "url": "https://dghistory.org/pierce-downers-well/",
+    "title": "Pierce Downer’s Well",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The page identifies the well at 4448 Seeley Avenue, across from the house.",
+      "Its text says designation in 2013; its approval field says 2003.",
+      "Its proposed household use is expressly qualified as probable."
+    ],
+    "quote": "Date built: circa 1832",
+    "limits": [
+      "Do not resolve designation-date conflict by inference.",
+      "Current visibility, exact historic position and safe public arrival remain unresolved."
+    ]
+  },
+  {
+    "id": "main-cemetery",
+    "url": "https://dghistory.org/main-street-cemetery-site/",
+    "title": "Main Street Cemetery",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The account dates the cemetery land contribution to 1856 and final interment to 1939.",
+      "Its listed 5190 Main Street address needs reconciliation; a municipal PDF search result gives 5158, but that large PDF could not be inspected in the browser."
+    ],
+    "quote": "The cemetery was used until 1939 when Emma Foster Miller was the last to be interred.",
+    "limits": [
+      "Historical entrance orientation is not a current pedestrian-access approval.",
+      "The municipal address lead is indexed-only at this checkpoint; do not adopt it as inspected evidence."
+    ]
+  },
+  {
+    "id": "downer-burial-history",
+    "url": "https://dghistory.org/downer-burial-ground/",
+    "title": "Downer Burial Ground",
+    "publisher": "Downers Grove Historical Society",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The society locates the family ground at 4520 Linscott Avenue.",
+      "Its account attributes the family burial on the farm to a flooded-creek obstacle to reaching Main Street Cemetery in 1863."
+    ],
+    "quote": "Location: 4520 Linscott Downers Grove IL",
+    "limits": [
+      "The encampment location is presented as reported tradition.",
+      "Do not infer actual water conditions today or an approved crossing from that account."
+    ]
+  },
+  {
+    "id": "house-municipal-minutes",
+    "url": "https://agendadocs.downers.us/public/docs/agendas/2017/02-21-17/MIN_2017-7274.pdf",
+    "title": "Architectural Design Review Board minutes, January 18, 2017, pp. 1–4",
+    "publisher": "Village of Downers Grove",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The minutes identify the historic-landmark petition at 4437 Seeley Avenue.",
+      "They distinguish staff presentation from owners’ testimony about changes and the uncertain exact construction year."
+    ],
+    "quote": "A petition seeking a Historic Landmark Designation for the property commonly known as 4437 Seeley Avenue",
+    "limits": [
+      "Historical descriptions of school visits are not current public-entry permission.",
+      "Keep reported testimony and oral stories attributed."
+    ]
+  },
+  {
+    "id": "cemetery-position",
+    "url": "https://graveyards.com/Illinois/DuPage/Downers-Grove-Main-Street",
+    "title": "Downers Grove Main Street Cemetery location reference",
+    "publisher": "Graveyards.com / Matt Hucke",
+    "retrieved_at": "2026-11-08",
+    "claims": [
+      "The original cemetery photography/location page lists latitude 41.792530 and longitude -88.010619."
+    ],
+    "quote": "41.792530 -88.010619",
+    "limits": [
+      "Independent location reference; no entrance/access certification.",
+      "Photographs explicitly require permission for copying; no photographs copied."
+    ]
+  }
+]

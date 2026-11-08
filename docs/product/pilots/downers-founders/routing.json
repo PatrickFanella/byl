@@ -1,0 +1,53 @@
+{
+  "provider": "Valhalla public development demo",
+  "retrieved_at": "2026-11-08T20:42:44.520264+00:00",
+  "request": {
+    "locations": [
+      {
+        "lat": 41.79253,
+        "lon": -88.010619,
+        "type": "break"
+      },
+      {
+        "lat": 41.804939,
+        "lon": -88.0159623,
+        "type": "break"
+      },
+      {
+        "lat": 41.8059948,
+        "lon": -88.0216323,
+        "type": "break"
+      },
+      {
+        "lat": 41.8058071,
+        "lon": -88.0218441,
+        "type": "break"
+      }
+    ],
+    "costing": "pedestrian",
+    "units": "kilometers",
+    "language": "en-US"
+  },
+  "original_response_sha256": "165e9b0d6e246e168d42f83aad02588c54f96b90ad2df5ceb8698e58fe9a2571",
+  "fixture_sha256": "f3e3ef4583a6a90a3b6ec3eadaa7f8715d0a56af0b8ab2851e44d8c4c230a818",
+  "fixture_transformation": "Retain only trip summary, per-leg summary and original encoded shapes; omit maneuvers and provider diagnostics. No geometry edits.",
+  "distance_m": 2722.0,
+  "walking_seconds": 1989.352,
+  "planned_dwell_minutes": 12,
+  "planned_narration_minutes": 4,
+  "conditional_total_minutes": 49.16,
+  "public_qualification": "needs_research",
+  "limitations": [
+    "Public demo comparison, not production routing.",
+    "Unreviewed site/address leads; no approved public arrivals.",
+    "Cemetery address geocoder was rejected as an apparent nearby-building match.",
+    "No inspected way/node connectivity or mode-access evidence.",
+    "No field observation or safe-crossing/entrance certification.",
+    "No 60–90 minute promise; recompute after approved arrivals/corridor changes."
+  ],
+  "attribution": "© OpenStreetMap contributors; routing computed by Valhalla/FOSSGIS public development demo",
+  "data_license": "ODbL-1.0",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "source_credit_url": "https://www.openstreetmap.org/copyright",
+  "api_endpoint": "https://valhalla1.openstreetmap.de/route"
+}

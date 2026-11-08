@@ -1,0 +1,31 @@
+{
+  "topic": "Pierce Downer and founding Downers Grove: settlement, family and contested dates",
+  "area": "Downers Grove, Illinois",
+  "notes": "Private draft pilot. Retain 1832/1833 discrepancy and 2003/2013 well designation discrepancy. Historical site positions are not approved public arrivals. Shared driveway and private-residence viewing need curator review. No publication or promised 60\u201390 minute duration.",
+  "place_leads": [
+    "Main Street Cemetery",
+    "Downer Burial Ground",
+    "Pierce Downer House",
+    "Pierce Downer Well"
+  ],
+  "event_leads": [
+    "Pierce and Lucy Downer",
+    "Settlement-date discrepancy"
+  ],
+  "source_links": [
+    "https://dghistory.org/pierce-downer/",
+    "https://www.dgparks.org/location/downer-burial-place",
+    "https://dghistory.org/the-pierce-downer-house/",
+    "https://dghistory.org/pierce-downers-well/",
+    "https://dghistory.org/main-street-cemetery-site/",
+    "https://dghistory.org/downer-burial-ground/"
+  ],
+  "modes": [
+    "walk"
+  ],
+  "trip_shape": "point_to_point",
+  "duration_minutes": null,
+  "start_preference": "Main Street Cemetery",
+  "end_preference": "Pierce Downer Well",
+  "pilot_id": "downers-founders-v1"
+}
