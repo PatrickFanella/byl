@@ -48,7 +48,7 @@ import tv.subcult.museum.ui.theme.Museum
 
 /** One tour: summary, per-mode estimates, save, start, and the stops with their featured moments. */
 @Composable
-fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: String, featuredMomentId: String?) -> Unit, onBack: () -> Unit) {
+fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: String, featuredMomentId: String?) -> Unit, onBack: () -> Unit, onReport: (tour: String, revision: String, mode: String) -> Unit) {
     val app by model.state.collectAsStateWithLifecycle()
     var state by remember(ref) { mutableStateOf(UiState<TourDetail>()) }
     var saved by remember { mutableStateOf(false) }
@@ -119,6 +119,9 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
                 }
                 if (tour.revisionId == null) Text("A reviewed revision is required before starting this tour.", color = Museum.muted)
                 startError?.let { Text(it, color = Museum.danger) }
+                tour.revisionId?.let { revision ->
+                    tour.modes.forEach { mode -> OutlinedButton(onClick = { onReport(tour.id, revision, mode) }, modifier = Modifier.fillMaxWidth()) { Text(if (mode == "bike") "Suggest a cycling route change" else "Suggest a walking route change") } }
+                }
                 OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                     onClick = {
                         if (!app.isSignedIn) { wantSave = true; return@OutlinedButton }

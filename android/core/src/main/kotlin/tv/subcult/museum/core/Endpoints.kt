@@ -97,4 +97,14 @@ class Endpoints(val client: ApiClient) {
 
     suspend fun submitSuggestion(input: RouteSuggestionInput, key: String): RouteSuggestion =
         client.post("/api/v1/me/route-briefs", input, mapOf("Idempotency-Key" to key))
+
+    suspend fun submitReport(input: RouteReportInput, key: String): RouteReport =
+        client.post("/api/v1/me/route-reports", input, mapOf("Idempotency-Key" to key))
+
+    suspend fun reports(offset: Int = 0): List<RouteReport> =
+        client.get<ListPage<RouteReport>>("/api/v1/me/route-reports", mapOf("limit" to "21", "offset" to offset.coerceAtLeast(0).toString())).items
+
+    suspend fun report(id: String): RouteReport = client.get("/api/v1/me/route-reports/$id")
+
+    suspend fun reportCorrection(id: String): RouteCorrectionOutcome = client.get("/api/v1/me/route-reports/$id/correction")
 }

@@ -46,6 +46,7 @@ import tv.subcult.museum.ui.profile.ProfileScreen
 import tv.subcult.museum.ui.routes.RouteBuilderScreen
 import tv.subcult.museum.ui.routes.RoutesScreen
 import tv.subcult.museum.ui.routes.RouteSuggestionsScreen
+import tv.subcult.museum.ui.routes.RouteReportsScreen
 import tv.subcult.museum.ui.saved.SavedScreen
 import tv.subcult.museum.ui.signin.SignInScreen
 import tv.subcult.museum.ui.theme.InvisibleMuseumTheme
@@ -150,7 +151,8 @@ fun MuseumNavHost(model: AppViewModel) {
                 TourDetailScreen(
                     model, ref = entry.arguments?.getString("ref") ?: "",
                     onOpenPlace = { id, featured -> nav.navigate("places/$id" + (featured?.let { "?featured=$it" } ?: "")) },
-                    onBack = { nav.popBackStack() }
+                    onBack = { nav.popBackStack() },
+                    onReport = { tour, revision, mode -> nav.navigate("route-report/$tour/$revision?mode=$mode") }
                 )
             }
             composable(
@@ -176,8 +178,12 @@ fun MuseumNavHost(model: AppViewModel) {
             composable("moments/{id}", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
                 MomentScreen(model, id = entry.arguments?.getString("id") ?: "")
             }
-            composable("routes") { RoutesScreen(model, onNew = { nav.navigate("routes/new") }, onEdit = { nav.navigate("routes/$it/edit") }, onOpenTour = { nav.navigate("tours/$it") }, onSuggestions = { nav.navigate("routes/suggestions") }) }
+            composable("routes") { RoutesScreen(model, onNew = { nav.navigate("routes/new") }, onEdit = { nav.navigate("routes/$it/edit") }, onOpenTour = { nav.navigate("tours/$it") }, onSuggestions = { nav.navigate("routes/suggestions") }, onReports = { nav.navigate("routes/reports") }) }
             composable("routes/suggestions") { RouteSuggestionsScreen(model, onBack = { nav.popBackStack() }) }
+            composable("routes/reports") { RouteReportsScreen(model, onBack = { nav.popBackStack() }, onOpenTour = { nav.navigate("tours/$it") }) }
+            composable("route-report/{tour}/{revision}?mode={mode}", arguments = listOf(navArgument("tour") { type = NavType.StringType }, navArgument("revision") { type = NavType.StringType }, navArgument("mode") { type = NavType.StringType; defaultValue = "walk" })) { entry ->
+                RouteReportsScreen(model, onBack = { nav.popBackStack() }, onOpenTour = { nav.navigate("tours/$it") }, tourId = entry.arguments?.getString("tour"), revisionId = entry.arguments?.getString("revision"), mode = entry.arguments?.getString("mode") ?: "walk")
+            }
             composable("routes/new") { RouteBuilderScreen(model, editingId = null, onDone = { nav.popBackStack() }) }
             composable("routes/{id}/edit", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
                 RouteBuilderScreen(model, editingId = entry.arguments?.getString("id"), onDone = { nav.popBackStack() })
