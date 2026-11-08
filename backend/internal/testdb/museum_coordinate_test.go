@@ -122,7 +122,7 @@ func TestMuseumForwardCorrectionPreservesRowsAndCuratorCoordinates(t *testing.T)
 			if err := pool.QueryRow(ctx, `SELECT draft_version,route_version,release_requested_version,byl_route_input_hash(tour_id,'walk') FROM tour_revision_state WHERE tour_id=$1`, SeedTourID).Scan(&newDraft, &newRoute, &requested, &newInput); err != nil {
 				t.Fatal(err)
 			}
-			if !edited && (newDraft != draft+1 || newRoute != route+1 || requested != nil || newInput == oldInput) {
+			if !edited && (newDraft != draft+1 || newRoute != route || requested != nil || newInput == oldInput) {
 				t.Fatal("correction did not fence stale review and routing inputs")
 			}
 			if err := goose.Up(db, MigrationsDir()); err != nil {

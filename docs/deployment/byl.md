@@ -845,9 +845,10 @@ still match. A later curator coordinate or changed identity is left for review.
 This is not a surveyed entrance, an approved public arrival or an access finding.
 
 The correction retains histories, media, arrival reviews, working geometry and
-immutable released revisions. It increments affected draft/route versions and
-cancels pending release requests. Changed site inputs invalidate the old route
-input hash. No route is automatically recomputed or published. A pinned existing
+immutable released revisions. It increments affected draft versions and cancels pending release requests.
+Changed site inputs invalidate the old route input hash, which fences stale
+completions. Route-job versions remain unchanged so already queued work can
+compute current draft inputs. No new job is queued and nothing is published. A pinned existing
 revision therefore still contains its old coordinate: a curator must prepare a
 new qualified route/revision and explicitly release it. Record that remaining
 runtime navigation correction instead of describing a catalogue change as a
@@ -855,7 +856,7 @@ complete field fix.
 
 Before admission, restore an actual schema-21 production backup in isolation.
 Apply the exact accepted migration and compare every pre-existing row: allow only
-the matching Museum coordinate/updated_at and affected draft/route version and
+the matching Museum coordinate/updated_at and affected draft-version and
 release-request fields. Confirm approved arrivals, historical bodies/citations,
 media, released snapshots and unrelated places remain byte-equivalent. Rehearse
 a curator-edited coordinate to prove the guard skips it. Retain filtered

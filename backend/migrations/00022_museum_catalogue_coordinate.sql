@@ -12,7 +12,7 @@ WITH corrected AS (
  RETURNING id
 )
 UPDATE tour_revision_state SET draft_version=draft_version+1,
- route_version=route_version+1, release_requested_version=NULL
+ release_requested_version=NULL
 WHERE tour_id IN (SELECT ts.tour_id FROM tour_stops ts JOIN corrected c ON c.id=ts.place_id);
 
 -- +goose Down
