@@ -99,6 +99,7 @@ public struct MediaAsset: Codable, Identifiable, Equatable {
 }
 
 public struct PlaceSummary: Codable, Identifiable, Equatable {
+    public let arrivalPoint: ApprovedArrival?
     public let id: String
     public let cityID: String
     public let slug: String
@@ -121,6 +122,7 @@ public struct PlaceSummary: Codable, Identifiable, Equatable {
         case primaryMomentID = "primary_moment_id"
         case momentCount = "moment_count"
         case distanceM = "distance_m"
+        case arrivalPoint = "arrival_point"
     }
 }
 
@@ -287,6 +289,8 @@ public struct TourRoute: Codable, Equatable {
 }
 
 public struct TourSummary: Codable, Identifiable, Equatable {
+    public let revisionID: String?
+    public let revisionNumber: Int?
     public let id: String
     public let cityID: String
     public let slug: String
@@ -309,6 +313,7 @@ public struct TourSummary: Codable, Identifiable, Equatable {
         case heroMedia = "hero_media"
         case ownerAccountID = "owner_account_id"
         case stopCount = "stop_count"
+        case revisionID = "revision_id", revisionNumber = "revision_number"
     }
 
     public var isUserRoute: Bool { ownerAccountID != nil }
@@ -330,6 +335,7 @@ public struct TourStop: Codable, Identifiable, Equatable {
 }
 
 public struct TourDetail: Codable, Identifiable, Equatable {
+    public let corridor: ReviewedCorridor?
     public let journeys: [String: RouteJourney]?
     public let tour: TourSummary
     public let stops: [TourStop]
@@ -337,7 +343,7 @@ public struct TourDetail: Codable, Identifiable, Equatable {
     public var id: String { tour.id }
 
     enum CodingKeys: String, CodingKey {
-        case stops, journeys
+        case stops, journeys, corridor
     }
 
     public init(from decoder: Decoder) throws {
@@ -345,6 +351,7 @@ public struct TourDetail: Codable, Identifiable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         stops = try container.decodeIfPresent([TourStop].self, forKey: .stops) ?? []
         journeys = try container.decodeIfPresent([String: RouteJourney].self, forKey: .journeys)
+        corridor = try container.decodeIfPresent(ReviewedCorridor.self, forKey: .corridor)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -352,6 +359,7 @@ public struct TourDetail: Codable, Identifiable, Equatable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(stops, forKey: .stops)
         try container.encodeIfPresent(journeys, forKey: .journeys)
+        try container.encodeIfPresent(corridor, forKey: .corridor)
     }
 }
 

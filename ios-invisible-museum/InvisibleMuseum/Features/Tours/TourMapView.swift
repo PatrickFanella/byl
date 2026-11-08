@@ -26,10 +26,12 @@ struct TourMapView: View {
                     .stroke(Museum.action, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
             }
             ForEach(model.tour.stops) { stop in
-                Annotation(stop.place.name, coordinate: CLLocationCoordinate2D(latitude: stop.place.latitude, longitude: stop.place.longitude)) {
-                    StopPin(number: stop.position, visited: model.isVisited(stop), isNext: model.nextStop?.id == stop.id)
+                if let coordinate = model.coordinate(for: stop) {
+                    Annotation(stop.place.name, coordinate: coordinate) {
+                        StopPin(number: stop.position, visited: model.isVisited(stop), isNext: model.nextStop?.id == stop.id)
+                    }
+                    .annotationTitles(.hidden)
                 }
-                .annotationTitles(.hidden)
             }
         }
         .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll))
@@ -52,7 +54,7 @@ struct TourMapView: View {
     private func frameRoute() {
         var points = model.tour.stops
             .filter { model.nextStop == nil || $0.position >= (model.nextStop?.position ?? 0) }
-            .map { CLLocationCoordinate2D(latitude: $0.place.latitude, longitude: $0.place.longitude) }
+            .compactMap { model.coordinate(for: $0) }
         if let here = model.lastLocation?.coordinate { points.append(here) }
         guard let first = points.first else { return }
         var minLat = first.latitude, maxLat = first.latitude, minLng = first.longitude, maxLng = first.longitude
