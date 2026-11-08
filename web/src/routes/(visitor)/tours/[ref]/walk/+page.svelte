@@ -25,11 +25,24 @@
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
 	import ArrivalPanel from '#lib/components/visitor/ArrivalPanel.svelte';
 	import JourneySummary from '#lib/components/visitor/JourneySummary.svelte';
+	import ContributionPanel from '#lib/components/visitor/ContributionPanel.svelte';
+	import { contributionClient } from '#lib/tour/contribution-api.ts';
+	import { ContributionStore } from '#lib/tour/contribution-store.ts';
+	import { TripContributions } from '#lib/tour/contributions.svelte.ts';
 
 	const ref = page.params.ref ?? '';
 	const mode = page.url.searchParams.get('mode') === 'bike' ? 'bike' : 'walk';
 	const AUDIO_KEY = 'invisible-museum.audio';
 	const current = session.store;
+	const contributionScope = contributionClient();
+	const contributions = new TripContributions({
+		...contributionScope,
+		store: new ContributionStore(localStorage, contributionScope.base)
+	});
+	$effect(() => {
+		const revision = walk.revision;
+		untrack(() => contributions.setRevision(revision, mode));
+	});
 
 	const walk: ActiveWalk = new ActiveWalk(ref, mode, {
 		fetchTour: getTour,
@@ -71,11 +84,21 @@
 			// ignore
 		}
 		walk.load();
+		void contributions.refresh();
+		contributions.setVisible(document.visibilityState === 'visible');
 		const onVisible = () => {
+			contributions.setVisible(document.visibilityState === 'visible');
+			if (document.visibilityState === 'visible') void contributions.refresh();
 			if (document.visibilityState === 'visible') walk.syncIfNeeded();
 		};
-		const onOnline = () => walk.syncIfNeeded();
+		const onOnline = () => {
+			walk.syncIfNeeded();
+			void contributions.refresh();
+		};
 		const onStorage = (e: StorageEvent) => {
+			if (e.key === contributionsKey || e.key === 'invisible-museum.session' || e.key === null) {
+				void contributions.storageChanged();
+			}
 			if (
 				e.key?.startsWith('invisible-museum.progress.') ||
 				e.key?.startsWith('invisible-museum.revision-progress.')
@@ -85,13 +108,25 @@
 		document.addEventListener('visibilitychange', onVisible);
 		window.addEventListener('online', onOnline);
 		window.addEventListener('storage', onStorage);
+		const contributionsKey = new ContributionStore(localStorage, contributionScope.base).key;
+		const contributionTimer = window.setInterval(() => void contributions.refresh(), 30_000);
+		const unsubscribe = session.store.subscribe(() => {
+			if (!contributionScope.sameIdentity()) contributions.lifecycle('end');
+		});
 		let watch: number | null = null;
 		if (!('geolocation' in navigator)) {
 			geoState = 'unavailable';
 		} else {
 			watch = navigator.geolocation.watchPosition(
 				(p) => {
+					if (geoState !== 'ok') contributions.lifecycle('resume');
 					geoState = 'ok';
+					contributions.observe({
+						lat: p.coords.latitude,
+						lng: p.coords.longitude,
+						accuracyM: p.coords.accuracy,
+						timestampMs: p.timestamp
+					});
 					walk.handleFix({
 						lat: p.coords.latitude,
 						lng: p.coords.longitude,
@@ -100,11 +135,15 @@
 				},
 				(err) => {
 					geoState = err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
+					contributions.lifecycle('permission_lost');
 				},
 				{ enableHighAccuracy: true, maximumAge: 5_000, timeout: 20_000 }
 			);
 		}
 		return () => {
+			contributions.lifecycle('end');
+			window.clearInterval(contributionTimer);
+			unsubscribe();
 			if (watch !== null) navigator.geolocation.clearWatch(watch);
 			document.removeEventListener('visibilitychange', onVisible);
 			window.removeEventListener('online', onOnline);
@@ -118,6 +157,7 @@
 	$effect(() => {
 		const stop = walk.arrivedStop;
 		const on = audioEnabled;
+		if (stop) untrack(() => contributions.lifecycle('manual_arrival'));
 		if (stop && on) untrack(() => void play(stop));
 	});
 
@@ -174,6 +214,7 @@
 	}
 
 	async function end(reset: boolean) {
+		contributions.lifecycle('end');
 		stopAudio();
 		await walk.flush();
 		walk.end(reset);
@@ -318,6 +359,7 @@
 				<summary class="cursor-pointer text-sm">Path readiness and trip timing</summary
 				><JourneySummary {mode} journey={walk.route?.journey ?? walk.tour?.journeys?.[mode]} />
 			</details>
+			<ContributionPanel {contributions} signedIn={$current !== null} trip />
 			{#if walk.nextStop}
 				{@const next = walk.nextStop}
 				<div class="rounded-lg border border-byl-border bg-byl-background p-4">
@@ -358,7 +400,10 @@
 					<div class="mt-3 flex flex-wrap gap-2">
 						<button
 							class="rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
-							onclick={() => walk.markArrived()}>I'm here</button
+							onclick={() => {
+								contributions.lifecycle('manual_arrival');
+								walk.markArrived();
+							}}>I'm here</button
 						>
 						<a
 							class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
@@ -402,6 +447,7 @@
 			oncontinue={() => {
 				stopAudio();
 				walk.arrivedStop = null;
+				contributions.lifecycle('resume');
 			}}
 		/>
 	{/if}

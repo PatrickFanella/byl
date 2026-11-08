@@ -1,5 +1,6 @@
 <script lang="ts">
 	import AppearancePicker from '#lib/components/AppearancePicker.svelte';
+	import ContributionSettings from '#lib/components/visitor/ContributionSettings.svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { session } from '#lib/auth.ts';
@@ -117,6 +118,9 @@
 			Location is requested by your browser when you start a tour; the walk also works with the "I'm
 			here" button.
 		</p>
+	</section>
+	<section class="min-w-0 rounded-lg border border-byl-border bg-byl-surface p-5 sm:col-span-2">
+		<ContributionSettings />
 	</section>
 	<section class="rounded-lg border border-byl-border bg-byl-surface p-5 sm:col-span-2">
 		<div class="text-xs font-bold tracking-normal text-byl-action">About</div>

@@ -29,6 +29,7 @@ func corridorInput(t *testing.T, tour *models.TourDetail) *models.CorridorIntent
 func TestCorridorReviewPublicationAndRecomputeRetainChoices(t *testing.T) {
 	s, ctx, author, original := revisionFixture(t)
 	input := corridorInput(t, &original.Snapshot.Tour)
+	input.Segments[1].SignalReferences = map[models.TravelMode]models.SignalReference{models.TravelModeWalk: {Version: 1, AmbiguityReviewed: true, Source: input.Source, CompetingPaths: []models.ReferenceLine{}, StopAreas: []models.SignalStopArea{}}}
 	p, err := s.ProposeCorridor(ctx, original.TourID, author, models.CorridorProposalRequest{Intent: input})
 	if err != nil {
 		t.Fatal(err)
@@ -76,6 +77,9 @@ func TestCorridorReviewPublicationAndRecomputeRetainChoices(t *testing.T) {
 	if err != nil || released.Snapshot.Tour.Corridor.ID != p.ID || len(released.Snapshot.Tour.Stops) != 4 || len(released.Snapshot.Moments) != 4 {
 		t.Fatalf("snapshot %+v %v", released, err)
 	}
+	if ref := released.Snapshot.Tour.Corridor.Intent.Segments[1].SignalReferences[models.TravelModeWalk]; !ref.AmbiguityReviewed || ref.CompetingPaths == nil || ref.StopAreas == nil || ref.Source.Version != input.Source.Version {
+		t.Fatal("published revision lost explicit signal review or source")
+	}
 	raw, err := json.Marshal(released)
 	if err != nil {
 		t.Fatal(err)
@@ -93,6 +97,9 @@ func TestCorridorReviewPublicationAndRecomputeRetainChoices(t *testing.T) {
 	old, err := s.GetTourRevision(ctx, working.ID, released.ID)
 	if err != nil || old.Snapshot.Tour.Corridor.ID != p.ID || old.Snapshot.Routes[models.TravelModeWalk].Status != models.RouteStatusReady {
 		t.Fatal("recompute changed a retained published revision")
+	}
+	if !old.Snapshot.Tour.Corridor.Intent.Segments[1].SignalReferences[models.TravelModeWalk].AmbiguityReviewed {
+		t.Fatal("recompute changed frozen signal review")
 	}
 }
 
