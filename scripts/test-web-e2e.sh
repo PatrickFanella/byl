@@ -40,6 +40,8 @@ export ADMIN_BOOTSTRAP_EMAILS=admin@example.com
 export MEDIA_FS_DIR="$test_dir/media"
 cd "$repo_root/backend"
 go run ./cmd/migrate up
+# This build-tagged tool targets only the isolated museum_test fixture database.
+BYL_E2E_FIXTURE=1 go run -tags=e2e ./cmd/e2e-fixture
 go build -o "$test_dir/api" ./cmd/api
 "$test_dir/api" >"$test_dir/api.log" 2>&1 &
 api_pid=$!

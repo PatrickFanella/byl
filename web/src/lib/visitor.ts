@@ -120,3 +120,18 @@ export const submitRouteSuggestion = (input: RouteSuggestionInput, key: string) 
 	api.request<RouteSuggestion>('POST', '/api/v1/me/route-briefs', input, false, {
 		'Idempotency-Key': key
 	});
+
+// Private reports refer only to the revision and affected reference selected by the visitor.
+export type RouteReport = Schemas['RouteReport'];
+export type RouteReportInput = Schemas['RouteReportInput'];
+export type RouteCorrectionOutcome = Schemas['RouteCorrectionOutcome'];
+export const submitRouteReport = (input: RouteReportInput, key: string) =>
+	api.request<RouteReport>('POST', '/api/v1/me/route-reports', input, false, {
+		'Idempotency-Key': key
+	});
+export const myRouteReports = (offset = 0) =>
+	api.list<RouteReport>(`/api/v1/me/route-reports${qs({ limit: 21, offset })}`);
+export const getRouteReport = (id: string) =>
+	api.get<RouteReport>(`/api/v1/me/route-reports/${encodeURIComponent(id)}`);
+export const getRouteCorrectionOutcome = (id: string) =>
+	api.get<RouteCorrectionOutcome>(`/api/v1/me/route-reports/${encodeURIComponent(id)}/correction`);

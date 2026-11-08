@@ -50,6 +50,12 @@
 	> has a separate research and review process.
 </p>
 
+<p class="mt-3 text-sm">
+	<a href="/routes/reports" class="text-byl-action underline"
+		>Your route reports and curator decisions</a
+	>
+</p>
+
 <div class="mt-6 space-y-4">
 	{#if !$current}
 		<SignInPrompt reason="Sign in to build routes that follow you to every device." />

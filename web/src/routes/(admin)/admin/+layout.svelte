@@ -14,6 +14,7 @@
 		{ href: '/admin', label: 'Dashboard' },
 		{ href: '/admin/briefs', label: 'Route briefs' },
 		{ href: '/admin/queue', label: 'Review queue' },
+		{ href: '/admin/queue/reports', label: 'Route reports' },
 		{ href: '/admin/imports', label: 'Imports' },
 		{ href: '/admin/places', label: 'Places' },
 		{ href: '/admin/media', label: 'Media' },
@@ -32,6 +33,8 @@
 	}
 
 	function active(href: string) {
+		if (href === '/admin/queue' && page.url.pathname.startsWith('/admin/queue/reports'))
+			return false;
 		return href === '/admin' ? page.url.pathname === '/admin' : page.url.pathname.startsWith(href);
 	}
 </script>
