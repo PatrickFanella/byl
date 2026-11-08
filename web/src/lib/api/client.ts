@@ -27,6 +27,7 @@ export interface ApiClientOptions {
 	baseUrl?: string;
 	token: () => string | null;
 	fetch?: typeof fetch;
+	headers?: Record<string, string>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -35,10 +36,12 @@ export class ApiClient {
 	private baseUrl: string;
 	private token: () => string | null;
 	private fetchFn: typeof fetch;
+	private headers: Record<string, string>;
 
 	constructor(opts: ApiClientOptions) {
 		this.baseUrl = (opts.baseUrl ?? '').replace(/\/$/, '');
 		this.token = opts.token;
+		this.headers = { ...opts.headers };
 		this.fetchFn = opts.fetch ?? ((input, init) => fetch(input, init));
 	}
 
@@ -49,7 +52,7 @@ export class ApiClient {
 		isForm = false,
 		extraHeaders: Record<string, string> = {}
 	): Promise<T> {
-		const headers = new Headers({ Accept: 'application/json' });
+		const headers = new Headers({ Accept: 'application/json', ...this.headers });
 		for (const [name, value] of Object.entries(extraHeaders)) headers.set(name, value);
 		const token = this.token();
 		if (token) headers.set('Authorization', `Bearer ${token}`);
