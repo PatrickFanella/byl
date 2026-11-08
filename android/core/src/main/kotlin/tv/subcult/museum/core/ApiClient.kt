@@ -38,8 +38,8 @@ class ApiClient(
     suspend inline fun <reified T> get(path: String, query: Map<String, String> = emptyMap()): T =
         MuseumJson.decodeFromString(serializer(), request("GET", path, query, null))
 
-    suspend inline fun <reified T, reified B> post(path: String, body: B?): T =
-        MuseumJson.decodeFromString(serializer(), request("POST", path, emptyMap(), body?.let { MuseumJson.encodeToString(it) }))
+    suspend inline fun <reified T, reified B> post(path: String, body: B?, headers: Map<String, String> = emptyMap()): T =
+        MuseumJson.decodeFromString(serializer(), request("POST", path, emptyMap(), body?.let { MuseumJson.encodeToString(it) }, headers))
 
     suspend inline fun <reified T, reified B> put(path: String, body: B?): T =
         MuseumJson.decodeFromString(serializer(), request("PUT", path, emptyMap(), body?.let { MuseumJson.encodeToString(it) }))
@@ -55,13 +55,14 @@ class ApiClient(
     suspend fun delete(path: String) = send("DELETE", path)
 
     /** Performs the request and returns the body text, or "{}" for an empty success body. */
-    suspend fun request(method: String, path: String, query: Map<String, String>, json: String?): String =
+    suspend fun request(method: String, path: String, query: Map<String, String>, json: String?, headers: Map<String, String> = emptyMap()): String =
         withContext(Dispatchers.IO) {
             val url = (baseUrl.trimEnd('/') + path).toHttpUrl().newBuilder().apply {
                 query.forEach { (k, v) -> addQueryParameter(k, v) }
             }.build()
             val token = tokenProvider()
             val builder = Request.Builder().url(url).header("Accept", "application/json")
+            headers.forEach { (key, value) -> builder.header(key, value) }
             if (token != null) builder.header("Authorization", "Bearer $token")
             val body = json?.toRequestBody(JSON_TYPE)
             builder.method(method, body ?: if (method == "POST" || method == "PUT" || method == "PATCH") "".toRequestBody(JSON_TYPE) else null)

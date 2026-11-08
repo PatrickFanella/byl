@@ -45,6 +45,7 @@ import tv.subcult.museum.ui.places.PlaceScreen
 import tv.subcult.museum.ui.profile.ProfileScreen
 import tv.subcult.museum.ui.routes.RouteBuilderScreen
 import tv.subcult.museum.ui.routes.RoutesScreen
+import tv.subcult.museum.ui.routes.RouteSuggestionsScreen
 import tv.subcult.museum.ui.saved.SavedScreen
 import tv.subcult.museum.ui.signin.SignInScreen
 import tv.subcult.museum.ui.theme.InvisibleMuseumTheme
@@ -167,7 +168,8 @@ fun MuseumNavHost(model: AppViewModel) {
             composable("moments/{id}", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
                 MomentScreen(model, id = entry.arguments?.getString("id") ?: "")
             }
-            composable("routes") { RoutesScreen(model, onNew = { nav.navigate("routes/new") }, onEdit = { nav.navigate("routes/$it/edit") }, onOpenTour = { nav.navigate("tours/$it") }) }
+            composable("routes") { RoutesScreen(model, onNew = { nav.navigate("routes/new") }, onEdit = { nav.navigate("routes/$it/edit") }, onOpenTour = { nav.navigate("tours/$it") }, onSuggestions = { nav.navigate("routes/suggestions") }) }
+            composable("routes/suggestions") { RouteSuggestionsScreen(model, onBack = { nav.popBackStack() }) }
             composable("routes/new") { RouteBuilderScreen(model, editingId = null, onDone = { nav.popBackStack() }) }
             composable("routes/{id}/edit", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
                 RouteBuilderScreen(model, editingId = entry.arguments?.getString("id"), onDone = { nav.popBackStack() })

@@ -73,4 +73,15 @@ class Endpoints(val client: ApiClient) {
     suspend fun progress(): List<TourProgress> = client.get<ListPage<TourProgress>>("/api/v1/me/progress").items
 
     suspend fun putProgress(tour: String, body: ProgressRequest): TourProgress = client.put("/api/v1/me/progress/$tour", body)
+
+    // Private research suggestions, never personal routes or publication.
+    suspend fun suggestionIntake(): SuggestionIntake = client.get("/api/v1/route-brief-intake")
+
+    suspend fun suggestions(offset: Int = 0): List<RouteSuggestion> =
+        client.get<ListPage<RouteSuggestion>>("/api/v1/me/route-briefs", mapOf("limit" to "21", "offset" to offset.coerceAtLeast(0).toString())).items
+
+    suspend fun suggestion(id: String): RouteSuggestion = client.get("/api/v1/me/route-briefs/$id")
+
+    suspend fun submitSuggestion(input: RouteSuggestionInput, key: String): RouteSuggestion =
+        client.post("/api/v1/me/route-briefs", input, mapOf("Idempotency-Key" to key))
 }
