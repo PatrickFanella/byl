@@ -1,0 +1,2742 @@
+{
+  "schema_version": 1,
+  "version": "b74f0d09ecd8ee5d176634674112dbe87e5c6887f97b683b27bd86d664090ada",
+  "state": "needs_research",
+  "ready_to_publish": false,
+  "brief": {
+    "id": "9f609a1a-95dc-4624-99f9-0446cf66f0c2",
+    "owner_account_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32",
+    "submitted": {
+      "topic": "Downtown Downers Grove architecture and commerce: Tivoli, station, Mochel, bank and Penner",
+      "area": "Downers Grove, Illinois",
+      "notes": "Private reviewed-draft pilot. Reuse existing Tivoli and station identities and select topic-appropriate histories. Brick streets remain an investigated exclusion until a precise segment\u2019s material and public exterior viewing conditions are supported. No padding or property-entry permission inferred. Compute the loop before timing claims. Synthetic crossing-improvement exercise must remain separate from actual conditions.",
+      "place_leads": [
+        "Main Street Station",
+        "Tivoli Theatre",
+        "Mochel Hardware Store",
+        "Farmers and Merchants Bank",
+        "Penner Building"
+      ],
+      "event_leads": [
+        "Downtown architectural change",
+        "Commercial building uses",
+        "Station-area context"
+      ],
+      "source_links": [
+        "https://dghistory.org/tivoli-theater/",
+        "https://dghistory.org/mochel-hardware-store/",
+        "https://dghistory.org/farmers-and-merchants-bank/",
+        "https://dghistory.org/penner-building/",
+        "https://dghistory.org/historic-brick-streets/"
+      ],
+      "modes": [
+        "walk"
+      ],
+      "trip_shape": "loop",
+      "duration_minutes": null,
+      "start_preference": "Main Street Station",
+      "end_preference": "Main Street Station",
+      "pilot_id": "downers-downtown-v1"
+    },
+    "status": "review",
+    "reason": "Research stages completed; curator review required.",
+    "version": 3,
+    "created_at": "2026-11-08T15:25:18.966512-06:00",
+    "updated_at": "2026-11-08T15:25:19.817017-06:00"
+  },
+  "research": {
+    "id": "5d0e95fd-7be4-4ef7-9b93-f2c656a81095",
+    "brief_id": "9f609a1a-95dc-4624-99f9-0446cf66f0c2",
+    "job_id": "0d5bcb8c-0bd4-4e07-963b-9479487bfd0e",
+    "source_version": 1,
+    "brief_version": 2,
+    "status": "completed",
+    "reason": "",
+    "requests_used": 2,
+    "tokens_reserved": 4000,
+    "request_limit": 12,
+    "token_limit": 20000,
+    "deadline_at": "2026-11-08T15:40:19.660247-06:00",
+    "created_at": "2026-11-08T15:25:19.660247-06:00",
+    "stages": [
+      {
+        "stage": "research",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "reconciliation",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "drafting",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "assembly",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      }
+    ]
+  },
+  "submitted": {
+    "topic": "Downtown Downers Grove architecture and commerce: Tivoli, station, Mochel, bank and Penner",
+    "area": "Downers Grove, Illinois",
+    "notes": "Private reviewed-draft pilot. Reuse existing Tivoli and station identities and select topic-appropriate histories. Brick streets remain an investigated exclusion until a precise segment\u2019s material and public exterior viewing conditions are supported. No padding or property-entry permission inferred. Compute the loop before timing claims. Synthetic crossing-improvement exercise must remain separate from actual conditions.",
+    "place_leads": [
+      "Main Street Station",
+      "Tivoli Theatre",
+      "Mochel Hardware Store",
+      "Farmers and Merchants Bank",
+      "Penner Building"
+    ],
+    "event_leads": [
+      "Downtown architectural change",
+      "Commercial building uses",
+      "Station-area context"
+    ],
+    "source_links": [
+      "https://dghistory.org/tivoli-theater/",
+      "https://dghistory.org/mochel-hardware-store/",
+      "https://dghistory.org/farmers-and-merchants-bank/",
+      "https://dghistory.org/penner-building/",
+      "https://dghistory.org/historic-brick-streets/"
+    ],
+    "modes": [
+      "walk"
+    ],
+    "trip_shape": "loop",
+    "duration_minutes": null,
+    "start_preference": "Main Street Station",
+    "end_preference": "Main Street Station",
+    "pilot_id": "downers-downtown-v1"
+  },
+  "proposal": {
+    "version": 1,
+    "status": "draft",
+    "created_at": "2026-11-08T15:25:19.789837833-06:00",
+    "title": "Downtown Downers Grove architecture and commerce: Tivoli, station, Mochel, bank and Penner \u2014 Downers Grove, Illinois",
+    "introduction": "Explore Downtown Downers Grove architecture and commerce: Tivoli, station, Mochel, bank and Penner in Downers Grove, Illinois through 5 researched locations and their selected historical accounts. This is a private proposal; current viewing guidance, connecting paths and publication still require review.",
+    "requested_shape": "loop",
+    "trip_shape": "loop",
+    "modes": [
+      "walk"
+    ],
+    "target_duration_minutes": null,
+    "travel_minutes": null,
+    "travel_state": "not_computed",
+    "planned_dwell_minutes": 15,
+    "planned_narration_minutes": 5,
+    "stops": [
+      {
+        "material": {
+          "record_id": "5c7a13fb-3cc2-48be-b938-2f425511591a",
+          "review_version": 1,
+          "place_id": "00000000-0000-4000-8000-00000000b0b1",
+          "place_name": "Main Street Station",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.7959,
+          "longitude": -88.0092,
+          "moment_id": "b95010a0-0953-424a-a727-86a73168a53f",
+          "moment_title": "The station building and the downtown it faces",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "0fdb82b0dd1f4235722b9a96b0006cd5997a37ff9ae188d2d7b51974647591a4",
+          "source_urls": [
+            "https://dghistory.org/history-walk-12-main-street-train-station/",
+            "https://agendadocs.downers.us/public/docs/agendas/2016/05-17-16/MIN_2016-6827.pdf"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: downtown, architecture, station",
+        "what_to_notice": "Curator research question: what traces of \u201cThe station building and the downtown it faces\u201d can be observed at Main Street Station today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with \u201cBuilt for the Talkies\u201d at Tivoli Theatre. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "3dc515bb-cc13-467e-a69b-2f56ec6fe892",
+          "review_version": 1,
+          "place_id": "00000000-0000-4000-8000-00000000b0b2",
+          "place_name": "Tivoli Theatre",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.7952,
+          "longitude": -88.0099,
+          "moment_id": "00000000-0000-4000-8000-00000000d0d3",
+          "moment_title": "Built for the Talkies",
+          "narrative": "When the Tivoli opened on Christmas Day in 1928, cinema was undergoing a fundamental change: recorded speech and music were becoming part of the film itself. The Downers Grove Historical Society identifies the theatre as an early building designed specifically for talking pictures. Local audiences came here to experience a new kind of entertainment in a setting intended to make a night at the movies an occasion.",
+          "evidence_kind": "curated_record",
+          "content_sha256": "cb8df9d18e6eb110df1a5af37f12143ddf48898c5d7ca0a19363d3bcb09d7c0e",
+          "source_urls": [
+            "https://dghistory.org/tivoli-theater/",
+            "https://dghistory.org/history-walk-1/"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: downers, grove, tivoli",
+        "what_to_notice": "Curator research question: what traces of \u201cBuilt for the Talkies\u201d can be observed at Tivoli Theatre today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with \u201cA hardware building changes with downtown commerce\u201d at Mochel Hardware Store. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "558ceea7-0f47-496f-8cf5-ab28af54491e",
+          "review_version": 1,
+          "place_id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+          "place_name": "Mochel Hardware Store",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.7942861,
+          "longitude": -88.0104387,
+          "moment_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+          "moment_title": "A hardware building changes with downtown commerce",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "1cf17bb7dde389657b6faf8a1b4bc82796c1b82eb1a19c9e48188961b3f0a071",
+          "source_urls": [
+            "https://dghistory.org/mochel-hardware-store/"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: downtown, architecture, commerce",
+        "what_to_notice": "Curator research question: what traces of \u201cA hardware building changes with downtown commerce\u201d can be observed at Mochel Hardware Store today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with \u201cA corner bank building and its later uses\u201d at Farmers and Merchants Bank. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "de8ade26-6ab3-407b-aec6-b6d33db94a4b",
+          "review_version": 1,
+          "place_id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+          "place_name": "Farmers and Merchants Bank",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.7938999,
+          "longitude": -88.010128,
+          "moment_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+          "moment_title": "A corner bank building and its later uses",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "50bb1e633ae5c156c9ba2424e0cdec8f57c074ff76b7003f35a00611b8992830",
+          "source_urls": [
+            "https://dghistory.org/farmers-and-merchants-bank/"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: bank",
+        "what_to_notice": "Curator research question: what traces of \u201cA corner bank building and its later uses\u201d can be observed at Farmers and Merchants Bank today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with \u201cFrom harness making to changing storefront trade\u201d at Penner Building. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "d6555802-54a5-4870-8306-eb4429f52371",
+          "review_version": 1,
+          "place_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+          "place_name": "Penner Building",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.7921213,
+          "longitude": -88.0099546,
+          "moment_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+          "moment_title": "From harness making to changing storefront trade",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "9b2ef38360706e03df929430421dc4f42075690973be687be487ee799c1394a5",
+          "source_urls": [
+            "https://dghistory.org/penner-building/"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: downtown, commerce, penner",
+        "what_to_notice": "Curator research question: what traces of \u201cFrom harness making to changing storefront trade\u201d can be observed at Penner Building today? Confirm visible features before writing viewing guidance.",
+        "transition": "",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      }
+    ],
+    "travel_sequence": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      0
+    ],
+    "excluded": [],
+    "research_gaps": [],
+    "assumptions": [
+      "Historical paragraphs are reused from retained material; their inclusion is not a new factual review.",
+      "What to notice is a curator research question, not verified current viewing guidance.",
+      "Plan three minutes of dwell per stop, plus narration at 130 words per minute; actual travel and access still require computation and review.",
+      "No duration was supplied; the geography screen uses a provisional 60-minute planning budget."
+    ]
+  },
+  "tour": {
+    "journeys": {
+      "walk": {
+        "version": 1,
+        "state": "unreviewed",
+        "computation": "ready",
+        "quality": "unreviewed",
+        "usable": false,
+        "issue_codes": [],
+        "travel_distance_m": 1246,
+        "travel_duration_s": 886,
+        "dwell_duration_s": 900,
+        "narration_duration_s": 600,
+        "itinerary_duration_s": 2386,
+        "round_trip_duration_s": 2386,
+        "return_plan": {
+          "status": "included",
+          "distance_m": 561,
+          "duration_s": 393
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      }
+    },
+    "draft_version": 0,
+    "route_version": 0,
+    "revision_id": null,
+    "revision_number": 0,
+    "id": "538b5d8c-4a0e-4c2f-b6ea-7214d12de8e0",
+    "city_id": "00000000-0000-4000-8000-0000000000c1",
+    "city_ids": [
+      "00000000-0000-4000-8000-0000000000c1"
+    ],
+    "slug": "downtown-architecture-and-commerce-private-pilot",
+    "title": "Downtown architecture and commerce \u2014 private pilot",
+    "summary": "",
+    "topic_id": null,
+    "topic": null,
+    "modes": [
+      "walk"
+    ],
+    "hero_media": null,
+    "status": "draft",
+    "visibility": "public",
+    "owner_account_id": null,
+    "stop_count": 5,
+    "routes": {
+      "walk": {
+        "mode": "walk",
+        "status": "ready",
+        "distance_m": 1246,
+        "duration_s": 886,
+        "estimated_minutes": 15,
+        "computed_at": "2026-11-08T15:25:19.947547-06:00"
+      }
+    },
+    "created_at": "2026-11-08T15:25:19.862808-06:00",
+    "updated_at": "2026-11-08T15:25:19.862808-06:00",
+    "stops": [
+      {
+        "id": "6c16b33c-cc47-4c2a-a726-6fa24ed1a680",
+        "position": 1,
+        "place": {
+          "id": "00000000-0000-4000-8000-00000000b0b1",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "main-street-station",
+          "name": "Main Street Station",
+          "summary": "A downtown railway stop shaped by the 1864 arrival of the Burlington line, the surviving 1911 passenger station, and generations of commuter travel.",
+          "kind": "station",
+          "latitude": 41.7959,
+          "longitude": -88.0092,
+          "arrival_radius_m": 50,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "5001 Main St, Downers Grove, IL",
+          "status": "published",
+          "primary_moment_id": "00000000-0000-4000-8000-00000000d0d1",
+          "moment_count": 3,
+          "created_at": "2026-11-08T15:25:15.620432-06:00",
+          "updated_at": "2026-11-08T15:25:15.620432-06:00"
+        },
+        "featured_moment_id": "b95010a0-0953-424a-a727-86a73168a53f",
+        "featured_moment": {
+          "id": "b95010a0-0953-424a-a727-86a73168a53f",
+          "place_id": "00000000-0000-4000-8000-00000000b0b1",
+          "slug": "the-station-building-and-the-downtown-it-faces",
+          "title": "The station building and the downtown it faces",
+          "excerpt": "The Historical Society\u2019s architecture walk distinguishes the 1911 Classical Revival passenger station from the earlier 1864 station. The guide describes a formal entrance pavilion and later repair following the 1947 crash. Municipal\u2026",
+          "date_start": "1911-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "6ccf5a16-0132-4c26-887a-e9a9564637f3",
+        "position": 2,
+        "place": {
+          "id": "00000000-0000-4000-8000-00000000b0b2",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "tivoli-theatre",
+          "name": "Tivoli Theatre",
+          "summary": "A working cinema and mixed-use landmark that opened in 1928 as talking pictures changed moviegoing.",
+          "kind": "building",
+          "latitude": 41.7952,
+          "longitude": -88.0099,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "5021 Highland Ave, Downers Grove, IL",
+          "status": "published",
+          "primary_moment_id": "00000000-0000-4000-8000-00000000d0d3",
+          "moment_count": 1,
+          "created_at": "2026-11-08T15:25:15.620432-06:00",
+          "updated_at": "2026-11-08T15:25:15.620432-06:00"
+        },
+        "featured_moment_id": "00000000-0000-4000-8000-00000000d0d3",
+        "featured_moment": {
+          "id": "00000000-0000-4000-8000-00000000d0d3",
+          "place_id": "00000000-0000-4000-8000-00000000b0b2",
+          "slug": "built-for-talkies",
+          "title": "Built for the Talkies",
+          "excerpt": "When the Tivoli opened on Christmas Day in 1928, cinema was undergoing a fundamental change: recorded speech and music were becoming part of the film itself. The Downers Grove Historical Society identifies the theatre as an early building\u2026",
+          "date_start": "1928-12-25",
+          "date_end": "1928-12-25",
+          "date_precision": "day",
+          "date_display": "December 25, 1928",
+          "hero_media": {
+            "id": "00000000-0000-4000-8000-00000000f0f2",
+            "kind": "image",
+            "external": false,
+            "public_url": "https://byl.subcult.tv/media/files/library/images/tivoli-theatre.jpg",
+            "mime_type": "image/jpeg",
+            "width": 1280,
+            "height": 1707,
+            "duration_seconds": null,
+            "caption": "The Tivoli marquee in August 2009. Resized by Wikimedia.",
+            "credit": "User: (WT-shared) Ethajek at  wts wikivoyage",
+            "license": "PD",
+            "license_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG#Licensing",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG",
+            "status": "published",
+            "created_at": "2026-11-08T15:25:15.653965-06:00",
+            "updated_at": "2026-11-08T15:25:15.653965-06:00"
+          },
+          "has_narration": false,
+          "status": "published",
+          "topic_ids": [
+            "00000000-0000-4000-8000-00000000a0a2",
+            "00000000-0000-4000-8000-00000000a0a1"
+          ]
+        },
+        "note": ""
+      },
+      {
+        "id": "1989ae61-9c75-4751-9e55-d1a9b11a35b2",
+        "position": 3,
+        "place": {
+          "id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "mochel-hardware-store",
+          "name": "Mochel Hardware Store",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.7942861,
+          "longitude": -88.0104387,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "5122 Main Street, Downers Grove, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:25:19.28187-06:00",
+          "updated_at": "2026-11-08T15:25:19.28187-06:00"
+        },
+        "featured_moment_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+        "featured_moment": {
+          "id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+          "place_id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+          "slug": "a-hardware-building-changes-with-downtown-commerce",
+          "title": "A hardware building changes with downtown commerce",
+          "excerpt": "The Historical Society traces the hardware business to an 1884 opening at 36 S Main, later numbered 5122 Main Street. Its account distinguishes that opening from later expansion and storefront changes. For the architecture-and-commerce\u2026",
+          "date_start": "1884-06-25",
+          "date_end": null,
+          "date_precision": "day",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "c3c44155-c8d5-4bbe-8d38-d6c65ee6af1c",
+        "position": 4,
+        "place": {
+          "id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "farmers-and-merchants-bank",
+          "name": "Farmers and Merchants Bank",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.7938999,
+          "longitude": -88.010128,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "5135 Main Street, Downers Grove, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:25:19.431762-06:00",
+          "updated_at": "2026-11-08T15:25:19.431762-06:00"
+        },
+        "featured_moment_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+        "featured_moment": {
+          "id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+          "place_id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+          "slug": "a-corner-bank-building-and-its-later-uses",
+          "title": "A corner bank building and its later uses",
+          "excerpt": "The Historical Society dates the bank\u2019s opening to 1892 and locates the building at 5135 Main Street. Its account describes several uses within the property and later commercial occupants. It also records a 1944 exterior modernization that\u2026",
+          "date_start": "1892-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "c33a21f9-760d-4987-9542-06b4241ce1de",
+        "position": 5,
+        "place": {
+          "id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "penner-building",
+          "name": "Penner Building",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.7921213,
+          "longitude": -88.0099546,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "5219\u20135221 Main Street, Downers Grove, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:25:19.574235-06:00",
+          "updated_at": "2026-11-08T15:25:19.574235-06:00"
+        },
+        "featured_moment_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+        "featured_moment": {
+          "id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+          "place_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+          "slug": "from-harness-making-to-changing-storefront-trade",
+          "title": "From harness making to changing storefront trade",
+          "excerpt": "The Historical Society dates this building circa 1894 and places it at 5219\u20135221 Main Street. Conrad Penner\u2019s harness business moved to this location around 1920, later adding tires and shoe repair as local needs changed. Construction and\u2026",
+          "date_start": "1894-01-01",
+          "date_end": null,
+          "date_precision": "circa",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      }
+    ]
+  },
+  "routes": {
+    "walk": {
+      "journey": {
+        "version": 1,
+        "state": "unreviewed",
+        "computation": "ready",
+        "quality": "unreviewed",
+        "usable": false,
+        "issue_codes": [],
+        "travel_distance_m": 1246,
+        "travel_duration_s": 886,
+        "dwell_duration_s": 900,
+        "narration_duration_s": 600,
+        "itinerary_duration_s": 2386,
+        "round_trip_duration_s": 2386,
+        "return_plan": {
+          "status": "included",
+          "distance_m": 561,
+          "duration_s": 393
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      },
+      "id": "fb3c05a3-8a0f-4796-bd15-d97790ab8103",
+      "tour_id": "538b5d8c-4a0e-4c2f-b6ea-7214d12de8e0",
+      "mode": "walk",
+      "status": "ready",
+      "provider": "valhalla",
+      "distance_m": 1246,
+      "duration_s": 886,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -88.009212,
+            41.7959
+          ],
+          [
+            -88.009215,
+            41.795969
+          ],
+          [
+            -88.009294,
+            41.795968
+          ],
+          [
+            -88.009434,
+            41.795968
+          ],
+          [
+            -88.010357,
+            41.795967
+          ],
+          [
+            -88.010342,
+            41.795862
+          ],
+          [
+            -88.010331,
+            41.795776
+          ],
+          [
+            -88.010334,
+            41.795744
+          ],
+          [
+            -88.010321,
+            41.795605
+          ],
+          [
+            -88.010317,
+            41.795562
+          ],
+          [
+            -88.010313,
+            41.795523
+          ],
+          [
+            -88.01031,
+            41.795486
+          ],
+          [
+            -88.010311,
+            41.795463
+          ],
+          [
+            -88.010293,
+            41.795303
+          ],
+          [
+            -88.010261,
+            41.795165
+          ],
+          [
+            -88.009901,
+            41.795164
+          ],
+          [
+            -88.009901,
+            41.795164
+          ],
+          [
+            -88.010261,
+            41.795165
+          ],
+          [
+            -88.010253,
+            41.795086
+          ],
+          [
+            -88.010245,
+            41.794997
+          ],
+          [
+            -88.010375,
+            41.794993
+          ],
+          [
+            -88.010491,
+            41.79499
+          ],
+          [
+            -88.010472,
+            41.794704
+          ],
+          [
+            -88.010446,
+            41.794286
+          ],
+          [
+            -88.010446,
+            41.794286
+          ],
+          [
+            -88.010414,
+            41.793784
+          ],
+          [
+            -88.010291,
+            41.793798
+          ],
+          [
+            -88.010185,
+            41.79381
+          ],
+          [
+            -88.010191,
+            41.793898
+          ],
+          [
+            -88.010191,
+            41.793898
+          ],
+          [
+            -88.010185,
+            41.79381
+          ],
+          [
+            -88.010291,
+            41.793798
+          ],
+          [
+            -88.010286,
+            41.793734
+          ],
+          [
+            -88.010281,
+            41.793662
+          ],
+          [
+            -88.010224,
+            41.792922
+          ],
+          [
+            -88.010112,
+            41.792928
+          ],
+          [
+            -88.010083,
+            41.792532
+          ],
+          [
+            -88.01005,
+            41.792074
+          ],
+          [
+            -88.009952,
+            41.792078
+          ],
+          [
+            -88.009952,
+            41.792078
+          ],
+          [
+            -88.01005,
+            41.792074
+          ],
+          [
+            -88.010083,
+            41.792532
+          ],
+          [
+            -88.010112,
+            41.792928
+          ],
+          [
+            -88.010167,
+            41.793671
+          ],
+          [
+            -88.010281,
+            41.793662
+          ],
+          [
+            -88.010286,
+            41.793734
+          ],
+          [
+            -88.010291,
+            41.793798
+          ],
+          [
+            -88.010333,
+            41.7944
+          ],
+          [
+            -88.010355,
+            41.794702
+          ],
+          [
+            -88.010361,
+            41.79479
+          ],
+          [
+            -88.010375,
+            41.794993
+          ],
+          [
+            -88.010382,
+            41.795084
+          ],
+          [
+            -88.010409,
+            41.795486
+          ],
+          [
+            -88.010412,
+            41.795523
+          ],
+          [
+            -88.010414,
+            41.795562
+          ],
+          [
+            -88.010435,
+            41.795864
+          ],
+          [
+            -88.010445,
+            41.795963
+          ],
+          [
+            -88.010357,
+            41.795967
+          ],
+          [
+            -88.009434,
+            41.795968
+          ],
+          [
+            -88.009294,
+            41.795968
+          ],
+          [
+            -88.009215,
+            41.795969
+          ],
+          [
+            -88.009212,
+            41.7959
+          ]
+        ]
+      },
+      "legs": [
+        {
+          "from_stop_id": "6c16b33c-cc47-4c2a-a726-6fa24ed1a680",
+          "to_stop_id": "6ccf5a16-0132-4c26-887a-e9a9564637f3",
+          "navigation_source": "unapproved_computed_comparison",
+          "from_position": 1,
+          "to_position": 2,
+          "distance_m": 222,
+          "duration_s": 155,
+          "geometry": [
+            [
+              -88.009212,
+              41.7959
+            ],
+            [
+              -88.009215,
+              41.795969
+            ],
+            [
+              -88.009294,
+              41.795968
+            ],
+            [
+              -88.009434,
+              41.795968
+            ],
+            [
+              -88.010357,
+              41.795967
+            ],
+            [
+              -88.010342,
+              41.795862
+            ],
+            [
+              -88.010331,
+              41.795776
+            ],
+            [
+              -88.010334,
+              41.795744
+            ],
+            [
+              -88.010321,
+              41.795605
+            ],
+            [
+              -88.010317,
+              41.795562
+            ],
+            [
+              -88.010313,
+              41.795523
+            ],
+            [
+              -88.01031,
+              41.795486
+            ],
+            [
+              -88.010311,
+              41.795463
+            ],
+            [
+              -88.010293,
+              41.795303
+            ],
+            [
+              -88.010261,
+              41.795165
+            ],
+            [
+              -88.009901,
+              41.795164
+            ]
+          ]
+        },
+        {
+          "from_stop_id": "6ccf5a16-0132-4c26-887a-e9a9564637f3",
+          "to_stop_id": "1989ae61-9c75-4751-9e55-d1a9b11a35b2",
+          "navigation_source": "unapproved_computed_comparison",
+          "from_position": 2,
+          "to_position": 3,
+          "distance_m": 149,
+          "duration_s": 108,
+          "geometry": [
+            [
+              -88.009901,
+              41.795164
+            ],
+            [
+              -88.010261,
+              41.795165
+            ],
+            [
+              -88.010253,
+              41.795086
+            ],
+            [
+              -88.010245,
+              41.794997
+            ],
+            [
+              -88.010375,
+              41.794993
+            ],
+            [
+              -88.010491,
+              41.79499
+            ],
+            [
+              -88.010472,
+              41.794704
+            ],
+            [
+              -88.010446,
+              41.794286
+            ]
+          ]
+        },
+        {
+          "from_stop_id": "1989ae61-9c75-4751-9e55-d1a9b11a35b2",
+          "to_stop_id": "c3c44155-c8d5-4bbe-8d38-d6c65ee6af1c",
+          "navigation_source": "unapproved_computed_comparison",
+          "from_position": 3,
+          "to_position": 4,
+          "distance_m": 84,
+          "duration_s": 60,
+          "geometry": [
+            [
+              -88.010446,
+              41.794286
+            ],
+            [
+              -88.010414,
+              41.793784
+            ],
+            [
+              -88.010291,
+              41.793798
+            ],
+            [
+              -88.010185,
+              41.79381
+            ],
+            [
+              -88.010191,
+              41.793898
+            ]
+          ]
+        },
+        {
+          "from_stop_id": "c3c44155-c8d5-4bbe-8d38-d6c65ee6af1c",
+          "to_stop_id": "c33a21f9-760d-4987-9542-06b4241ce1de",
+          "navigation_source": "unapproved_computed_comparison",
+          "from_position": 4,
+          "to_position": 5,
+          "distance_m": 228,
+          "duration_s": 170,
+          "geometry": [
+            [
+              -88.010191,
+              41.793898
+            ],
+            [
+              -88.010185,
+              41.79381
+            ],
+            [
+              -88.010291,
+              41.793798
+            ],
+            [
+              -88.010286,
+              41.793734
+            ],
+            [
+              -88.010281,
+              41.793662
+            ],
+            [
+              -88.010224,
+              41.792922
+            ],
+            [
+              -88.010112,
+              41.792928
+            ],
+            [
+              -88.010083,
+              41.792532
+            ],
+            [
+              -88.01005,
+              41.792074
+            ],
+            [
+              -88.009952,
+              41.792078
+            ]
+          ]
+        },
+        {
+          "from_stop_id": "c33a21f9-760d-4987-9542-06b4241ce1de",
+          "to_stop_id": "6c16b33c-cc47-4c2a-a726-6fa24ed1a680",
+          "navigation_source": "unapproved_computed_comparison",
+          "return": true,
+          "from_position": 5,
+          "to_position": 1,
+          "distance_m": 561,
+          "duration_s": 393,
+          "geometry": [
+            [
+              -88.009952,
+              41.792078
+            ],
+            [
+              -88.01005,
+              41.792074
+            ],
+            [
+              -88.010083,
+              41.792532
+            ],
+            [
+              -88.010112,
+              41.792928
+            ],
+            [
+              -88.010167,
+              41.793671
+            ],
+            [
+              -88.010281,
+              41.793662
+            ],
+            [
+              -88.010286,
+              41.793734
+            ],
+            [
+              -88.010291,
+              41.793798
+            ],
+            [
+              -88.010333,
+              41.7944
+            ],
+            [
+              -88.010355,
+              41.794702
+            ],
+            [
+              -88.010361,
+              41.79479
+            ],
+            [
+              -88.010375,
+              41.794993
+            ],
+            [
+              -88.010382,
+              41.795084
+            ],
+            [
+              -88.010409,
+              41.795486
+            ],
+            [
+              -88.010412,
+              41.795523
+            ],
+            [
+              -88.010414,
+              41.795562
+            ],
+            [
+              -88.010435,
+              41.795864
+            ],
+            [
+              -88.010445,
+              41.795963
+            ],
+            [
+              -88.010357,
+              41.795967
+            ],
+            [
+              -88.009434,
+              41.795968
+            ],
+            [
+              -88.009294,
+              41.795968
+            ],
+            [
+              -88.009215,
+              41.795969
+            ],
+            [
+              -88.009212,
+              41.7959
+            ]
+          ]
+        }
+      ],
+      "computed_at": "2026-11-08T15:25:19.947547-06:00"
+    }
+  },
+  "path_reports": {
+    "walk": null
+  },
+  "reconciliation": [
+    {
+      "id": "5c7a13fb-3cc2-48be-b938-2f425511591a",
+      "identity_key": "7c491933e629e49ffdab1543ab3751de5b33858ecd31cab6c132be2949fae298",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Main Street Station",
+          "text": "",
+          "url": "https://dghistory.org/history-walk-12-main-street-train-station/",
+          "lat": 41.7959,
+          "lng": -88.0092,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Main Street Station",
+            "address": "5001 Main St, Downers Grove, IL",
+            "historical_addresses": [
+              "1000 Burlington Avenue, Downers Grove, IL"
+            ]
+          }
+        },
+        "key": "7c491933e629e49ffdab1543ab3751de5b33858ecd31cab6c132be2949fae298",
+        "place_key": "e30f59c548eb3a3f7ffffd9e0e1817ab246c1e7357c62394753bb3516d254402",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "moment_id": "",
+        "outcome": "needs_review",
+        "issues": [
+          "historical_address"
+        ]
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Main Street Station",
+          "text": "",
+          "url": "https://dghistory.org/history-walk-12-main-street-train-station/",
+          "lat": 41.7959,
+          "lng": -88.0092,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Main Street Station",
+            "address": "5001 Main St, Downers Grove, IL",
+            "historical_addresses": [
+              "1000 Burlington Avenue, Downers Grove, IL"
+            ]
+          }
+        },
+        "key": "7c491933e629e49ffdab1543ab3751de5b33858ecd31cab6c132be2949fae298",
+        "place_key": "e30f59c548eb3a3f7ffffd9e0e1817ab246c1e7357c62394753bb3516d254402",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "moment_id": "",
+        "outcome": "needs_review",
+        "issues": [
+          "historical_address"
+        ]
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "moment_id": "b95010a0-0953-424a-a727-86a73168a53f",
+        "aliases": null,
+        "historical_addresses": [
+          "1000 Burlington Avenue, Downers Grove, IL"
+        ],
+        "note": "Disposable curator selection; retains original place/story identities and address aliases. No public release.",
+        "reviewer_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32"
+      },
+      "created_at": "2026-11-08T15:25:18.999748-06:00"
+    },
+    {
+      "id": "3dc515bb-cc13-467e-a69b-2f56ec6fe892",
+      "identity_key": "8bacb42a2b318a4ec97c0a2890b38396d1b4ed63c683662f96e20845dc43156a",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Tivoli Theatre",
+          "text": "The existing Tivoli history is retained at the existing theatre place. For this theme, the relevant thread is the 1928 building as a combined entertainment, commercial and residential venue. The Historical Society identifies its Highland Avenue address and describes the variety of uses planned for the building. This pilot does not rely on a national ranking among early sound-film theatres or imply entry into private or ticketed spaces. Public exterior viewing and an exact arrival still need review.",
+          "url": "https://dghistory.org/tivoli-theater/",
+          "lat": 41.7952,
+          "lng": -88.0099,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Tivoli Theatre",
+            "address": "5021 Highland Ave, Downers Grove, IL"
+          }
+        },
+        "key": "8bacb42a2b318a4ec97c0a2890b38396d1b4ed63c683662f96e20845dc43156a",
+        "place_key": "dc2bcdcdb9688efb22435714a3d2fa78903c85fc872390564605e542d725a2ce",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b2",
+        "moment_id": "",
+        "outcome": "existing_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Tivoli Theatre",
+          "text": "The existing Tivoli history is retained at the existing theatre place. For this theme, the relevant thread is the 1928 building as a combined entertainment, commercial and residential venue. The Historical Society identifies its Highland Avenue address and describes the variety of uses planned for the building. This pilot does not rely on a national ranking among early sound-film theatres or imply entry into private or ticketed spaces. Public exterior viewing and an exact arrival still need review.",
+          "url": "https://dghistory.org/tivoli-theater/",
+          "lat": 41.7952,
+          "lng": -88.0099,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Tivoli Theatre",
+            "address": "5021 Highland Ave, Downers Grove, IL"
+          }
+        },
+        "key": "8bacb42a2b318a4ec97c0a2890b38396d1b4ed63c683662f96e20845dc43156a",
+        "place_key": "dc2bcdcdb9688efb22435714a3d2fa78903c85fc872390564605e542d725a2ce",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b2",
+        "moment_id": "",
+        "outcome": "existing_place",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "00000000-0000-4000-8000-00000000b0b2",
+        "moment_id": "00000000-0000-4000-8000-00000000d0d3",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator selection; retains original place/story identities and address aliases. No public release.",
+        "reviewer_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32"
+      },
+      "created_at": "2026-11-08T15:25:19.121252-06:00"
+    },
+    {
+      "id": "558ceea7-0f47-496f-8cf5-ab28af54491e",
+      "identity_key": "9dc4c84c24a267f7774e8f27e72f4c1cabd4b19926fdb61062bd51e3bcee2214",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Mochel Hardware Store",
+          "text": "",
+          "url": "https://dghistory.org/mochel-hardware-store/",
+          "lat": 41.7942861,
+          "lng": -88.0104387,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Mochel Hardware Store",
+            "address": "5122 Main Street, Downers Grove, IL",
+            "historical_addresses": [
+              "36 S Main, Downers Grove, IL"
+            ]
+          }
+        },
+        "key": "9dc4c84c24a267f7774e8f27e72f4c1cabd4b19926fdb61062bd51e3bcee2214",
+        "place_key": "bcf642700502c6f44c921037118013b85ebf2c2e8e5503a5f9a6b25c1d28df5d",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "needs_review",
+        "issues": [
+          "historical_address"
+        ]
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Mochel Hardware Store",
+          "text": "",
+          "url": "https://dghistory.org/mochel-hardware-store/",
+          "lat": 41.7942861,
+          "lng": -88.0104387,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Mochel Hardware Store",
+            "address": "5122 Main Street, Downers Grove, IL",
+            "historical_addresses": [
+              "36 S Main, Downers Grove, IL"
+            ]
+          }
+        },
+        "key": "9dc4c84c24a267f7774e8f27e72f4c1cabd4b19926fdb61062bd51e3bcee2214",
+        "place_key": "bcf642700502c6f44c921037118013b85ebf2c2e8e5503a5f9a6b25c1d28df5d",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "needs_review",
+        "issues": [
+          "historical_address"
+        ]
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+        "moment_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+        "aliases": null,
+        "historical_addresses": [
+          "36 S Main, Downers Grove, IL"
+        ],
+        "note": "Disposable curator selection; retains original place/story identities and address aliases. No public release.",
+        "reviewer_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32"
+      },
+      "created_at": "2026-11-08T15:25:19.216461-06:00"
+    },
+    {
+      "id": "de8ade26-6ab3-407b-aec6-b6d33db94a4b",
+      "identity_key": "ef5b12dbdc29c4000ed08e654dbac951c8165cc23b1e26b26278efc59edbf00e",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Farmers and Merchants Bank",
+          "text": "",
+          "url": "https://dghistory.org/farmers-and-merchants-bank/",
+          "lat": 41.7938999,
+          "lng": -88.010128,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Farmers and Merchants Bank",
+            "address": "5135 Main Street, Downers Grove, IL"
+          }
+        },
+        "key": "ef5b12dbdc29c4000ed08e654dbac951c8165cc23b1e26b26278efc59edbf00e",
+        "place_key": "59aab59f07e97eef0f17e0d60285586d97d8d72e6127ecf69afd1f5986d2f08c",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "needs_review",
+        "issues": [
+          "nearby_distinct_identity"
+        ]
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Farmers and Merchants Bank",
+          "text": "",
+          "url": "https://dghistory.org/farmers-and-merchants-bank/",
+          "lat": 41.7938999,
+          "lng": -88.010128,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Farmers and Merchants Bank",
+            "address": "5135 Main Street, Downers Grove, IL"
+          }
+        },
+        "key": "ef5b12dbdc29c4000ed08e654dbac951c8165cc23b1e26b26278efc59edbf00e",
+        "place_key": "59aab59f07e97eef0f17e0d60285586d97d8d72e6127ecf69afd1f5986d2f08c",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "needs_review",
+        "issues": [
+          "nearby_distinct_identity"
+        ]
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+        "moment_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator selection; retains original place/story identities and address aliases. No public release.",
+        "reviewer_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32"
+      },
+      "created_at": "2026-11-08T15:25:19.369254-06:00"
+    },
+    {
+      "id": "d6555802-54a5-4870-8306-eb4429f52371",
+      "identity_key": "b31b35b3b41d24e4566a6912985ffc54ac45985f5268983ad0d58dcf6d278d6f",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Penner Building",
+          "text": "",
+          "url": "https://dghistory.org/penner-building/",
+          "lat": 41.7921213,
+          "lng": -88.0099546,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Penner Building",
+            "address": "5219\u20135221 Main Street, Downers Grove, IL"
+          }
+        },
+        "key": "b31b35b3b41d24e4566a6912985ffc54ac45985f5268983ad0d58dcf6d278d6f",
+        "place_key": "2eec3feb83b234ef1ef99780d1d48f18dcf2e855f605fff9fef0e536be495e77",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Penner Building",
+          "text": "",
+          "url": "https://dghistory.org/penner-building/",
+          "lat": 41.7921213,
+          "lng": -88.0099546,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Penner Building",
+            "address": "5219\u20135221 Main Street, Downers Grove, IL"
+          }
+        },
+        "key": "b31b35b3b41d24e4566a6912985ffc54ac45985f5268983ad0d58dcf6d278d6f",
+        "place_key": "2eec3feb83b234ef1ef99780d1d48f18dcf2e855f605fff9fef0e536be495e77",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "59b8d539-7a49-4e9d-8e7c-ba1285d434ac",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+        "moment_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator selection; retains original place/story identities and address aliases. No public release.",
+        "reviewer_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32"
+      },
+      "created_at": "2026-11-08T15:25:19.509241-06:00"
+    },
+    {
+      "id": "7a51c1a9-7656-4b36-a30c-886d2677cb90",
+      "identity_key": "ed8c2cf980eb4fa5af61cc796c0642a514d98e056d67acc2f5e6c06b4799a924",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "00000000-0000-4000-8000-00000000d0d3",
+          "title": "Built for the Talkies",
+          "text": "The existing Tivoli history is retained at the existing theatre place. For this theme, the relevant thread is the 1928 building as a combined entertainment, commercial and residential venue. The Historical Society identifies its Highland Avenue address and describes the variety of uses planned for the building. This pilot does not rely on a national ranking among early sound-film theatres or imply entry into private or ticketed spaces. Public exterior viewing and an exact arrival still need review.",
+          "url": "https://dghistory.org/tivoli-theater/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "ed8c2cf980eb4fa5af61cc796c0642a514d98e056d67acc2f5e6c06b4799a924",
+        "place_key": "dc2bcdcdb9688efb22435714a3d2fa78903c85fc872390564605e542d725a2ce",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b2",
+        "moment_id": "00000000-0000-4000-8000-00000000d0d3",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "00000000-0000-4000-8000-00000000d0d3",
+          "title": "Built for the Talkies",
+          "text": "The existing Tivoli history is retained at the existing theatre place. For this theme, the relevant thread is the 1928 building as a combined entertainment, commercial and residential venue. The Historical Society identifies its Highland Avenue address and describes the variety of uses planned for the building. This pilot does not rely on a national ranking among early sound-film theatres or imply entry into private or ticketed spaces. Public exterior viewing and an exact arrival still need review.",
+          "url": "https://dghistory.org/tivoli-theater/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "ed8c2cf980eb4fa5af61cc796c0642a514d98e056d67acc2f5e6c06b4799a924",
+        "place_key": "dc2bcdcdb9688efb22435714a3d2fa78903c85fc872390564605e542d725a2ce",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b2",
+        "moment_id": "00000000-0000-4000-8000-00000000d0d3",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:25:19.743965-06:00"
+    },
+    {
+      "id": "906597e9-818d-441f-a845-33ffc23f3b35",
+      "identity_key": "664efd53959b4abfdd8e1745a9aade388f39fa90e7954752669e36ab1ba850b7",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+          "title": "From harness making to changing storefront trade",
+          "text": "",
+          "url": "https://dghistory.org/penner-building/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "664efd53959b4abfdd8e1745a9aade388f39fa90e7954752669e36ab1ba850b7",
+        "place_key": "d97377c3dead18909bde640ad0fe760cc5e20c058222f78f34a4e80f9f716521",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+        "moment_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+          "title": "From harness making to changing storefront trade",
+          "text": "",
+          "url": "https://dghistory.org/penner-building/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "664efd53959b4abfdd8e1745a9aade388f39fa90e7954752669e36ab1ba850b7",
+        "place_key": "d97377c3dead18909bde640ad0fe760cc5e20c058222f78f34a4e80f9f716521",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+        "moment_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:25:19.743965-06:00"
+    },
+    {
+      "id": "9a3f0177-de19-414f-8b9f-1a95eee8a324",
+      "identity_key": "5fd83246b6e3a2257c96bf173bdb27f2c7dbac4a583e5aae26ef05c2b2caeac4",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+          "title": "A corner bank building and its later uses",
+          "text": "",
+          "url": "https://dghistory.org/farmers-and-merchants-bank/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "5fd83246b6e3a2257c96bf173bdb27f2c7dbac4a583e5aae26ef05c2b2caeac4",
+        "place_key": "ef0e4076fff5c19ddde42b7eae27b3186c29b69b80b1ae3c6e2b3f2afd464fae",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+        "moment_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+          "title": "A corner bank building and its later uses",
+          "text": "",
+          "url": "https://dghistory.org/farmers-and-merchants-bank/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "5fd83246b6e3a2257c96bf173bdb27f2c7dbac4a583e5aae26ef05c2b2caeac4",
+        "place_key": "ef0e4076fff5c19ddde42b7eae27b3186c29b69b80b1ae3c6e2b3f2afd464fae",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+        "moment_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:25:19.743965-06:00"
+    },
+    {
+      "id": "bf864753-d3c3-45c9-8e57-3211d48f046a",
+      "identity_key": "15b83a016ba3db991257676aa81db28873efd1b01fcc5606534fe26c0a6f6a14",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "b95010a0-0953-424a-a727-86a73168a53f",
+          "title": "The station building and the downtown it faces",
+          "text": "",
+          "url": "https://dghistory.org/history-walk-12-main-street-train-station/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "15b83a016ba3db991257676aa81db28873efd1b01fcc5606534fe26c0a6f6a14",
+        "place_key": "e30f59c548eb3a3f7ffffd9e0e1817ab246c1e7357c62394753bb3516d254402",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "moment_id": "b95010a0-0953-424a-a727-86a73168a53f",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "b95010a0-0953-424a-a727-86a73168a53f",
+          "title": "The station building and the downtown it faces",
+          "text": "",
+          "url": "https://dghistory.org/history-walk-12-main-street-train-station/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "15b83a016ba3db991257676aa81db28873efd1b01fcc5606534fe26c0a6f6a14",
+        "place_key": "e30f59c548eb3a3f7ffffd9e0e1817ab246c1e7357c62394753bb3516d254402",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "moment_id": "b95010a0-0953-424a-a727-86a73168a53f",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:25:19.743965-06:00"
+    },
+    {
+      "id": "fede8a98-a95a-4aa1-812d-5f6c9abeab3b",
+      "identity_key": "4fcad8c5d76e71c984e4b068cca111eaf37870631e293f84d3eb987dd2b48769",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+          "title": "A hardware building changes with downtown commerce",
+          "text": "",
+          "url": "https://dghistory.org/mochel-hardware-store/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "4fcad8c5d76e71c984e4b068cca111eaf37870631e293f84d3eb987dd2b48769",
+        "place_key": "05988baa5cc8d8237b9dfc0bc3e53ca9b09fba24fb77ce17325e24b9e1630053",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+        "moment_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+          "title": "A hardware building changes with downtown commerce",
+          "text": "",
+          "url": "https://dghistory.org/mochel-hardware-store/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "4fcad8c5d76e71c984e4b068cca111eaf37870631e293f84d3eb987dd2b48769",
+        "place_key": "05988baa5cc8d8237b9dfc0bc3e53ca9b09fba24fb77ce17325e24b9e1630053",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+        "moment_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:25:19.743965-06:00"
+    }
+  ],
+  "entities": [
+    {
+      "key": "place:796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+      "kind": "place",
+      "id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "penner-building",
+        "name": "Penner Building",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.7921213,
+        "longitude": -88.0099546,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5219\u20135221 Main Street, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:25:19.574235-06:00",
+        "updated_at": "2026-11-08T15:25:19.574235-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:59b8d539-7a49-4e9d-8e7c-ba1285d434ac",
+      "kind": "place",
+      "id": "59b8d539-7a49-4e9d-8e7c-ba1285d434ac",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "penner-building",
+        "name": "Penner Building",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.7921213,
+        "longitude": -88.0099546,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5219\u20135221 Main Street, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:25:19.574235-06:00",
+        "updated_at": "2026-11-08T15:25:19.574235-06:00"
+      },
+      "candidate": {
+        "id": "59b8d539-7a49-4e9d-8e7c-ba1285d434ac",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "2eec3feb83b234ef1ef99780d1d48f18dcf2e855f605fff9fef0e536be495e77",
+        "submitted_by_account_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Penner Building",
+          "slug": "",
+          "address": "5219\u20135221 Main Street, Downers Grove, IL",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "summary": "",
+          "latitude": 41.7921213,
+          "longitude": -88.0099546,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "9ea49760-8f7a-43be-8460-b5f4bcd38d32",
+        "review_note": "Disposable draft identity review only; no real arrival/access approval.",
+        "approved_entity_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+        "reviewed_at": "2026-11-08T15:25:19.574235-06:00",
+        "created_at": "2026-11-08T15:25:19.509241-06:00",
+        "updated_at": "2026-11-08T15:25:19.574235-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Penner Building",
+        "slug": "",
+        "address": "5219\u20135221 Main Street, Downers Grove, IL",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "summary": "",
+        "latitude": 41.7921213,
+        "longitude": -88.0099546,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:00000000-0000-4000-8000-00000000b0b1",
+      "kind": "place",
+      "id": "00000000-0000-4000-8000-00000000b0b1",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000b0b1",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "main-street-station",
+        "name": "Main Street Station",
+        "summary": "A downtown railway stop shaped by the 1864 arrival of the Burlington line, the surviving 1911 passenger station, and generations of commuter travel.",
+        "kind": "station",
+        "latitude": 41.7959,
+        "longitude": -88.0092,
+        "arrival_radius_m": 50,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5001 Main St, Downers Grove, IL",
+        "status": "published",
+        "primary_moment_id": "00000000-0000-4000-8000-00000000d0d1",
+        "moment_count": 3,
+        "created_at": "2026-11-08T15:25:15.620432-06:00",
+        "updated_at": "2026-11-08T15:25:15.620432-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:00000000-0000-4000-8000-00000000d0d1",
+      "kind": "moment",
+      "id": "00000000-0000-4000-8000-00000000d0d1",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000d0d1",
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "slug": "the-burlington-arrives",
+        "title": "The Burlington Arrives",
+        "excerpt": "The arrival of the Chicago, Burlington & Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop\u2026",
+        "date_start": "1864-01-01",
+        "date_end": "1873-12-31",
+        "date_precision": "year",
+        "date_display": "1864",
+        "hero_media": {
+          "id": "00000000-0000-4000-8000-00000000f0f1",
+          "kind": "image",
+          "external": false,
+          "public_url": "https://byl.subcult.tv/media/files/library/images/main-street-station.jpg",
+          "mime_type": "image/jpeg",
+          "width": 1280,
+          "height": 960,
+          "duration_seconds": null,
+          "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
+          "credit": "David Wilson",
+          "license": "CC-BY-2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0",
+          "source_url": "https://commons.wikimedia.org/wiki/File:20040511_29_Metra_Downers_Grove,_IL.jpg",
+          "status": "published",
+          "created_at": "2026-11-08T15:25:15.653965-06:00",
+          "updated_at": "2026-11-08T15:25:15.653965-06:00"
+        },
+        "has_narration": false,
+        "status": "published",
+        "topic_ids": [
+          "00000000-0000-4000-8000-00000000a0a1"
+        ],
+        "body": "The arrival of the Chicago, Burlington & Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop became an organizing point for the village: shops, streets, houses and everyday journeys gathered around the tracks. The railway was both a connection to the city and a reason for a town center to develop here.\n\nThat change did not begin on empty ground. The Encyclopedia of Chicago describes a community of farming families already established around the grove. Samuel Curtiss laid out a subdivision in 1863, the year before the railroad arrived. The settlement incorporated as a village in 1873. Reading those dates together shows a sequence of land development, transportation investment and local government, rather than a town created in a single dramatic moment.\n\nThe railway also helps explain the shape of the wider community. Growth developed near the Main Street, Belmont and East Grove stations. A rail siding and access to Chicago later made Downers Grove a destination for mail-order houses supplied by Sears, Roebuck & Co. between 1908 and 1940. Building materials and commuters moved along the same corridor, connecting domestic life with a much larger regional economy.\n\nPassenger traffic eventually needed a different arrangement from freight handling. In 1911 a new passenger station replaced the original depot, which continued as a freight facility before being demolished. The Historical Society identifies the surviving building as Classical Revival with Beaux Arts influences. Its symmetrical front, pilasters and terra-cotta detailing belong to a station built almost half a century after the line arrived. Damage from the 1947 train wreck led to repairs using original bricks, giving the building itself evidence of successive periods of use and rebuilding.",
+        "media": [
+          {
+            "id": "00000000-0000-4000-8000-00000000f0f1",
+            "kind": "image",
+            "external": false,
+            "public_url": "https://byl.subcult.tv/media/files/library/images/main-street-station.jpg",
+            "mime_type": "image/jpeg",
+            "width": 1280,
+            "height": 960,
+            "duration_seconds": null,
+            "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
+            "credit": "David Wilson",
+            "license": "CC-BY-2.0",
+            "license_url": "https://creativecommons.org/licenses/by/2.0",
+            "source_url": "https://commons.wikimedia.org/wiki/File:20040511_29_Metra_Downers_Grove,_IL.jpg",
+            "status": "published",
+            "created_at": "2026-11-08T15:25:15.653965-06:00",
+            "updated_at": "2026-11-08T15:25:15.653965-06:00"
+          }
+        ],
+        "sources": [
+          {
+            "title": "Downers Grove, IL",
+            "url": "https://www.encyclopedia.chicagohistory.org/pages/389.html",
+            "publisher": "Encyclopedia of Chicago",
+            "retrieved_at": "2026-11-06",
+            "license": "",
+            "note": "Railroad arrival, incorporation and mail-order housing."
+          },
+          {
+            "title": "Main Street Train Station",
+            "url": "https://dghistory.org/main-street-train-station/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-06",
+            "license": "",
+            "note": "Original 1864 station and surviving 1911 passenger station. Historical ridership ranking is not repeated."
+          }
+        ],
+        "topics": [
+          {
+            "id": "00000000-0000-4000-8000-00000000a0a1",
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "city_ids": [
+              "00000000-0000-4000-8000-0000000000c1"
+            ],
+            "slug": "rail-and-the-commuter-town",
+            "name": "Rail and the Commuter Town",
+            "description": "How the Chicago, Burlington & Quincy line turned a farm settlement into a railroad suburb, and how the daily commute still shapes downtown.",
+            "moment_count": 4
+          }
+        ],
+        "narration": null,
+        "created_at": "2026-11-08T15:25:15.620432-06:00",
+        "updated_at": "2026-11-08T15:25:15.653965-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "media:00000000-0000-4000-8000-00000000f0f1",
+      "kind": "media",
+      "id": "00000000-0000-4000-8000-00000000f0f1",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000f0f1",
+        "kind": "image",
+        "external": false,
+        "public_url": "https://byl.subcult.tv/media/files/library/images/main-street-station.jpg",
+        "mime_type": "image/jpeg",
+        "width": 1280,
+        "height": 960,
+        "duration_seconds": null,
+        "caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
+        "credit": "David Wilson",
+        "license": "CC-BY-2.0",
+        "license_url": "https://creativecommons.org/licenses/by/2.0",
+        "source_url": "https://commons.wikimedia.org/wiki/File:20040511_29_Metra_Downers_Grove,_IL.jpg",
+        "status": "published",
+        "created_at": "2026-11-08T15:25:15.653965-06:00",
+        "updated_at": "2026-11-08T15:25:15.653965-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "media:00000000-0000-4000-8000-00000000f1f1",
+      "kind": "media",
+      "id": "00000000-0000-4000-8000-00000000f1f1",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000f1f1",
+        "kind": "image",
+        "external": false,
+        "public_url": "https://byl.subcult.tv/media/files/library/images/station-2017.jpg",
+        "mime_type": "image/jpeg",
+        "width": 1280,
+        "height": 960,
+        "duration_seconds": null,
+        "caption": "Main Street station platform and shelter, July 20, 2017. Resized by Wikimedia.",
+        "credit": "David Wilson from Oak Park, Illinois, USA",
+        "license": "CC-BY-2.0",
+        "license_url": "https://creativecommons.org/licenses/by/2.0",
+        "source_url": "https://commons.wikimedia.org/wiki/File:20170720_07_Metra_station,_Downers_Grove,_Illinois_(44195883935).jpg",
+        "status": "published",
+        "created_at": "2026-11-08T15:25:15.778364-06:00",
+        "updated_at": "2026-11-08T15:25:15.778364-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "media:00000000-0000-4000-8000-00000000f1f2",
+      "kind": "media",
+      "id": "00000000-0000-4000-8000-00000000f1f2",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000f1f2",
+        "kind": "image",
+        "external": false,
+        "public_url": "https://byl.subcult.tv/media/files/library/images/station-night-2010.jpg",
+        "mime_type": "image/jpeg",
+        "width": 1280,
+        "height": 960,
+        "duration_seconds": null,
+        "caption": "Main Street station at night, November 30, 2010. Resized by Wikimedia.",
+        "credit": "Maggie Wolff",
+        "license": "CC-BY-2.0",
+        "license_url": "https://creativecommons.org/licenses/by/2.0",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Downers_Grove.jpg",
+        "status": "published",
+        "created_at": "2026-11-08T15:25:15.778364-06:00",
+        "updated_at": "2026-11-08T15:25:15.778364-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "media:00000000-0000-4000-8000-00000000f1f4",
+      "kind": "media",
+      "id": "00000000-0000-4000-8000-00000000f1f4",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000f1f4",
+        "kind": "document",
+        "external": false,
+        "public_url": "https://byl.subcult.tv/media/files/library/documents/icc-downers-grove-1947.pdf",
+        "mime_type": "application/pdf",
+        "width": null,
+        "height": null,
+        "duration_seconds": null,
+        "caption": "Accident investigation 3092: Downers Grove, April 3, 1947 (report dated May 26, 1947)",
+        "credit": "United States Interstate Commerce Commission; digitized by the National Transportation Library",
+        "license": "PD",
+        "license_url": "https://www.copyright.gov/title17/92chap1.html#105",
+        "source_url": "https://rosap.ntl.bts.gov/view/dot/44964",
+        "status": "published",
+        "created_at": "2026-11-08T15:25:15.778364-06:00",
+        "updated_at": "2026-11-08T15:25:15.778364-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:b95010a0-0953-424a-a727-86a73168a53f",
+      "kind": "moment",
+      "id": "b95010a0-0953-424a-a727-86a73168a53f",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "b95010a0-0953-424a-a727-86a73168a53f",
+        "place_id": "00000000-0000-4000-8000-00000000b0b1",
+        "slug": "the-station-building-and-the-downtown-it-faces",
+        "title": "The station building and the downtown it faces",
+        "excerpt": "The Historical Society\u2019s architecture walk distinguishes the 1911 Classical Revival passenger station from the earlier 1864 station. The guide describes a formal entrance pavilion and later repair following the 1947 crash. Municipal\u2026",
+        "date_start": "1911-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "History Walk 12: Main Street Train Station",
+            "url": "https://dghistory.org/history-walk-12-main-street-train-station/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Village Council minutes, May 10, 2016, p. 3",
+            "url": "https://agendadocs.downers.us/public/docs/agendas/2016/05-17-16/MIN_2016-6827.pdf",
+            "publisher": "Village of Downers Grove",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:25:19.058965-06:00",
+        "updated_at": "2026-11-08T15:25:19.058965-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "place:00000000-0000-4000-8000-00000000b0b2",
+      "kind": "place",
+      "id": "00000000-0000-4000-8000-00000000b0b2",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000b0b2",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "tivoli-theatre",
+        "name": "Tivoli Theatre",
+        "summary": "A working cinema and mixed-use landmark that opened in 1928 as talking pictures changed moviegoing.",
+        "kind": "building",
+        "latitude": 41.7952,
+        "longitude": -88.0099,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5021 Highland Ave, Downers Grove, IL",
+        "status": "published",
+        "primary_moment_id": "00000000-0000-4000-8000-00000000d0d3",
+        "moment_count": 1,
+        "created_at": "2026-11-08T15:25:15.620432-06:00",
+        "updated_at": "2026-11-08T15:25:15.620432-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:00000000-0000-4000-8000-00000000d0d3",
+      "kind": "moment",
+      "id": "00000000-0000-4000-8000-00000000d0d3",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000d0d3",
+        "place_id": "00000000-0000-4000-8000-00000000b0b2",
+        "slug": "built-for-talkies",
+        "title": "Built for the Talkies",
+        "excerpt": "When the Tivoli opened on Christmas Day in 1928, cinema was undergoing a fundamental change: recorded speech and music were becoming part of the film itself. The Downers Grove Historical Society identifies the theatre as an early building\u2026",
+        "date_start": "1928-12-25",
+        "date_end": "1928-12-25",
+        "date_precision": "day",
+        "date_display": "December 25, 1928",
+        "hero_media": {
+          "id": "00000000-0000-4000-8000-00000000f0f2",
+          "kind": "image",
+          "external": false,
+          "public_url": "https://byl.subcult.tv/media/files/library/images/tivoli-theatre.jpg",
+          "mime_type": "image/jpeg",
+          "width": 1280,
+          "height": 1707,
+          "duration_seconds": null,
+          "caption": "The Tivoli marquee in August 2009. Resized by Wikimedia.",
+          "credit": "User: (WT-shared) Ethajek at  wts wikivoyage",
+          "license": "PD",
+          "license_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG#Licensing",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG",
+          "status": "published",
+          "created_at": "2026-11-08T15:25:15.653965-06:00",
+          "updated_at": "2026-11-08T15:25:15.653965-06:00"
+        },
+        "has_narration": false,
+        "status": "published",
+        "topic_ids": [
+          "00000000-0000-4000-8000-00000000a0a2",
+          "00000000-0000-4000-8000-00000000a0a1"
+        ],
+        "body": "When the Tivoli opened on Christmas Day in 1928, cinema was undergoing a fundamental change: recorded speech and music were becoming part of the film itself. The Downers Grove Historical Society identifies the theatre as an early building designed specifically for talking pictures. Local audiences came here to experience a new kind of entertainment in a setting intended to make a night at the movies an occasion.\n\nThe project belonged to local businessmen Gustav and George Bunge, a father and son. Van Gunten and Van Gunten designed the building, and J. T. Schless handled construction. The Historical Society records that thousands of people lined up for the opening program, which included Howard Hawks's film Fazil. The opening date places the building in the prosperous final years of the 1920s, before the economic upheaval of the following decade.\n\nThe theatre was only one part of the development. Bowling, commercial storefronts, offices and a residential hotel shared the building. That mixture matters to its history: the Tivoli was conceived as a downtown destination with several uses, rather than an isolated auditorium. Entertainment, work and lodging occupied the same block, helping to keep activity in the village center after daytime business had ended.\n\nLater restoration and equipment changes allowed the Tivoli to remain a working cinema. The large main auditorium survived while many older theatres were subdivided into smaller rooms. A second, much smaller auditorium was added in 2021. The building's history is therefore not a story of everything remaining exactly as it was in 1928; it is a record of adapting a historic venue for successive generations of audiences.\n\nThe building has also provided a stage for live performance and community events. The Historical Society lists concerts by artists including Los Lobos, Neko Case and The Wallflowers alongside its account of film exhibition. That range of activity continues the original idea of a downtown entertainment destination. The theatre, its surrounding commercial spaces and the people using them connect the architecture with the village's cultural life.",
+        "media": [
+          {
+            "id": "00000000-0000-4000-8000-00000000f0f2",
+            "kind": "image",
+            "external": false,
+            "public_url": "https://byl.subcult.tv/media/files/library/images/tivoli-theatre.jpg",
+            "mime_type": "image/jpeg",
+            "width": 1280,
+            "height": 1707,
+            "duration_seconds": null,
+            "caption": "The Tivoli marquee in August 2009. Resized by Wikimedia.",
+            "credit": "User: (WT-shared) Ethajek at  wts wikivoyage",
+            "license": "PD",
+            "license_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG#Licensing",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG",
+            "status": "published",
+            "created_at": "2026-11-08T15:25:15.653965-06:00",
+            "updated_at": "2026-11-08T15:25:15.653965-06:00"
+          }
+        ],
+        "sources": [
+          {
+            "title": "Tivoli Theatre",
+            "url": "https://dghistory.org/tivoli-theater/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-06",
+            "license": "",
+            "note": "Opening, builders and original mixed-use development."
+          },
+          {
+            "title": "History Walk: Tivoli Theatre",
+            "url": "https://dghistory.org/history-walk-1/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-06",
+            "license": "",
+            "note": "Historic auditorium and second-screen addition in 2021."
+          }
+        ],
+        "topics": [
+          {
+            "id": "00000000-0000-4000-8000-00000000a0a2",
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "city_ids": [
+              "00000000-0000-4000-8000-0000000000c1"
+            ],
+            "slug": "downtown-after-dark",
+            "name": "Downtown After Dark",
+            "description": "Theaters, marquees, music, and the nightlife that gave the village a reason to gather after the last train home.",
+            "moment_count": 1
+          },
+          {
+            "id": "00000000-0000-4000-8000-00000000a0a1",
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "city_ids": [
+              "00000000-0000-4000-8000-0000000000c1"
+            ],
+            "slug": "rail-and-the-commuter-town",
+            "name": "Rail and the Commuter Town",
+            "description": "How the Chicago, Burlington & Quincy line turned a farm settlement into a railroad suburb, and how the daily commute still shapes downtown.",
+            "moment_count": 4
+          }
+        ],
+        "narration": null,
+        "created_at": "2026-11-08T15:25:15.620432-06:00",
+        "updated_at": "2026-11-08T15:25:15.653965-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "media:00000000-0000-4000-8000-00000000f0f2",
+      "kind": "media",
+      "id": "00000000-0000-4000-8000-00000000f0f2",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000f0f2",
+        "kind": "image",
+        "external": false,
+        "public_url": "https://byl.subcult.tv/media/files/library/images/tivoli-theatre.jpg",
+        "mime_type": "image/jpeg",
+        "width": 1280,
+        "height": 1707,
+        "duration_seconds": null,
+        "caption": "The Tivoli marquee in August 2009. Resized by Wikimedia.",
+        "credit": "User: (WT-shared) Ethajek at  wts wikivoyage",
+        "license": "PD",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG#Licensing",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG",
+        "status": "published",
+        "created_at": "2026-11-08T15:25:15.653965-06:00",
+        "updated_at": "2026-11-08T15:25:15.653965-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "media:00000000-0000-4000-8000-00000000f1f3",
+      "kind": "media",
+      "id": "00000000-0000-4000-8000-00000000f1f3",
+      "required": true,
+      "disposition": "reused_published",
+      "current": {
+        "id": "00000000-0000-4000-8000-00000000f1f3",
+        "kind": "image",
+        "external": false,
+        "public_url": "https://byl.subcult.tv/media/files/library/images/tivoli-2024.jpg",
+        "mime_type": "image/jpeg",
+        "width": 1280,
+        "height": 1700,
+        "duration_seconds": null,
+        "caption": "The Tivoli exterior and illuminated marquee, October 20, 2024. Resized by Wikimedia.",
+        "credit": "AEDIAEDI",
+        "license": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Tivoli_Theatre,_Downers_Grove_Main_Street.jpg",
+        "status": "published",
+        "created_at": "2026-11-08T15:25:15.778364-06:00",
+        "updated_at": "2026-11-08T15:25:15.778364-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "place:cd142e9f-ebf4-4b41-badd-13e19602f64d",
+      "kind": "place",
+      "id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "mochel-hardware-store",
+        "name": "Mochel Hardware Store",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.7942861,
+        "longitude": -88.0104387,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5122 Main Street, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:25:19.28187-06:00",
+        "updated_at": "2026-11-08T15:25:19.28187-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:f1dd4667-9304-48eb-a30b-d9c8817df58c",
+      "kind": "moment",
+      "id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+        "place_id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+        "slug": "a-hardware-building-changes-with-downtown-commerce",
+        "title": "A hardware building changes with downtown commerce",
+        "excerpt": "The Historical Society traces the hardware business to an 1884 opening at 36 S Main, later numbered 5122 Main Street. Its account distinguishes that opening from later expansion and storefront changes. For the architecture-and-commerce\u2026",
+        "date_start": "1884-06-25",
+        "date_end": null,
+        "date_precision": "day",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Mochel Hardware Store",
+            "url": "https://dghistory.org/mochel-hardware-store/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:25:19.299683-06:00",
+        "updated_at": "2026-11-08T15:25:19.299683-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "place:da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+      "kind": "place",
+      "id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "farmers-and-merchants-bank",
+        "name": "Farmers and Merchants Bank",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.7938999,
+        "longitude": -88.010128,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5135 Main Street, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:25:19.431762-06:00",
+        "updated_at": "2026-11-08T15:25:19.431762-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:47a7f566-8547-455c-bb22-5c70018f4c5f",
+      "kind": "moment",
+      "id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+        "place_id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+        "slug": "a-corner-bank-building-and-its-later-uses",
+        "title": "A corner bank building and its later uses",
+        "excerpt": "The Historical Society dates the bank\u2019s opening to 1892 and locates the building at 5135 Main Street. Its account describes several uses within the property and later commercial occupants. It also records a 1944 exterior modernization that\u2026",
+        "date_start": "1892-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Farmers and Merchants Bank",
+            "url": "https://dghistory.org/farmers-and-merchants-bank/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:25:19.448173-06:00",
+        "updated_at": "2026-11-08T15:25:19.448173-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+      "kind": "moment",
+      "id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+        "place_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+        "slug": "from-harness-making-to-changing-storefront-trade",
+        "title": "From harness making to changing storefront trade",
+        "excerpt": "The Historical Society dates this building circa 1894 and places it at 5219\u20135221 Main Street. Conrad Penner\u2019s harness business moved to this location around 1920, later adding tires and shoe repair as local needs changed. Construction and\u2026",
+        "date_start": "1894-01-01",
+        "date_end": null,
+        "date_precision": "circa",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Penner Building",
+            "url": "https://dghistory.org/penner-building/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:25:19.590262-06:00",
+        "updated_at": "2026-11-08T15:25:19.590262-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    }
+  ],
+  "evidence": [],
+  "tasks": [
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:b95010a0-0953-424a-a727-86a73168a53f",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:b95010a0-0953-424a-a727-86a73168a53f",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:b95010a0-0953-424a-a727-86a73168a53f",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:cd142e9f-ebf4-4b41-badd-13e19602f64d",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f1dd4667-9304-48eb-a30b-d9c8817df58c",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f1dd4667-9304-48eb-a30b-d9c8817df58c",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f1dd4667-9304-48eb-a30b-d9c8817df58c",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:47a7f566-8547-455c-bb22-5c70018f4c5f",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:47a7f566-8547-455c-bb22-5c70018f4c5f",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:47a7f566-8547-455c-bb22-5c70018f4c5f",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "route_not_usable",
+      "entity_key": "walk",
+      "detail": "Route readiness is unreviewed; inspect the mode's retained quality report."
+    }
+  ],
+  "visitor_stories": [
+    {
+      "position": 1,
+      "place_id": "00000000-0000-4000-8000-00000000b0b1",
+      "moment_id": "b95010a0-0953-424a-a727-86a73168a53f",
+      "candidate_id": "",
+      "title": "The station building and the downtown it faces",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://dghistory.org/history-walk-12-main-street-train-station/",
+        "https://agendadocs.downers.us/public/docs/agendas/2016/05-17-16/MIN_2016-6827.pdf"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 2,
+      "place_id": "00000000-0000-4000-8000-00000000b0b2",
+      "moment_id": "00000000-0000-4000-8000-00000000d0d3",
+      "candidate_id": "",
+      "title": "Built for the Talkies",
+      "body": "When the Tivoli opened on Christmas Day in 1928, cinema was undergoing a fundamental change: recorded speech and music were becoming part of the film itself. The Downers Grove Historical Society identifies the theatre as an early building designed specifically for talking pictures. Local audiences came here to experience a new kind of entertainment in a setting intended to make a night at the movies an occasion.\n\nThe project belonged to local businessmen Gustav and George Bunge, a father and son. Van Gunten and Van Gunten designed the building, and J. T. Schless handled construction. The Historical Society records that thousands of people lined up for the opening program, which included Howard Hawks's film Fazil. The opening date places the building in the prosperous final years of the 1920s, before the economic upheaval of the following decade.\n\nThe theatre was only one part of the development. Bowling, commercial storefronts, offices and a residential hotel shared the building. That mixture matters to its history: the Tivoli was conceived as a downtown destination with several uses, rather than an isolated auditorium. Entertainment, work and lodging occupied the same block, helping to keep activity in the village center after daytime business had ended.\n\nLater restoration and equipment changes allowed the Tivoli to remain a working cinema. The large main auditorium survived while many older theatres were subdivided into smaller rooms. A second, much smaller auditorium was added in 2021. The building's history is therefore not a story of everything remaining exactly as it was in 1928; it is a record of adapting a historic venue for successive generations of audiences.\n\nThe building has also provided a stage for live performance and community events. The Historical Society lists concerts by artists including Los Lobos, Neko Case and The Wallflowers alongside its account of film exhibition. That range of activity continues the original idea of a downtown entertainment destination. The theatre, its surrounding commercial spaces and the people using them connect the architecture with the village's cultural life.",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://dghistory.org/tivoli-theater/",
+        "https://dghistory.org/history-walk-1/"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 3,
+      "place_id": "cd142e9f-ebf4-4b41-badd-13e19602f64d",
+      "moment_id": "f1dd4667-9304-48eb-a30b-d9c8817df58c",
+      "candidate_id": "",
+      "title": "A hardware building changes with downtown commerce",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://dghistory.org/mochel-hardware-store/"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 4,
+      "place_id": "da7579d1-8518-4859-a37c-60cfbdf7bc8c",
+      "moment_id": "47a7f566-8547-455c-bb22-5c70018f4c5f",
+      "candidate_id": "",
+      "title": "A corner bank building and its later uses",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://dghistory.org/farmers-and-merchants-bank/"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 5,
+      "place_id": "796975f2-6215-4cc4-ac9f-c1aa14a8bc36",
+      "moment_id": "8fa5002e-2bbd-48c8-ab48-330c03aa4af7",
+      "candidate_id": "",
+      "title": "From harness making to changing storefront trade",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://dghistory.org/penner-building/"
+      ],
+      "evidence_ids": []
+    }
+  ]
+}

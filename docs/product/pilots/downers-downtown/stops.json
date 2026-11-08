@@ -1,0 +1,155 @@
+[
+  {
+    "key": "main-street-station",
+    "name": "Main Street Station",
+    "existing_place_id": "00000000-0000-4000-8000-00000000b0b1",
+    "address": "5001 Main St, Downers Grove, IL",
+    "historical_addresses": [
+      "1000 Burlington Avenue, Downers Grove, IL"
+    ],
+    "position": {
+      "latitude": 41.7959,
+      "longitude": -88.0092,
+      "kind": "existing catalogue location, not approved arrival",
+      "source_url": "https://byl.subcult.tv/api/v1/places/main-street-station"
+    },
+    "source_ids": [
+      "station-walk",
+      "station-minutes"
+    ],
+    "moment_title": "The station building and the downtown it faces",
+    "date_start": "1911-01-01",
+    "date_precision": "year",
+    "body": "The Historical Society’s architecture walk distinguishes the 1911 Classical Revival passenger station from the earlier 1864 station. The guide describes a formal entrance pavilion and later repair following the 1947 crash. Municipal minutes identify the landmark request under 1000 Burlington Avenue, while the existing Byl place uses 5001 Main Street. This pilot reuses that station identity and selects its building history for the downtown architecture theme. It does not treat a historical entrance description as a current arrival approval.",
+    "gaps": [
+      "Reconcile postal/corner addresses without duplicating the station.",
+      "Existing catalogue position is not an independently approved public arrival.",
+      "Current station approaches and crossings need inspection."
+    ],
+    "status": "draft",
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 with year/circa precision is storage normalization, not an exact-day claim.",
+    "body_kind": "supported_short_draft"
+  },
+  {
+    "key": "tivoli-theatre",
+    "name": "Tivoli Theatre",
+    "existing_place_id": "00000000-0000-4000-8000-00000000b0b2",
+    "existing_moment_id": "00000000-0000-4000-8000-00000000d0d3",
+    "address": "5021 Highland Ave, Downers Grove, IL",
+    "position": {
+      "latitude": 41.7952,
+      "longitude": -88.0099,
+      "kind": "existing catalogue location, not approved arrival",
+      "source_url": "https://byl.subcult.tv/api/v1/places/tivoli-theatre"
+    },
+    "source_ids": [
+      "tivoli"
+    ],
+    "moment_title": "Built for the Talkies",
+    "date_start": "1928-12-25",
+    "date_precision": "day",
+    "body": "The existing Tivoli history is retained at the existing theatre place. For this theme, the relevant thread is the 1928 building as a combined entertainment, commercial and residential venue. The Historical Society identifies its Highland Avenue address and describes the variety of uses planned for the building. This pilot does not rely on a national ranking among early sound-film theatres or imply entry into private or ticketed spaces. Public exterior viewing and an exact arrival still need review.",
+    "gaps": [
+      "Reuse the existing place and selected history; do not replace its published prose.",
+      "Do not infer present admission, business hours or a safe sidewalk approach from historical sources."
+    ],
+    "status": "draft",
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 3,
+    "date_storage_note": "January 1 with year/circa precision is storage normalization, not an exact-day claim.",
+    "body_kind": "selection_note_only_existing_story_unchanged",
+    "retained_story_word_count": 333,
+    "retained_story_sha256": "cb8df9d18e6eb110df1a5af37f12143ddf48898c5d7ca0a19363d3bcb09d7c0e"
+  },
+  {
+    "key": "mochel-hardware",
+    "name": "Mochel Hardware Store",
+    "address": "5122 Main Street, Downers Grove, IL",
+    "historical_addresses": [
+      "36 S Main, Downers Grove, IL"
+    ],
+    "position": {
+      "latitude": 41.7942861,
+      "longitude": -88.0104387,
+      "kind": "Nominatim address lead, not approved public viewpoint",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=5122+Main+Street%2C+Downers+Grove%2C+Illinois&format=jsonv2&limit=1&addressdetails=1"
+    },
+    "source_ids": [
+      "mochel"
+    ],
+    "moment_title": "A hardware building changes with downtown commerce",
+    "date_start": "1884-06-25",
+    "date_precision": "day",
+    "body": "The Historical Society traces the hardware business to an 1884 opening at 36 S Main, later numbered 5122 Main Street. Its account distinguishes that opening from later expansion and storefront changes. For the architecture-and-commerce theme, the building illustrates how a downtown property could change over generations of business use. The old address is retained as an identity lead, not a second place. Present storefront access, public viewing position and any street crossing remain separate review questions.",
+    "gaps": [
+      "Historical/current numbering needs a versioned identity decision.",
+      "No rights-cleared illustration or reviewed public arrival supplied."
+    ],
+    "status": "draft",
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 with year/circa precision is storage normalization, not an exact-day claim.",
+    "body_kind": "supported_short_draft"
+  },
+  {
+    "key": "farmers-merchants-bank",
+    "name": "Farmers and Merchants Bank",
+    "address": "5135 Main Street, Downers Grove, IL",
+    "position": {
+      "latitude": 41.7938999,
+      "longitude": -88.010128,
+      "kind": "Nominatim commercial-address lead, not reviewed entrance",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=5135+Main+Street%2C+Downers+Grove%2C+Illinois&format=jsonv2&limit=1&addressdetails=1"
+    },
+    "source_ids": [
+      "bank"
+    ],
+    "moment_title": "A corner bank building and its later uses",
+    "date_start": "1892-01-01",
+    "date_precision": "year",
+    "body": "The Historical Society dates the bank’s opening to 1892 and locates the building at 5135 Main Street. Its account describes several uses within the property and later commercial occupants. It also records a 1944 exterior modernization that removed the turret. Those changes make the corner building relevant to this route’s architectural theme. The narrative is historical interpretation from a named source; neither an old corner entrance nor a current business listing establishes visitor entry or a safe crossing today.",
+    "gaps": [
+      "Address geocoding is an identity suggestion, not a surveyed arrival.",
+      "No rights-cleared illustration or current exterior access inspection."
+    ],
+    "status": "draft",
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 with year/circa precision is storage normalization, not an exact-day claim.",
+    "body_kind": "supported_short_draft"
+  },
+  {
+    "key": "penner-building",
+    "name": "Penner Building",
+    "address": "5219–5221 Main Street, Downers Grove, IL",
+    "position": {
+      "latitude": 41.7921213,
+      "longitude": -88.0099546,
+      "kind": "Nominatim address-range lead, not public arrival",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=5219+Main+Street%2C+Downers+Grove%2C+Illinois&format=jsonv2&limit=1&addressdetails=1"
+    },
+    "source_ids": [
+      "penner"
+    ],
+    "moment_title": "From harness making to changing storefront trade",
+    "date_start": "1894-01-01",
+    "date_precision": "circa",
+    "body": "The Historical Society dates this building circa 1894 and places it at 5219–5221 Main Street. Conrad Penner’s harness business moved to this location around 1920, later adding tires and shoe repair as local needs changed. Construction and the arrival of the named business remain distinct dates. This short account supports the downtown commerce theme without claiming that historical shop interiors are publicly accessible. A current exterior viewpoint, arrival point and crossing still need review.",
+    "gaps": [
+      "Retain approximate construction date separately from business relocation.",
+      "No rights-cleared illustration or approved public viewing point."
+    ],
+    "status": "draft",
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 with year/circa precision is storage normalization, not an exact-day claim.",
+    "body_kind": "supported_short_draft"
+  }
+]

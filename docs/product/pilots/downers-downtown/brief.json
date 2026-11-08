@@ -1,0 +1,32 @@
+{
+  "topic": "Downtown Downers Grove architecture and commerce: Tivoli, station, Mochel, bank and Penner",
+  "area": "Downers Grove, Illinois",
+  "notes": "Private reviewed-draft pilot. Reuse existing Tivoli and station identities and select topic-appropriate histories. Brick streets remain an investigated exclusion until a precise segment’s material and public exterior viewing conditions are supported. No padding or property-entry permission inferred. Compute the loop before timing claims. Synthetic crossing-improvement exercise must remain separate from actual conditions.",
+  "place_leads": [
+    "Main Street Station",
+    "Tivoli Theatre",
+    "Mochel Hardware Store",
+    "Farmers and Merchants Bank",
+    "Penner Building"
+  ],
+  "event_leads": [
+    "Downtown architectural change",
+    "Commercial building uses",
+    "Station-area context"
+  ],
+  "source_links": [
+    "https://dghistory.org/tivoli-theater/",
+    "https://dghistory.org/mochel-hardware-store/",
+    "https://dghistory.org/farmers-and-merchants-bank/",
+    "https://dghistory.org/penner-building/",
+    "https://dghistory.org/historic-brick-streets/"
+  ],
+  "modes": [
+    "walk"
+  ],
+  "trip_shape": "loop",
+  "duration_minutes": null,
+  "start_preference": "Main Street Station",
+  "end_preference": "Main Street Station",
+  "pilot_id": "downers-downtown-v1"
+}
