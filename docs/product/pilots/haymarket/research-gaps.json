@@ -1,0 +1,18 @@
+[
+  {
+    "key": "greifs-hall",
+    "historical_address": "54 West Lake Street, east of Clinton",
+    "pin": null,
+    "reason": "Old-number conversion, parcel identity and surviving-building continuity unresolved. Witness evidence is retained with attribution; no modern address is guessed."
+  },
+  {
+    "key": "zepfs-hall",
+    "pin": null,
+    "reason": "Historical transcript distinguishes this hall, but the inspected 2003 preservation lead was not available beyond a verification page. No current building/access evidence established in this packet."
+  },
+  {
+    "key": "exact-execution-courtyard",
+    "pin": null,
+    "reason": "Use the courthouse exterior as an interpretation anchor only; catalogue direction conflict and changed jail fabric prevent an exact execution point."
+  }
+]

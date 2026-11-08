@@ -1,0 +1,19 @@
+{
+  "status": "separate_unqualified_extension",
+  "name": "Haymarket Martyrs’ Monument",
+  "municipality": "Forest Park, Illinois",
+  "site": "Forest Home Cemetery",
+  "address_lead": "863 Desplaines Avenue, Forest Park, IL",
+  "source_ids": [
+    "ilhs-chicago",
+    "nps-forest-park"
+  ],
+  "dedicated_on": "1893-06-23",
+  "included_in_walking_geometry": false,
+  "scheduled_connection": null,
+  "gaps": [
+    "No cemetery arrival or current hours/access inspection.",
+    "No fabricated connection: scheduled transit capability remains disabled until separately qualified.",
+    "Requires explicit chapter/plan review; never draw cemetery travel as a walking line from downtown Chicago."
+  ]
+}

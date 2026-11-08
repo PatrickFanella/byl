@@ -1,0 +1,42 @@
+{
+  "provider": "Valhalla/FOSSGIS public development demo",
+  "api_endpoint": "https://valhalla1.openstreetmap.de/route",
+  "retrieved_at": "2026-11-08T21:30:31.357945+00:00",
+  "request": {
+    "locations": [
+      {
+        "lat": 41.8848807,
+        "lon": -87.6441288,
+        "type": "break"
+      },
+      {
+        "lat": 41.8902314,
+        "lon": -87.6301348,
+        "type": "break"
+      }
+    ],
+    "costing": "pedestrian",
+    "units": "kilometers",
+    "language": "en-US"
+  },
+  "original_response_sha256": "4a53b26b0aedb3175d32ba448c12257af6be9e2233257ec4123e1bf34b792fbd",
+  "fixture_sha256": "df23753afcf87b918cb3220ca1c09b3f0373a447a932916227d281bb4962b7c2",
+  "fixture_transformation": "Original encoded shape and summary metrics only; no geometry edits.",
+  "trip_shape": "point_to_point",
+  "distance_m": 1716.0,
+  "walking_seconds": 1300.437,
+  "planned_dwell_minutes": 6,
+  "planned_narration_minutes": 2,
+  "conditional_total_minutes": 29.67,
+  "public_qualification": "needs_research",
+  "limitations": [
+    "Two interpretation anchors, no padding with unconverted historical addresses.",
+    "Public arrivals and current crossing/access conditions unapproved.",
+    "No cemetery travel or fabricated transit connection included.",
+    "No inspected network attribution or field timing."
+  ],
+  "attribution": "© OpenStreetMap contributors; routing by Valhalla/FOSSGIS public development demo",
+  "data_license": "ODbL-1.0",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "source_credit_url": "https://www.openstreetmap.org/copyright"
+}

@@ -1,0 +1,60 @@
+[
+  {
+    "key": "meeting-site-memorial",
+    "name": "Haymarket meeting-site memorial",
+    "address": "175 North Desplaines Street, Chicago, IL",
+    "position": {
+      "latitude": 41.8848807,
+      "longitude": -87.6441288,
+      "source_url": "https://nominatim.openstreetmap.org/search?q=Haymarket+Memorial%2C+175+North+Desplaines+Street%2C+Chicago%2C+Illinois&format=jsonv2&limit=1&addressdetails=1",
+      "kind": "OSM/Nominatim location lead, not approved public viewpoint"
+    },
+    "source_ids": [
+      "chm-overview",
+      "chicago-site",
+      "ilhs-chicago"
+    ],
+    "moment_title": "Eight-hour organizing and the May 4 meeting",
+    "date_start": "1886-05-04",
+    "date_precision": "day",
+    "body": "The Chicago History Museum connects the May 4, 1886 meeting with the eight-hour-day struggle and police violence at McCormick the previous day. The City’s landmark record locates the meeting area on Desplaines north of Randolph. The Illinois Labor History Society identifies Mary Brogger’s 2004 memorial at 175 North Desplaines. This is the Chicago meeting-site chapter, distinct from the cemetery monument in Forest Park. The bomber remains unidentified in the museum’s account; testimony and disputed details must retain their attribution.",
+    "status": "draft",
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "gaps": [
+      "Current public exterior viewpoint and crossings need review.",
+      "No rights-cleared image or approved arrival."
+    ],
+    "date_storage_note": "January 1 with year precision is a storage normalization, not an exact date."
+  },
+  {
+    "key": "former-courthouse-site",
+    "name": "Former criminal courthouse site / Courthouse Place exterior",
+    "address": "54 West Hubbard Street, Chicago, IL",
+    "position": {
+      "latitude": 41.8902314,
+      "longitude": -87.6301348,
+      "source_url": "https://nominatim.openstreetmap.org/search?q=54+West+Hubbard+Street%2C+Chicago%2C+Illinois&format=jsonv2&limit=1&addressdetails=1",
+      "kind": "OSM/Nominatim location lead, not approved public viewpoint"
+    },
+    "source_ids": [
+      "court-replacement",
+      "court-photo-catalogue",
+      "city-courthouse"
+    ],
+    "moment_title": "The trial site and the building that replaced it",
+    "date_start": "1886-01-01",
+    "date_precision": "year",
+    "body": "The Haymarket trial took place in an earlier criminal courthouse at Hubbard and Dearborn. The museum’s account says that building was demolished in 1892 and replaced; the City lists today’s Courthouse Place as built in 1893. This exterior is an interpretation anchor for the changed site, not a surviving Haymarket courtroom or a pinpointed execution courtyard. The jail fabric also changed. Historical corner descriptions conflict in the inspected records, so no exact courtyard location is asserted. Current office entry is not part of this walking draft.",
+    "status": "draft",
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "gaps": [
+      "Current public exterior viewpoint and crossings need review.",
+      "No rights-cleared image or approved arrival."
+    ],
+    "date_storage_note": "January 1 with year precision is a storage normalization, not an exact date."
+  }
+]
