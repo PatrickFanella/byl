@@ -1,0 +1,15 @@
+{
+  "qualification": "Software-only; no actual temporary closure, route observation, device calibration or production activation.",
+  "checks": [
+    {
+      "scenario": "temporary detour retained through recomputation",
+      "fixture": "backend/internal/http/great_western_pilot_test.go: TestGreatWesternPilotTemporaryDetourSurvivesRecompute",
+      "expected": "Retain approved synthetic corridor, reassessment date, temporary flag and frozen released revision after recomputation."
+    },
+    {
+      "scenario": "review due does not automatically reopen old route",
+      "fixture": "backend/internal/repository/route_corrections_test.go: TestRouteCorrectionTemporaryReviewNeverRestoresOldRoute",
+      "expected": "Expiry queues reassessment without silently restoring earlier route intent."
+    }
+  ]
+}

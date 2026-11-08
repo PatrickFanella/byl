@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Villa Avenue CA&E station / Villa Park Historical Museum",
+    "reason": "Separate 1929 electric-railway station at 220 S Villa Avenue; not the CGW depot.",
+    "selected": false
+  },
+  {
+    "name": "Ardmore CA&E station",
+    "reason": "Separate 1910 electric-railway station at 10 W Park Boulevard; not the CGW depot.",
+    "selected": false
+  },
+  {
+    "name": "Lombard StoryMap point 42: CA&E Main Street crossing",
+    "position": {
+      "latitude": 41.88188099002363,
+      "longitude": -88.01828071472909
+    },
+    "reason": "More than 1 km south of the separately mapped CGW point 16; no conflation.",
+    "selected": false
+  },
+  {
+    "name": "Elmhurst CGW depot, HMDB 237001",
+    "source_url": "https://www.hmdb.org/m.asp?m=237001",
+    "reason": "Inspected and rejected: Elmhurst/Wild Meadows Trace, not Cortesi Park in Villa Park.",
+    "selected": false
+  },
+  {
+    "name": "Nominatim 318 E Kenilworth street result and short Cortesi query",
+    "reason": "Returned a street midpoint or South Cortesi Avenue, not a park/depot arrival. Rejected.",
+    "selected": false
+  }
+]

@@ -1,0 +1,989 @@
+{
+  "source": {
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "query": "[out:json][timeout:40];way(41.85,-88.14,41.91,-87.95)[\"name\"~\"Illinois Prairie Path|Great Western Trail\"];out geom;",
+    "retrieved_at": "2026-11-08T21:37:00.174941+00:00",
+    "sha256": "a7df7e16d96380f5c18622e85869c8f0cd8b2ee4dcd069854c2c03b819e905b3",
+    "osm_base": "2026-11-08T21:35:18Z",
+    "attribution": "© OpenStreetMap contributors",
+    "license": "ODbL-1.0",
+    "license_url": "https://opendatacommons.org/licenses/odbl/1-0/"
+  },
+  "additional_sources": [
+    {
+      "file_role": "cortesi-osm-map.xml",
+      "sha256": "e2287f51d8fa91a52785e65ba8bb1e97bb8b83ba5f5b17dd7406e003eba460ab",
+      "captured_file_at": "2026-11-08T22:08:02.665310+00:00",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-87.980,41.884,-87.970,41.890"
+    },
+    {
+      "file_role": "cortesi-osm-map-westmore.xml",
+      "sha256": "9d9ab389e091d5b9f440de4075a7010f89baea473db2fe32080be238404128b6",
+      "captured_file_at": "2026-11-08T22:13:51.004241+00:00",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-87.995,41.888,-87.992,41.8905"
+    }
+  ],
+  "selection": "Actual node-connected GWT reference with explicit Cortesi Park and Westmore crossing connectors. No straight gap or CA&E main-stem shortcut inserted.",
+  "outbound_reference_distance_m": 4132.1121508510605,
+  "start_node": 388140714,
+  "turnaround_node": 13796112983,
+  "nodes": [
+    [
+      388140714,
+      -87.9706324,
+      41.8866716
+    ],
+    [
+      10224601080,
+      -87.9706535,
+      41.8867041
+    ],
+    [
+      6637782965,
+      -87.9706664,
+      41.8869118
+    ],
+    [
+      10224601082,
+      -87.9706337,
+      41.8869475
+    ],
+    [
+      388140713,
+      -87.9706276,
+      41.8869974
+    ],
+    [
+      13796112382,
+      -87.9706315,
+      41.8870071
+    ],
+    [
+      388140712,
+      -87.9706461,
+      41.8870426
+    ],
+    [
+      388140711,
+      -87.9706618,
+      41.8870811
+    ],
+    [
+      10224601081,
+      -87.9706877,
+      41.8871126
+    ],
+    [
+      388140710,
+      -87.9708145,
+      41.8871816
+    ],
+    [
+      388140470,
+      -87.9709422,
+      41.8873663
+    ],
+    [
+      377261768,
+      -87.9760658,
+      41.887794
+    ],
+    [
+      13796112384,
+      -87.9790076,
+      41.8880482
+    ],
+    [
+      237823226,
+      -87.9790907,
+      41.8880554
+    ],
+    [
+      13796112383,
+      -87.9791855,
+      41.8880628
+    ],
+    [
+      13796112978,
+      -87.983952,
+      41.8884521
+    ],
+    [
+      237823220,
+      -87.984,
+      41.888456
+    ],
+    [
+      13796112977,
+      -87.9840754,
+      41.8884623
+    ],
+    [
+      3975117091,
+      -87.9936265,
+      41.8892549
+    ],
+    [
+      10226923345,
+      -87.9936289,
+      41.8895045
+    ],
+    [
+      10226923346,
+      -87.9936373,
+      41.8897026
+    ],
+    [
+      10226923349,
+      -87.993726,
+      41.8897019
+    ],
+    [
+      3975121521,
+      -87.993844,
+      41.8897021
+    ],
+    [
+      3975117090,
+      -87.9938357,
+      41.8892718
+    ],
+    [
+      870103786,
+      -87.9950211,
+      41.8893506
+    ],
+    [
+      13796112975,
+      -87.9973188,
+      41.8895582
+    ],
+    [
+      237739093,
+      -87.9973802,
+      41.8895637
+    ],
+    [
+      13796112976,
+      -87.9974329,
+      41.8895672
+    ],
+    [
+      12314458935,
+      -87.9974857,
+      41.8895706
+    ],
+    [
+      237823261,
+      -87.998578,
+      41.889642
+    ],
+    [
+      377260584,
+      -88.0009738,
+      41.8898451
+    ],
+    [
+      3884289389,
+      -88.0019075,
+      41.8899306
+    ],
+    [
+      3884289388,
+      -88.0038044,
+      41.8900947
+    ],
+    [
+      3884289387,
+      -88.0040135,
+      41.8901119
+    ],
+    [
+      3884289386,
+      -88.0045608,
+      41.8901569
+    ],
+    [
+      2406413588,
+      -88.0046181,
+      41.890172
+    ],
+    [
+      2392297886,
+      -88.0049548,
+      41.890298
+    ],
+    [
+      2392297883,
+      -88.0050539,
+      41.8903232
+    ],
+    [
+      2406413586,
+      -88.0051292,
+      41.8903269
+    ],
+    [
+      2392297885,
+      -88.0051853,
+      41.8903152
+    ],
+    [
+      2392297882,
+      -88.0052873,
+      41.8902773
+    ],
+    [
+      2392297887,
+      -88.0054214,
+      41.8902345
+    ],
+    [
+      12314458934,
+      -88.0055342,
+      41.890238
+    ],
+    [
+      3884289385,
+      -88.0055839,
+      41.8902396
+    ],
+    [
+      2392297881,
+      -88.0056869,
+      41.8902756
+    ],
+    [
+      2406412509,
+      -88.0061873,
+      41.8905071
+    ],
+    [
+      2392297877,
+      -88.0062809,
+      41.8905478
+    ],
+    [
+      2392299186,
+      -88.0064097,
+      41.8905689
+    ],
+    [
+      2392297889,
+      -88.0065355,
+      41.8905579
+    ],
+    [
+      2392299183,
+      -88.0066802,
+      41.8904985
+    ],
+    [
+      2392299187,
+      -88.0068503,
+      41.8904107
+    ],
+    [
+      2392299184,
+      -88.0069606,
+      41.8903789
+    ],
+    [
+      2392299188,
+      -88.0070496,
+      41.890364
+    ],
+    [
+      3884289384,
+      -88.0071611,
+      41.8903721
+    ],
+    [
+      2392299185,
+      -88.0072726,
+      41.89038
+    ],
+    [
+      3884289383,
+      -88.0083029,
+      41.8904716
+    ],
+    [
+      3884289382,
+      -88.0086617,
+      41.8905018
+    ],
+    [
+      3884289381,
+      -88.0094128,
+      41.8905704
+    ],
+    [
+      377257224,
+      -88.0145351,
+      41.8909632
+    ],
+    [
+      13092807636,
+      -88.0161115,
+      41.8911085
+    ],
+    [
+      13796112981,
+      -88.0161863,
+      41.8911154
+    ],
+    [
+      237789378,
+      -88.016225,
+      41.891119
+    ],
+    [
+      13796112980,
+      -88.0163053,
+      41.8911256
+    ],
+    [
+      13796112983,
+      -88.0180898,
+      41.891273
+    ]
+  ],
+  "outbound_traversals": [
+    {
+      "way_id": 1509134514,
+      "reverse": true,
+      "from_node": 388140714,
+      "to_node": 13796112382,
+      "node_ids": [
+        388140714,
+        10224601080,
+        6637782965,
+        10224601082,
+        388140713,
+        13796112382
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "route": "bicycle",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "paved",
+        "tracktype": "grade2"
+      },
+      "role": "explicit proposed park/crossing connector"
+    },
+    {
+      "way_id": 1509134515,
+      "reverse": false,
+      "from_node": 13796112382,
+      "to_node": 388140711,
+      "node_ids": [
+        13796112382,
+        388140712,
+        388140711
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "crossing": "uncontrolled",
+        "crossing:island": "no",
+        "crossing:markings": "ladder:skewed",
+        "cycleway": "crossing",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Illinois Prairie Path",
+        "old_railway_operator": "CA&E",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "compacted",
+        "tactile_paving": "yes",
+        "tracktype": "grade1"
+      },
+      "role": "explicit proposed park/crossing connector"
+    },
+    {
+      "way_id": 33877383,
+      "reverse": true,
+      "from_node": 388140711,
+      "to_node": 388140470,
+      "node_ids": [
+        388140711,
+        10224601081,
+        388140710,
+        388140470
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "route": "bicycle",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "paved",
+        "tracktype": "grade2"
+      },
+      "role": "explicit proposed park/crossing connector"
+    },
+    {
+      "way_id": 1509134516,
+      "reverse": true,
+      "from_node": 388140470,
+      "to_node": 13796112384,
+      "node_ids": [
+        388140470,
+        377261768,
+        13796112384
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "motor_vehicle": "no",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "oneway": "no",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134517,
+      "reverse": true,
+      "from_node": 13796112384,
+      "to_node": 13796112383,
+      "node_ids": [
+        13796112384,
+        237823226,
+        13796112383
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "crossing": "uncontrolled",
+        "crossing:island": "no",
+        "crossing:markings": "ladder:skewed",
+        "cycleway": "crossing",
+        "foot": "designated",
+        "highway": "cycleway",
+        "motor_vehicle": "no",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "oneway": "no",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tactile_paving": "no",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134561,
+      "reverse": true,
+      "from_node": 13796112383,
+      "to_node": 13796112978,
+      "node_ids": [
+        13796112383,
+        13796112978
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "motor_vehicle": "no",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "oneway": "no",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134562,
+      "reverse": true,
+      "from_node": 13796112978,
+      "to_node": 13796112977,
+      "node_ids": [
+        13796112978,
+        237823220,
+        13796112977
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "crossing": "uncontrolled",
+        "crossing:island": "no",
+        "crossing:markings": "ladder:skewed",
+        "cycleway": "crossing",
+        "foot": "designated",
+        "highway": "cycleway",
+        "motor_vehicle": "no",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "oneway": "no",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tactile_paving": "no",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 175820165,
+      "reverse": true,
+      "from_node": 13796112977,
+      "to_node": 3975117091,
+      "node_ids": [
+        13796112977,
+        3975117091
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "motor_vehicle": "no",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "oneway": "no",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1118220710,
+      "reverse": false,
+      "from_node": 3975117091,
+      "to_node": 10226923346,
+      "node_ids": [
+        3975117091,
+        10226923345,
+        10226923346
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "footway": "sidewalk",
+        "highway": "footway",
+        "surface": "concrete"
+      },
+      "role": "explicit proposed park/crossing connector"
+    },
+    {
+      "way_id": 1118220712,
+      "reverse": true,
+      "from_node": 10226923346,
+      "to_node": 3975121521,
+      "node_ids": [
+        10226923346,
+        10226923349,
+        3975121521
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "crossing": "traffic_signals",
+        "crossing:markings": "zebra",
+        "footway": "crossing",
+        "highway": "footway",
+        "surface": "asphalt"
+      },
+      "role": "explicit proposed park/crossing connector"
+    },
+    {
+      "way_id": 1118220714,
+      "reverse": true,
+      "from_node": 3975121521,
+      "to_node": 3975117090,
+      "node_ids": [
+        3975121521,
+        3975117090
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "footway": "sidewalk",
+        "highway": "footway",
+        "lit": "yes",
+        "surface": "concrete"
+      },
+      "role": "explicit proposed park/crossing connector"
+    },
+    {
+      "way_id": 1118220713,
+      "reverse": true,
+      "from_node": 3975117090,
+      "to_node": 870103786,
+      "node_ids": [
+        3975117090,
+        870103786
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "motor_vehicle": "no",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "oneway": "no",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134559,
+      "reverse": true,
+      "from_node": 870103786,
+      "to_node": 13796112975,
+      "node_ids": [
+        870103786,
+        13796112975
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "lit": "yes",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2",
+        "width": "4"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134560,
+      "reverse": true,
+      "from_node": 13796112975,
+      "to_node": 13796112976,
+      "node_ids": [
+        13796112975,
+        237739093,
+        13796112976
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "crossing": "uncontrolled",
+        "crossing:island": "no",
+        "crossing:markings": "zebra",
+        "cycleway": "crossing",
+        "foot": "designated",
+        "highway": "cycleway",
+        "lit": "yes",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tactile_paving": "no",
+        "tracktype": "grade2",
+        "width": "4"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 59338236,
+      "reverse": true,
+      "from_node": 13796112976,
+      "to_node": 3884289389,
+      "node_ids": [
+        13796112976,
+        12314458935,
+        237823261,
+        377260584,
+        3884289389
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "lit": "yes",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2",
+        "width": "4"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 232278398,
+      "reverse": true,
+      "from_node": 3884289389,
+      "to_node": 2406413588,
+      "node_ids": [
+        3884289389,
+        3884289388,
+        3884289387,
+        3884289386,
+        2406413588
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "source": "GPS",
+        "surface": "asphalt",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 232278396,
+      "reverse": true,
+      "from_node": 2406413588,
+      "to_node": 2392297886,
+      "node_ids": [
+        2406413588,
+        2392297886
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "bridge": "yes",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "concrete",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 232278399,
+      "reverse": true,
+      "from_node": 2392297886,
+      "to_node": 2392297881,
+      "node_ids": [
+        2392297886,
+        2392297883,
+        2406413586,
+        2392297885,
+        2392297882,
+        2392297887,
+        12314458934,
+        3884289385,
+        2392297881
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "embankment": "yes",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "asphalt",
+        "tracktype": "grade2",
+        "width": "4"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 232278397,
+      "reverse": true,
+      "from_node": 2392297881,
+      "to_node": 2406412509,
+      "node_ids": [
+        2392297881,
+        2406412509
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "bridge": "yes",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "concrete",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 232278190,
+      "reverse": true,
+      "from_node": 2406412509,
+      "to_node": 3884289383,
+      "node_ids": [
+        2406412509,
+        2392297877,
+        2392299186,
+        2392297889,
+        2392299183,
+        2392299187,
+        2392299184,
+        2392299188,
+        3884289384,
+        2392299185,
+        3884289383
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "asphalt",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 232278188,
+      "reverse": true,
+      "from_node": 3884289383,
+      "to_node": 3884289382,
+      "node_ids": [
+        3884289383,
+        3884289382
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "bridge": "yes",
+        "foot": "designated",
+        "highway": "cycleway",
+        "layer": "1",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "concrete",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 232278411,
+      "reverse": true,
+      "from_node": 3884289382,
+      "to_node": 3884289381,
+      "node_ids": [
+        3884289382,
+        3884289381
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "asphalt",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134563,
+      "reverse": true,
+      "from_node": 3884289381,
+      "to_node": 13796112981,
+      "node_ids": [
+        3884289381,
+        377257224,
+        13092807636,
+        13796112981
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134564,
+      "reverse": true,
+      "from_node": 13796112981,
+      "to_node": 13796112980,
+      "node_ids": [
+        13796112981,
+        237789378,
+        13796112980
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "crossing": "uncontrolled",
+        "crossing:island": "no",
+        "crossing:markings": "zebra",
+        "cycleway": "crossing",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "compacted",
+        "tactile_paving": "yes",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    },
+    {
+      "way_id": 1509134565,
+      "reverse": true,
+      "from_node": 13796112980,
+      "to_node": 13796112983,
+      "node_ids": [
+        13796112980,
+        13796112983
+      ],
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "name": "Great Western Trail",
+        "old_railway_operator": "CGW",
+        "railway": "abandoned",
+        "segregated": "no",
+        "source": "GPS",
+        "surface": "compacted",
+        "tracktype": "grade2"
+      },
+      "role": "mapped GWT segment"
+    }
+  ],
+  "return_selection": "Reverse the selected connected reference for a non-narrated return; actual provider returned separate direction metrics.",
+  "access": "unknown; mapped bicycle designations and historical trail accounts are not current access inspection."
+}

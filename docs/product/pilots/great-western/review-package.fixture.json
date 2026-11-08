@@ -1,0 +1,2133 @@
+{
+  "schema_version": 1,
+  "version": "542637103825543f763a04adcca88d85f6369c5e8a6b75cd6d5c3cf9e14f3cd2",
+  "state": "needs_research",
+  "ready_to_publish": false,
+  "brief": {
+    "id": "cca42aa8-fa58-4e24-a1ad-2b7016b6b25a",
+    "owner_account_id": "14850b71-243d-4f30-900f-c53e3e789650",
+    "submitted": {
+      "topic": "Great Western Trail: Cortesi Park depot, rail freight and the former Lombard CGW station",
+      "area": "Villa Park to Lombard, Illinois",
+      "notes": "Private bounded out-and-back bike draft. Keep CGW and CA&E station/corridor identities distinct. The western place lead is the turnaround; end preference names the final return destination, matching the start. The return adds no repeated narration. Retain park and crossing connectors; no automatic publication or current access approval. Synthetic temporary-detour exercise is not an actual closure.",
+      "place_leads": [
+        "Cortesi Park / CGW depot interpretation point",
+        "Former Lombard CGW station / trail interpretation point"
+      ],
+      "event_leads": [
+        "Railway freight and local industry",
+        "CGW depot interpretation",
+        "Railway right-of-way converted to trail"
+      ],
+      "source_links": [
+        "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+        "https://www.invillapark.com/DocumentCenter/View/561",
+        "https://www.invillapark.com/facilities/facility/details/Cortesi-Veterans-Memorial-Park-1",
+        "https://www.hmdb.org/m.asp?m=244906",
+        "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+        "https://www.dupagecounty.gov/Transportation/Documents/2024-0212%20DUPAGE%20TRAILS%20PLAN%20ADOPTED.pdf",
+        "https://villageoflombard.org/411/Walking-Biking-in-Lombard"
+      ],
+      "modes": [
+        "bike"
+      ],
+      "trip_shape": "out_and_back",
+      "duration_minutes": null,
+      "start_preference": "Cortesi Park / CGW depot interpretation point",
+      "end_preference": "Cortesi Park / CGW depot interpretation point",
+      "pilot_id": "great-western-v1"
+    },
+    "status": "review",
+    "reason": "Research stages completed; curator review required.",
+    "version": 3,
+    "created_at": "2026-11-08T16:30:47.303243-06:00",
+    "updated_at": "2026-11-08T16:30:47.787747-06:00"
+  },
+  "research": {
+    "id": "5627abda-503e-4c1d-9752-3b85a6abbc31",
+    "brief_id": "cca42aa8-fa58-4e24-a1ad-2b7016b6b25a",
+    "job_id": "8506054d-9628-4240-aa5a-1d22ca07ec2b",
+    "source_version": 1,
+    "brief_version": 2,
+    "status": "completed",
+    "reason": "",
+    "requests_used": 2,
+    "tokens_reserved": 4000,
+    "request_limit": 12,
+    "token_limit": 20000,
+    "deadline_at": "2026-11-08T16:45:47.629001-06:00",
+    "created_at": "2026-11-08T16:30:47.629001-06:00",
+    "stages": [
+      {
+        "stage": "research",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "reconciliation",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "drafting",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "assembly",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      }
+    ]
+  },
+  "submitted": {
+    "topic": "Great Western Trail: Cortesi Park depot, rail freight and the former Lombard CGW station",
+    "area": "Villa Park to Lombard, Illinois",
+    "notes": "Private bounded out-and-back bike draft. Keep CGW and CA&E station/corridor identities distinct. The western place lead is the turnaround; end preference names the final return destination, matching the start. The return adds no repeated narration. Retain park and crossing connectors; no automatic publication or current access approval. Synthetic temporary-detour exercise is not an actual closure.",
+    "place_leads": [
+      "Cortesi Park / CGW depot interpretation point",
+      "Former Lombard CGW station / trail interpretation point"
+    ],
+    "event_leads": [
+      "Railway freight and local industry",
+      "CGW depot interpretation",
+      "Railway right-of-way converted to trail"
+    ],
+    "source_links": [
+      "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+      "https://www.invillapark.com/DocumentCenter/View/561",
+      "https://www.invillapark.com/facilities/facility/details/Cortesi-Veterans-Memorial-Park-1",
+      "https://www.hmdb.org/m.asp?m=244906",
+      "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+      "https://www.dupagecounty.gov/Transportation/Documents/2024-0212%20DUPAGE%20TRAILS%20PLAN%20ADOPTED.pdf",
+      "https://villageoflombard.org/411/Walking-Biking-in-Lombard"
+    ],
+    "modes": [
+      "bike"
+    ],
+    "trip_shape": "out_and_back",
+    "duration_minutes": null,
+    "start_preference": "Cortesi Park / CGW depot interpretation point",
+    "end_preference": "Cortesi Park / CGW depot interpretation point",
+    "pilot_id": "great-western-v1"
+  },
+  "proposal": {
+    "version": 1,
+    "status": "draft",
+    "created_at": "2026-11-08T16:30:47.753804508-06:00",
+    "title": "Great Western Trail: Cortesi Park depot, rail freight and the former Lombard CGW station — Villa Park to Lombard, Illinois",
+    "introduction": "Explore Great Western Trail: Cortesi Park depot, rail freight and the former Lombard CGW station in Villa Park to Lombard, Illinois through 2 researched locations and their selected historical accounts. This is a private proposal; current viewing guidance, connecting paths and publication still require review.",
+    "requested_shape": "out_and_back",
+    "trip_shape": "out_and_back",
+    "modes": [
+      "bike"
+    ],
+    "target_duration_minutes": null,
+    "travel_minutes": null,
+    "travel_state": "not_computed",
+    "planned_dwell_minutes": 6,
+    "planned_narration_minutes": 2,
+    "stops": [
+      {
+        "material": {
+          "record_id": "000e7360-34e7-4145-aac6-551ac039d46b",
+          "review_version": 1,
+          "place_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+          "place_name": "Cortesi Park / CGW depot interpretation point",
+          "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+          "latitude": 41.88675,
+          "longitude": -87.9704333,
+          "moment_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+          "moment_title": "A 1926 depot serving railway freight and local industry",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "155395b6ee74f9ca9aeb16808faec16eb03e3f2987e102f5e8909e2a449304b6",
+          "source_urls": [
+            "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+            "https://www.invillapark.com/DocumentCenter/View/561",
+            "https://www.invillapark.com/facilities/facility/details/Cortesi-Veterans-Memorial-Park-1",
+            "https://www.hmdb.org/m.asp?m=244906"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: great, western, park, depot, rail, freight, station, event: Railway freight and local industry",
+        "what_to_notice": "Curator research question: what traces of “A 1926 depot serving railway freight and local industry” can be observed at Cortesi Park / CGW depot interpretation point today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with “A former Great Western depot in a municipal photograph” at Former Lombard CGW station / trail interpretation point. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "c1f6ef83-4b25-4c95-b5fd-26083d7e1d9a",
+          "review_version": 1,
+          "place_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+          "place_name": "Former Lombard CGW station / trail interpretation point",
+          "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+          "latitude": 41.89118916663432,
+          "longitude": -88.0179440974977,
+          "moment_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+          "moment_title": "A former Great Western depot in a municipal photograph",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "b2c6f1f3f3fdb045147f6078ae145b223aa9eb7b53c094ccba1c30ce54567a8a",
+          "source_urls": [
+            "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+            "https://www.dupagecounty.gov/Transportation/Documents/2024-0212%20DUPAGE%20TRAILS%20PLAN%20ADOPTED.pdf"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: great, western, trail, depot, rail, former, lombard, cgw, station",
+        "what_to_notice": "Curator research question: what traces of “A former Great Western depot in a municipal photograph” can be observed at Former Lombard CGW station / trail interpretation point today? Confirm visible features before writing viewing guidance.",
+        "transition": "",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      }
+    ],
+    "travel_sequence": [
+      0,
+      1,
+      0
+    ],
+    "excluded": [],
+    "research_gaps": [],
+    "assumptions": [
+      "Historical paragraphs are reused from retained material; their inclusion is not a new factual review.",
+      "What to notice is a curator research question, not verified current viewing guidance.",
+      "Plan three minutes of dwell per stop, plus narration at 130 words per minute; actual travel and access still require computation and review.",
+      "No duration was supplied; the geography screen uses a provisional 60-minute planning budget."
+    ]
+  },
+  "tour": {
+    "journeys": {
+      "bike": {
+        "version": 1,
+        "state": "unreviewed",
+        "computation": "ready",
+        "quality": "unreviewed",
+        "usable": false,
+        "issue_codes": [],
+        "travel_distance_m": 8270,
+        "travel_duration_s": 2062,
+        "dwell_duration_s": 360,
+        "narration_duration_s": 240,
+        "itinerary_duration_s": 2662,
+        "round_trip_duration_s": 2662,
+        "return_plan": {
+          "status": "included",
+          "distance_m": 4135,
+          "duration_s": 1031
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      }
+    },
+    "draft_version": 0,
+    "route_version": 0,
+    "revision_id": null,
+    "revision_number": 0,
+    "id": "1428387b-c503-48ee-86ad-90283a4ccf58",
+    "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+    "city_ids": [
+      "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+      "53255a37-21df-42b7-98c4-3b0210114d8e"
+    ],
+    "slug": "great-western-out-and-back-private-pilot",
+    "title": "Great Western out-and-back — private pilot",
+    "summary": "",
+    "topic_id": null,
+    "topic": null,
+    "modes": [
+      "bike"
+    ],
+    "hero_media": null,
+    "status": "draft",
+    "visibility": "public",
+    "owner_account_id": null,
+    "stop_count": 2,
+    "routes": {
+      "bike": {
+        "mode": "bike",
+        "status": "ready",
+        "distance_m": 8270,
+        "duration_s": 2062,
+        "estimated_minutes": 35,
+        "computed_at": "2026-11-08T16:30:47.969241-06:00"
+      }
+    },
+    "created_at": "2026-11-08T16:30:47.892-06:00",
+    "updated_at": "2026-11-08T16:30:47.892-06:00",
+    "stops": [
+      {
+        "id": "5efb8d8c-908d-4b78-a875-282a05aba753",
+        "position": 1,
+        "place": {
+          "id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+          "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+          "slug": "cortesi-park-cgw-depot-interpretation-point",
+          "name": "Cortesi Park / CGW depot interpretation point",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.88675,
+          "longitude": -87.9704333,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "318 E Kenilworth Avenue, Villa Park, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T16:30:47.465877-06:00",
+          "updated_at": "2026-11-08T16:30:47.465877-06:00"
+        },
+        "featured_moment_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+        "featured_moment": {
+          "id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+          "place_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+          "slug": "a-1926-depot-serving-railway-freight-and-local-industry",
+          "title": "A 1926 depot serving railway freight and local industry",
+          "excerpt": "The Village’s preservation record dates the Chicago Great Western depot to 1926. It describes railway freight serving Ovaltine and local building suppliers, including Sears house kits. The depot is distinct from Villa Park’s CA&E stations.…",
+          "date_start": "1926-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "b231d019-596d-4f99-b8f9-eaaa0b13f1d6",
+        "position": 2,
+        "place": {
+          "id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+          "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+          "slug": "former-lombard-cgw-station-trail-interpretation-point",
+          "name": "Former Lombard CGW station / trail interpretation point",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.89118916663432,
+          "longitude": -88.0179440974977,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "Great Western Trail near North Charlotte Street, Lombard, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T16:30:47.547836-06:00",
+          "updated_at": "2026-11-08T16:30:47.547836-06:00"
+        },
+        "featured_moment_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+        "featured_moment": {
+          "id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+          "place_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+          "slug": "a-former-great-western-depot-in-a-municipal-photograph",
+          "title": "A former Great Western depot in a municipal photograph",
+          "excerpt": "The Village of Lombard’s municipal StoryMap labels a 1949 train-station photograph and describes the CGW depot south of the old tracks near North Charlotte Street. This is the western interpretation anchor and turnaround for the bounded…",
+          "date_start": "1949-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      }
+    ]
+  },
+  "routes": {
+    "bike": {
+      "journey": {
+        "version": 1,
+        "state": "unreviewed",
+        "computation": "ready",
+        "quality": "unreviewed",
+        "usable": false,
+        "issue_codes": [],
+        "travel_distance_m": 8270,
+        "travel_duration_s": 2062,
+        "dwell_duration_s": 360,
+        "narration_duration_s": 240,
+        "itinerary_duration_s": 2662,
+        "round_trip_duration_s": 2662,
+        "return_plan": {
+          "status": "included",
+          "distance_m": 4135,
+          "duration_s": 1031
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      },
+      "id": "509fe9e2-ca9e-4219-90dc-43ce58cf99a7",
+      "tour_id": "1428387b-c503-48ee-86ad-90283a4ccf58",
+      "mode": "bike",
+      "status": "ready",
+      "provider": "valhalla",
+      "distance_m": 8270,
+      "duration_s": 2062,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.970633,
+            41.886665
+          ],
+          [
+            -87.970632,
+            41.886672
+          ],
+          [
+            -87.970654,
+            41.886704
+          ],
+          [
+            -87.970666,
+            41.886912
+          ],
+          [
+            -87.970634,
+            41.886947
+          ],
+          [
+            -87.970628,
+            41.886997
+          ],
+          [
+            -87.970632,
+            41.887007
+          ],
+          [
+            -87.970646,
+            41.887043
+          ],
+          [
+            -87.970662,
+            41.887081
+          ],
+          [
+            -87.970688,
+            41.887113
+          ],
+          [
+            -87.970815,
+            41.887182
+          ],
+          [
+            -87.970942,
+            41.887366
+          ],
+          [
+            -87.976066,
+            41.887794
+          ],
+          [
+            -87.979008,
+            41.888048
+          ],
+          [
+            -87.979091,
+            41.888055
+          ],
+          [
+            -87.979186,
+            41.888063
+          ],
+          [
+            -87.983952,
+            41.888452
+          ],
+          [
+            -87.984,
+            41.888456
+          ],
+          [
+            -87.984075,
+            41.888462
+          ],
+          [
+            -87.993627,
+            41.889255
+          ],
+          [
+            -87.993629,
+            41.889504
+          ],
+          [
+            -87.993637,
+            41.889703
+          ],
+          [
+            -87.993726,
+            41.889702
+          ],
+          [
+            -87.993844,
+            41.889702
+          ],
+          [
+            -87.993836,
+            41.889272
+          ],
+          [
+            -87.995021,
+            41.889351
+          ],
+          [
+            -87.997319,
+            41.889558
+          ],
+          [
+            -87.99738,
+            41.889564
+          ],
+          [
+            -87.997433,
+            41.889567
+          ],
+          [
+            -87.997486,
+            41.889571
+          ],
+          [
+            -87.998578,
+            41.889642
+          ],
+          [
+            -88.000974,
+            41.889845
+          ],
+          [
+            -88.001908,
+            41.889931
+          ],
+          [
+            -88.003804,
+            41.890095
+          ],
+          [
+            -88.004014,
+            41.890112
+          ],
+          [
+            -88.004561,
+            41.890157
+          ],
+          [
+            -88.004618,
+            41.890172
+          ],
+          [
+            -88.004955,
+            41.890298
+          ],
+          [
+            -88.005054,
+            41.890323
+          ],
+          [
+            -88.005129,
+            41.890327
+          ],
+          [
+            -88.005185,
+            41.890315
+          ],
+          [
+            -88.005287,
+            41.890277
+          ],
+          [
+            -88.005421,
+            41.890234
+          ],
+          [
+            -88.005534,
+            41.890238
+          ],
+          [
+            -88.005584,
+            41.89024
+          ],
+          [
+            -88.005687,
+            41.890276
+          ],
+          [
+            -88.006187,
+            41.890507
+          ],
+          [
+            -88.006281,
+            41.890548
+          ],
+          [
+            -88.00641,
+            41.890569
+          ],
+          [
+            -88.006536,
+            41.890558
+          ],
+          [
+            -88.00668,
+            41.890499
+          ],
+          [
+            -88.00685,
+            41.890411
+          ],
+          [
+            -88.006961,
+            41.890379
+          ],
+          [
+            -88.00705,
+            41.890364
+          ],
+          [
+            -88.007161,
+            41.890372
+          ],
+          [
+            -88.007273,
+            41.89038
+          ],
+          [
+            -88.008303,
+            41.890472
+          ],
+          [
+            -88.008662,
+            41.890502
+          ],
+          [
+            -88.009413,
+            41.89057
+          ],
+          [
+            -88.014535,
+            41.890963
+          ],
+          [
+            -88.016112,
+            41.891109
+          ],
+          [
+            -88.016186,
+            41.891115
+          ],
+          [
+            -88.016225,
+            41.891119
+          ],
+          [
+            -88.016305,
+            41.891126
+          ],
+          [
+            -88.01809,
+            41.891273
+          ],
+          [
+            -88.01809,
+            41.891273
+          ],
+          [
+            -88.016305,
+            41.891126
+          ],
+          [
+            -88.016225,
+            41.891119
+          ],
+          [
+            -88.016186,
+            41.891115
+          ],
+          [
+            -88.016112,
+            41.891109
+          ],
+          [
+            -88.014535,
+            41.890963
+          ],
+          [
+            -88.009413,
+            41.89057
+          ],
+          [
+            -88.008662,
+            41.890502
+          ],
+          [
+            -88.008303,
+            41.890472
+          ],
+          [
+            -88.007273,
+            41.89038
+          ],
+          [
+            -88.007161,
+            41.890372
+          ],
+          [
+            -88.00705,
+            41.890364
+          ],
+          [
+            -88.006961,
+            41.890379
+          ],
+          [
+            -88.00685,
+            41.890411
+          ],
+          [
+            -88.00668,
+            41.890499
+          ],
+          [
+            -88.006536,
+            41.890558
+          ],
+          [
+            -88.00641,
+            41.890569
+          ],
+          [
+            -88.006281,
+            41.890548
+          ],
+          [
+            -88.006187,
+            41.890507
+          ],
+          [
+            -88.005687,
+            41.890276
+          ],
+          [
+            -88.005584,
+            41.89024
+          ],
+          [
+            -88.005534,
+            41.890238
+          ],
+          [
+            -88.005421,
+            41.890234
+          ],
+          [
+            -88.005287,
+            41.890277
+          ],
+          [
+            -88.005185,
+            41.890315
+          ],
+          [
+            -88.005129,
+            41.890327
+          ],
+          [
+            -88.005054,
+            41.890323
+          ],
+          [
+            -88.004955,
+            41.890298
+          ],
+          [
+            -88.004618,
+            41.890172
+          ],
+          [
+            -88.004561,
+            41.890157
+          ],
+          [
+            -88.004014,
+            41.890112
+          ],
+          [
+            -88.003804,
+            41.890095
+          ],
+          [
+            -88.001908,
+            41.889931
+          ],
+          [
+            -88.000974,
+            41.889845
+          ],
+          [
+            -87.998578,
+            41.889642
+          ],
+          [
+            -87.997486,
+            41.889571
+          ],
+          [
+            -87.997433,
+            41.889567
+          ],
+          [
+            -87.99738,
+            41.889564
+          ],
+          [
+            -87.997319,
+            41.889558
+          ],
+          [
+            -87.995021,
+            41.889351
+          ],
+          [
+            -87.993836,
+            41.889272
+          ],
+          [
+            -87.993844,
+            41.889702
+          ],
+          [
+            -87.993726,
+            41.889702
+          ],
+          [
+            -87.993637,
+            41.889703
+          ],
+          [
+            -87.993629,
+            41.889504
+          ],
+          [
+            -87.993627,
+            41.889255
+          ],
+          [
+            -87.984075,
+            41.888462
+          ],
+          [
+            -87.984,
+            41.888456
+          ],
+          [
+            -87.983952,
+            41.888452
+          ],
+          [
+            -87.979186,
+            41.888063
+          ],
+          [
+            -87.979091,
+            41.888055
+          ],
+          [
+            -87.979008,
+            41.888048
+          ],
+          [
+            -87.976066,
+            41.887794
+          ],
+          [
+            -87.970942,
+            41.887366
+          ],
+          [
+            -87.970815,
+            41.887182
+          ],
+          [
+            -87.970688,
+            41.887113
+          ],
+          [
+            -87.970662,
+            41.887081
+          ],
+          [
+            -87.970646,
+            41.887043
+          ],
+          [
+            -87.970632,
+            41.887007
+          ],
+          [
+            -87.970628,
+            41.886997
+          ],
+          [
+            -87.970634,
+            41.886947
+          ],
+          [
+            -87.970666,
+            41.886912
+          ],
+          [
+            -87.970654,
+            41.886704
+          ],
+          [
+            -87.970632,
+            41.886672
+          ],
+          [
+            -87.970633,
+            41.886665
+          ]
+        ]
+      },
+      "legs": [
+        {
+          "from_stop_id": "5efb8d8c-908d-4b78-a875-282a05aba753",
+          "to_stop_id": "b231d019-596d-4f99-b8f9-eaaa0b13f1d6",
+          "navigation_source": "unapproved_proposed_arrival_comparison",
+          "from_position": 1,
+          "to_position": 2,
+          "distance_m": 4135,
+          "duration_s": 1030,
+          "geometry": [
+            [
+              -87.970633,
+              41.886665
+            ],
+            [
+              -87.970632,
+              41.886672
+            ],
+            [
+              -87.970654,
+              41.886704
+            ],
+            [
+              -87.970666,
+              41.886912
+            ],
+            [
+              -87.970634,
+              41.886947
+            ],
+            [
+              -87.970628,
+              41.886997
+            ],
+            [
+              -87.970632,
+              41.887007
+            ],
+            [
+              -87.970646,
+              41.887043
+            ],
+            [
+              -87.970662,
+              41.887081
+            ],
+            [
+              -87.970688,
+              41.887113
+            ],
+            [
+              -87.970815,
+              41.887182
+            ],
+            [
+              -87.970942,
+              41.887366
+            ],
+            [
+              -87.976066,
+              41.887794
+            ],
+            [
+              -87.979008,
+              41.888048
+            ],
+            [
+              -87.979091,
+              41.888055
+            ],
+            [
+              -87.979186,
+              41.888063
+            ],
+            [
+              -87.983952,
+              41.888452
+            ],
+            [
+              -87.984,
+              41.888456
+            ],
+            [
+              -87.984075,
+              41.888462
+            ],
+            [
+              -87.993627,
+              41.889255
+            ],
+            [
+              -87.993629,
+              41.889504
+            ],
+            [
+              -87.993637,
+              41.889703
+            ],
+            [
+              -87.993726,
+              41.889702
+            ],
+            [
+              -87.993844,
+              41.889702
+            ],
+            [
+              -87.993836,
+              41.889272
+            ],
+            [
+              -87.995021,
+              41.889351
+            ],
+            [
+              -87.997319,
+              41.889558
+            ],
+            [
+              -87.99738,
+              41.889564
+            ],
+            [
+              -87.997433,
+              41.889567
+            ],
+            [
+              -87.997486,
+              41.889571
+            ],
+            [
+              -87.998578,
+              41.889642
+            ],
+            [
+              -88.000974,
+              41.889845
+            ],
+            [
+              -88.001908,
+              41.889931
+            ],
+            [
+              -88.003804,
+              41.890095
+            ],
+            [
+              -88.004014,
+              41.890112
+            ],
+            [
+              -88.004561,
+              41.890157
+            ],
+            [
+              -88.004618,
+              41.890172
+            ],
+            [
+              -88.004955,
+              41.890298
+            ],
+            [
+              -88.005054,
+              41.890323
+            ],
+            [
+              -88.005129,
+              41.890327
+            ],
+            [
+              -88.005185,
+              41.890315
+            ],
+            [
+              -88.005287,
+              41.890277
+            ],
+            [
+              -88.005421,
+              41.890234
+            ],
+            [
+              -88.005534,
+              41.890238
+            ],
+            [
+              -88.005584,
+              41.89024
+            ],
+            [
+              -88.005687,
+              41.890276
+            ],
+            [
+              -88.006187,
+              41.890507
+            ],
+            [
+              -88.006281,
+              41.890548
+            ],
+            [
+              -88.00641,
+              41.890569
+            ],
+            [
+              -88.006536,
+              41.890558
+            ],
+            [
+              -88.00668,
+              41.890499
+            ],
+            [
+              -88.00685,
+              41.890411
+            ],
+            [
+              -88.006961,
+              41.890379
+            ],
+            [
+              -88.00705,
+              41.890364
+            ],
+            [
+              -88.007161,
+              41.890372
+            ],
+            [
+              -88.007273,
+              41.89038
+            ],
+            [
+              -88.008303,
+              41.890472
+            ],
+            [
+              -88.008662,
+              41.890502
+            ],
+            [
+              -88.009413,
+              41.89057
+            ],
+            [
+              -88.014535,
+              41.890963
+            ],
+            [
+              -88.016112,
+              41.891109
+            ],
+            [
+              -88.016186,
+              41.891115
+            ],
+            [
+              -88.016225,
+              41.891119
+            ],
+            [
+              -88.016305,
+              41.891126
+            ],
+            [
+              -88.01809,
+              41.891273
+            ]
+          ]
+        },
+        {
+          "from_stop_id": "b231d019-596d-4f99-b8f9-eaaa0b13f1d6",
+          "to_stop_id": "5efb8d8c-908d-4b78-a875-282a05aba753",
+          "navigation_source": "unapproved_proposed_arrival_comparison",
+          "return": true,
+          "from_position": 2,
+          "to_position": 1,
+          "distance_m": 4135,
+          "duration_s": 1031,
+          "geometry": [
+            [
+              -88.01809,
+              41.891273
+            ],
+            [
+              -88.016305,
+              41.891126
+            ],
+            [
+              -88.016225,
+              41.891119
+            ],
+            [
+              -88.016186,
+              41.891115
+            ],
+            [
+              -88.016112,
+              41.891109
+            ],
+            [
+              -88.014535,
+              41.890963
+            ],
+            [
+              -88.009413,
+              41.89057
+            ],
+            [
+              -88.008662,
+              41.890502
+            ],
+            [
+              -88.008303,
+              41.890472
+            ],
+            [
+              -88.007273,
+              41.89038
+            ],
+            [
+              -88.007161,
+              41.890372
+            ],
+            [
+              -88.00705,
+              41.890364
+            ],
+            [
+              -88.006961,
+              41.890379
+            ],
+            [
+              -88.00685,
+              41.890411
+            ],
+            [
+              -88.00668,
+              41.890499
+            ],
+            [
+              -88.006536,
+              41.890558
+            ],
+            [
+              -88.00641,
+              41.890569
+            ],
+            [
+              -88.006281,
+              41.890548
+            ],
+            [
+              -88.006187,
+              41.890507
+            ],
+            [
+              -88.005687,
+              41.890276
+            ],
+            [
+              -88.005584,
+              41.89024
+            ],
+            [
+              -88.005534,
+              41.890238
+            ],
+            [
+              -88.005421,
+              41.890234
+            ],
+            [
+              -88.005287,
+              41.890277
+            ],
+            [
+              -88.005185,
+              41.890315
+            ],
+            [
+              -88.005129,
+              41.890327
+            ],
+            [
+              -88.005054,
+              41.890323
+            ],
+            [
+              -88.004955,
+              41.890298
+            ],
+            [
+              -88.004618,
+              41.890172
+            ],
+            [
+              -88.004561,
+              41.890157
+            ],
+            [
+              -88.004014,
+              41.890112
+            ],
+            [
+              -88.003804,
+              41.890095
+            ],
+            [
+              -88.001908,
+              41.889931
+            ],
+            [
+              -88.000974,
+              41.889845
+            ],
+            [
+              -87.998578,
+              41.889642
+            ],
+            [
+              -87.997486,
+              41.889571
+            ],
+            [
+              -87.997433,
+              41.889567
+            ],
+            [
+              -87.99738,
+              41.889564
+            ],
+            [
+              -87.997319,
+              41.889558
+            ],
+            [
+              -87.995021,
+              41.889351
+            ],
+            [
+              -87.993836,
+              41.889272
+            ],
+            [
+              -87.993844,
+              41.889702
+            ],
+            [
+              -87.993726,
+              41.889702
+            ],
+            [
+              -87.993637,
+              41.889703
+            ],
+            [
+              -87.993629,
+              41.889504
+            ],
+            [
+              -87.993627,
+              41.889255
+            ],
+            [
+              -87.984075,
+              41.888462
+            ],
+            [
+              -87.984,
+              41.888456
+            ],
+            [
+              -87.983952,
+              41.888452
+            ],
+            [
+              -87.979186,
+              41.888063
+            ],
+            [
+              -87.979091,
+              41.888055
+            ],
+            [
+              -87.979008,
+              41.888048
+            ],
+            [
+              -87.976066,
+              41.887794
+            ],
+            [
+              -87.970942,
+              41.887366
+            ],
+            [
+              -87.970815,
+              41.887182
+            ],
+            [
+              -87.970688,
+              41.887113
+            ],
+            [
+              -87.970662,
+              41.887081
+            ],
+            [
+              -87.970646,
+              41.887043
+            ],
+            [
+              -87.970632,
+              41.887007
+            ],
+            [
+              -87.970628,
+              41.886997
+            ],
+            [
+              -87.970634,
+              41.886947
+            ],
+            [
+              -87.970666,
+              41.886912
+            ],
+            [
+              -87.970654,
+              41.886704
+            ],
+            [
+              -87.970632,
+              41.886672
+            ],
+            [
+              -87.970633,
+              41.886665
+            ]
+          ]
+        }
+      ],
+      "computed_at": "2026-11-08T16:30:47.969241-06:00"
+    }
+  },
+  "path_reports": {
+    "bike": null
+  },
+  "reconciliation": [
+    {
+      "id": "000e7360-34e7-4145-aac6-551ac039d46b",
+      "identity_key": "85ddb113ed12e0a0d530f76519ac72b8369f633c455bc10db04a52c26decdbd8",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Cortesi Park / CGW depot interpretation point",
+          "text": "",
+          "url": "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+          "lat": 41.88675,
+          "lng": -87.9704333,
+          "area": "Villa Park",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+            "place_name": "Cortesi Park / CGW depot interpretation point",
+            "address": "318 E Kenilworth Avenue, Villa Park, IL"
+          }
+        },
+        "key": "85ddb113ed12e0a0d530f76519ac72b8369f633c455bc10db04a52c26decdbd8",
+        "place_key": "ca1bbfc9470678609c298fdace58d740bd9760cb7a711089eda4ec35ba267c6b",
+        "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Cortesi Park / CGW depot interpretation point",
+          "text": "",
+          "url": "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+          "lat": 41.88675,
+          "lng": -87.9704333,
+          "area": "Villa Park",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+            "place_name": "Cortesi Park / CGW depot interpretation point",
+            "address": "318 E Kenilworth Avenue, Villa Park, IL"
+          }
+        },
+        "key": "85ddb113ed12e0a0d530f76519ac72b8369f633c455bc10db04a52c26decdbd8",
+        "place_key": "ca1bbfc9470678609c298fdace58d740bd9760cb7a711089eda4ec35ba267c6b",
+        "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "8938481b-2b75-4514-9791-c37de243ae35",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+        "moment_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "14850b71-243d-4f30-900f-c53e3e789650"
+      },
+      "created_at": "2026-11-08T16:30:47.336075-06:00"
+    },
+    {
+      "id": "c1f6ef83-4b25-4c95-b5fd-26083d7e1d9a",
+      "identity_key": "122d988ef5ca3347a4640c5347107afb15fdef1a52c6eab91b94af64ba0553fa",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Former Lombard CGW station / trail interpretation point",
+          "text": "",
+          "url": "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+          "lat": 41.89118916663432,
+          "lng": -88.0179440974977,
+          "area": "Lombard",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+            "place_name": "Former Lombard CGW station / trail interpretation point",
+            "address": "Great Western Trail near North Charlotte Street, Lombard, IL"
+          }
+        },
+        "key": "122d988ef5ca3347a4640c5347107afb15fdef1a52c6eab91b94af64ba0553fa",
+        "place_key": "a474c1141b0423582878bccb5a8557bd4dbfab12ef7879915210fdc1b2045421",
+        "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Former Lombard CGW station / trail interpretation point",
+          "text": "",
+          "url": "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+          "lat": 41.89118916663432,
+          "lng": -88.0179440974977,
+          "area": "Lombard",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+            "place_name": "Former Lombard CGW station / trail interpretation point",
+            "address": "Great Western Trail near North Charlotte Street, Lombard, IL"
+          }
+        },
+        "key": "122d988ef5ca3347a4640c5347107afb15fdef1a52c6eab91b94af64ba0553fa",
+        "place_key": "a474c1141b0423582878bccb5a8557bd4dbfab12ef7879915210fdc1b2045421",
+        "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "787259ed-4715-49e6-a003-1675215693d0",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+        "moment_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "14850b71-243d-4f30-900f-c53e3e789650"
+      },
+      "created_at": "2026-11-08T16:30:47.40019-06:00"
+    },
+    {
+      "id": "3c95f629-4b8e-41e0-9391-d30c125e9217",
+      "identity_key": "5805e94ec3de956df9bf96841c3e8b38f31d7c6922d89a66d62251c7762cfea6",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+          "title": "A 1926 depot serving railway freight and local industry",
+          "text": "",
+          "url": "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+          "area": "Villa Park",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "5805e94ec3de956df9bf96841c3e8b38f31d7c6922d89a66d62251c7762cfea6",
+        "place_key": "a2d6fddd3ea80623cd2eec8e3c1ebe7c0ac011df7dc4f4e069af7c8e74f49c54",
+        "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+        "place_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+        "moment_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+          "title": "A 1926 depot serving railway freight and local industry",
+          "text": "",
+          "url": "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+          "area": "Villa Park",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "5805e94ec3de956df9bf96841c3e8b38f31d7c6922d89a66d62251c7762cfea6",
+        "place_key": "a2d6fddd3ea80623cd2eec8e3c1ebe7c0ac011df7dc4f4e069af7c8e74f49c54",
+        "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+        "place_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+        "moment_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T16:30:47.714851-06:00"
+    },
+    {
+      "id": "bfdc73d9-fcda-41e9-909f-1bb7e1abf895",
+      "identity_key": "bd289c349c8da15bbff211cfb55ac430b945f0c015bc0778286b899c0972b34d",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+          "title": "A former Great Western depot in a municipal photograph",
+          "text": "",
+          "url": "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+          "area": "Lombard",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "bd289c349c8da15bbff211cfb55ac430b945f0c015bc0778286b899c0972b34d",
+        "place_key": "e28ae045774494c5b0f5747140d44ee0e81c1691fa6ccb6825e8bfe521dd9357",
+        "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+        "place_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+        "moment_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+          "title": "A former Great Western depot in a municipal photograph",
+          "text": "",
+          "url": "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+          "area": "Lombard",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "bd289c349c8da15bbff211cfb55ac430b945f0c015bc0778286b899c0972b34d",
+        "place_key": "e28ae045774494c5b0f5747140d44ee0e81c1691fa6ccb6825e8bfe521dd9357",
+        "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+        "place_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+        "moment_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T16:30:47.714851-06:00"
+    }
+  ],
+  "entities": [
+    {
+      "key": "place:9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+      "kind": "place",
+      "id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+        "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+        "slug": "cortesi-park-cgw-depot-interpretation-point",
+        "name": "Cortesi Park / CGW depot interpretation point",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.88675,
+        "longitude": -87.9704333,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "318 E Kenilworth Avenue, Villa Park, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T16:30:47.465877-06:00",
+        "updated_at": "2026-11-08T16:30:47.465877-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:8938481b-2b75-4514-9791-c37de243ae35",
+      "kind": "place",
+      "id": "8938481b-2b75-4514-9791-c37de243ae35",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+        "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+        "slug": "cortesi-park-cgw-depot-interpretation-point",
+        "name": "Cortesi Park / CGW depot interpretation point",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.88675,
+        "longitude": -87.9704333,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "318 E Kenilworth Avenue, Villa Park, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T16:30:47.465877-06:00",
+        "updated_at": "2026-11-08T16:30:47.465877-06:00"
+      },
+      "candidate": {
+        "id": "8938481b-2b75-4514-9791-c37de243ae35",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "ca1bbfc9470678609c298fdace58d740bd9760cb7a711089eda4ec35ba267c6b",
+        "submitted_by_account_id": "14850b71-243d-4f30-900f-c53e3e789650",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Cortesi Park / CGW depot interpretation point",
+          "slug": "",
+          "address": "318 E Kenilworth Avenue, Villa Park, IL",
+          "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+          "summary": "",
+          "latitude": 41.88675,
+          "longitude": -87.9704333,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "14850b71-243d-4f30-900f-c53e3e789650",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+        "reviewed_at": "2026-11-08T16:30:47.465877-06:00",
+        "created_at": "2026-11-08T16:30:47.336075-06:00",
+        "updated_at": "2026-11-08T16:30:47.465877-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Cortesi Park / CGW depot interpretation point",
+        "slug": "",
+        "address": "318 E Kenilworth Avenue, Villa Park, IL",
+        "city_id": "53255a37-21df-42b7-98c4-3b0210114d8e",
+        "summary": "",
+        "latitude": 41.88675,
+        "longitude": -87.9704333,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+      "kind": "place",
+      "id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+        "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+        "slug": "former-lombard-cgw-station-trail-interpretation-point",
+        "name": "Former Lombard CGW station / trail interpretation point",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.89118916663432,
+        "longitude": -88.0179440974977,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "Great Western Trail near North Charlotte Street, Lombard, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T16:30:47.547836-06:00",
+        "updated_at": "2026-11-08T16:30:47.547836-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:787259ed-4715-49e6-a003-1675215693d0",
+      "kind": "place",
+      "id": "787259ed-4715-49e6-a003-1675215693d0",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+        "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+        "slug": "former-lombard-cgw-station-trail-interpretation-point",
+        "name": "Former Lombard CGW station / trail interpretation point",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.89118916663432,
+        "longitude": -88.0179440974977,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "Great Western Trail near North Charlotte Street, Lombard, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T16:30:47.547836-06:00",
+        "updated_at": "2026-11-08T16:30:47.547836-06:00"
+      },
+      "candidate": {
+        "id": "787259ed-4715-49e6-a003-1675215693d0",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "a474c1141b0423582878bccb5a8557bd4dbfab12ef7879915210fdc1b2045421",
+        "submitted_by_account_id": "14850b71-243d-4f30-900f-c53e3e789650",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Former Lombard CGW station / trail interpretation point",
+          "slug": "",
+          "address": "Great Western Trail near North Charlotte Street, Lombard, IL",
+          "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+          "summary": "",
+          "latitude": 41.89118916663432,
+          "longitude": -88.0179440974977,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "14850b71-243d-4f30-900f-c53e3e789650",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+        "reviewed_at": "2026-11-08T16:30:47.547836-06:00",
+        "created_at": "2026-11-08T16:30:47.40019-06:00",
+        "updated_at": "2026-11-08T16:30:47.547836-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Former Lombard CGW station / trail interpretation point",
+        "slug": "",
+        "address": "Great Western Trail near North Charlotte Street, Lombard, IL",
+        "city_id": "0b2b0c9d-9758-4ac6-963c-6c1d2bf3cde0",
+        "summary": "",
+        "latitude": 41.89118916663432,
+        "longitude": -88.0179440974977,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "moment:3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+      "kind": "moment",
+      "id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+        "place_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+        "slug": "a-1926-depot-serving-railway-freight-and-local-industry",
+        "title": "A 1926 depot serving railway freight and local industry",
+        "excerpt": "The Village’s preservation record dates the Chicago Great Western depot to 1926. It describes railway freight serving Ovaltine and local building suppliers, including Sears house kits. The depot is distinct from Villa Park’s CA&E stations.…",
+        "date_start": "1926-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "1926 Chicago Great Western Railroad Depot preservation record, 2001",
+            "url": "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+            "publisher": "Villa Park Historic Preservation Commission",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Villa Historic Landmark District, PDF pages 1–2",
+            "url": "https://www.invillapark.com/DocumentCenter/View/561",
+            "publisher": "Villa Park Historic Preservation Commission",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Cortesi Veterans Memorial Park facility record",
+            "url": "https://www.invillapark.com/facilities/facility/details/Cortesi-Veterans-Memorial-Park-1",
+            "publisher": "Village of Villa Park",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Cortesi Veterans Memorial Park location reference",
+            "url": "https://www.hmdb.org/m.asp?m=244906",
+            "publisher": "Historical Marker Database; original photographs by Sean P. Flynn, April 12, 2024",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T16:30:47.482027-06:00",
+        "updated_at": "2026-11-08T16:30:47.482027-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+      "kind": "moment",
+      "id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+        "place_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+        "slug": "a-former-great-western-depot-in-a-municipal-photograph",
+        "title": "A former Great Western depot in a municipal photograph",
+        "excerpt": "The Village of Lombard’s municipal StoryMap labels a 1949 train-station photograph and describes the CGW depot south of the old tracks near North Charlotte Street. This is the western interpretation anchor and turnaround for the bounded…",
+        "date_start": "1949-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Village of Lombard Sesquicentennial Story in Maps, point 16",
+            "url": "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+            "publisher": "Village of Lombard Public Works",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "2024 DuPage Trails Plan, PDF page 11 / printed page 7",
+            "url": "https://www.dupagecounty.gov/Transportation/Documents/2024-0212%20DUPAGE%20TRAILS%20PLAN%20ADOPTED.pdf",
+            "publisher": "DuPage County Division of Transportation",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T16:30:47.565056-06:00",
+        "updated_at": "2026-11-08T16:30:47.565056-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    }
+  ],
+  "evidence": [],
+  "tasks": [
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "return_reference_unresolved",
+      "entity_key": "bike",
+      "detail": "Out-and-back travel needs a reviewed reference with explicitly reversed return traversals."
+    },
+    {
+      "code": "route_not_usable",
+      "entity_key": "bike",
+      "detail": "Route readiness is unreviewed; inspect the mode's retained quality report."
+    }
+  ],
+  "visitor_stories": [
+    {
+      "position": 1,
+      "place_id": "9cd156e7-bf4a-47c4-8edf-2146289ea9ec",
+      "moment_id": "3b527d8d-1e39-4cac-a795-5e42cbba9d7e",
+      "candidate_id": "",
+      "title": "A 1926 depot serving railway freight and local industry",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+        "https://www.invillapark.com/DocumentCenter/View/561",
+        "https://www.invillapark.com/facilities/facility/details/Cortesi-Veterans-Memorial-Park-1",
+        "https://www.hmdb.org/m.asp?m=244906"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 2,
+      "place_id": "85c13e4c-13d9-4792-a4fd-a4be1ae68802",
+      "moment_id": "26c2853e-e2bc-4ee3-aeb6-6fea996f2722",
+      "candidate_id": "",
+      "title": "A former Great Western depot in a municipal photograph",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+        "https://www.dupagecounty.gov/Transportation/Documents/2024-0212%20DUPAGE%20TRAILS%20PLAN%20ADOPTED.pdf"
+      ],
+      "evidence_ids": []
+    }
+  ]
+}

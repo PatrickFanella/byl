@@ -1,0 +1,100 @@
+{
+  "provider": "Valhalla/FOSSGIS public development demo",
+  "endpoint": "https://valhalla1.openstreetmap.de/route",
+  "retrieved_at": "2026-11-08T22:15:13.894167+00:00",
+  "request": {
+    "locations": [
+      {
+        "lat": 41.8866716,
+        "lon": -87.9706324,
+        "type": "break",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8873663,
+        "lon": -87.9709422,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8897026,
+        "lon": -87.9936373,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.891273,
+        "lon": -88.0180898,
+        "type": "break",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8897026,
+        "lon": -87.9936373,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8873663,
+        "lon": -87.9709422,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8866716,
+        "lon": -87.9706324,
+        "type": "break",
+        "radius": 20,
+        "search_cutoff": 25
+      }
+    ],
+    "costing": "bicycle",
+    "units": "kilometers"
+  },
+  "control_node_ids": [
+    388140714,
+    388140470,
+    10226923346,
+    13796112983,
+    10226923346,
+    388140470,
+    388140714
+  ],
+  "original_response_sha256": "2c3bdb2735b890d85f4ff9892c4caafbf29c898fd03de601cf4a862586d5b7cb",
+  "fixture_sha256": "c84069869e5de81edae890a3c2be4db2b3473e4b9977332728ad4a3b73df56fd",
+  "fixture_transformation": "Original encoded shapes and summaries only; no geometry edits.",
+  "trip_shape": "out_and_back",
+  "return_to_first": true,
+  "distance_m": 8270,
+  "cycling_seconds": 2061.701,
+  "outbound": {
+    "distance_m": 4135,
+    "cycling_seconds": 1030.369
+  },
+  "return": {
+    "distance_m": 4135,
+    "cycling_seconds": 1031.332,
+    "repeated_narration": false
+  },
+  "planned_dwell_minutes": 6,
+  "planned_narration_minutes": 4,
+  "conditional_total_minutes": 44.36,
+  "attribution": "© OpenStreetMap contributors; routing by Valhalla/FOSSGIS public development demo",
+  "data_license": "ODbL-1.0",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "source_credit_url": "https://www.openstreetmap.org/copyright",
+  "qualification": "needs_research",
+  "limitations": [
+    "No approved current arrivals or access/crossing inspection.",
+    "Mapped connector continuity and provider geometry are not current permission or field proof.",
+    "Strict provider node topology and full runtime corridor qualification remain incomplete.",
+    "The return is travel only; the two selected stories are not repeated."
+  ],
+  "narration_assumption": "Two minutes per featured story, matching the app journey planner; not measured audio length."
+}

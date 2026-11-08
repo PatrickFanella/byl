@@ -1,0 +1,31 @@
+{
+  "topic": "Great Western Trail: Cortesi Park depot, rail freight and the former Lombard CGW station",
+  "area": "Villa Park to Lombard, Illinois",
+  "notes": "Private bounded out-and-back bike draft. Keep CGW and CA&E station/corridor identities distinct. The western place lead is the turnaround; end preference names the final return destination, matching the start. The return adds no repeated narration. Retain park and crossing connectors; no automatic publication or current access approval. Synthetic temporary-detour exercise is not an actual closure.",
+  "place_leads": [
+    "Cortesi Park / CGW depot interpretation point",
+    "Former Lombard CGW station / trail interpretation point"
+  ],
+  "event_leads": [
+    "Railway freight and local industry",
+    "CGW depot interpretation",
+    "Railway right-of-way converted to trail"
+  ],
+  "source_links": [
+    "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+    "https://www.invillapark.com/DocumentCenter/View/561",
+    "https://www.invillapark.com/facilities/facility/details/Cortesi-Veterans-Memorial-Park-1",
+    "https://www.hmdb.org/m.asp?m=244906",
+    "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+    "https://www.dupagecounty.gov/Transportation/Documents/2024-0212%20DUPAGE%20TRAILS%20PLAN%20ADOPTED.pdf",
+    "https://villageoflombard.org/411/Walking-Biking-in-Lombard"
+  ],
+  "modes": [
+    "bike"
+  ],
+  "trip_shape": "out_and_back",
+  "duration_minutes": null,
+  "start_preference": "Cortesi Park / CGW depot interpretation point",
+  "end_preference": "Cortesi Park / CGW depot interpretation point",
+  "pilot_id": "great-western-v1"
+}
