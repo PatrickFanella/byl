@@ -2,6 +2,7 @@ package tv.subcult.museum.storage
 
 import tv.subcult.museum.core.KeyValueStore
 import java.io.File
+import java.io.IOException
 
 /** One JSON file per key under the app's files directory. */
 class FileKeyValueStore(private val dir: File) : KeyValueStore {
@@ -13,9 +14,16 @@ class FileKeyValueStore(private val dir: File) : KeyValueStore {
 
     @Synchronized override fun put(key: String, value: String) {
         val tmp = File(dir, file(key).name + ".tmp")
-        tmp.writeText(value)
-        tmp.renameTo(file(key))
+        try {
+            tmp.writeText(value)
+            if (!tmp.renameTo(file(key))) throw IOException("Could not replace the saved file")
+        } finally {
+            tmp.delete()
+        }
     }
 
-    @Synchronized override fun remove(key: String) { file(key).delete() }
+    @Synchronized override fun remove(key: String) {
+        val target = file(key)
+        if (target.exists() && !target.delete()) throw IOException("Could not remove the saved file")
+    }
 }
