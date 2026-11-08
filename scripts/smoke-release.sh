@@ -53,6 +53,10 @@ done
 if [[ $service == api ]]; then
   docker exec "$container" wget -q -O - "http://127.0.0.1:$port/api/v1/cities" > "$scratch/cities.json"
   python3 -c 'import json,sys; assert any(c["slug"] == "downers-grove" for c in json.load(open(sys.argv[1]))["items"])' "$scratch/cities.json"
+  docker exec "$container" wget -q -O - "http://127.0.0.1:$port/api/v1/cities/downers-grove/places?limit=1" > "$scratch/places.json"
+  happening_place=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["items"][0]["id"])' "$scratch/places.json")
+  docker exec "$container" wget -q -O - "http://127.0.0.1:$port/api/v1/places/$happening_place/happenings" > "$scratch/happenings.json"
+  python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["items"] == []' "$scratch/happenings.json"
   docker exec "$container" wget -q -O - "http://127.0.0.1:$port/api/v1/itinerary-capabilities" > "$scratch/itinerary-capabilities.json"
   python3 -c 'import json,sys; c=json.load(open(sys.argv[1])); assert c == {"scheduled_transit_v1":False,"provider":"cta_gtfs_blue_v1","live":False,"transfers":False,"bicycles":False}' "$scratch/itinerary-capabilities.json"
   if docker exec "$container" wget -S -O /dev/null --header 'Content-Type: application/json' \
