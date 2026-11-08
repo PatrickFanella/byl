@@ -25,9 +25,9 @@
   "trip_shape": "point_to_point",
   "distance_m": 1716.0,
   "walking_seconds": 1300.437,
-  "planned_dwell_minutes": 12,
+  "planned_dwell_minutes": 6,
   "planned_narration_minutes": 2,
-  "conditional_total_minutes": 35.67,
+  "conditional_total_minutes": 29.67,
   "public_qualification": "needs_research",
   "limitations": [
     "Two interpretation anchors, no padding with unconverted historical addresses.",

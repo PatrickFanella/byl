@@ -26,12 +26,13 @@ type haymarketStop struct {
 		Latitude, Longitude float64
 		SourceURL           string `json:"source_url"`
 	}
-	SourceIDs     []string             `json:"source_ids"`
-	MomentTitle   string               `json:"moment_title"`
-	DateStart     string               `json:"date_start"`
-	DatePrecision models.DatePrecision `json:"date_precision"`
-	Body          string
-	Gaps          []string
+	PlannedDwellMinutes int                  `json:"planned_dwell_minutes"`
+	SourceIDs           []string             `json:"source_ids"`
+	MomentTitle         string               `json:"moment_title"`
+	DateStart           string               `json:"date_start"`
+	DatePrecision       models.DatePrecision `json:"date_precision"`
+	Body                string
+	Gaps                []string
 }
 type haymarketSource struct {
 	ID, URL, Title, Publisher string
@@ -187,6 +188,18 @@ func TestHaymarketPilotReplayReconcilesDraftsAndKeepsPublicationBlocked(t *testi
 		raw, _ := json.MarshalIndent(itinerary, "", "  ")
 		t.Fatalf("local assembly: %s %v", raw, err)
 	}
+	dwell := 0
+	for _, stop := range stops {
+		dwell += stop.PlannedDwellMinutes
+	}
+	var timing struct {
+		PlannedDwellMinutes int `json:"planned_dwell_minutes"`
+	}
+	haymarketRead(t, "routing.json", &timing)
+	if itinerary.Proposal.PlannedDwellMinutes != dwell || timing.PlannedDwellMinutes != dwell {
+		t.Fatalf("packet/proposal dwell mismatch: proposal %d, stops %d, routing %d", itinerary.Proposal.PlannedDwellMinutes, dwell, timing.PlannedDwellMinutes)
+	}
+
 	before, _ := json.Marshal(itinerary)
 	// Re-deliver the exact completed job, as a restarted worker can. No source/LLM
 	// stage or place creation may repeat.

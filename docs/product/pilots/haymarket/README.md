@@ -50,8 +50,8 @@ day. Both narratives remain below the public story-length requirement.
 
 `routing.json` records an actual pedestrian request to the Valhalla/FOSSGIS public
 development demo. It returned **1,716 m** and **1,300.437 seconds** between the two
-location leads. Adding explicit assumptions of 12 minutes of dwell and two
-minutes of narration gives **35.67 conditional minutes**. This is not an observed
+location leads. Adding explicit assumptions of six minutes of dwell and two
+minutes of narration gives **29.67 conditional minutes**. This is not an observed
 duration or a current sidewalk/crossing certification. It excludes Forest Park.
 
 The original encoded shape and summaries are retained in
