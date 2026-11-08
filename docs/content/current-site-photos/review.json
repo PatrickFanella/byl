@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "issue": 85,
+  "review_date": "2026-11-08",
+  "decision": "retain_explicit_sourcing_gaps",
+  "release": {
+    "new_files_copied_to_repository": false,
+    "new_media_uploaded": false,
+    "attachments_changed": false,
+    "publication_performed": false
+  },
+  "places": [
+    {
+      "place_id": "00000000-0000-4000-8000-00000000b0b4",
+      "slug": "downers-grove-museum",
+      "name": "Downers Grove Museum",
+      "attachment_target": "place",
+      "status": "sourcing_gap",
+      "reason": "No inspected lead has established reusable file rights, creator attribution and a supported capture date; no approved site photograph is ready to attach.",
+      "existing_moments": [
+        {
+          "id": "00000000-0000-4000-8000-00000000d0d5",
+          "title": "Israel and Avis Blodgett and the Underground Railroad",
+          "body_sha256": "629a2c1e04cdb4637408a1f16872859b3d3fc5c49b4359dc75dda8cbf7044b80",
+          "source_urls": [
+            "https://www.nps.gov/places/illinois-israel-and-avis-blodgett-house.htm",
+            "https://dghistory.org/history-walk-6-blodgett-homes-museum/",
+            "https://dghistory.org/dg-timeline/page/3/",
+            "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg"
+          ],
+          "hero_media": {
+            "id": "00000000-0000-4000-8000-00000000f0f4",
+            "kind": "image",
+            "external": false,
+            "public_url": "https://byl.subcult.tv/media/files/library/images/blodgett-family.jpg",
+            "mime_type": "image/jpeg",
+            "width": 1280,
+            "height": 1461,
+            "duration_seconds": null,
+            "caption": "Family portrait: Henry Williams Blodgett, son of Israel and Avis, painted in 1875 by Alden Finney Brooks. Smithsonian National Portrait Gallery. Resized by Wikimedia.",
+            "credit": "Alden Finney Brooks (1840-c. 1938)",
+            "license": "CC0-1.0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg",
+            "status": "published",
+            "created_at": "2026-11-06T17:51:53.564249Z",
+            "updated_at": "2026-11-06T17:51:53.564249Z"
+          },
+          "hosted_image_check": {
+            "http_status": 200,
+            "content_type": "image/jpeg",
+            "sha256": "ea6fbc1c0e4b872e07fb16626d75440bdf0499786cad135a708fbc5343c2ddfe"
+          }
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000d0d7",
+          "title": "The Charles Blodgett House Becomes a Museum",
+          "body_sha256": "8fe7948f8760a82c22e7804d7e3152aa78e1f6dec016b990963611596c073437",
+          "source_urls": [
+            "https://dghistory.org/the-charles-blodgett-house/",
+            "https://www.dgparks.org/downers-grove-museum",
+            "https://dghistory.org/history-walk-6-blodgett-homes-museum/",
+            "https://dghistory.org/dg-timeline/page/3/"
+          ],
+          "hero_media": {
+            "id": "00000000-0000-4000-8000-00000000f0f4",
+            "kind": "image",
+            "external": false,
+            "public_url": "https://byl.subcult.tv/media/files/library/images/blodgett-family.jpg",
+            "mime_type": "image/jpeg",
+            "width": 1280,
+            "height": 1461,
+            "duration_seconds": null,
+            "caption": "Family portrait: Henry Williams Blodgett, son of Israel and Avis, painted in 1875 by Alden Finney Brooks. Smithsonian National Portrait Gallery. Resized by Wikimedia.",
+            "credit": "Alden Finney Brooks (1840-c. 1938)",
+            "license": "CC0-1.0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg",
+            "status": "published",
+            "created_at": "2026-11-06T17:51:53.564249Z",
+            "updated_at": "2026-11-06T17:51:53.564249Z"
+          },
+          "hosted_image_check": {
+            "http_status": 200,
+            "content_type": "image/jpeg",
+            "sha256": "ea6fbc1c0e4b872e07fb16626d75440bdf0499786cad135a708fbc5343c2ddfe"
+          }
+        }
+      ]
+    },
+    {
+      "place_id": "00000000-0000-4000-8000-00000000b0b3",
+      "slug": "fishel-park",
+      "name": "Fishel Park",
+      "attachment_target": "place",
+      "status": "sourcing_gap",
+      "reason": "No inspected lead has established reusable file rights, creator attribution and a supported capture date; no approved site photograph is ready to attach.",
+      "existing_moments": [
+        {
+          "id": "00000000-0000-4000-8000-00000000d0d4",
+          "title": "A School Site Becomes a Gathering Place",
+          "body_sha256": "ac3e9214fbeaeea35203cb058a7515fe95e1d2176de789fa84d29fb0f90e267d",
+          "source_urls": [
+            "https://www.downers.us/legacy_documents/board_commission/HPDRB/8-29-13_Agenda_Report.pdf",
+            "https://www.dgparks.org/location/fishel-park",
+            "https://dghistory.org/tim-bodden-1942-1967/",
+            "https://en.wikipedia.org/wiki/Avery_Coonley_School"
+          ],
+          "hero_media": {
+            "id": "00000000-0000-4000-8000-00000000f0f3",
+            "kind": "image",
+            "external": false,
+            "public_url": "https://byl.subcult.tv/media/files/library/images/fishel-school.jpg",
+            "mime_type": "image/jpeg",
+            "width": 899,
+            "height": 899,
+            "duration_seconds": null,
+            "caption": "The former Downers Grove School, later Junior Elementary School, circa 1915, on the site now occupied by Fishel Park. The building no longer stands.",
+            "credit": "The Avery Coonley School",
+            "license": "CC-BY-SA-3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Downers_Grove_School.JPG",
+            "status": "published",
+            "created_at": "2026-11-06T17:51:53.564249Z",
+            "updated_at": "2026-11-06T17:51:53.564249Z"
+          },
+          "hosted_image_check": {
+            "http_status": 200,
+            "content_type": "image/jpeg",
+            "sha256": "f1b6b105e42b3ffed7a06c253f699931e31612810553e1137cf3c882494405b1"
+          }
+        }
+      ]
+    }
+  ],
+  "inspected_leads": [
+    {
+      "place_id": "00000000-0000-4000-8000-00000000b0b4",
+      "source_url": "https://www.dgparks.org/downers-grove-museum",
+      "original_file_url": "https://www.dgparks.org/upload/Images/Facility%20Headers/MuseumHeader.jpg",
+      "publisher": "Downers Grove Park District",
+      "visual_review": "Later exterior photograph of a house and museum-campus setting; not a portrait or a photograph of an Underground Railroad event. Confirm which building and viewpoint before caption approval.",
+      "creator": null,
+      "capture_date": null,
+      "license": null,
+      "license_url": null,
+      "permission": null,
+      "status": "rights_and_identity_review_required",
+      "file_sha256": "bad8f6ff515206fbc597c115808e5bcfe70a99ff22ac0421dcf46f4f463f2cdc"
+    },
+    {
+      "place_id": "00000000-0000-4000-8000-00000000b0b3",
+      "source_url": "https://www.dgparks.org/location/fishel-park",
+      "original_file_url": "https://www.dgparks.org/upload/Images/Parks/Summer%20Concerts.jpg",
+      "publisher": "Downers Grove Park District",
+      "visual_review": "Photograph of the Veterans Memorial Pavilion during a concert, with audience and performers. Not the former school. Capture date and photographer are not supplied in the inspected page.",
+      "creator": null,
+      "capture_date": null,
+      "license": null,
+      "license_url": null,
+      "permission": null,
+      "status": "rights_review_required",
+      "file_sha256": "3b70dcf892307a9e30ea951c496f061e05d17defa3685bc60f763a6038a4d0f7"
+    },
+    {
+      "place_id": "00000000-0000-4000-8000-00000000b0b4",
+      "source_url": "https://www.hmdb.org/PhotoFullSize.asp?PhotoID=860234",
+      "publisher": "Historical Marker Database",
+      "creator": "Sean P. Flynn",
+      "capture_date": "2025-04-12",
+      "license": null,
+      "license_url": null,
+      "permission": null,
+      "rights_record_url": "https://www.hmdb.org/copyright.asp",
+      "inspection": "Photo description, credit, capture date and rights notice inspected; original photo not visually inspected. General terms restrict commercial reuse; no CC BY/BY-SA, public-domain or written permission established.",
+      "status": "permission_required"
+    }
+  ],
+  "rejected_substitutes": [
+    {
+      "url": "https://www.dgparks.org/upload/blodgett.jpg",
+      "reason": "Visually inspected: Victorian Blodgett House logo/illustration, not an exterior photograph."
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Downers_Grove.jpg",
+      "reason": "Description identifies Main Street Metra station, a different place."
+    }
+  ],
+  "search_limits": "Bounded park-district, HMdb and Commons/name searches; not an assertion that no usable photograph exists anywhere.",
+  "existing_release_browser_check": {
+    "date": "2026-11-08",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "results": [
+      {
+        "label": "museum",
+        "http_status": 200,
+        "caption": "Family portrait",
+        "overflow": false,
+        "broken_images": [],
+        "source_links": [
+          {
+            "text": "CC0-1.0",
+            "href": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+          },
+          {
+            "text": "Image source",
+            "href": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg"
+          },
+          {
+            "text": "Henry Williams Blodgett, 1875 portrait ↗",
+            "href": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg"
+          }
+        ]
+      },
+      {
+        "label": "fishel",
+        "http_status": 200,
+        "caption": "circa 1915",
+        "overflow": false,
+        "broken_images": [],
+        "source_links": [
+          {
+            "text": "CC-BY-SA-3.0",
+            "href": "https://creativecommons.org/licenses/by-sa/3.0"
+          },
+          {
+            "text": "Image source",
+            "href": "https://commons.wikimedia.org/wiki/File:Downers_Grove_School.JPG"
+          }
+        ]
+      }
+    ],
+    "scope": "Read-only public place pages and primary historical captions; no new photo or publication. All three story bodies and citations separately retained through the public API."
+  }
+}
