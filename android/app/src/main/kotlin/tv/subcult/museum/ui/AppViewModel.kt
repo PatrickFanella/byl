@@ -17,6 +17,7 @@ import tv.subcult.museum.core.ApiException
 import tv.subcult.museum.core.City
 import tv.subcult.museum.core.LoadStatus
 import tv.subcult.museum.core.Session
+import tv.subcult.museum.core.RouteSuggestions
 import tv.subcult.museum.core.TourDetail
 import tv.subcult.museum.core.TourStop
 import tv.subcult.museum.core.getJson
@@ -102,6 +103,17 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     }
 
     fun showSignIn(show: Boolean) = _state.update { it.copy(showSignIn = show) }
+
+    /** Bind suggestion requests to the session that opened this screen. */
+    fun routeSuggestions(owner: Session): RouteSuggestions {
+        val origin = container.client.baseUrl
+        val client = ApiClient(origin) { owner.token }
+        client.onUnauthorized = { token -> if (container.client.baseUrl == origin) handleUnauthorized(token) }
+        return RouteSuggestions(Endpoints(client), container.store, owner.account.id) {
+            val current = container.session.state.value
+            current != null && current.account.id == owner.account.id && current.token == owner.token && container.client.baseUrl == origin
+        }
+    }
 
     fun signOut() {
         val token = container.session.token
