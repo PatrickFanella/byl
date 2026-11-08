@@ -98,6 +98,7 @@ public struct TourRevision: Codable, Identifiable, Equatable {
     /// A computed line alone cannot authorize starting a reviewed trip.
     public func unavailableReason(mode: String) -> String? {
         guard ["walk", "bike"].contains(mode), let snapshot, !id.isEmpty, snapshot.tour.id == tourID,
+              snapshot.tour.tour.revisionID == id, snapshot.tour.tour.revisionNumber == number,
               snapshot.tour.tour.status == "published", snapshot.tour.tour.modes.contains(mode) else {
             return "The reviewed itinerary is unavailable for this mode."
         }
