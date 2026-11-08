@@ -236,3 +236,71 @@ export const resumeBriefResearch = (id: string, version: number, run_id: string)
 		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/research/resume`,
 		{ version, run_id }
 	);
+
+// Route observations and their comparisons remain private curator material.
+export type RouteReport = Schemas['RouteReport'];
+export type RouteInvestigation = Schemas['RouteInvestigation'];
+export type RouteCorrectionComparison = Schemas['RouteCorrectionComparison'];
+export type RouteCorrection = Schemas['RouteCorrection'];
+export const listRouteReports = (status = '', offset = 0) =>
+	api.list<RouteReport>(`/api/v1/admin/route-reports${qs({ status, offset, limit: 50 })}`);
+export const getRouteReport = (id: string) =>
+	api.get<RouteReport>(`/api/v1/admin/route-reports/${encodeURIComponent(id)}`);
+export const setRouteReportState = (
+	id: string,
+	version: number,
+	status: BriefStatus,
+	reason: string
+) =>
+	api.post<RouteReport>(`/api/v1/admin/route-reports/${encodeURIComponent(id)}/state`, {
+		version,
+		status,
+		reason
+	});
+export const relatedRouteReports = (id: string) =>
+	api.list<RouteReport>(`/api/v1/admin/route-reports/${encodeURIComponent(id)}/related?limit=20`);
+export const listRouteInvestigations = (id: string) =>
+	api.list<RouteInvestigation>(
+		`/api/v1/admin/route-reports/${encodeURIComponent(id)}/investigations?limit=50`
+	);
+export const queueRouteInvestigation = (
+	id: string,
+	body: Schemas['RouteInvestigationRequest'],
+	key: string
+) =>
+	api.request<RouteInvestigation>(
+		'POST',
+		`/api/v1/admin/route-reports/${encodeURIComponent(id)}/investigations`,
+		body,
+		false,
+		{ 'Idempotency-Key': key }
+	);
+export const getRouteCorrectionComparison = (id: string, investigation_id: string) =>
+	api.get<RouteCorrectionComparison>(
+		`/api/v1/admin/route-reports/${encodeURIComponent(id)}/correction-comparison${qs({ investigation_id })}`
+	);
+export const approveRouteCorrection = (
+	id: string,
+	body: Schemas['ApproveRouteCorrectionRequest']
+) =>
+	api.post<RouteCorrection>(
+		`/api/v1/admin/route-reports/${encodeURIComponent(id)}/corrections`,
+		body
+	);
+
+export type ArrivalProposal = Schemas['ArrivalProposal'];
+export type CorridorProposal = Schemas['CorridorProposal'];
+export const proposeArrival = (place: string, body: Schemas['ArrivalProposalRequest']) =>
+	api.post<ArrivalProposal>(`/api/v1/admin/places/${encodeURIComponent(place)}/arrivals`, body);
+export const reviewArrival = (place: string, id: string, body: Schemas['ArrivalReviewRequest']) =>
+	api.post<ArrivalProposal>(
+		`/api/v1/admin/places/${encodeURIComponent(place)}/arrivals/${encodeURIComponent(id)}/review`,
+		body
+	);
+export const proposeCorridor = (tour: string, body: Schemas['CorridorProposalRequest']) =>
+	api.post<CorridorProposal>(`/api/v1/admin/tours/${encodeURIComponent(tour)}/corridors`, body);
+export const reviewCorridor = (tour: string, id: string, body: Schemas['CorridorReviewRequest']) =>
+	api.post<CorridorProposal>(
+		`/api/v1/admin/tours/${encodeURIComponent(tour)}/corridors/${encodeURIComponent(id)}/review`,
+		body
+	);

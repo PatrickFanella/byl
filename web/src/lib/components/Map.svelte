@@ -24,7 +24,8 @@
 		legs = [],
 		user = null,
 		fit = 'all',
-		height = '20rem'
+		height = '20rem',
+		onpoint = null
 	}: {
 		markers?: Marker[];
 		line?: [number, number][];
@@ -32,6 +33,7 @@
 		user?: { lat: number; lng: number } | null;
 		fit?: 'all' | 'ahead';
 		height?: string;
+		onpoint?: ((point: { lat: number; lng: number }) => void) | null;
 	} = $props();
 
 	let container: HTMLDivElement;
@@ -77,6 +79,7 @@
 
 	function render() {
 		if (!map || !lib) return;
+		map.getCanvas().style.cursor = onpoint ? 'crosshair' : '';
 		for (const h of markerHandles) h.remove();
 		markerHandles = markers.map((m) =>
 			(m.position != null
@@ -173,6 +176,7 @@
 				zoom: 13,
 				attributionControl: { compact: true }
 			});
+			map.on('click', (event) => onpoint?.({ lat: event.lngLat.lat, lng: event.lngLat.lng }));
 			map.addControl(new lib.NavigationControl({ showCompass: false }));
 			styleDark = $darkTheme;
 			map.on('style.load', () => {
@@ -202,6 +206,7 @@
 		void line;
 		void legs;
 		void user;
+		void onpoint;
 		if (map && ready) render();
 	});
 </script>

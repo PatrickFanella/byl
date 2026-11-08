@@ -124,7 +124,10 @@ func (s *Store) ListRouteReports(ctx context.Context, owner string, status model
 	if offset < 0 {
 		offset = 0
 	}
-	rows, err := s.pool.Query(ctx, `SELECT `+routeReportCols+` FROM route_reports WHERE ($1='' OR owner_account_id::text=$1) AND ($2='' OR status=$2) ORDER BY created_at DESC,id LIMIT $3 OFFSET $4`, owner, status, clamp(limit), offset)
+	rows, err := s.pool.Query(ctx, `SELECT `+routeReportCols+` FROM route_reports WHERE ($1='' OR owner_account_id::text=$1) AND ($2='' OR status=$2) ORDER BY
+ CASE WHEN $1='' AND status IN ('accepted','declined') THEN 1 ELSE 0 END,
+ CASE WHEN $1='' THEN CASE submitted->>'reason' WHEN 'closed' THEN 0 WHEN 'blocked' THEN 1 WHEN 'unsafe' THEN 2 ELSE 3 END ELSE 0 END,
+ created_at DESC,id LIMIT $3 OFFSET $4`, owner, status, clamp(limit), offset)
 	if err != nil {
 		return nil, err
 	}

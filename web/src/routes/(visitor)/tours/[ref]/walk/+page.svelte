@@ -260,6 +260,13 @@
 						disabled={walk.updateBusy}
 						onclick={() => walk.checkForUpdate()}>Check for route updates</button
 					>
+					<p class="mt-2">
+						<a
+							class="text-byl-action underline"
+							href={`/tours/${encodeURIComponent(walk.revision.tour_id)}/report?revision=${encodeURIComponent(walk.revision.id)}&mode=${mode}&affected=${encodeURIComponent(walk.nextStop ? `entrance:${walk.nextStop.id}` : '')}`}
+							>Suggest a route change</a
+						>
+					</p>
 					{#if walk.updateMessage}<p role="status" class="mt-2 text-byl-warning">
 							{walk.updateMessage}
 						</p>{/if}

@@ -163,6 +163,13 @@
 							>
 						{/if}
 					</div>
+					{#if t.revision_id}<p class="text-sm">
+							<a
+								class="text-byl-action underline"
+								href={`/tours/${encodeURIComponent(t.id)}/report?revision=${encodeURIComponent(t.revision_id)}&mode=${t.modes[0] ?? 'walk'}`}
+								>Suggest a route change</a
+							>
+						</p>{/if}
 					{#if wantSave && !$current}
 						<SignInPrompt reason="Sign in to save tours and keep your progress on every device." />
 					{/if}
