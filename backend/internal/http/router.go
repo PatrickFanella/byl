@@ -139,6 +139,7 @@ func NewRouter(d Deps) http.Handler {
 			r.Get("/route-briefs/{id}/research", d.getBriefResearch(true))
 			r.Get("/route-briefs/{id}/itinerary", d.adminBriefItinerary)
 			r.Get("/route-briefs/{id}/review-package", d.adminReviewPackage)
+			r.Post("/route-briefs/{id}/review-package/publish", d.adminPublishReviewPackage)
 			r.Get("/route-briefs/{id}/evidence", d.adminListSourceEvidence)
 			r.Post("/route-briefs/{id}/evidence", d.adminQueueSourceEvidence)
 			r.Get("/route-briefs/{id}/evidence/{evidence}", d.adminGetSourceEvidence)

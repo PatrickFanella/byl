@@ -223,6 +223,11 @@ func (s *Store) curatorReviewPackage(ctx context.Context, brief, runID, tourID s
 			return nil, err
 		}
 		out.Tour = tour
+		if tour.HeroMedia != nil {
+			if err := p.entity(ctx, "media", tour.HeroMedia.ID, true); err != nil {
+				return nil, err
+			}
+		}
 		if tour.OwnerAccountID != nil {
 			p.task("personal_tour", tour.ID, "Select a curated working tour; personal routes have a separate owner workflow.")
 		}
