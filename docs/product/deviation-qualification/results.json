@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "issue": 63,
+  "review_date": "2026-11-08",
+  "decision": "NO_GO",
+  "calibrated": false,
+  "production_activation_authorized": false,
+  "threshold_changes": false,
+  "field_observations": 0,
+  "field_false_flag_rate": null,
+  "field_reason": "No independent observer-labelled real-route samples on either trail or representative phone/background runs. Simulator control is blocked by T3 run ownership.",
+  "synthetic_fixture": {
+    "case_count": 26,
+    "copies": [
+      {
+        "path": "web/src/lib/tour/fixtures/deviation-v1.json",
+        "sha256": "e0bb50577c1745f222bf7bdc98e6e47abf88d446ee0bca5c0a1a1634338c2691"
+      },
+      {
+        "path": "ios-invisible-museum/InvisibleMuseumKit/Tests/InvisibleMuseumKitTests/Fixtures/deviation-v1.json",
+        "sha256": "e0bb50577c1745f222bf7bdc98e6e47abf88d446ee0bca5c0a1a1634338c2691"
+      },
+      {
+        "path": "android/core/src/test/resources/fixtures/deviation-v1.json",
+        "sha256": "e0bb50577c1745f222bf7bdc98e6e47abf88d446ee0bca5c0a1a1634338c2691"
+      }
+    ],
+    "cases": [
+      {
+        "name": "qualified-forward-passage",
+        "expected_deviation": false
+      },
+      {
+        "name": "sustained-moving-detour",
+        "expected_deviation": true
+      },
+      {
+        "name": "poor-accuracy-drift",
+        "expected_deviation": null
+      },
+      {
+        "name": "stationary-jitter",
+        "expected_deviation": null
+      },
+      {
+        "name": "legitimate-short-crossing",
+        "expected_deviation": false
+      },
+      {
+        "name": "stop-access-spur",
+        "expected_deviation": null
+      },
+      {
+        "name": "known-parallel-road",
+        "expected_deviation": null
+      },
+      {
+        "name": "pause-cannot-create-a-deviation",
+        "expected_deviation": null
+      },
+      {
+        "name": "permission_lost-cannot-create-a-deviation",
+        "expected_deviation": null
+      },
+      {
+        "name": "manual_arrival-cannot-create-a-deviation",
+        "expected_deviation": null
+      },
+      {
+        "name": "end-is-terminal",
+        "expected_deviation": null
+      },
+      {
+        "name": "sample-gap",
+        "expected_deviation": null
+      },
+      {
+        "name": "implausible-location-jump",
+        "expected_deviation": null
+      },
+      {
+        "name": "out-and-back-overlap",
+        "expected_deviation": null
+      },
+      {
+        "name": "repeated-loop-section",
+        "expected_deviation": null
+      },
+      {
+        "name": "unsupported-segment",
+        "expected_deviation": null
+      },
+      {
+        "name": "unreviewed-ambiguity-context",
+        "expected_deviation": null
+      },
+      {
+        "name": "duplicate-fixes-and-complete-replay",
+        "expected_deviation": false
+      },
+      {
+        "name": "qualified-reverse-passage",
+        "expected_deviation": false
+      },
+      {
+        "name": "cycling-detour",
+        "expected_deviation": true
+      },
+      {
+        "name": "bounded-uncertainty-between-departure-and-rejoin",
+        "expected_deviation": true
+      },
+      {
+        "name": "stationary-break-does-not-qualify-as-detour",
+        "expected_deviation": false
+      },
+      {
+        "name": "partial-mid-segment-observation",
+        "expected_deviation": null
+      },
+      {
+        "name": "simple-loop-without-overlap",
+        "expected_deviation": false
+      },
+      {
+        "name": "incomplete-deviation-without-end-of-passage",
+        "expected_deviation": null
+      },
+      {
+        "name": "long-uncertain-bridge",
+        "expected_deviation": null
+      }
+    ],
+    "scope": "Synthetic reference semantics only; fixtures are not visitor traces, population estimates or field calibration."
+  },
+  "candidate_review_thresholds": {
+    "version": "uncalibrated-review-v1",
+    "minimum_account_scopes": 5,
+    "minimum_departure_account_scopes": 3,
+    "minimum_departure_percent": 30,
+    "window": "Separate nonoverlapping UTC weeks starting Monday, revision/segment/mode/direction groups.",
+    "rationale": "A repeat account cannot alone trigger review; require several scopes and material departure share. Candidate suppression rules, not statistical confidence or calibrated alert precision. Account scopes do not prove distinct human observers."
+  },
+  "live_intake": {
+    "url": "https://byl.subcult.tv/api/v1/route-contribution-intake",
+    "http_status": 200,
+    "body": {
+      "calibrated": false,
+      "detector_version": "uncalibrated-v1",
+      "enabled": false,
+      "retention_days": 30,
+      "withdrawal_available": true
+    }
+  },
+  "qualification_matrix": [
+    {
+      "case": "parallel-road drift",
+      "web_field": "not_run",
+      "ios_field": "not_run",
+      "android_field": "not_run",
+      "required_trails": [
+        "Illinois Prairie Path Main Stem",
+        "Great Western Trail"
+      ]
+    },
+    {
+      "case": "legitimate crossing",
+      "web_field": "not_run",
+      "ios_field": "not_run",
+      "android_field": "not_run",
+      "required_trails": [
+        "Illinois Prairie Path Main Stem",
+        "Great Western Trail"
+      ]
+    },
+    {
+      "case": "stationary break",
+      "web_field": "not_run",
+      "ios_field": "not_run",
+      "android_field": "not_run",
+      "required_trails": [
+        "Illinois Prairie Path Main Stem",
+        "Great Western Trail"
+      ]
+    },
+    {
+      "case": "separate outbound and return travel",
+      "web_field": "not_run",
+      "ios_field": "not_run",
+      "android_field": "not_run",
+      "required_trails": [
+        "Illinois Prairie Path Main Stem",
+        "Great Western Trail"
+      ]
+    },
+    {
+      "case": "sustained detour and rejoin",
+      "web_field": "not_run",
+      "ios_field": "not_run",
+      "android_field": "not_run",
+      "required_trails": [
+        "Illinois Prairie Path Main Stem",
+        "Great Western Trail"
+      ]
+    },
+    {
+      "case": "sparse/background samples",
+      "web_field": "not_run",
+      "ios_field": "not_run",
+      "android_field": "not_run",
+      "required_trails": [
+        "Illinois Prairie Path Main Stem",
+        "Great Western Trail"
+      ]
+    }
+  ],
+  "blockers": [
+    "Missing representative phone/OS and independent field truth on both pilots.",
+    "Pilot arrivals, corridor access, competitor/stop-area signal references and strict provider topology remain unqualified.",
+    "Production backup/WAL/volume/snapshot/log custody, deletion schedules and restore drill need actual operator evidence."
+  ],
+  "existing_checks": {
+    "swift_package": {
+      "tests": 190,
+      "failures": 0,
+      "scope": "Soyuz macOS package tests, not iOS device execution."
+    },
+    "web": {
+      "unit_tests": 184,
+      "browser_tests": 93,
+      "scope": "Great Western branch disposable API/Chromium suite includes consent/offline/lifecycle fixtures, not actual trail sampling."
+    },
+    "backend": {
+      "command": "go test -race -count=1 -v ./internal/http ./internal/repository ./internal/config ./internal/models -run Contribution|Contributions",
+      "result": "PASS",
+      "http_seconds": 29.808,
+      "repository_seconds": 59.074,
+      "scope": "Disposable PostgreSQL consent/withdrawal/expiry/redaction/restore/admission/aggregation tests. No production custody proof."
+    },
+    "kotlin_core": {
+      "command": "bash scripts/test-android-core-container.sh",
+      "result": "PASS",
+      "duration": "1m40s",
+      "source_revision": "d32fd200eb9a0683bda0f302f47348e744634867",
+      "scope": "Pinned Gradle JVM core tests, not phone execution."
+    }
+  }
+}
