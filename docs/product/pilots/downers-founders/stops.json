@@ -1,0 +1,122 @@
+[
+  {
+    "key": "main-street-cemetery",
+    "name": "Main Street Cemetery",
+    "address": "5190 Main Street, Downers Grove, IL",
+    "position": {
+      "latitude": 41.79253,
+      "longitude": -88.010619,
+      "kind": "independent cemetery-location reference",
+      "source_url": "https://graveyards.com/Illinois/DuPage/Downers-Grove-Main-Street"
+    },
+    "source_ids": [
+      "main-cemetery"
+    ],
+    "moment_title": "Main Street Cemetery and the town’s early families",
+    "date_start": "1856-01-01",
+    "date_precision": "year",
+    "body": "The Downers Grove Historical Society dates the cemetery’s beginnings to an 1856 land contribution by Samuel Curtiss. Its account identifies members of several early local families and names Emma Foster Miller’s 1939 burial as the final interment. The cemetery offers a separate thread from the Downer family ground on Linscott Avenue. Its listed street address and the location reference still need curator reconciliation; neither establishes an approved visitor entrance.",
+    "gaps": [
+      "5190 versus indexed municipal 5158 address lead; inspect original records.",
+      "Exact public entrance, present hours and pedestrian crossing remain unreviewed.",
+      "No rights-cleared image selected."
+    ],
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "status": "draft",
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 normalizes year-only/circa storage; it does not assert an exact event day."
+  },
+  {
+    "key": "downer-burial-ground",
+    "name": "Downer Burial Ground",
+    "address": "4520 Linscott Avenue, Downers Grove, IL",
+    "position": {
+      "latitude": 41.804939,
+      "longitude": -88.0159623,
+      "kind": "Nominatim address lead, not surveyed site/entrance",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=4520+Linscott+Avenue%2C+Downers+Grove%2C+Illinois&format=jsonv2&limit=1&addressdetails=1"
+    },
+    "source_ids": [
+      "burial-access",
+      "downer-burial-history",
+      "downer-biography"
+    ],
+    "moment_title": "The Downer family ground and an unresolved arrival date",
+    "date_start": "1863-01-01",
+    "date_precision": "year",
+    "body": "The Historical Society places the Downer family burial ground on land formerly associated with Pierce Downer. Its account attributes the 1863 farm burials to a flooded-creek obstacle to reaching Main Street Cemetery. That historical explanation does not describe present crossing conditions. The settlement date remains disputed in this packet: the society gives 1832, while the Park District gives 1833. The district describes dawn-to-dusk visits using a signed shared driveway. A curator still needs to confirm the exact visitor approach and its current conditions.",
+    "gaps": [
+      "1832/1833 discrepancy retained; no chosen replacement date.",
+      "Geocoded address is not a surveyed burial-ground or entrance position.",
+      "Shared driveway, street approach and current access need review.",
+      "No rights-cleared image selected."
+    ],
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "status": "draft",
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 normalizes year-only/circa storage; it does not assert an exact event day."
+  },
+  {
+    "key": "pierce-downer-house",
+    "name": "Pierce Downer House",
+    "address": "4437 Seeley Avenue, Downers Grove, IL",
+    "position": {
+      "latitude": 41.8059948,
+      "longitude": -88.0216323,
+      "kind": "Nominatim address lead, not surveyed building/entrance",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=4437+Seeley+Avenue%2C+Downers+Grove%2C+Illinois&format=jsonv2&limit=1&addressdetails=1"
+    },
+    "source_ids": [
+      "downer-house",
+      "house-municipal-minutes"
+    ],
+    "moment_title": "A surviving house and changing street orientation",
+    "date_start": "1840-01-01",
+    "date_precision": "circa",
+    "body": "The Historical Society identifies the house at 4437 Seeley Avenue as an early-1840s home associated with Pierce Downer. It distinguishes the retained building position from a later change in front-door orientation as Seeley Avenue developed. Municipal landmark-review minutes separate staff descriptions from the owners’ testimony about alterations and uncertainty over the exact construction year. These records support a historical draft, not a right to enter the residence. A safe public exterior viewpoint remains unreviewed.",
+    "gaps": [
+      "Use early 1840s as an attributed range, not an exact construction day/year.",
+      "Keep staff findings distinct from owners’ testimony and oral accounts.",
+      "Private residence: no entry or current viewing permission established.",
+      "House/well geocoder returns the same OSM way; do not merge the two sites.",
+      "No rights-cleared image selected."
+    ],
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "status": "draft",
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 normalizes year-only/circa storage; it does not assert an exact event day."
+  },
+  {
+    "key": "pierce-downer-well",
+    "name": "Pierce Downer Well",
+    "address": "4448 Seeley Avenue, Downers Grove, IL",
+    "position": {
+      "latitude": 41.8058071,
+      "longitude": -88.0218441,
+      "kind": "Nominatim address lead, not surveyed well/entrance",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=4448+Seeley+Avenue%2C+Downers+Grove%2C+Illinois&format=jsonv2&limit=1&addressdetails=1"
+    },
+    "source_ids": [
+      "downer-well"
+    ],
+    "moment_title": "A well across from the house",
+    "date_start": "1832-01-01",
+    "date_precision": "circa",
+    "body": "The Historical Society identifies a well site at 4448 Seeley Avenue, across from the Downer house, and dates it circa 1832. Its description treats the well’s household use as probable rather than established. Its designation dates also conflict: the descriptive text gives 2013 while the approval field gives 2003. Both remain visible for curator research. The address is a site lead; current visibility, the well’s exact position and a safe public arrival have not been established.",
+    "gaps": [
+      "2003/2013 designation-date discrepancy retained.",
+      "Do not turn probable household use into a settled claim.",
+      "House/well geocoder returns the same OSM way; maintain distinct physical identities.",
+      "No verified public viewpoint, exact well position or safe crossing.",
+      "No rights-cleared image selected."
+    ],
+    "public_arrival": null,
+    "planned_dwell_minutes": 3,
+    "status": "draft",
+    "planned_narration_minutes": 1,
+    "date_storage_note": "January 1 normalizes year-only/circa storage; it does not assert an exact event day."
+  }
+]

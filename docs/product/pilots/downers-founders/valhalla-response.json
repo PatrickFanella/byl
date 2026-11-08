@@ -1,0 +1,31 @@
+{
+  "trip": {
+    "summary": {
+      "length": 2.722,
+      "time": 1989.352
+    },
+    "legs": [
+      {
+        "summary": {
+          "length": 1.833,
+          "time": 1341.087
+        },
+        "shape": "gyxunAnvvzfDGuR}]`Aok@~Ai@f@wCLoBHox@rB{Pd@?h@yDHyBLiA_@iO`@uABiABoABgA@gJ`@kDNyDPkXjAgSz@qMj@cADy[tAqWhAkh@xBaCLeEPac@f@sn@r@y@p@m@|@\\pQf@rk@BvDFdGt@x|@D~DDlFv@~|@iCBwDDB`EFvFx@b}@cfBlBwCDuDDDxDokBhCqDDimApA"
+      },
+      {
+        "summary": {
+          "length": 0.67,
+          "time": 490.421
+        },
+        "shape": "ygqvnAt|`{fDcWVkCB@xFPdmA@dC?fEDdEB|AzAxaB?hHJ`FFpB`@bKb@lGFt@^vE|@hIhArHhA~FdEnPhAnF`A`GnAdM\\hGNhGF|IFfH}CFCiCAmAqX\\w_@x@mBB"
+      },
+      {
+        "summary": {
+          "length": 0.218,
+          "time": 157.844
+        },
+        "shape": "uisvnAfgl{fDlBCv_@y@pX]@lABhCDrC@nAmABcAMiKXuTT{JP"
+      }
+    ]
+  }
+}

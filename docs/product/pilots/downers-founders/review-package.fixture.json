@@ -1,0 +1,2067 @@
+{
+  "schema_version": 1,
+  "version": "f0d7dc0459dc6bf5e7a59f8d0c3b314e100475edbe582d56538974285ee8b546",
+  "state": "needs_research",
+  "ready_to_publish": false,
+  "brief": {
+    "id": "e4b51c26-680c-4c17-80ea-867c63b30713",
+    "owner_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+    "submitted": {
+      "topic": "Pierce Downer and founding Downers Grove: settlement, family and contested dates",
+      "area": "Downers Grove, Illinois",
+      "notes": "Private draft pilot. Retain 1832/1833 discrepancy and 2003/2013 well designation discrepancy. Historical site positions are not approved public arrivals. Shared driveway and private-residence viewing need curator review. No publication or promised 60–90 minute duration.",
+      "place_leads": [
+        "Main Street Cemetery",
+        "Downer Burial Ground",
+        "Pierce Downer House",
+        "Pierce Downer Well"
+      ],
+      "event_leads": ["Pierce and Lucy Downer", "Settlement-date discrepancy"],
+      "source_links": [
+        "https://dghistory.org/pierce-downer/",
+        "https://www.dgparks.org/location/downer-burial-place",
+        "https://dghistory.org/the-pierce-downer-house/",
+        "https://dghistory.org/pierce-downers-well/",
+        "https://dghistory.org/main-street-cemetery-site/",
+        "https://dghistory.org/downer-burial-ground/"
+      ],
+      "modes": ["walk"],
+      "trip_shape": "point_to_point",
+      "duration_minutes": null,
+      "start_preference": "Main Street Cemetery",
+      "end_preference": "Pierce Downer Well",
+      "pilot_id": "downers-founders-v1"
+    },
+    "status": "review",
+    "reason": "Research stages completed; curator review required.",
+    "version": 3,
+    "created_at": "2026-11-08T14:53:21.317508-06:00",
+    "updated_at": "2026-11-08T14:53:21.911889-06:00"
+  },
+  "research": {
+    "id": "a7587ebe-899c-40ba-a0bb-45de8388d683",
+    "brief_id": "e4b51c26-680c-4c17-80ea-867c63b30713",
+    "job_id": "3a07398c-08ef-4539-8341-cf99c587733d",
+    "source_version": 1,
+    "brief_version": 2,
+    "status": "completed",
+    "reason": "",
+    "requests_used": 2,
+    "tokens_reserved": 4000,
+    "request_limit": 12,
+    "token_limit": 20000,
+    "deadline_at": "2026-11-08T15:08:21.800586-06:00",
+    "created_at": "2026-11-08T14:53:21.800586-06:00",
+    "stages": [
+      {
+        "stage": "research",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "reconciliation",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "drafting",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "assembly",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      }
+    ]
+  },
+  "submitted": {
+    "topic": "Pierce Downer and founding Downers Grove: settlement, family and contested dates",
+    "area": "Downers Grove, Illinois",
+    "notes": "Private draft pilot. Retain 1832/1833 discrepancy and 2003/2013 well designation discrepancy. Historical site positions are not approved public arrivals. Shared driveway and private-residence viewing need curator review. No publication or promised 60–90 minute duration.",
+    "place_leads": [
+      "Main Street Cemetery",
+      "Downer Burial Ground",
+      "Pierce Downer House",
+      "Pierce Downer Well"
+    ],
+    "event_leads": ["Pierce and Lucy Downer", "Settlement-date discrepancy"],
+    "source_links": [
+      "https://dghistory.org/pierce-downer/",
+      "https://www.dgparks.org/location/downer-burial-place",
+      "https://dghistory.org/the-pierce-downer-house/",
+      "https://dghistory.org/pierce-downers-well/",
+      "https://dghistory.org/main-street-cemetery-site/",
+      "https://dghistory.org/downer-burial-ground/"
+    ],
+    "modes": ["walk"],
+    "trip_shape": "point_to_point",
+    "duration_minutes": null,
+    "start_preference": "Main Street Cemetery",
+    "end_preference": "Pierce Downer Well",
+    "pilot_id": "downers-founders-v1"
+  },
+  "proposal": {
+    "version": 1,
+    "status": "draft",
+    "created_at": "2026-11-08T14:53:21.888172551-06:00",
+    "title": "Pierce Downer and founding Downers Grove: settlement, family and contested dates — Downers Grove, Illinois",
+    "introduction": "Explore Pierce Downer and founding Downers Grove: settlement, family and contested dates in Downers Grove, Illinois through 4 researched locations and their selected historical accounts. This is a private proposal; current viewing guidance, connecting paths and publication still require review.",
+    "requested_shape": "point_to_point",
+    "trip_shape": "point_to_point",
+    "modes": ["walk"],
+    "target_duration_minutes": null,
+    "travel_minutes": null,
+    "travel_state": "not_computed",
+    "planned_dwell_minutes": 12,
+    "planned_narration_minutes": 4,
+    "stops": [
+      {
+        "material": {
+          "record_id": "c4a5a2a1-4540-4926-acc7-d1397d1becd8",
+          "review_version": 1,
+          "place_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+          "place_name": "Main Street Cemetery",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.79253,
+          "longitude": -88.010619,
+          "moment_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+          "moment_title": "Main Street Cemetery and the town’s early families",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "252dd568fd54433f77d2d98b61aa188ba41683f643dc83bf5a14a280b84089f1",
+          "source_urls": ["https://dghistory.org/main-street-cemetery-site/"],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: downer, downers, grove, family, dates",
+        "what_to_notice": "Curator research question: what traces of “Main Street Cemetery and the town’s early families” can be observed at Main Street Cemetery today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with “The Downer family ground and an unresolved arrival date” at Downer Burial Ground. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "5d1c0e8f-9062-415e-bff5-82c0c782bc87",
+          "review_version": 1,
+          "place_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+          "place_name": "Downer Burial Ground",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.804939,
+          "longitude": -88.0159623,
+          "moment_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+          "moment_title": "The Downer family ground and an unresolved arrival date",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "82f1e268bb00736451888093ad15827685b352359dc07e3cd44c8e94ea926de4",
+          "source_urls": [
+            "https://www.dgparks.org/location/downer-burial-place",
+            "https://dghistory.org/downer-burial-ground/",
+            "https://dghistory.org/pierce-downer/"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: pierce, downer, settlement, family",
+        "what_to_notice": "Curator research question: what traces of “The Downer family ground and an unresolved arrival date” can be observed at Downer Burial Ground today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with “A surviving house and changing street orientation” at Pierce Downer House. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "02237e17-01e3-4866-90c5-b8f9c022ff3a",
+          "review_version": 1,
+          "place_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+          "place_name": "Pierce Downer House",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.8059948,
+          "longitude": -88.0216323,
+          "moment_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+          "moment_title": "A surviving house and changing street orientation",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "2fbec7213fb3d4b6e3c176c7e8df24a3bbb9de6fc026f75fc9c1484d4bf5b604",
+          "source_urls": [
+            "https://dghistory.org/the-pierce-downer-house/",
+            "https://agendadocs.downers.us/public/docs/agendas/2017/02-21-17/MIN_2017-7274.pdf"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: pierce, downer",
+        "what_to_notice": "Curator research question: what traces of “A surviving house and changing street orientation” can be observed at Pierce Downer House today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with “A well across from the house” at Pierce Downer Well. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "c6b7754d-e0fa-4769-88ab-87c383bf82a7",
+          "review_version": 1,
+          "place_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+          "place_name": "Pierce Downer Well",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "latitude": 41.8058071,
+          "longitude": -88.0218441,
+          "moment_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+          "moment_title": "A well across from the house",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "f319bd112b1f1165e200fbcd1e4ffa78988a3d5c3189b54b5f657e01b5a4be76",
+          "source_urls": ["https://dghistory.org/pierce-downers-well/"],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: downer, dates",
+        "what_to_notice": "Curator research question: what traces of “A well across from the house” can be observed at Pierce Downer Well today? Confirm visible features before writing viewing guidance.",
+        "transition": "",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      }
+    ],
+    "travel_sequence": [0, 1, 2, 3],
+    "excluded": [],
+    "research_gaps": [],
+    "assumptions": [
+      "Historical paragraphs are reused from retained material; their inclusion is not a new factual review.",
+      "What to notice is a curator research question, not verified current viewing guidance.",
+      "Plan three minutes of dwell per stop, plus narration at 130 words per minute; actual travel and access still require computation and review.",
+      "No duration was supplied; the geography screen uses a provisional 60-minute planning budget."
+    ]
+  },
+  "tour": {
+    "journeys": {
+      "walk": {
+        "version": 1,
+        "state": "blocked",
+        "computation": "ready",
+        "quality": "blocked",
+        "usable": false,
+        "issue_codes": [
+          "arrival_unknown",
+          "corridor_reference_missing",
+          "strict_attribution_unavailable"
+        ],
+        "travel_distance_m": 2722,
+        "travel_duration_s": 1989,
+        "dwell_duration_s": 720,
+        "narration_duration_s": 480,
+        "itinerary_duration_s": 3189,
+        "round_trip_duration_s": null,
+        "return_plan": {
+          "status": "unplanned",
+          "distance_m": null,
+          "duration_s": null
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      }
+    },
+    "draft_version": 0,
+    "route_version": 0,
+    "revision_id": null,
+    "revision_number": 0,
+    "id": "3622246d-b38a-4a25-8f1f-c5d3900f8f7a",
+    "city_id": "00000000-0000-4000-8000-0000000000c1",
+    "city_ids": ["00000000-0000-4000-8000-0000000000c1"],
+    "slug": "founding-downers-grove-private-pilot",
+    "title": "Founding Downers Grove — private pilot",
+    "summary": "",
+    "topic_id": null,
+    "topic": null,
+    "modes": ["walk"],
+    "hero_media": null,
+    "status": "draft",
+    "visibility": "public",
+    "owner_account_id": null,
+    "stop_count": 4,
+    "routes": {
+      "walk": {
+        "quality": {
+          "report_id": "de398a8e-12ce-4a5b-9117-21cbe7b784f7",
+          "input_current": true,
+          "version": 1,
+          "status": "blocked",
+          "issues": [
+            {
+              "code": "arrival_unknown",
+              "severity": "blocked",
+              "origin": "curator_assertion",
+              "detail": "Each story stop requires an independently allowed arrival for this mode."
+            },
+            {
+              "code": "corridor_reference_missing",
+              "severity": "needs_research",
+              "origin": "unknown",
+              "detail": "Provide a reviewed network reference and inspected access evidence."
+            },
+            {
+              "code": "strict_attribution_unavailable",
+              "severity": "needs_research",
+              "origin": "unknown",
+              "detail": "Strict network attribution is unavailable; no alternate path or map-snap result was accepted."
+            }
+          ],
+          "checked_at": "2026-11-08T14:53:22.028899917-06:00"
+        },
+        "mode": "walk",
+        "status": "ready",
+        "distance_m": 2722,
+        "duration_s": 1989,
+        "estimated_minutes": 34,
+        "computed_at": "2026-11-08T14:53:22.030063-06:00"
+      }
+    },
+    "created_at": "2026-11-08T14:53:21.995005-06:00",
+    "updated_at": "2026-11-08T14:53:21.995005-06:00",
+    "stops": [
+      {
+        "id": "f725a143-ca5b-4440-82b8-38a8d5fc5209",
+        "position": 1,
+        "place": {
+          "id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "main-street-cemetery",
+          "name": "Main Street Cemetery",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.79253,
+          "longitude": -88.010619,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "5190 Main Street, Downers Grove, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T14:53:21.555547-06:00",
+          "updated_at": "2026-11-08T14:53:21.555547-06:00"
+        },
+        "featured_moment_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+        "featured_moment": {
+          "id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+          "place_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+          "slug": "main-street-cemetery-and-the-town-s-early-families",
+          "title": "Main Street Cemetery and the town’s early families",
+          "excerpt": "The Downers Grove Historical Society dates the cemetery’s beginnings to an 1856 land contribution by Samuel Curtiss. Its account identifies members of several early local families and names Emma Foster Miller’s 1939 burial as the final…",
+          "date_start": "1856-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "1b4424ef-eeb7-4c0e-9a75-55214bc3c652",
+        "position": 2,
+        "place": {
+          "id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "downer-burial-ground",
+          "name": "Downer Burial Ground",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.804939,
+          "longitude": -88.0159623,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "4520 Linscott Avenue, Downers Grove, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T14:53:21.624668-06:00",
+          "updated_at": "2026-11-08T14:53:21.624668-06:00"
+        },
+        "featured_moment_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+        "featured_moment": {
+          "id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+          "place_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+          "slug": "the-downer-family-ground-and-an-unresolved-arrival-date",
+          "title": "The Downer family ground and an unresolved arrival date",
+          "excerpt": "The Historical Society places the Downer family burial ground on land formerly associated with Pierce Downer. Its account attributes the 1863 farm burials to a flooded-creek obstacle to reaching Main Street Cemetery. That historical…",
+          "date_start": "1863-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "6d38819e-d1a4-474c-b799-637eca38da5d",
+        "position": 3,
+        "place": {
+          "id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "pierce-downer-house",
+          "name": "Pierce Downer House",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.8059948,
+          "longitude": -88.0216323,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "4437 Seeley Avenue, Downers Grove, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T14:53:21.683227-06:00",
+          "updated_at": "2026-11-08T14:53:21.683227-06:00"
+        },
+        "featured_moment_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+        "featured_moment": {
+          "id": "76464798-36c2-494f-9a82-ada345fc95ab",
+          "place_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+          "slug": "a-surviving-house-and-changing-street-orientation",
+          "title": "A surviving house and changing street orientation",
+          "excerpt": "The Historical Society identifies the house at 4437 Seeley Avenue as an early-1840s home associated with Pierce Downer. It distinguishes the retained building position from a later change in front-door orientation as Seeley Avenue…",
+          "date_start": "1840-01-01",
+          "date_end": null,
+          "date_precision": "circa",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "e981d034-6f2a-4017-9a67-2e214e19d08a",
+        "position": 4,
+        "place": {
+          "id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "slug": "pierce-downer-well",
+          "name": "Pierce Downer Well",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.8058071,
+          "longitude": -88.0218441,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "4448 Seeley Avenue, Downers Grove, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T14:53:21.742-06:00",
+          "updated_at": "2026-11-08T14:53:21.742-06:00"
+        },
+        "featured_moment_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+        "featured_moment": {
+          "id": "d90655e7-809e-47d2-ae09-46e203abc099",
+          "place_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+          "slug": "a-well-across-from-the-house",
+          "title": "A well across from the house",
+          "excerpt": "The Historical Society identifies a well site at 4448 Seeley Avenue, across from the Downer house, and dates it circa 1832. Its description treats the well’s household use as probable rather than established. Its designation dates also…",
+          "date_start": "1832-01-01",
+          "date_end": null,
+          "date_precision": "circa",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      }
+    ]
+  },
+  "routes": {
+    "walk": {
+      "journey": {
+        "version": 1,
+        "state": "blocked",
+        "computation": "ready",
+        "quality": "blocked",
+        "usable": false,
+        "issue_codes": [
+          "arrival_unknown",
+          "corridor_reference_missing",
+          "strict_attribution_unavailable"
+        ],
+        "travel_distance_m": 2722,
+        "travel_duration_s": 1989,
+        "dwell_duration_s": 720,
+        "narration_duration_s": 480,
+        "itinerary_duration_s": 3189,
+        "round_trip_duration_s": null,
+        "return_plan": {
+          "status": "unplanned",
+          "distance_m": null,
+          "duration_s": null
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      },
+      "quality": {
+        "report_id": "de398a8e-12ce-4a5b-9117-21cbe7b784f7",
+        "input_current": true,
+        "version": 1,
+        "status": "blocked",
+        "issues": [
+          {
+            "code": "arrival_unknown",
+            "severity": "blocked",
+            "origin": "curator_assertion",
+            "detail": "Each story stop requires an independently allowed arrival for this mode."
+          },
+          {
+            "code": "corridor_reference_missing",
+            "severity": "needs_research",
+            "origin": "unknown",
+            "detail": "Provide a reviewed network reference and inspected access evidence."
+          },
+          {
+            "code": "strict_attribution_unavailable",
+            "severity": "needs_research",
+            "origin": "unknown",
+            "detail": "Strict network attribution is unavailable; no alternate path or map-snap result was accepted."
+          }
+        ],
+        "checked_at": "2026-11-08T14:53:22.028899917-06:00"
+      },
+      "id": "01c17d35-3b98-4b61-adb2-93822d4c4f64",
+      "tour_id": "3622246d-b38a-4a25-8f1f-c5d3900f8f7a",
+      "mode": "walk",
+      "status": "ready",
+      "provider": "valhalla",
+      "distance_m": 2722,
+      "duration_s": 1989,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-88.010616, 41.79242],
+          [-88.010301, 41.792424],
+          [-88.010334, 41.792919],
+          [-88.010382, 41.793631],
+          [-88.010402, 41.793652],
+          [-88.010409, 41.793728],
+          [-88.010414, 41.793784],
+          [-88.010472, 41.794704],
+          [-88.010491, 41.79499],
+          [-88.010512, 41.79499],
+          [-88.010517, 41.795083],
+          [-88.010524, 41.795144],
+          [-88.010508, 41.795181],
+          [-88.010525, 41.795442],
+          [-88.010527, 41.795485],
+          [-88.010529, 41.795522],
+          [-88.010531, 41.795562],
+          [-88.010532, 41.795598],
+          [-88.010549, 41.795778],
+          [-88.010557, 41.795864],
+          [-88.010566, 41.795957],
+          [-88.010604, 41.796363],
+          [-88.010634, 41.796687],
+          [-88.010656, 41.79692],
+          [-88.010659, 41.796954],
+          [-88.010702, 41.797415],
+          [-88.010739, 41.797808],
+          [-88.0108, 41.79847],
+          [-88.010807, 41.798535],
+          [-88.010816, 41.798634],
+          [-88.010836, 41.799211],
+          [-88.010862, 41.799973],
+          [-88.010887, 41.800002],
+          [-88.010918, 41.800025],
+          [-88.011215, 41.80001],
+          [-88.011929, 41.79999],
+          [-88.012021, 41.799988],
+          [-88.012152, 41.799984],
+          [-88.013141, 41.799957],
+          [-88.013237, 41.799954],
+          [-88.013356, 41.799951],
+          [-88.014348, 41.799923],
+          [-88.01435, 41.799992],
+          [-88.014353, 41.800084],
+          [-88.01445, 41.800082],
+          [-88.014574, 41.800078],
+          [-88.015568, 41.800049],
+          [-88.015623, 41.801699],
+          [-88.015626, 41.801775],
+          [-88.015629, 41.801866],
+          [-88.015722, 41.801863],
+          [-88.015791, 41.803599],
+          [-88.015794, 41.803688],
+          [-88.015835, 41.804941],
+          [-88.015835, 41.804941],
+          [-88.015847, 41.805327],
+          [-88.015849, 41.805397],
+          [-88.015974, 41.805396],
+          [-88.017225, 41.805387],
+          [-88.017292, 41.805386],
+          [-88.017392, 41.805386],
+          [-88.017491, 41.805383],
+          [-88.017538, 41.805381],
+          [-88.019119, 41.805335],
+          [-88.019268, 41.805335],
+          [-88.019381, 41.805329],
+          [-88.019438, 41.805325],
+          [-88.019632, 41.805308],
+          [-88.019767, 41.80529],
+          [-88.019794, 41.805286],
+          [-88.019902, 41.80527],
+          [-88.020067, 41.805239],
+          [-88.020221, 41.805202],
+          [-88.020349, 41.805165],
+          [-88.020629, 41.805066],
+          [-88.020749, 41.805029],
+          [-88.020878, 41.804996],
+          [-88.021105, 41.804956],
+          [-88.021238, 41.804941],
+          [-88.021371, 41.804933],
+          [-88.021546, 41.804929],
+          [-88.021694, 41.804925],
+          [-88.021698, 41.805004],
+          [-88.021629, 41.805006],
+          [-88.02159, 41.805007],
+          [-88.021605, 41.805416],
+          [-88.021634, 41.80594],
+          [-88.021636, 41.805995],
+          [-88.021636, 41.805995],
+          [-88.021634, 41.80594],
+          [-88.021605, 41.805416],
+          [-88.02159, 41.805007],
+          [-88.021629, 41.805006],
+          [-88.021698, 41.805004],
+          [-88.021772, 41.805001],
+          [-88.021812, 41.805],
+          [-88.021814, 41.805039],
+          [-88.021807, 41.805073],
+          [-88.02182, 41.80527],
+          [-88.021831, 41.805617],
+          [-88.02184, 41.805807]
+        ]
+      },
+      "legs": [
+        {
+          "from_position": 1,
+          "to_position": 2,
+          "distance_m": 1833,
+          "duration_s": 1341,
+          "geometry": [
+            [-88.010616, 41.79242],
+            [-88.010301, 41.792424],
+            [-88.010334, 41.792919],
+            [-88.010382, 41.793631],
+            [-88.010402, 41.793652],
+            [-88.010409, 41.793728],
+            [-88.010414, 41.793784],
+            [-88.010472, 41.794704],
+            [-88.010491, 41.79499],
+            [-88.010512, 41.79499],
+            [-88.010517, 41.795083],
+            [-88.010524, 41.795144],
+            [-88.010508, 41.795181],
+            [-88.010525, 41.795442],
+            [-88.010527, 41.795485],
+            [-88.010529, 41.795522],
+            [-88.010531, 41.795562],
+            [-88.010532, 41.795598],
+            [-88.010549, 41.795778],
+            [-88.010557, 41.795864],
+            [-88.010566, 41.795957],
+            [-88.010604, 41.796363],
+            [-88.010634, 41.796687],
+            [-88.010656, 41.79692],
+            [-88.010659, 41.796954],
+            [-88.010702, 41.797415],
+            [-88.010739, 41.797808],
+            [-88.0108, 41.79847],
+            [-88.010807, 41.798535],
+            [-88.010816, 41.798634],
+            [-88.010836, 41.799211],
+            [-88.010862, 41.799973],
+            [-88.010887, 41.800002],
+            [-88.010918, 41.800025],
+            [-88.011215, 41.80001],
+            [-88.011929, 41.79999],
+            [-88.012021, 41.799988],
+            [-88.012152, 41.799984],
+            [-88.013141, 41.799957],
+            [-88.013237, 41.799954],
+            [-88.013356, 41.799951],
+            [-88.014348, 41.799923],
+            [-88.01435, 41.799992],
+            [-88.014353, 41.800084],
+            [-88.01445, 41.800082],
+            [-88.014574, 41.800078],
+            [-88.015568, 41.800049],
+            [-88.015623, 41.801699],
+            [-88.015626, 41.801775],
+            [-88.015629, 41.801866],
+            [-88.015722, 41.801863],
+            [-88.015791, 41.803599],
+            [-88.015794, 41.803688],
+            [-88.015835, 41.804941]
+          ]
+        },
+        {
+          "from_position": 2,
+          "to_position": 3,
+          "distance_m": 670,
+          "duration_s": 490,
+          "geometry": [
+            [-88.015835, 41.804941],
+            [-88.015847, 41.805327],
+            [-88.015849, 41.805397],
+            [-88.015974, 41.805396],
+            [-88.017225, 41.805387],
+            [-88.017292, 41.805386],
+            [-88.017392, 41.805386],
+            [-88.017491, 41.805383],
+            [-88.017538, 41.805381],
+            [-88.019119, 41.805335],
+            [-88.019268, 41.805335],
+            [-88.019381, 41.805329],
+            [-88.019438, 41.805325],
+            [-88.019632, 41.805308],
+            [-88.019767, 41.80529],
+            [-88.019794, 41.805286],
+            [-88.019902, 41.80527],
+            [-88.020067, 41.805239],
+            [-88.020221, 41.805202],
+            [-88.020349, 41.805165],
+            [-88.020629, 41.805066],
+            [-88.020749, 41.805029],
+            [-88.020878, 41.804996],
+            [-88.021105, 41.804956],
+            [-88.021238, 41.804941],
+            [-88.021371, 41.804933],
+            [-88.021546, 41.804929],
+            [-88.021694, 41.804925],
+            [-88.021698, 41.805004],
+            [-88.021629, 41.805006],
+            [-88.02159, 41.805007],
+            [-88.021605, 41.805416],
+            [-88.021634, 41.80594],
+            [-88.021636, 41.805995]
+          ]
+        },
+        {
+          "from_position": 3,
+          "to_position": 4,
+          "distance_m": 218,
+          "duration_s": 158,
+          "geometry": [
+            [-88.021636, 41.805995],
+            [-88.021634, 41.80594],
+            [-88.021605, 41.805416],
+            [-88.02159, 41.805007],
+            [-88.021629, 41.805006],
+            [-88.021698, 41.805004],
+            [-88.021772, 41.805001],
+            [-88.021812, 41.805],
+            [-88.021814, 41.805039],
+            [-88.021807, 41.805073],
+            [-88.02182, 41.80527],
+            [-88.021831, 41.805617],
+            [-88.02184, 41.805807]
+          ]
+        }
+      ],
+      "computed_at": "2026-11-08T14:53:22.030063-06:00"
+    }
+  },
+  "path_reports": {
+    "walk": {
+      "route_sha256": "9f86c90b3fc63adf5e26f6ce68ef8f40769bbf560d369ed69ce14cf10936ee58",
+      "report_id": "de398a8e-12ce-4a5b-9117-21cbe7b784f7",
+      "input_current": true,
+      "version": 1,
+      "status": "blocked",
+      "issues": [
+        {
+          "code": "arrival_unknown",
+          "severity": "blocked",
+          "origin": "curator_assertion",
+          "detail": "Each story stop requires an independently allowed arrival for this mode."
+        },
+        {
+          "code": "corridor_reference_missing",
+          "severity": "needs_research",
+          "origin": "unknown",
+          "detail": "Provide a reviewed network reference and inspected access evidence."
+        },
+        {
+          "code": "strict_attribution_unavailable",
+          "severity": "needs_research",
+          "origin": "unknown",
+          "detail": "Strict network attribution is unavailable; no alternate path or map-snap result was accepted."
+        }
+      ],
+      "checked_at": "2026-11-08T14:53:22.028899917-06:00",
+      "input_hash": "c5c56d9f8e425e140ec7487bb21f0958",
+      "mode": "walk",
+      "provider": "valhalla",
+      "inspections": [],
+      "attribution": {
+        "provider": "valhalla",
+        "method": "trace_attributes/edge_walk",
+        "legs": [],
+        "failure": "exact_match_unavailable"
+      }
+    }
+  },
+  "reconciliation": [
+    {
+      "id": "c4a5a2a1-4540-4926-acc7-d1397d1becd8",
+      "identity_key": "67a1c35779a80608000763ef3aee8f73e0b3811a4e4e50c1e442c8b88fa6f9b7",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Main Street Cemetery",
+          "text": "",
+          "url": "https://dghistory.org/main-street-cemetery-site/",
+          "lat": 41.79253,
+          "lng": -88.010619,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Main Street Cemetery",
+            "address": "5190 Main Street, Downers Grove, IL"
+          }
+        },
+        "key": "67a1c35779a80608000763ef3aee8f73e0b3811a4e4e50c1e442c8b88fa6f9b7",
+        "place_key": "e1b7af9889b0a91a1e8a1ff7f25816589abde03337f032b40ae8df630ffaca2e",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Main Street Cemetery",
+          "text": "",
+          "url": "https://dghistory.org/main-street-cemetery-site/",
+          "lat": 41.79253,
+          "lng": -88.010619,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Main Street Cemetery",
+            "address": "5190 Main Street, Downers Grove, IL"
+          }
+        },
+        "key": "67a1c35779a80608000763ef3aee8f73e0b3811a4e4e50c1e442c8b88fa6f9b7",
+        "place_key": "e1b7af9889b0a91a1e8a1ff7f25816589abde03337f032b40ae8df630ffaca2e",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "0e73554e-b6fe-4224-8e78-dfb5e6e482a1",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+        "moment_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "e2d54846-c639-4e25-9f71-a6811a604d1b"
+      },
+      "created_at": "2026-11-08T14:53:21.345608-06:00"
+    },
+    {
+      "id": "5d1c0e8f-9062-415e-bff5-82c0c782bc87",
+      "identity_key": "c40453b79ecd9723f1b13bff78b9d761f71b8c7bb97f33dcada2cea9ac4d76cf",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Downer Burial Ground",
+          "text": "",
+          "url": "https://www.dgparks.org/location/downer-burial-place",
+          "lat": 41.804939,
+          "lng": -88.0159623,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Downer Burial Ground",
+            "address": "4520 Linscott Avenue, Downers Grove, IL"
+          }
+        },
+        "key": "c40453b79ecd9723f1b13bff78b9d761f71b8c7bb97f33dcada2cea9ac4d76cf",
+        "place_key": "dae92ff743f8f8be9b5619587c0b41beede778533e304412f2a9f0e8136b69b6",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Downer Burial Ground",
+          "text": "",
+          "url": "https://www.dgparks.org/location/downer-burial-place",
+          "lat": 41.804939,
+          "lng": -88.0159623,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Downer Burial Ground",
+            "address": "4520 Linscott Avenue, Downers Grove, IL"
+          }
+        },
+        "key": "c40453b79ecd9723f1b13bff78b9d761f71b8c7bb97f33dcada2cea9ac4d76cf",
+        "place_key": "dae92ff743f8f8be9b5619587c0b41beede778533e304412f2a9f0e8136b69b6",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "a9c02d52-ee08-4b30-b883-b7961cd13382",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+        "moment_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "e2d54846-c639-4e25-9f71-a6811a604d1b"
+      },
+      "created_at": "2026-11-08T14:53:21.403043-06:00"
+    },
+    {
+      "id": "02237e17-01e3-4866-90c5-b8f9c022ff3a",
+      "identity_key": "065c494547080d01ba25d576b58cc53d39384d599ca4d549954af37223f04d3e",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Pierce Downer House",
+          "text": "",
+          "url": "https://dghistory.org/the-pierce-downer-house/",
+          "lat": 41.8059948,
+          "lng": -88.0216323,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Pierce Downer House",
+            "address": "4437 Seeley Avenue, Downers Grove, IL"
+          }
+        },
+        "key": "065c494547080d01ba25d576b58cc53d39384d599ca4d549954af37223f04d3e",
+        "place_key": "98faab5ce1af3ea2c2cf609b6c6c4f6f8416e52f70b5768677eaa51a5329d4c3",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Pierce Downer House",
+          "text": "",
+          "url": "https://dghistory.org/the-pierce-downer-house/",
+          "lat": 41.8059948,
+          "lng": -88.0216323,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Pierce Downer House",
+            "address": "4437 Seeley Avenue, Downers Grove, IL"
+          }
+        },
+        "key": "065c494547080d01ba25d576b58cc53d39384d599ca4d549954af37223f04d3e",
+        "place_key": "98faab5ce1af3ea2c2cf609b6c6c4f6f8416e52f70b5768677eaa51a5329d4c3",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "f1a3715d-22f9-4ccc-93c0-da5055a7c71a",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+        "moment_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "e2d54846-c639-4e25-9f71-a6811a604d1b"
+      },
+      "created_at": "2026-11-08T14:53:21.458723-06:00"
+    },
+    {
+      "id": "c6b7754d-e0fa-4769-88ab-87c383bf82a7",
+      "identity_key": "4981e867f48daa62e3dd425b25b8eeb850c5fa795474f721d3bec8b749a85acc",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Pierce Downer Well",
+          "text": "",
+          "url": "https://dghistory.org/pierce-downers-well/",
+          "lat": 41.8058071,
+          "lng": -88.0218441,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Pierce Downer Well",
+            "address": "4448 Seeley Avenue, Downers Grove, IL"
+          }
+        },
+        "key": "4981e867f48daa62e3dd425b25b8eeb850c5fa795474f721d3bec8b749a85acc",
+        "place_key": "b6ad5b2193db53b9f730bf8c945f3e59fa8189981241218ff58cb62c69558f42",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Pierce Downer Well",
+          "text": "",
+          "url": "https://dghistory.org/pierce-downers-well/",
+          "lat": 41.8058071,
+          "lng": -88.0218441,
+          "area": "Downers Grove",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "00000000-0000-4000-8000-0000000000c1",
+            "place_name": "Pierce Downer Well",
+            "address": "4448 Seeley Avenue, Downers Grove, IL"
+          }
+        },
+        "key": "4981e867f48daa62e3dd425b25b8eeb850c5fa795474f721d3bec8b749a85acc",
+        "place_key": "b6ad5b2193db53b9f730bf8c945f3e59fa8189981241218ff58cb62c69558f42",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "7afa0ad4-d4e1-4eae-b892-83b015964c04",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+        "moment_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "e2d54846-c639-4e25-9f71-a6811a604d1b"
+      },
+      "created_at": "2026-11-08T14:53:21.514733-06:00"
+    },
+    {
+      "id": "6aa3e5cf-07f8-4120-a071-53dbe361d047",
+      "identity_key": "ad74e1164c6e1e1b2f4294ba7372b870f7620097ea5061d26c77427fc5989606",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+          "title": "A well across from the house",
+          "text": "",
+          "url": "https://dghistory.org/pierce-downers-well/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "ad74e1164c6e1e1b2f4294ba7372b870f7620097ea5061d26c77427fc5989606",
+        "place_key": "abdea8caceaa874b9d7e5ffbb901bce966320e0b8f9926235245ec75ff82679e",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+        "moment_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+          "title": "A well across from the house",
+          "text": "",
+          "url": "https://dghistory.org/pierce-downers-well/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "ad74e1164c6e1e1b2f4294ba7372b870f7620097ea5061d26c77427fc5989606",
+        "place_key": "abdea8caceaa874b9d7e5ffbb901bce966320e0b8f9926235245ec75ff82679e",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+        "moment_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T14:53:21.856109-06:00"
+    },
+    {
+      "id": "8532568a-a407-4154-8f60-491672bdeb17",
+      "identity_key": "aa33c656ca09fc2db5c6f8deb77c8f8e28ce922de2abf824ee21c578e2829187",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+          "title": "Main Street Cemetery and the town’s early families",
+          "text": "",
+          "url": "https://dghistory.org/main-street-cemetery-site/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "aa33c656ca09fc2db5c6f8deb77c8f8e28ce922de2abf824ee21c578e2829187",
+        "place_key": "e3d26a9205dae2333470150c5f01b4bac3d8fd1df98cf6659adee5f7b7d6049a",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+        "moment_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+          "title": "Main Street Cemetery and the town’s early families",
+          "text": "",
+          "url": "https://dghistory.org/main-street-cemetery-site/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "aa33c656ca09fc2db5c6f8deb77c8f8e28ce922de2abf824ee21c578e2829187",
+        "place_key": "e3d26a9205dae2333470150c5f01b4bac3d8fd1df98cf6659adee5f7b7d6049a",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+        "moment_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T14:53:21.856109-06:00"
+    },
+    {
+      "id": "9cefe6e9-23bb-4f3c-ad96-850340ba4f69",
+      "identity_key": "4604123f64c076d89a2592e6258792437a7dda547997ff287d120fe99bcafee7",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+          "title": "The Downer family ground and an unresolved arrival date",
+          "text": "",
+          "url": "https://www.dgparks.org/location/downer-burial-place",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "4604123f64c076d89a2592e6258792437a7dda547997ff287d120fe99bcafee7",
+        "place_key": "3c1e2594c5107856ca4529e6450fc470aef342bcb8bd7a927b343d38883d831b",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+        "moment_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+          "title": "The Downer family ground and an unresolved arrival date",
+          "text": "",
+          "url": "https://www.dgparks.org/location/downer-burial-place",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "4604123f64c076d89a2592e6258792437a7dda547997ff287d120fe99bcafee7",
+        "place_key": "3c1e2594c5107856ca4529e6450fc470aef342bcb8bd7a927b343d38883d831b",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+        "moment_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T14:53:21.856109-06:00"
+    },
+    {
+      "id": "de7d4494-e9ad-49e6-a0ac-b53e00b08848",
+      "identity_key": "460072de1759fd810d2e6ae2a5d15b30735d969f57a5003915a26fd7504ad8c3",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+          "title": "A surviving house and changing street orientation",
+          "text": "",
+          "url": "https://dghistory.org/the-pierce-downer-house/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "460072de1759fd810d2e6ae2a5d15b30735d969f57a5003915a26fd7504ad8c3",
+        "place_key": "5441ac707286005891a5ca62c0817c6eb7ae57b002b3cd9c561fbc76a8fa7a07",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+        "moment_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+          "title": "A surviving house and changing street orientation",
+          "text": "",
+          "url": "https://dghistory.org/the-pierce-downer-house/",
+          "area": "Downers Grove",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "460072de1759fd810d2e6ae2a5d15b30735d969f57a5003915a26fd7504ad8c3",
+        "place_key": "5441ac707286005891a5ca62c0817c6eb7ae57b002b3cd9c561fbc76a8fa7a07",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "place_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+        "moment_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T14:53:21.856109-06:00"
+    }
+  ],
+  "entities": [
+    {
+      "key": "place:15538a01-92a1-469d-a4d4-11bae9fb184e",
+      "kind": "place",
+      "id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "main-street-cemetery",
+        "name": "Main Street Cemetery",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.79253,
+        "longitude": -88.010619,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5190 Main Street, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.555547-06:00",
+        "updated_at": "2026-11-08T14:53:21.555547-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:0e73554e-b6fe-4224-8e78-dfb5e6e482a1",
+      "kind": "place",
+      "id": "0e73554e-b6fe-4224-8e78-dfb5e6e482a1",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "main-street-cemetery",
+        "name": "Main Street Cemetery",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.79253,
+        "longitude": -88.010619,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "5190 Main Street, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.555547-06:00",
+        "updated_at": "2026-11-08T14:53:21.555547-06:00"
+      },
+      "candidate": {
+        "id": "0e73554e-b6fe-4224-8e78-dfb5e6e482a1",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "e1b7af9889b0a91a1e8a1ff7f25816589abde03337f032b40ae8df630ffaca2e",
+        "submitted_by_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Main Street Cemetery",
+          "slug": "",
+          "address": "5190 Main Street, Downers Grove, IL",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "summary": "",
+          "latitude": 41.79253,
+          "longitude": -88.010619,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+        "reviewed_at": "2026-11-08T14:53:21.555547-06:00",
+        "created_at": "2026-11-08T14:53:21.345608-06:00",
+        "updated_at": "2026-11-08T14:53:21.555547-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Main Street Cemetery",
+        "slug": "",
+        "address": "5190 Main Street, Downers Grove, IL",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "summary": "",
+        "latitude": 41.79253,
+        "longitude": -88.010619,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+      "kind": "place",
+      "id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "downer-burial-ground",
+        "name": "Downer Burial Ground",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.804939,
+        "longitude": -88.0159623,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "4520 Linscott Avenue, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.624668-06:00",
+        "updated_at": "2026-11-08T14:53:21.624668-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:a9c02d52-ee08-4b30-b883-b7961cd13382",
+      "kind": "place",
+      "id": "a9c02d52-ee08-4b30-b883-b7961cd13382",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "downer-burial-ground",
+        "name": "Downer Burial Ground",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.804939,
+        "longitude": -88.0159623,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "4520 Linscott Avenue, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.624668-06:00",
+        "updated_at": "2026-11-08T14:53:21.624668-06:00"
+      },
+      "candidate": {
+        "id": "a9c02d52-ee08-4b30-b883-b7961cd13382",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "dae92ff743f8f8be9b5619587c0b41beede778533e304412f2a9f0e8136b69b6",
+        "submitted_by_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Downer Burial Ground",
+          "slug": "",
+          "address": "4520 Linscott Avenue, Downers Grove, IL",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "summary": "",
+          "latitude": 41.804939,
+          "longitude": -88.0159623,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+        "reviewed_at": "2026-11-08T14:53:21.624668-06:00",
+        "created_at": "2026-11-08T14:53:21.403043-06:00",
+        "updated_at": "2026-11-08T14:53:21.624668-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Downer Burial Ground",
+        "slug": "",
+        "address": "4520 Linscott Avenue, Downers Grove, IL",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "summary": "",
+        "latitude": 41.804939,
+        "longitude": -88.0159623,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+      "kind": "place",
+      "id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "pierce-downer-house",
+        "name": "Pierce Downer House",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8059948,
+        "longitude": -88.0216323,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "4437 Seeley Avenue, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.683227-06:00",
+        "updated_at": "2026-11-08T14:53:21.683227-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:f1a3715d-22f9-4ccc-93c0-da5055a7c71a",
+      "kind": "place",
+      "id": "f1a3715d-22f9-4ccc-93c0-da5055a7c71a",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "pierce-downer-house",
+        "name": "Pierce Downer House",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8059948,
+        "longitude": -88.0216323,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "4437 Seeley Avenue, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.683227-06:00",
+        "updated_at": "2026-11-08T14:53:21.683227-06:00"
+      },
+      "candidate": {
+        "id": "f1a3715d-22f9-4ccc-93c0-da5055a7c71a",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "98faab5ce1af3ea2c2cf609b6c6c4f6f8416e52f70b5768677eaa51a5329d4c3",
+        "submitted_by_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Pierce Downer House",
+          "slug": "",
+          "address": "4437 Seeley Avenue, Downers Grove, IL",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "summary": "",
+          "latitude": 41.8059948,
+          "longitude": -88.0216323,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+        "reviewed_at": "2026-11-08T14:53:21.683227-06:00",
+        "created_at": "2026-11-08T14:53:21.458723-06:00",
+        "updated_at": "2026-11-08T14:53:21.683227-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Pierce Downer House",
+        "slug": "",
+        "address": "4437 Seeley Avenue, Downers Grove, IL",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "summary": "",
+        "latitude": 41.8059948,
+        "longitude": -88.0216323,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+      "kind": "place",
+      "id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "pierce-downer-well",
+        "name": "Pierce Downer Well",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8058071,
+        "longitude": -88.0218441,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "4448 Seeley Avenue, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.742-06:00",
+        "updated_at": "2026-11-08T14:53:21.742-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:7afa0ad4-d4e1-4eae-b892-83b015964c04",
+      "kind": "place",
+      "id": "7afa0ad4-d4e1-4eae-b892-83b015964c04",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "slug": "pierce-downer-well",
+        "name": "Pierce Downer Well",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8058071,
+        "longitude": -88.0218441,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "4448 Seeley Avenue, Downers Grove, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T14:53:21.742-06:00",
+        "updated_at": "2026-11-08T14:53:21.742-06:00"
+      },
+      "candidate": {
+        "id": "7afa0ad4-d4e1-4eae-b892-83b015964c04",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "b6ad5b2193db53b9f730bf8c945f3e59fa8189981241218ff58cb62c69558f42",
+        "submitted_by_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Pierce Downer Well",
+          "slug": "",
+          "address": "4448 Seeley Avenue, Downers Grove, IL",
+          "city_id": "00000000-0000-4000-8000-0000000000c1",
+          "summary": "",
+          "latitude": 41.8058071,
+          "longitude": -88.0218441,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "e2d54846-c639-4e25-9f71-a6811a604d1b",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+        "reviewed_at": "2026-11-08T14:53:21.742-06:00",
+        "created_at": "2026-11-08T14:53:21.514733-06:00",
+        "updated_at": "2026-11-08T14:53:21.742-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Pierce Downer Well",
+        "slug": "",
+        "address": "4448 Seeley Avenue, Downers Grove, IL",
+        "city_id": "00000000-0000-4000-8000-0000000000c1",
+        "summary": "",
+        "latitude": 41.8058071,
+        "longitude": -88.0218441,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "moment:045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+      "kind": "moment",
+      "id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+        "place_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+        "slug": "main-street-cemetery-and-the-town-s-early-families",
+        "title": "Main Street Cemetery and the town’s early families",
+        "excerpt": "The Downers Grove Historical Society dates the cemetery’s beginnings to an 1856 land contribution by Samuel Curtiss. Its account identifies members of several early local families and names Emma Foster Miller’s 1939 burial as the final…",
+        "date_start": "1856-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Main Street Cemetery",
+            "url": "https://dghistory.org/main-street-cemetery-site/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T14:53:21.573796-06:00",
+        "updated_at": "2026-11-08T14:53:21.573796-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+      "kind": "moment",
+      "id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+        "place_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+        "slug": "the-downer-family-ground-and-an-unresolved-arrival-date",
+        "title": "The Downer family ground and an unresolved arrival date",
+        "excerpt": "The Historical Society places the Downer family burial ground on land formerly associated with Pierce Downer. Its account attributes the 1863 farm burials to a flooded-creek obstacle to reaching Main Street Cemetery. That historical…",
+        "date_start": "1863-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Downer Burial Place",
+            "url": "https://www.dgparks.org/location/downer-burial-place",
+            "publisher": "Downers Grove Park District",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Downer Burial Ground",
+            "url": "https://dghistory.org/downer-burial-ground/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Pierce Downer",
+            "url": "https://dghistory.org/pierce-downer/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T14:53:21.635466-06:00",
+        "updated_at": "2026-11-08T14:53:21.635466-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:76464798-36c2-494f-9a82-ada345fc95ab",
+      "kind": "moment",
+      "id": "76464798-36c2-494f-9a82-ada345fc95ab",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "76464798-36c2-494f-9a82-ada345fc95ab",
+        "place_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+        "slug": "a-surviving-house-and-changing-street-orientation",
+        "title": "A surviving house and changing street orientation",
+        "excerpt": "The Historical Society identifies the house at 4437 Seeley Avenue as an early-1840s home associated with Pierce Downer. It distinguishes the retained building position from a later change in front-door orientation as Seeley Avenue…",
+        "date_start": "1840-01-01",
+        "date_end": null,
+        "date_precision": "circa",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "The Pierce Downer House",
+            "url": "https://dghistory.org/the-pierce-downer-house/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Architectural Design Review Board minutes, January 18, 2017, pp. 1–4",
+            "url": "https://agendadocs.downers.us/public/docs/agendas/2017/02-21-17/MIN_2017-7274.pdf",
+            "publisher": "Village of Downers Grove",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T14:53:21.695343-06:00",
+        "updated_at": "2026-11-08T14:53:21.695343-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:d90655e7-809e-47d2-ae09-46e203abc099",
+      "kind": "moment",
+      "id": "d90655e7-809e-47d2-ae09-46e203abc099",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "d90655e7-809e-47d2-ae09-46e203abc099",
+        "place_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+        "slug": "a-well-across-from-the-house",
+        "title": "A well across from the house",
+        "excerpt": "The Historical Society identifies a well site at 4448 Seeley Avenue, across from the Downer house, and dates it circa 1832. Its description treats the well’s household use as probable rather than established. Its designation dates also…",
+        "date_start": "1832-01-01",
+        "date_end": null,
+        "date_precision": "circa",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Pierce Downer’s Well",
+            "url": "https://dghistory.org/pierce-downers-well/",
+            "publisher": "Downers Grove Historical Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T14:53:21.752696-06:00",
+        "updated_at": "2026-11-08T14:53:21.752696-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    }
+  ],
+  "evidence": [],
+  "tasks": [
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:15538a01-92a1-469d-a4d4-11bae9fb184e",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:76464798-36c2-494f-9a82-ada345fc95ab",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:76464798-36c2-494f-9a82-ada345fc95ab",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:76464798-36c2-494f-9a82-ada345fc95ab",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:d90655e7-809e-47d2-ae09-46e203abc099",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:d90655e7-809e-47d2-ae09-46e203abc099",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:d90655e7-809e-47d2-ae09-46e203abc099",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "route_not_usable",
+      "entity_key": "walk",
+      "detail": "Route readiness is blocked; inspect the mode's retained quality report."
+    }
+  ],
+  "visitor_stories": [
+    {
+      "position": 1,
+      "place_id": "15538a01-92a1-469d-a4d4-11bae9fb184e",
+      "moment_id": "045f9002-89f2-4a7f-adc0-a8ad6eae483e",
+      "candidate_id": "",
+      "title": "Main Street Cemetery and the town’s early families",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": ["https://dghistory.org/main-street-cemetery-site/"],
+      "evidence_ids": []
+    },
+    {
+      "position": 2,
+      "place_id": "ca96c4b5-724e-47f7-8175-66e01d4cf7af",
+      "moment_id": "f80cb905-fa2e-4e7c-b75b-3ab669c8a426",
+      "candidate_id": "",
+      "title": "The Downer family ground and an unresolved arrival date",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://www.dgparks.org/location/downer-burial-place",
+        "https://dghistory.org/downer-burial-ground/",
+        "https://dghistory.org/pierce-downer/"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 3,
+      "place_id": "87bcff57-dc63-4eba-ae8c-734ec1430e7c",
+      "moment_id": "76464798-36c2-494f-9a82-ada345fc95ab",
+      "candidate_id": "",
+      "title": "A surviving house and changing street orientation",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://dghistory.org/the-pierce-downer-house/",
+        "https://agendadocs.downers.us/public/docs/agendas/2017/02-21-17/MIN_2017-7274.pdf"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 4,
+      "place_id": "59cf6dbd-c7dd-4cde-b8bd-8cba2acf3009",
+      "moment_id": "d90655e7-809e-47d2-ae09-46e203abc099",
+      "candidate_id": "",
+      "title": "A well across from the house",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": ["https://dghistory.org/pierce-downers-well/"],
+      "evidence_ids": []
+    }
+  ]
+}
