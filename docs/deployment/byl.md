@@ -759,3 +759,24 @@ publisher also remain on the revision row. This private provenance is omitted
 from the typed public snapshot and all revision responses; do not expose raw
 snapshot JSON through a public endpoint. No migration or host admission change
 is needed. No production content is approved by deploying this API.
+
+The curator brief page provides package review beside the saved-brief editor.
+Select a prepared tour, load the package, compare each story and picture with
+its retained source passages and uncertainty, and inspect each mode's geometry
+and path evidence. The affected-record list distinguishes selected prepared
+dependencies from contextual candidates and unapplied shared edits. Editing
+links open the existing record editors in separate tabs. Reload the package
+after editing and review it again before confirming publication.
+
+Targeted history research uses explicitly selected inspected sources for pending
+candidates. Resuming an incomplete research run retains its completed checkpoints.
+Neither action replaces editor text. A research request or stale-version response
+requires another package load before a decision. Returning or declining a brief
+requires a reason and uses the saved version; publication uses the exact package
+version and an explicit review checkbox.
+
+Saved-brief reloads retain unsaved form text. If another curator changed the
+submitted fields, the editor retains its earlier expected version, so saving
+cannot overwrite those changes. Copy any local text you need, then use
+**Replace editor with saved brief** to adopt the newer fields. Status-only
+refreshes keep the editor usable without discarding unsaved work.
