@@ -3,6 +3,7 @@ package httpapi
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 
@@ -10,8 +11,34 @@ import (
 	"invisible-museum/backend/internal/repository"
 )
 
+func briefHeaders(w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Add("Vary", "Authorization")
+}
+
+func (d Deps) routeBriefIntakeStatus(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
+	writeJSON(w, http.StatusOK, map[string]bool{"enabled": d.BriefIntake})
+}
+
+func (d Deps) createMyRouteBrief(w http.ResponseWriter, r *http.Request) {
+	if !d.BriefIntake {
+		d.routeBriefIntakeDisabled(w, r)
+		return
+	}
+	if strings.IndexFunc(r.Header.Get("Idempotency-Key"), func(r rune) bool { return r < 33 || r > 126 }) >= 0 {
+		briefHeaders(w)
+		writeValidation(w, map[string]string{"idempotency_key": "must contain printable ASCII characters without spaces"})
+		return
+	}
+	// The shared creator stores leads only, with existing owner quotas and retry
+	// keys. It grants no research, review, route mutation or publication authority.
+	d.adminCreateRouteBrief(w, r)
+}
+
 func (d Deps) listRouteBriefs(curator bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		briefHeaders(w)
 		owner := accountFrom(r.Context()).ID
 		if curator {
 			owner = ""
@@ -33,6 +60,7 @@ func (d Deps) listRouteBriefs(curator bool) http.HandlerFunc {
 
 func (d Deps) getRouteBrief(curator bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		briefHeaders(w)
 		owner := accountFrom(r.Context()).ID
 		if curator {
 			owner = ""
@@ -47,13 +75,17 @@ func (d Deps) getRouteBrief(curator bool) http.HandlerFunc {
 	}
 }
 
-// Public intake deliberately has no runtime enable switch. Opening submissions
-// requires a reviewed change once the publication workflow is ready.
-func (d Deps) routeBriefIntakeDisabled(w http.ResponseWriter, _ *http.Request) {
-	writeError(w, http.StatusForbidden, "intake_disabled", "public route brief submissions are not open yet")
+func (d Deps) routeBriefIntakeDisabled(w http.ResponseWriter, r *http.Request) {
+	briefHeaders(w)
+	message := "public route brief submissions are not open yet"
+	if r.Method == http.MethodPut {
+		message = "submitted route suggestions cannot be edited here"
+	}
+	writeError(w, http.StatusForbidden, "intake_disabled", message)
 }
 
 func (d Deps) adminCreateRouteBrief(w http.ResponseWriter, r *http.Request) {
+	briefHeaders(w)
 	var req models.RouteBriefInput
 	if !decodeOrFail(w, r, &req) {
 		return
