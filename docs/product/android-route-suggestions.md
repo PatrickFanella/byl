@@ -41,6 +41,13 @@ the flow reuses that pair. Two simultaneous submit taps cannot send two distinct
 attempts. Validation failures keep the input editable and show field messages;
 closed intake and expired sign-in retain the pending identity for later recovery.
 
+The app's file store throws when a replacement rename or removal fails and cleans
+up its own temporary write. Draft edits report failed autosave; failed local
+discard retains the current form and attempt. The pure JVM store lives in `core`
+so hosted tests exercise the same file implementation used by the Android app.
+The existing active-trip caller also keeps a trip open with an error if its
+resume record cannot be removed, rather than reporting a completed end.
+
 **Discard local draft** removes only that local input and attempt. It does not
 delete a suggestion already saved by the server. Successful submission clears
 the local draft and opens the returned owner status. The screen scrolls to the
@@ -82,6 +89,12 @@ device walkthrough below.
 Local verification runs `:core:test`, `:app:assembleDebug` and `:app:lintDebug` with
 the installed Android SDK. These establish core behavior, app compilation and
 lint results, not device rendering or provider sign-in.
+
+All 89 core tests pass, including five tests using actual temporary files. The
+regression first reproduced three failures: ignored rename failure, ignored
+removal failure, and a suggestion POST after failed persistence. The repaired
+store and callers pass the same checks, including refusal to send the POST and
+keeping a trip open when its local end cannot be recorded.
 
 The local Android 15 emulator `T3_Pixel_API_35` is available and disk space was
 checked. T3's `device_open` returned **The calling provider no longer owns an active

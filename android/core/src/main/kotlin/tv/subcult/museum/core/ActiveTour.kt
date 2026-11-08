@@ -293,11 +293,17 @@ class ActiveTour(
     }
 
     /** Ends the walk: the tour is no longer resumed on launch (only if the record still names this walk). Progress stays. */
-    fun end() {
+    fun end(): Boolean {
+        try {
+            val record = store.getJson<ActiveTourRecord>(ActiveTourRecord.KEY)
+            if (record == null || (record.tourId == tour.id && record.mode == mode && record.accountId == accountId)) store.remove(ActiveTourRecord.KEY)
+        } catch (_: Exception) {
+            _state.update { it.copy(syncError = "The trip could not be closed on this device. Try ending it again.") }
+            return false
+        }
         ended = true
         routePoll?.cancel()
-        val record = store.getJson<ActiveTourRecord>(ActiveTourRecord.KEY)
-        if (record == null || (record.tourId == tour.id && record.mode == mode && record.accountId == accountId)) store.remove(ActiveTourRecord.KEY)
+        return true
     }
 
     /** Forgets local progress and, when signed in, clears the server record too. */
