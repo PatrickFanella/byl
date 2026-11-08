@@ -66,13 +66,18 @@ func TestListPlacesByTopicAndBBox(t *testing.T) {
 	if len(places) != 1 || places[0].Slug != "downers-grove-museum" {
 		t.Fatalf("topic filter: %+v", places)
 	}
-	box := geo.BBox{MinLat: 41.79, MinLng: -88.02, MaxLat: 41.80, MaxLng: -88.00}
+	box := geo.BBox{MinLat: 41.793, MinLng: -88.02, MaxLat: 41.80, MaxLng: -88.00}
 	places, _, err = s.ListPlaces(ctx, PlaceFilter{CityID: testdb.SeedCityID, BBox: &box})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(places) != 3 {
 		t.Fatalf("bbox should exclude the museum, got %d", len(places))
+	}
+	box.MinLat = 41.79
+	places, _, err = s.ListPlaces(ctx, PlaceFilter{CityID: testdb.SeedCityID, BBox: &box})
+	if err != nil || len(places) != 4 {
+		t.Fatalf("expanded bbox should include the corrected Museum pin: %d %v", len(places), err)
 	}
 }
 

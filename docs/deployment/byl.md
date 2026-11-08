@@ -832,3 +832,45 @@ submitted fields, the editor retains its earlier expected version, so saving
 cannot overwrite those changes. Copy any local text you need, then use
 **Replace editor with saved brief** to adopt the newer fields. Status-only
 refreshes keep the editor usable without discarding unsaved work.
+
+
+## Museum catalogue coordinate correction (migration 22)
+
+The original seed placed the Museum at 41.8083/-88.0111, about 1.85 km from
+the named/addressed campus building. The [source review](../content/downers-grove/museum-coordinate-correction.json)
+records the Park District address, inspected OSM building and independent campus
+marker reference. Migration 22 changes the physical-site coordinate to
+41.7923663/-88.0045442 only when the exact seed ID, slug, address and old coordinates
+still match. A later curator coordinate or changed identity is left for review.
+This is not a surveyed entrance, an approved public arrival or an access finding.
+
+The correction retains histories, media, arrival reviews, working geometry and
+immutable released revisions. It increments affected draft versions and cancels pending release requests.
+Changed site inputs invalidate the old route input hash, which fences stale
+completions. Route-job versions remain unchanged so already queued work can
+compute current draft inputs. No new job is queued and nothing is published. A pinned existing
+revision therefore still contains its old coordinate: a curator must prepare a
+new qualified route/revision and explicitly release it. Record that remaining
+runtime navigation correction instead of describing a catalogue change as a
+complete field fix.
+
+Before admission, restore an actual schema-21 production backup in isolation.
+Apply the exact accepted migration and compare every pre-existing row: allow only
+the matching Museum coordinate/updated_at and affected draft-version and
+release-request fields. Confirm approved arrivals, historical bodies/citations,
+media, released snapshots and unrelated places remain byte-equivalent. Rehearse
+a curator-edited coordinate to prove the guard skips it. Retain filtered
+contribution backup exclusions and erasure capability.
+
+Under the receiver lock, take and independently verify the actual database/media
+backup before operator SQL, then admit the accepted SQL checksum manifest and
+matching schema-22 hook/image. CI does not apply production SQL. After delivery,
+read the live catalogue coordinate back, compare the historical records/media
+and reviewed arrivals, and inspect the existing versus newly approved revision
+separately in the browser and appropriate device. Admission, live readback and
+replacement-route qualification remain pending in this source change.
+
+Image rollback retains schema 22 and the corrected site coordinate. Automatic
+down refuses to restore the known wrong pin. Any later manual correction needs
+new source evidence and review of subsequent curator changes, not a blind backup
+restore or rewriting a published snapshot.

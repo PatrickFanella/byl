@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"math"
 	"strings"
 	"testing"
 	"time"
@@ -66,9 +67,11 @@ func TestComputeRouteJobsProduceReadyRoutes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The corrected Museum pin makes this development-polyline itinerary about
+	// 921 m; the old 1.8 km floor depended on the misplaced seed coordinate.
 	for _, mode := range models.AllTravelModes {
 		rs := tour.Routes[mode]
-		if rs.Status != models.RouteStatusReady || rs.EstimatedMinutes == nil || rs.DistanceM < 1800 {
+		if rs.Status != models.RouteStatusReady || rs.EstimatedMinutes == nil || math.Abs(rs.DistanceM-920.6) > 1 {
 			t.Fatalf("%s route: %+v", mode, rs)
 		}
 		full, err := store.GetTourRoute(ctx, testdb.SeedTourID, mode)

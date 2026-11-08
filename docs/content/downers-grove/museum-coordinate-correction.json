@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "issue": 130,
+  "review_date": "2026-11-08",
+  "place_id": "00000000-0000-4000-8000-00000000b0b4",
+  "old_coordinate": {
+    "latitude": 41.8083,
+    "longitude": -88.0111
+  },
+  "corrected_site_coordinate": {
+    "latitude": 41.7923663,
+    "longitude": -88.0045442,
+    "kind": "named/addressed mapped museum building; not an approved entrance"
+  },
+  "sources": [
+    {
+      "url": "https://www.dgparks.org/downers-grove-museum",
+      "publisher": "Downers Grove Park District",
+      "inspection": "Primary facility page inspected; campus address 831 Maple Avenue."
+    },
+    {
+      "url": "https://nominatim.openstreetmap.org/search?q=831+Maple+Avenue%2C+Downers+Grove%2C+Illinois&format=jsonv2&limit=3",
+      "publisher": "Nominatim / OpenStreetMap contributors",
+      "inspection": "Actual named/addressed result, not a street midpoint.",
+      "osm_type": "way",
+      "osm_id": 684600474,
+      "display_name": "Downers Grove Museum, 831, Maple Avenue, Downers Grove, DuPage County, Illinois, 60515, United States"
+    },
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/way/684600474/full",
+      "publisher": "OpenStreetMap contributors",
+      "sha256": "77383c22975332a338540298d178daa9913bc711febe2a907aea542f02e8aada",
+      "way_version": "2",
+      "tags": {
+        "addr:city": "Downers Grove",
+        "addr:housenumber": "831",
+        "addr:postcode": "60515",
+        "addr:state": "IL",
+        "addr:street": "Maple Avenue",
+        "building": "yes",
+        "name": "Downers Grove Museum",
+        "tourism": "museum"
+      },
+      "license": "ODbL-1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "credit_url": "https://www.openstreetmap.org/copyright"
+    },
+    {
+      "url": "https://www.hmdb.org/m.asp?m=270861",
+      "publisher": "Historical Marker Database",
+      "inspection": "Independent museum-campus marker page inspected; 831 Maple Avenue, near Lyman Avenue. Marker location is distinct from building centre.",
+      "marker_coordinate": {
+        "latitude": 41.79248333333334,
+        "longitude": -88.00491666666667
+      }
+    }
+  ],
+  "limits": [
+    "Corrects physical catalogue position only.",
+    "No new approved arrival or present access finding.",
+    "Published tour snapshots remain unchanged and require a separately reviewed replacement revision.",
+    "Production SQL admission, release and live readback pending."
+  ]
+}

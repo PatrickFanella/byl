@@ -41,7 +41,9 @@ func TestRevisionMigrationPinsLegacyProgressWithoutRewritingSourceRows(t *testin
 			t.Error(err)
 		}
 	}()
-	if err := goose.Up(db, testdb.MigrationsDir()); err != nil {
+	// Migration 22 intentionally corrects a catalogue row; its guarded diff
+	// is verified separately from the legacy-revision preservation contract.
+	if err := goose.UpTo(db, testdb.MigrationsDir(), 21); err != nil {
 		t.Fatal(err)
 	}
 	var after, placesAfter string

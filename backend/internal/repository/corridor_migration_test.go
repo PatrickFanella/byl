@@ -64,7 +64,9 @@ func assertNavigationMigrationPreservesRows(t *testing.T, version int64) {
 			t.Error(err)
 		}
 	}()
-	if err := goose.Up(db, testdb.MigrationsDir()); err != nil {
+	// These navigation-only preservation checks end before the intentional
+	// museum catalogue data correction in migration 22, which has its own diff test.
+	if err := goose.UpTo(db, testdb.MigrationsDir(), 21); err != nil {
 		t.Fatal(err)
 	}
 	for _, table := range tables {
