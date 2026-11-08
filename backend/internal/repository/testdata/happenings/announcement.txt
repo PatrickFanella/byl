@@ -1,0 +1,2 @@
+Synthetic recorded organizer announcement, used only by persistence tests.
+Fixture Parks invites visitors to the Synthetic park history talk at Main Street Station on 2026-11-10. A curator will discuss local history. This is a test occurrence, not a real event or field observation.

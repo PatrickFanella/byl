@@ -68,6 +68,105 @@ paths:
         - { name: place, in: path, required: true, schema: { type: string }, description: "Place id, or slug with ?city=" }
         - { name: city, in: query, schema: { type: string } }
       responses: { "200": { description: OK }, "404": { description: Not found } }
+  /api/v1/places/{place}/happenings:
+    get:
+      summary: Read optional reviewed current notices separately from historical stories
+      description: Only approved immutable notice snapshots for published places. No discovery, fetch, historical-story edit, route change or progress update occurs. Dates use the city's timezone and have date-only precision. Current source health and expiry are recomputed without changing the stored snapshot; cancellation, conflict, changed/pending/unavailable sources and review needs remain explicit. Responses are no-store. Default 20 and maximum 50 notices per page, newest publication first; next_cursor is the bounded decimal offset for this endpoint.
+      parameters:
+        - { name: place, in: path, required: true, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - { name: cursor, in: query, schema: { type: string, pattern: '^[0-9]+$' }, description: Use next_cursor from the prior page; maximum offset 10000 }
+      responses:
+        "200": { description: Reviewed notices including explicit unusable/expired states, content: { application/json: { schema: { type: object, required: [items], properties: { items: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/Happening" } }, next_cursor: { type: string } } } } } }
+        "404": { description: Public place not found }
+        "422": { description: Invalid cursor }
+  /api/v1/admin/happenings/capabilities:
+    get:
+      summary: Read the independent curator happening-import gate
+      security: [{ bearer: [] }]
+      responses:
+        "200": { description: Curator-only configuration; automatic discovery is unsupported, content: { application/json: { schema: { type: object, required: [import_enabled, automatic_discovery, occurrence_precision, max_evidence, max_drafts_per_day], properties: { import_enabled: { type: boolean }, automatic_discovery: { type: boolean, const: false }, occurrence_precision: { type: string, const: date }, max_evidence: { type: integer, const: 5 }, max_drafts_per_day: { type: integer, const: 40 } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+  /api/v1/admin/happenings:
+    get:
+      summary: List private current-notice drafts for curator review
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, maximum: 10000, default: 0 } }
+      responses:
+        "200": { description: Current private drafts, content: { application/json: { schema: { type: object, required: [items], properties: { items: { type: array, items: { $ref: "#/components/schemas/HappeningDraft" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+    post:
+      summary: Import one bounded source-linked curator draft behind the default-off gate
+      description: Requires HAPPENINGS_IMPORT_ENABLED=true and curator authorization. Only selects existing retained evidence; it starts no crawler or social feed. Direct visitor prose cannot create or publish an event. Bodies are strict 32 KiB with no query parameters. Version must be zero. Save the exact request/key before sending; exact retries return the original draft without consuming quota. Up to 40 drafts per curator per rolling 24 hours and 100 unexpired non-rejected drafts or published notices per place. Draft creation never publishes.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128, pattern: '^[!-~]+$' } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/HappeningWriteRequest" } } } }
+      responses:
+        "201": { description: Original immutable draft, content: { application/json: { schema: { $ref: "#/components/schemas/HappeningDraft" } } } }
+        "400": { description: Malformed, oversized, unknown fields or write query }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required or import disabled }
+        "409": { description: Retry identity reused for different input }
+        "422": { description: Invalid bounded occurrence, source, venue or expiry decision }
+        "429": { description: Bounded import quota reached }
+  /api/v1/admin/happenings/{id}:
+    get:
+      summary: Read one private current-notice draft
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: Private immutable draft and current publication pointer, content: { application/json: { schema: { $ref: "#/components/schemas/HappeningDraft" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Not found }
+    put:
+      summary: Append an explicitly edited curator draft without changing the published notice
+      description: Remains available when new import is off so existing cancellation/review work can continue. Supply the current draft version and a new exact retry key/body. Venue identity cannot change; a different venue needs a separate notice. Strict 32 KiB JSON and no query parameters. Review decisions and historical draft rows remain immutable.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128, pattern: '^[!-~]+$' } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/HappeningWriteRequest" } } } }
+      responses:
+        "200": { description: Original immutable appended draft, content: { application/json: { schema: { $ref: "#/components/schemas/HappeningDraft" } } } }
+        "400": { description: Malformed, oversized, unknown fields or write query }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Not found }
+        "409": { description: Draft changed, venue differs or retry input changed }
+        "422": { description: Invalid occurrence, evidence or expiry decision }
+        "429": { description: Draft quota reached }
+  /api/v1/admin/happenings/{id}/review-package:
+    get:
+      summary: Inspect the complete source-linked current-notice read set
+      description: Repeatable-read snapshot includes the immutable draft, previous approved snapshot, current place, selected inspected evidence, latest known retrieval attempts, explicit tasks and a visitor preview. Exact captured quotes provide traceability; the curator must judge entailment of wording, organizer, venue, dates and status. Missing/snippet/catalog-only/uncited/stale/changed/pending/unavailable sources block approval. No direct user prose or automatic worker result is published. Version includes the full read set and city calendar date. A completed decision requires a newly appended draft for another review.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: Private curator package, content: { application/json: { schema: { $ref: "#/components/schemas/HappeningReviewPackage" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Not found }
+  /api/v1/admin/happenings/{id}/review:
+    post:
+      summary: Approve or reject exactly the inspected happening package
+      description: Strict 32 KiB JSON with no query parameters. Serializable approval rechecks the complete read set, source health, venue publication and calendar boundary, then atomically records the immutable decision/snapshot and public pointer. Exact same version/action/note retries retain the original result; changed retry input conflicts. Rejection leaves prior public content intact. Never updates a permanent story, tour revision or progress. Import may remain disabled during existing review work.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [version, action, note], properties: { version: { type: string, minLength: 64, maxLength: 64 }, action: { type: string, enum: [approve, reject] }, note: { type: string, minLength: 1, maxLength: 4000 } } } } } }
+      responses:
+        "200": { description: Original immutable decision, content: { application/json: { schema: { type: object, required: [draft_id, action, revision], properties: { draft_id: { type: string, format: uuid }, action: { type: string, enum: [approve, reject] }, revision: { $ref: "#/components/schemas/Happening", nullable: true } } } } } }
+        "400": { description: Malformed, oversized, unknown fields or write query }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Not found }
+        "409": { description: Changed package, unresolved tasks, completed decision or concurrent edit }
+        "422": { description: Invalid review version, action or note }
   /api/v1/places/{place}/moments:
     get:
       summary: List a place's published moments in date order
@@ -2322,6 +2421,105 @@ components:
         truncated: { type: boolean }
         untrusted: { type: boolean, const: true }
         media_reuse: { type: string, enum: [unresolved], description: Text access and page metadata never grant media copying permission; no media is fetched }
+    HappeningInput:
+      type: object
+      additionalProperties: false
+      required: [place_id, title, summary, organizer, starts_on, ends_on, state, review_on, expires_on, evidence_ids, claims]
+      description: Private curator wording with explicit source traceability. Date-only precision in the place's city timezone; no exact occurrence time is inferred. Occurrence spans at most 31 days, begins within 180 days and ends no more than 30 days ago. A fresh decision needs a future review date within 14 days, and expiry between review_on and seven days after ends_on.
+      properties:
+        place_id: { type: string, format: uuid }
+        title: { type: string, minLength: 1, maxLength: 300 }
+        summary: { type: string, minLength: 1, maxLength: 2000 }
+        organizer: { type: string, minLength: 1, maxLength: 300 }
+        starts_on: { type: string, format: date }
+        ends_on: { type: string, format: date }
+        state: { type: string, enum: [scheduled, cancelled, date_conflict, source_unavailable] }
+        review_on: { type: string, format: date }
+        expires_on: { type: string, format: date }
+        evidence_ids: { type: array, minItems: 1, maxItems: 5, uniqueItems: true, items: { type: string, format: uuid } }
+        claims:
+          type: array
+          minItems: 1
+          maxItems: 12
+          description: Approval needs captured support for title, summary, organizer, occurrence and place; non-scheduled declarations also require status support. Every quote must occur verbatim in its selected inspected passage. Structural acceptance alone never approves a draft.
+          items:
+            type: object
+            additionalProperties: false
+            required: [field, evidence_id, passage, quote]
+            properties:
+              field: { type: string, enum: [title, summary, organizer, occurrence, place, status] }
+              evidence_id: { type: string, format: uuid }
+              passage: { type: string, minLength: 1, maxLength: 100 }
+              quote: { type: string, minLength: 1, maxLength: 500 }
+    HappeningWriteRequest:
+      type: object
+      additionalProperties: false
+      required: [version, input]
+      properties:
+        version: { type: integer, format: int64, minimum: 0, description: Zero for creation; current draft version for append }
+        input: { $ref: "#/components/schemas/HappeningInput" }
+    HappeningDraft:
+      type: object
+      required: [id, draft_id, version, input, published_revision_id, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        draft_id: { type: string, format: uuid }
+        version: { type: integer, format: int64 }
+        input: { $ref: "#/components/schemas/HappeningInput" }
+        published_revision_id: { type: string, format: uuid, nullable: true }
+        created_at: { type: string, format: date-time }
+    HappeningReviewPackage:
+      type: object
+      required: [version, ready_to_publish, draft, place, evidence, latest_checks, tasks, preview, current, reviewed_action, review_note, reviewed_by, reviewed_at, review_day]
+      properties:
+        version: { type: string }
+        ready_to_publish: { type: boolean }
+        draft: { $ref: "#/components/schemas/HappeningDraft" }
+        place: { $ref: "#/components/schemas/PlaceSummary" }
+        evidence: { type: array, items: { $ref: "#/components/schemas/SourceEvidence" } }
+        latest_checks: { type: array, items: { $ref: "#/components/schemas/SourceEvidence" } }
+        tasks: { type: array, items: { $ref: "#/components/schemas/ReviewPackageTask" } }
+        preview: { $ref: "#/components/schemas/Happening", nullable: true }
+        current: { $ref: "#/components/schemas/Happening", nullable: true, description: Previous immutable approved snapshot as captured at its publication }
+        reviewed_action: { type: string }
+        review_note: { type: string }
+        reviewed_by: { type: string }
+        reviewed_at: { type: string, format: date-time, nullable: true }
+        review_day: { type: string, format: date }
+    Happening:
+      type: object
+      required: [id, revision_id, place_id, title, summary, organizer, starts_on, ends_on, timezone, declared_state, state, review_on, expires_on, last_checked_at, source_health, sources, issues]
+      properties:
+        id: { type: string, format: uuid }
+        revision_id: { type: string, description: Approved UUID; empty only in a private unpublished preview }
+        place_id: { type: string, format: uuid }
+        title: { type: string }
+        summary: { type: string }
+        organizer: { type: string }
+        starts_on: { type: string, format: date }
+        ends_on: { type: string, format: date }
+        timezone: { type: string }
+        declared_state: { type: string, enum: [scheduled, cancelled, date_conflict, source_unavailable] }
+        state: { type: string, enum: [upcoming, active, ended, expired, needs_review, cancelled, date_conflict, source_unavailable] }
+        review_on: { type: string, format: date, description: Notice needs review beginning at this city-date boundary }
+        expires_on: { type: string, format: date, description: Exclusive expiry at this city-date boundary; never rewrites a historical story }
+        last_checked_at: { type: string, format: date-time }
+        source_health: { type: string, enum: [unchanged, changed, pending, unavailable] }
+        issues: { type: array, items: { type: string } }
+        sources:
+          type: array
+          maxItems: 5
+          items:
+            type: object
+            required: [url, title, publisher, version, retrieved_on, license, license_url]
+            properties:
+              url: { type: string }
+              title: { type: string }
+              publisher: { type: string }
+              version: { type: string, description: Captured content SHA-256 }
+              retrieved_on: { type: string, format: date }
+              license: { type: string, const: unresolved, description: Inspection is not media reuse permission }
+              license_url: { type: string }
     SourceEvidence:
       type: object
       required: [id, brief_id, brief_version, job_id, source_key, url, reference, source_kind, result, created_at]

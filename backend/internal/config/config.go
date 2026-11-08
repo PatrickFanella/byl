@@ -19,6 +19,7 @@ type Config struct {
 
 	DevAuthEnabled       bool
 	PublicBriefIntake    bool
+	HappeningsImport     bool
 	RouteContributions   bool
 	ContributionScopeKey []byte
 	TransitProvider      string
@@ -76,6 +77,7 @@ func Load() (Config, error) {
 		PublicBaseURL:      strings.TrimRight(envOr("PUBLIC_BASE_URL", "http://localhost:8080"), "/"),
 		DevAuthEnabled:     envBool("DEV_AUTH_ENABLED"),
 		PublicBriefIntake:  envBool("PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED"),
+		HappeningsImport:   envBool("HAPPENINGS_IMPORT_ENABLED"),
 		RouteContributions: envBool("ROUTE_CONTRIBUTIONS_ENABLED"),
 		TransitProvider:    strings.TrimSpace(os.Getenv("TRANSIT_PROVIDER")),
 		ScheduledTransit:   envBool("SCHEDULED_TRANSIT_ENABLED"),

@@ -31,24 +31,25 @@ type SessionManager interface {
 
 // Deps holds everything the handlers need.
 type Deps struct {
-	Store           *repository.Store
-	Sessions        SessionResolver
-	SessionManager  SessionManager
-	Apple           auth.Verifier
-	Google          auth.Verifier
-	DevAuth         bool
-	BriefIntake     bool
-	Contributions   bool
-	ContributionKey []byte
-	TransitPlanner  transit.Planner
-	TransitEnabled  bool
-	IsBootstrap     func(email string) bool
-	Blob            blob.Store
-	MediaFSDir      string
-	Sources         *sources.Registry
-	Drafter         llm.Drafter
-	Log             *slog.Logger
-	Ready           func(ctx context.Context) error
+	Store            *repository.Store
+	Sessions         SessionResolver
+	SessionManager   SessionManager
+	Apple            auth.Verifier
+	Google           auth.Verifier
+	DevAuth          bool
+	BriefIntake      bool
+	HappeningsImport bool
+	Contributions    bool
+	ContributionKey  []byte
+	TransitPlanner   transit.Planner
+	TransitEnabled   bool
+	IsBootstrap      func(email string) bool
+	Blob             blob.Store
+	MediaFSDir       string
+	Sources          *sources.Registry
+	Drafter          llm.Drafter
+	Log              *slog.Logger
+	Ready            func(ctx context.Context) error
 }
 
 // drafterAvailable reports whether an LLM provider is configured.
@@ -93,6 +94,7 @@ func NewRouter(d Deps) http.Handler {
 		r.Get("/cities/{city}/tours", d.listTours)
 		r.Get("/places/{place}", d.getPlace)
 		r.Get("/places/{place}/moments", d.listPlaceMoments)
+		r.Get("/places/{place}/happenings", d.listPlaceHappenings)
 		r.Get("/places/{place}/arrival", d.getPlaceArrival)
 		r.Get("/moments/{id}", d.getMoment)
 		r.Get("/topics/{id}", d.getTopic)
@@ -153,6 +155,13 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/route-reports/{id}/investigations", d.adminQueueRouteInvestigation)
 			r.Get("/route-reports/{id}/investigations/{investigation}", d.adminGetRouteInvestigation)
 			r.Get("/route-briefs", d.listRouteBriefs(true))
+			r.Get("/happenings", d.adminListHappenings)
+			r.Get("/happenings/capabilities", d.happeningCapabilities)
+			r.Post("/happenings", d.adminSaveHappening(false))
+			r.Get("/happenings/{id}", d.adminGetHappening)
+			r.Put("/happenings/{id}", d.adminSaveHappening(true))
+			r.Get("/happenings/{id}/review-package", d.adminHappeningReviewPackage)
+			r.Post("/happenings/{id}/review", d.adminReviewHappening)
 			r.Post("/route-briefs", d.adminCreateRouteBrief)
 			r.Get("/route-briefs/{id}", d.getRouteBrief(true))
 			r.Put("/route-briefs/{id}", d.adminUpdateRouteBrief)

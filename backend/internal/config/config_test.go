@@ -9,11 +9,25 @@ func setEnv(t *testing.T, kv map[string]string) {
 	t.Helper()
 	t.Setenv("TRANSIT_PROVIDER", "")
 	t.Setenv("SCHEDULED_TRANSIT_ENABLED", "")
+	t.Setenv("HAPPENINGS_IMPORT_ENABLED", "")
 	for _, k := range []string{"API_ADDR", "DATABASE_URL", "ROUTING_PROVIDER", "NARRATION_PROVIDER", "MEDIA_STORE", "JOB_WORKERS", "SESSION_TTL_HOURS", "APPLE_CLIENT_IDS", "ADMIN_BOOTSTRAP_EMAILS", "DEV_AUTH_ENABLED", "PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED", "LLM_PROVIDER", "BRIEF_DISCOVERY_PROVIDERS", "BRIEF_DISCOVERY_SEED_URLS", "ROUTE_CONTRIBUTIONS_ENABLED", "ROUTE_CONTRIBUTION_SCOPE_KEY", "ROUTE_CONTRIBUTION_CUSTODY_APPROVED"} {
 		t.Setenv(k, "")
 	}
 	for k, v := range kv {
 		t.Setenv(k, v)
+	}
+}
+
+func TestHappeningsImportDefaultsOff(t *testing.T) {
+	setEnv(t, map[string]string{"DATABASE_URL": "postgres://fixture"})
+	cfg, err := Load()
+	if err != nil || cfg.HappeningsImport {
+		t.Fatal("happenings import activated by default", err)
+	}
+	t.Setenv("HAPPENINGS_IMPORT_ENABLED", "true")
+	cfg, err = Load()
+	if err != nil || !cfg.HappeningsImport {
+		t.Fatal("explicit happenings import gate not read", err)
 	}
 }
 
