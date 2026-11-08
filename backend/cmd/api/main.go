@@ -53,18 +53,20 @@ func main() {
 	sessions := auth.NewSessions(store, time.Duration(cfg.SessionTTLHours)*time.Hour)
 
 	deps := httpapi.Deps{
-		Store:          store,
-		Sessions:       sessions,
-		SessionManager: sessions,
-		DevAuth:        cfg.DevAuthEnabled,
-		BriefIntake:    cfg.PublicBriefIntake,
-		IsBootstrap:    cfg.IsBootstrapAdmin,
-		Blob:           prov.Blob,
-		MediaFSDir:     prov.MediaFSDir,
-		Sources:        prov.Sources,
-		Drafter:        prov.Drafter,
-		Log:            log,
-		Ready:          pool.Ping,
+		Store:           store,
+		Sessions:        sessions,
+		SessionManager:  sessions,
+		DevAuth:         cfg.DevAuthEnabled,
+		BriefIntake:     cfg.PublicBriefIntake,
+		Contributions:   cfg.RouteContributions,
+		ContributionKey: cfg.ContributionScopeKey,
+		IsBootstrap:     cfg.IsBootstrapAdmin,
+		Blob:            prov.Blob,
+		MediaFSDir:      prov.MediaFSDir,
+		Sources:         prov.Sources,
+		Drafter:         prov.Drafter,
+		Log:             log,
+		Ready:           pool.Ping,
 	}
 	if len(cfg.AppleClientIDs) > 0 {
 		deps.Apple = auth.NewApple(cfg.AppleClientIDs)
@@ -87,6 +89,8 @@ func main() {
 		defer close(workerDone)
 		worker.Run(ctx)
 	}()
+	retentionDone := make(chan struct{})
+	go func() { defer close(retentionDone); jobs.RunContributionRetention(ctx, store, log) }()
 
 	server := &http.Server{
 		Addr:              cfg.APIAddr,
@@ -126,5 +130,10 @@ func main() {
 	case <-workerDone:
 	case <-shutdownCtx.Done():
 		log.Warn("worker did not stop in time")
+	}
+	select {
+	case <-retentionDone:
+	case <-shutdownCtx.Done():
+		log.Warn("contribution retention did not stop in time")
 	}
 }

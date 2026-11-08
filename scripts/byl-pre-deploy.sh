@@ -12,10 +12,17 @@ manifest=$(docker run --rm --network none --entrypoint sh "$image" -c 'sha256sum
   exit 1
 }
 version=$(docker exec byl-postgres-1 psql -U byl -d byl -Atqc 'SELECT max(version_id) FROM goose_db_version WHERE is_applied')
-[[ $version == 18 ]]
+[[ $version == 19 ]]
 backup="$root/backups/$(date -u +%Y%m%dT%H%M%S)-$revision"
 mkdir -p "$backup"
-docker exec byl-postgres-1 pg_dump -U byl -d byl -Fc > "$backup/database.dump"
+# Voluntary observations, consent capabilities and rate counters are deliberately
+# disposable. Never place their rows in retained deployment backups. Exclude the
+# admission record too so a restored database cannot automatically collect.
+docker exec byl-postgres-1 pg_dump -U byl -d byl -Fc \
+  --exclude-table-data='*.route_contribution_consents' \
+  --exclude-table-data='*.route_contributions' \
+  --exclude-table-data='*.route_contribution_limits' \
+  --exclude-table-data='*.route_contribution_custody' > "$backup/database.dump"
 test -s "$backup/database.dump"
 docker exec -i byl-postgres-1 pg_restore --list < "$backup/database.dump" > "$backup/database.list"
 docker exec byl-api-1 tar -C /data/media -czf - . > "$backup/media.tar.gz"

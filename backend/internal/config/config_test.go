@@ -7,11 +7,40 @@ import (
 
 func setEnv(t *testing.T, kv map[string]string) {
 	t.Helper()
-	for _, k := range []string{"API_ADDR", "DATABASE_URL", "ROUTING_PROVIDER", "NARRATION_PROVIDER", "MEDIA_STORE", "JOB_WORKERS", "SESSION_TTL_HOURS", "APPLE_CLIENT_IDS", "ADMIN_BOOTSTRAP_EMAILS", "DEV_AUTH_ENABLED", "PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED", "LLM_PROVIDER", "BRIEF_DISCOVERY_PROVIDERS", "BRIEF_DISCOVERY_SEED_URLS"} {
+	for _, k := range []string{"API_ADDR", "DATABASE_URL", "ROUTING_PROVIDER", "NARRATION_PROVIDER", "MEDIA_STORE", "JOB_WORKERS", "SESSION_TTL_HOURS", "APPLE_CLIENT_IDS", "ADMIN_BOOTSTRAP_EMAILS", "DEV_AUTH_ENABLED", "PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED", "LLM_PROVIDER", "BRIEF_DISCOVERY_PROVIDERS", "BRIEF_DISCOVERY_SEED_URLS", "ROUTE_CONTRIBUTIONS_ENABLED", "ROUTE_CONTRIBUTION_SCOPE_KEY", "ROUTE_CONTRIBUTION_CUSTODY_APPROVED"} {
 		t.Setenv(k, "")
 	}
 	for k, v := range kv {
 		t.Setenv(k, v)
+	}
+}
+
+func TestContributionCollectionDefaultsOffAndRequiresCustodyAndScopeKey(t *testing.T) {
+	setEnv(t, map[string]string{"DATABASE_URL": "postgres://fixture"})
+	cfg, err := Load()
+	if err != nil || cfg.RouteContributions || len(cfg.ContributionScopeKey) != 0 {
+		t.Fatalf("default collection gate: %v", err)
+	}
+	for _, tc := range []struct {
+		name, key, custody string
+		valid              bool
+	}{
+		{"missing", "", "", false},
+		{"no custody", strings.Repeat("ab", 32), "", false},
+		{"no key", "", "true", false},
+		{"malformed key", "fixture-invalid", "true", false},
+		{"reviewed isolated test", strings.Repeat("ab", 32), "true", true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			setEnv(t, map[string]string{"DATABASE_URL": "postgres://fixture", "ROUTE_CONTRIBUTIONS_ENABLED": "true", "ROUTE_CONTRIBUTION_SCOPE_KEY": tc.key, "ROUTE_CONTRIBUTION_CUSTODY_APPROVED": tc.custody})
+			cfg, err := Load()
+			if (err == nil) != tc.valid {
+				t.Fatalf("gate validity expected %v", tc.valid)
+			}
+			if tc.valid && (!cfg.RouteContributions || len(cfg.ContributionScopeKey) != 32) {
+				t.Fatal("reviewed test gate did not load")
+			}
+		})
 	}
 }
 

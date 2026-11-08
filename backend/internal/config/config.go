@@ -2,6 +2,7 @@
 package config
 
 import (
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strconv"
@@ -18,6 +19,8 @@ type Config struct {
 
 	DevAuthEnabled       bool
 	PublicBriefIntake    bool
+	RouteContributions   bool
+	ContributionScopeKey []byte
 	AppleClientIDs       []string
 	GoogleClientIDs      []string
 	AdminBootstrapEmails []string
@@ -71,6 +74,7 @@ func Load() (Config, error) {
 		PublicBaseURL:      strings.TrimRight(envOr("PUBLIC_BASE_URL", "http://localhost:8080"), "/"),
 		DevAuthEnabled:     envBool("DEV_AUTH_ENABLED"),
 		PublicBriefIntake:  envBool("PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED"),
+		RouteContributions: envBool("ROUTE_CONTRIBUTIONS_ENABLED"),
 		AppleClientIDs:     envList("APPLE_CLIENT_IDS"),
 		GoogleClientIDs:    envList("GOOGLE_CLIENT_IDS"),
 		RoutingProvider:    envOr("ROUTING_PROVIDER", "straightline"),
@@ -105,6 +109,16 @@ func Load() (Config, error) {
 
 	if cfg.DatabaseURL == "" {
 		return Config{}, fmt.Errorf("DATABASE_URL is required")
+	}
+	if key := strings.TrimSpace(os.Getenv("ROUTE_CONTRIBUTION_SCOPE_KEY")); key != "" {
+		decoded, err := hex.DecodeString(key)
+		if err != nil || len(decoded) != 32 {
+			return Config{}, fmt.Errorf("ROUTE_CONTRIBUTION_SCOPE_KEY must contain 32 random bytes encoded as 64 hex characters")
+		}
+		cfg.ContributionScopeKey = decoded
+	}
+	if cfg.RouteContributions && (len(cfg.ContributionScopeKey) != 32 || !envBool("ROUTE_CONTRIBUTION_CUSTODY_APPROVED")) {
+		return Config{}, fmt.Errorf("route contributions require a scope key and explicit ROUTE_CONTRIBUTION_CUSTODY_APPROVED after retention, restore/deletion and backup custody review")
 	}
 	var err error
 	if cfg.SessionTTLHours, err = envInt("SESSION_TTL_HOURS", 2160); err != nil {
