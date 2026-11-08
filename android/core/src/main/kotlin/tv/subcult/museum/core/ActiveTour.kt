@@ -142,10 +142,10 @@ class ActiveTour(
             _state.update { it.copy(checkingUpdate = true, updateError = null) }
         }
         try {
-            val latest = api.tour(tour.id)
+            val latest = api.latestRevision(tour.id) ?: throw ApiException(0, "unavailable", "No reviewed revision")
             if (!canUse) return
-            val id = latest.revisionId ?: throw ApiException(0, "unavailable", "No reviewed revision")
-            if (latest.id != tour.id) throw ApiException(0, "unavailable", "Wrong tour")
+            val id = latest.id
+            if (latest.tourId != tour.id) throw ApiException(0, "unavailable", "Wrong tour")
             if (id == original.id) {
                 _state.update { if (!canUse) it else it.copy(availableUpdate = null) }
                 return
@@ -364,9 +364,11 @@ class ActiveTour(
                 }
                 if (changed) sync()
             } catch (e: CancellationException) { throw e }
-            catch (_: Exception) {
+            catch (e: ApiException) {
+                if (e.status == 404) return
                 _state.update { if (!canUse) it else it.copy(syncError = "Could not read progress for this revision.") }
             }
+            catch (_: Exception) { _state.update { if (!canUse) it else it.copy(syncError = "Could not read progress for this revision.") } }
             return
         }
         val remote = try { api.progress().firstOrNull { it.tourId == tour.id } } catch (_: Exception) { null } ?: return
