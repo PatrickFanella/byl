@@ -44,6 +44,12 @@ public final class TourDetailModel {
     /// Modes the tour offers, in the tour's own order.
     public var modes: [String] { tour?.tour.modes ?? [] }
 
+    public func canStart(mode: String) -> Bool {
+        guard let tour, tour.tour.revisionID != nil, tour.tour.status == "published",
+              tour.journeys?[mode]?.usable == true, !tour.stops.isEmpty else { return false }
+        return tour.stops.allSatisfy { $0.place.arrivalPoint?.allows(mode) == true }
+    }
+
     /// "24 min walk" / "7 min ride" for a ready route, nil otherwise.
     public func estimateText(mode: String) -> String? {
         guard let route = tour?.tour.routes[mode] else { return nil }

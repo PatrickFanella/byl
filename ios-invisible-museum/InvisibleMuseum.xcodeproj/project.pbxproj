@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		596100ACDA1148281647DF19 /* TripJourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C487B8C737C05D5FB1FD27FA /* TripJourneyView.swift */; };
 		DB48AD9BB0764728B49A2B81 /* RouteSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA24822E248E170FD97F9F /* RouteSuggestionsView.swift */; };
 		B11000000000000000000001 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = B11000000000000000000002; };
 		6164E378BE85A428B74F556E /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F088E1B0110F20830CDB5228 /* AppModel.swift */; };
@@ -44,6 +45,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C487B8C737C05D5FB1FD27FA /* TripJourneyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripJourneyView.swift; sourceTree = "<group>"; };
 		6FAA24822E248E170FD97F9F /* RouteSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSuggestionsView.swift; sourceTree = "<group>"; };
 		B11000000000000000000002 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 		F088E1B0110F20830CDB5228 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 				2CD12AEBEC3C1DA0C708A243 /* TourDetailView.swift */,
 				CDC384DDDD6E9D0388FFD44F /* TourListView.swift */,
 				C6D471B8FBB1DCB11941F81D /* TourMapView.swift */,
+				C487B8C737C05D5FB1FD27FA /* TripJourneyView.swift */,
 			);
 			path = Tours;
 			sourceTree = "<group>";
@@ -350,6 +353,7 @@
 				D0131EEF3AFD0F0F9A4245CA /* TourDetailView.swift in Sources */,
 				C98778B24C63CED11E654406 /* TourListView.swift in Sources */,
 				724EC1B39967303484313EDD /* TourMapView.swift in Sources */,
+				596100ACDA1148281647DF19 /* TripJourneyView.swift in Sources */,
 				3895D62EE8414C5169813245 /* InvisibleMuseumApp.swift in Sources */,
 				08E5944EBD720E2BD73D5FBD /* GeoMath.swift in Sources */,
 				10DB979E0224DAB2BFD0F07C /* LocationService.swift in Sources */,

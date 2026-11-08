@@ -88,14 +88,22 @@ final class AppModel {
     /// Brings back the tour that was being walked when the app was last closed (Review Focus 2).
     func resumeActiveTour() {
         let accountID = session.account?.id
-        guard active == nil, let restored = ActiveTourModel.restore(api: activeTourAPI(), cache: cache, isSignedIn: { [weak self] in self?.isSignedIn == true && self?.session.account?.id == accountID }, accountID: accountID) else { return }
+        let token = session.token
+        let origin = client.baseURL
+        guard active == nil, let restored = ActiveTourModel.restore(api: activeTourAPI(), cache: cache, isSignedIn: { [weak self] in
+            self?.isSignedIn == true && self?.session.account?.id == accountID && self?.session.token == token && self?.client.baseURL == origin
+        }, accountID: accountID) else { return }
         attach(restored)
     }
 
     /// Foreground: push any progress the server has not seen yet.
     func didBecomeActive() {
         guard let active else { return }
-        Task { await active.syncIfNeeded() }
+        Task {
+            await active.loadRoute()
+            if active.revoked { narration.stop() }
+            await active.syncIfNeeded()
+        }
     }
 
     func loadCities() async {
@@ -163,17 +171,54 @@ final class AppModel {
     }
 
     /// Makes a tour the active one; RootView presents ActiveTourView over everything.
-    func startTour(_ tour: TourDetail, mode: String) {
+    func startTour(_ tour: TourDetail, mode: String) async throws {
+        guard let revisionID = tour.tour.revisionID else {
+            throw APIError(status: 0, code: "revision_unavailable", message: "This tour has no reviewed revision to start.")
+        }
         let accountID = session.account?.id
-        let model = ActiveTourModel(api: activeTourAPI(), tour: tour, mode: mode, cache: cache, isSignedIn: { [weak self] in self?.isSignedIn == true && self?.session.account?.id == accountID }, accountID: accountID)
+        let token = session.token
+        let origin = client.baseURL
+        let api = activeTourAPI()
+        let revision = try await api.revision(tour: tour.id, revision: revisionID)
+        guard session.account?.id == accountID, session.token == token, client.baseURL == origin, active == nil,
+              revision.id == revisionID, revision.tourID == tour.id else {
+            throw APIError(status: 0, code: "trip_changed", message: "The trip or session changed. Open the tour again before starting.")
+        }
+        let model = try ActiveTourModel(api: api, revision: revision, mode: mode, cache: cache, isSignedIn: { [weak self] in
+            self?.isSignedIn == true && self?.session.account?.id == accountID && self?.session.token == token && self?.client.baseURL == origin
+        }, accountID: accountID)
         attach(model)
+    }
+
+    func adoptUpdate(for expected: ActiveTourModel) async throws {
+        guard let candidate = expected.availableUpdate else {
+            throw APIError(status: 0, code: "revision_unavailable", message: "Check for a reviewed update first.")
+        }
+        let confirmed = try await expected.api.revision(tour: expected.tour.id, revision: candidate.id)
+        await expected.flush()
+        guard active === expected, expected.api.client.baseURL == client.baseURL,
+              expected.owningAccountID == session.account?.id,
+              expected.api.client.tokenProvider() == session.token,
+              expected.availableUpdate?.id == candidate.id, confirmed.id == candidate.id,
+              confirmed.tourID == expected.tour.id, confirmed.unavailableReason(mode: expected.mode) == nil else {
+            throw APIError(status: 0, code: "trip_changed", message: "The active trip or session changed. Check the trip again.")
+        }
+        let replacement = try expected.adoptingUpdate()
+        narration.stop()
+        attach(replacement)
     }
 
     // A queued progress request must keep the original account token and server.
     private func activeTourAPI() -> Endpoints {
         let token = session.token
-        let scoped = APIClient(baseURL: client.baseURL, tokenProvider: { token })
-        scoped.onUnauthorized = client.onUnauthorized
+        let origin = client.baseURL
+        let scoped = APIClient(baseURL: origin, tokenProvider: { token })
+        scoped.onUnauthorized = { [weak self] rejected in
+            Task { @MainActor [weak self] in
+                guard let self, self.client.baseURL == origin else { return }
+                self.handleUnauthorized(token: rejected)
+            }
+        }
         return Endpoints(client: scoped)
     }
 
@@ -226,11 +271,16 @@ final class AppModel {
     /// Plays the featured moment at a stop: its recorded narration, else the body read aloud.
     /// The summary already says whether narration exists; the detail carries the URL and body.
     func playNarration(for stop: TourStop, requireGuide: Bool = false) async {
-        guard let expected = active, let featured = stop.featuredMoment else { return }
+        guard let expected = active, !expected.revoked, let featured = stop.featuredMoment else { return }
         let cacheKey = "moment.\(featured.id)"
-        var detail = try? await api.moment(featured.id)
-        if let detail { cache.save(detail, key: cacheKey) } else { detail = cache.load(MomentDetail.self, key: cacheKey) }
-        guard active === expected, (!requireGuide || expected.audioEnabled), expected.arrivedStop?.id == stop.id else { return }
+        var detail: MomentDetail?
+        if expected.revision != nil || expected.legacyResume {
+            detail = expected.retainedMoment(featured.id)
+        } else {
+            detail = try? await api.moment(featured.id)
+            if let detail { cache.save(detail, key: cacheKey) } else { detail = cache.load(MomentDetail.self, key: cacheKey) }
+        }
+        guard active === expected, !expected.revoked, (!requireGuide || expected.audioEnabled), expected.arrivedStop?.id == stop.id else { return }
         let source = NarrationPlayer.plan(narrationURL: detail?.narration?.url, body: detail?.body ?? featured.excerpt)
         narration.play(source)
     }
