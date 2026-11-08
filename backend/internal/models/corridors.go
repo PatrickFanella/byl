@@ -32,17 +32,18 @@ type ReferenceLine struct {
 // CorridorSegment has explicit endpoint identities. Geometry crossings create
 // no connection; road connectors must be selected and reviewed explicitly.
 type CorridorSegment struct {
-	Surface  string           `json:"surface,omitempty"`
-	ID       string           `json:"id"`
-	Kind     string           `json:"kind"`
-	FromNode string           `json:"from_node"`
-	ToNode   string           `json:"to_node"`
-	Branches []string         `json:"branches"`
-	Modes    []TravelMode     `json:"modes"`
-	Geometry ReferenceLine    `json:"geometry"`
-	Source   *CorridorSource  `json:"source"`
-	Network  *CorridorNetwork `json:"network,omitempty"`
-	Access   []CorridorAccess `json:"access,omitempty"`
+	Surface          string                         `json:"surface,omitempty"`
+	ID               string                         `json:"id"`
+	Kind             string                         `json:"kind"`
+	FromNode         string                         `json:"from_node"`
+	ToNode           string                         `json:"to_node"`
+	Branches         []string                       `json:"branches"`
+	Modes            []TravelMode                   `json:"modes"`
+	Geometry         ReferenceLine                  `json:"geometry"`
+	Source           *CorridorSource                `json:"source"`
+	Network          *CorridorNetwork               `json:"network,omitempty"`
+	Access           []CorridorAccess               `json:"access,omitempty"`
+	SignalReferences map[TravelMode]SignalReference `json:"signal_references,omitempty"`
 }
 
 // CorridorTraversal selects one directed reference segment, including repeats.
@@ -144,6 +145,9 @@ func (c CorridorIntent) Validate() Fields {
 	nodes := map[string][2]float64{}
 	vertices := 0
 	for _, s := range c.Segments {
+		if err := s.validateSignalReferences(); err != nil {
+			f["signal_references"] = err.Error()
+		}
 		if utf8.RuneCountInString(s.Surface) > 80 {
 			f["surface"] = "surface must be at most 80 characters"
 		}
