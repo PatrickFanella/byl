@@ -41,10 +41,11 @@ public final class TripContributions {
     private var actions = 0
     private var gateRequest = 0
     private var choiceEpoch = 0
+    private var acceptedGeneration: Int
 
     public init(store: ContributionStore, api: any ContributionAPI, owner: String?, origin: URL, revision: TourRevision?, mode: String, sameIdentity: @escaping () -> Bool, now: @escaping () -> Date = Date.init, key: @escaping () -> String = { UUID().uuidString }) {
         let originString = origin.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        self.store = store; self.api = api; self.owner = owner; self.origin = originString
+        self.store = store; acceptedGeneration = store.choiceGeneration; self.api = api; self.owner = owner; self.origin = originString
         self.revision = revision; self.mode = mode; self.sameIdentity = sameIdentity; self.now = now; self.key = key
         contexts = contributionContexts(revision: revision, mode: mode); eligible = !contexts.isEmpty
         recordID = owner.flatMap { owner in revision.map { [originString, owner, $0.tourID, $0.id, mode].joined(separator: "|") } }
@@ -57,13 +58,13 @@ public final class TripContributions {
         guard admitted, let checked = gateChecked else { return false }
         return (0...60).contains(now().timeIntervalSince(checked))
     }
-    private var mayResume: Bool { foreground && !ended && !stopped && !paused && !manualSuspended && !permissionSuspended && freshGate && sameIdentity() && optedIn }
+    private var mayResume: Bool { foreground && !ended && !stopped && acceptedGeneration == store.choiceGeneration && !paused && !manualSuspended && !permissionSuspended && freshGate && sameIdentity() && optedIn }
     private func restore() throws {
         let records = try store.read()
         pending = records.reduce(0) { $0 + $1.queue.count }; retainedCount = records.count
         deletionPending = records.filter(\.withdrawing).count
         let current = records.first { $0.id == recordID }
-        optedIn = !stopped && sameIdentity() && current?.enabled == true && current?.withdrawing == false && current?.consent != nil && (current?.consent?.expiresOn ?? "") > ContributionDay.string(now())
+        optedIn = !stopped && acceptedGeneration == store.choiceGeneration && sameIdentity() && current?.enabled == true && current?.withdrawing == false && current?.consent != nil && (current?.consent?.expiresOn ?? "") > ContributionDay.string(now())
     }
     private func storageFailed() {
         storageBroken = true; admitted = false; optedIn = false; stopped = true; confirmedConsent = nil
@@ -109,7 +110,7 @@ public final class TripContributions {
     }
     public func setPaused(_ value: Bool) async {
         if value { choiceEpoch += 1; paused = true; pauseEpisode(); return }
-        guard !ended, !storageBroken, !stopped, sameIdentity() else { return }
+        guard !ended, !storageBroken, !stopped, acceptedGeneration == store.choiceGeneration, sameIdentity() else { return }
         await refresh()
         guard optedIn, freshGate, !stopped else { return }
         paused = false; resumeSampling()
@@ -157,7 +158,7 @@ public final class TripContributions {
                 records.append(ContributionRecord(origin: origin, owner: owner, choice: ContributionChoice(tourID: revision.tourID, revisionID: revision.id, mode: mode, requestedOn: ContributionDay.string(now())), key: key(), enabled: true, withdrawing: false, consent: nil, queue: []))
             }
             // The original choice and retry key must be durable before POST.
-            try store.write(records); stopped = false; try restore()
+            try store.write(records); acceptedGeneration = generation; stopped = false; try restore()
             await flush(); try restore()
             guard epoch == choiceEpoch, generation == store.choiceGeneration, !ended, optedIn, freshGate, !stopped, sameIdentity() else { return }
             paused = false; resumeSampling()
@@ -165,6 +166,10 @@ public final class TripContributions {
     }
 
     public func observe(_ fix: DeviationFix, authorizationGranted: Bool) {
+        guard acceptedGeneration == store.choiceGeneration else {
+            stopped = true; optedIn = false; paused = true; confirmedConsent = nil; detectors = []; samplingSince = .infinity
+            return
+        }
         guard authorizationGranted else { lifecycle(.permissionLost); return }
         if admitted && !freshGate {
             admitted = false; confirmedConsent = nil; pauseEpisode()
@@ -228,7 +233,7 @@ public final class TripContributions {
                 guard var record = try store.read().first(where: { $0.id == initial.id && $0.key == initial.key }) else { continue }
                 var freshlyConfirmed = false
                 if record.consent == nil {
-                    guard record.enabled || record.withdrawing, foreground, freshGate, sameIdentity(), record.owner == owner, record.origin == origin else { continue }
+                    guard record.enabled || record.withdrawing, record.withdrawing || acceptedGeneration == store.choiceGeneration, foreground, freshGate, sameIdentity(), record.owner == owner, record.origin == origin else { continue }
                     let consent = try await api.grant(record.choice, key: record.key)
                     guard ContributionStore.validConsent(consent, choice: record.choice) else { throw ContributionFailure.invalidContract }
                     // Keep this capability even if opt-out/account loss happened
@@ -246,16 +251,16 @@ public final class TripContributions {
                     try store.write(store.read().filter { $0.id != record.id || $0.key != record.key })
                     continue
                 }
-                guard !stopped, foreground, record.enabled, freshGate, sameIdentity(), record.owner == owner, record.origin == origin else { continue }
+                guard !stopped, acceptedGeneration == store.choiceGeneration, foreground, record.enabled, freshGate, sameIdentity(), record.owner == owner, record.origin == origin else { continue }
                 if !freshlyConfirmed {
                     let checked = try await api.grant(record.choice, key: record.key)
                     guard checked == consent else { throw ContributionFailure.invalidContract }
                 }
-                guard let current = try store.read().first(where: { $0.id == record.id && $0.key == record.key }), current.enabled, !current.withdrawing, sameIdentity(), foreground, !stopped, freshGate else { continue }
+                guard let current = try store.read().first(where: { $0.id == record.id && $0.key == record.key }), current.enabled, !current.withdrawing, sameIdentity(), foreground, !stopped, acceptedGeneration == store.choiceGeneration, freshGate else { continue }
                 if current.id == recordID { confirmedConsent = (current.key, now()) }
                 for pending in current.queue {
                     try store.prune()
-                    guard foreground, !stopped, freshGate, sameIdentity(),
+                    guard foreground, !stopped, acceptedGeneration == store.choiceGeneration, freshGate, sameIdentity(),
                           let before = try store.read().first(where: { $0.id == current.id && $0.key == current.key }), before.enabled, !before.withdrawing,
                           before.queue.contains(where: { $0.key == pending.key }), let receipt = before.consent else { break }
                     do { try await api.submit(consent: receipt, summary: pending.summary, key: pending.key) }

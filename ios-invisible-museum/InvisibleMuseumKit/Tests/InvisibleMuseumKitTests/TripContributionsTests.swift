@@ -108,6 +108,21 @@ final class TripContributionsTests: XCTestCase {
         XCTAssertFalse(model.optedIn)
     }
 
+    func testProfileErasureStorageFailureStopsAnAlreadyActiveController() async throws {
+        let active = try model(); await active.optIn(); await passage(active)
+        let original = try Data(contentsOf: directory.appendingPathComponent("contributions-v1.json"))
+        let profile = try model(settings: true)
+        // Keep the old enabled record readable while atomic replacement is denied.
+        try FileManager.default.setAttributes([.posixPermissions: 0o500], ofItemAtPath: directory.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: directory.path) }
+        await profile.eraseAll()
+        XCTAssertEqual(try Data(contentsOf: directory.appendingPathComponent("contributions-v1.json")), original)
+        active.observe(fix(0), authorizationGranted: true)
+        XCTAssertFalse(active.optedIn)
+        await active.flush()
+        XCTAssertTrue(api.submissions.isEmpty)
+    }
+
     func testNavigationHasNoImplicitConsentAndClosedGateCannotGrant() async throws {
         let model = try model()
         XCTAssertTrue(model.eligible); XCTAssertFalse(model.optedIn); XCTAssertTrue(model.paused)
