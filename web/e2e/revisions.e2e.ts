@@ -167,3 +167,73 @@ test('unsupported modes are refused, and signed-in visits use the exact revision
 	await page.getByRole('link', { name: 'Resume saved revision and its progress' }).click();
 	await expect(page.getByText('1 of 4 stops', { exact: true })).toBeVisible();
 });
+
+test('a visit in another tab updates the open pinned walk', async ({ page }) => {
+	await page.goto('/signin');
+	await page.getByLabel('Email').fill(`revision-tab-sync-${Date.now()}@example.com`);
+	await page.getByRole('button', { name: /sign in/i }).click();
+	await expect(page).not.toHaveURL(/\/signin/);
+	await page.goto('/tours/downtown-memory-loop/walk?mode=walk');
+	await expect(page.getByText('0 of 4 stops', { exact: true })).toBeVisible();
+
+	const other = await page.context().newPage();
+	try {
+		await other.goto('/tours/downtown-memory-loop/walk?mode=walk');
+		await expect(other.getByText('0 of 4 stops', { exact: true })).toBeVisible();
+		await other.getByRole('button', { name: "I'm here", exact: true }).click();
+		await expect(other.getByText('1 of 4 stops', { exact: true })).toBeVisible();
+
+		await expect(page.getByText('1 of 4 stops', { exact: true })).toBeVisible();
+		await expect(page.getByText('Next · stop 2 of 4', { exact: true })).toBeVisible();
+	} finally {
+		await other.close();
+	}
+});
+
+test('a visit in another tab updates a walk without geolocation', async ({ browser }) => {
+	const context = await browser.newContext();
+	await context.addInitScript(() => {
+		const nativeNavigator = window.navigator;
+		Object.defineProperty(window, 'navigator', {
+			configurable: true,
+			value: new Proxy(nativeNavigator, {
+				has(target, key) {
+					return key === 'geolocation' ? false : Reflect.has(target, key);
+				},
+				get(target, key) {
+					const value = Reflect.get(target, key, target);
+					return typeof value === 'function' ? value.bind(target) : value;
+				}
+			})
+		});
+	});
+	const page = await context.newPage();
+	try {
+		await page.goto('/signin');
+		await page.getByLabel('Email').fill(`revision-no-geo-tab-sync-${Date.now()}@example.com`);
+		await page.getByRole('button', { name: /sign in/i }).click();
+		await expect(page).not.toHaveURL(/\/signin/);
+		await page.goto('/tours/downtown-memory-loop/walk?mode=walk');
+		await expect(
+			page.getByText("Your location is unavailable right now. Tap I'm here at each stop.", {
+				exact: true
+			})
+		).toBeVisible();
+		await expect(page.getByText('0 of 4 stops', { exact: true })).toBeVisible();
+
+		const other = await context.newPage();
+		try {
+			await other.goto('/tours/downtown-memory-loop/walk?mode=walk');
+			await expect(other.getByText('0 of 4 stops', { exact: true })).toBeVisible();
+			await other.getByRole('button', { name: "I'm here", exact: true }).click();
+			await expect(other.getByText('1 of 4 stops', { exact: true })).toBeVisible();
+
+			await expect(page.getByText('1 of 4 stops', { exact: true })).toBeVisible();
+			await expect(page.getByText('Next · stop 2 of 4', { exact: true })).toBeVisible();
+		} finally {
+			await other.close();
+		}
+	} finally {
+		await context.close();
+	}
+});

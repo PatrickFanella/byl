@@ -71,36 +71,41 @@
 			// ignore
 		}
 		walk.load();
-		if (!('geolocation' in navigator)) {
-			geoState = 'unavailable';
-			return;
-		}
-		const watch = navigator.geolocation.watchPosition(
-			(p) => {
-				geoState = 'ok';
-				walk.handleFix({
-					lat: p.coords.latitude,
-					lng: p.coords.longitude,
-					accuracy: p.coords.accuracy
-				});
-			},
-			(err) => {
-				geoState = err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
-			},
-			{ enableHighAccuracy: true, maximumAge: 5_000, timeout: 20_000 }
-		);
 		const onVisible = () => {
 			if (document.visibilityState === 'visible') walk.syncIfNeeded();
 		};
 		const onOnline = () => walk.syncIfNeeded();
 		const onStorage = (e: StorageEvent) => {
-			if (e.key?.startsWith('invisible-museum.progress.')) walk.refreshFromStorage();
+			if (
+				e.key?.startsWith('invisible-museum.progress.') ||
+				e.key?.startsWith('invisible-museum.revision-progress.')
+			)
+				walk.refreshFromStorage();
 		};
 		document.addEventListener('visibilitychange', onVisible);
 		window.addEventListener('online', onOnline);
 		window.addEventListener('storage', onStorage);
+		let watch: number | null = null;
+		if (!('geolocation' in navigator)) {
+			geoState = 'unavailable';
+		} else {
+			watch = navigator.geolocation.watchPosition(
+				(p) => {
+					geoState = 'ok';
+					walk.handleFix({
+						lat: p.coords.latitude,
+						lng: p.coords.longitude,
+						accuracy: p.coords.accuracy
+					});
+				},
+				(err) => {
+					geoState = err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
+				},
+				{ enableHighAccuracy: true, maximumAge: 5_000, timeout: 20_000 }
+			);
+		}
 		return () => {
-			navigator.geolocation.clearWatch(watch);
+			if (watch !== null) navigator.geolocation.clearWatch(watch);
 			document.removeEventListener('visibilitychange', onVisible);
 			window.removeEventListener('online', onOnline);
 			window.removeEventListener('storage', onStorage);
