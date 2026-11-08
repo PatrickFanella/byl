@@ -11,6 +11,7 @@ struct ActiveTourView: View {
     @State private var showEndConfirm = false
     @State private var path = NavigationPath()
     @State private var showTripReview = false
+    @State private var showTransit = false
     @State private var confirmUpdate = false
     @State private var updateBusy = false
     @State private var updateError: String?
@@ -73,6 +74,11 @@ struct ActiveTourView: View {
                 }
             }
             .sheet(isPresented: $showTripReview) { tripReview }
+            .sheet(isPresented: $showTransit) {
+                NavigationStack {
+                    if let transit = active.transit { TransitConnectionView(trip: transit) }
+                }
+            }
             .sheet(isPresented: $showReport, onDismiss: {
                 if reviewAfterReport { reviewAfterReport = false; showTripReview = true }
             }) {
@@ -112,6 +118,7 @@ struct ActiveTourView: View {
                 }
             }
             .onChange(of: scenePhase) { _, _ in updateContributionVisibility() }
+            .onChange(of: showTransit) { _, _ in updateContributionVisibility() }
             .onChange(of: showTripReview) { _, _ in updateContributionVisibility() }
             .onChange(of: showReport) { _, _ in updateContributionVisibility() }
             .onChange(of: showEndConfirm) { _, _ in updateContributionVisibility() }
@@ -162,6 +169,10 @@ struct ActiveTourView: View {
                 }
                 Button("Route improvement · \(contributionController?.optedIn == true ? (contributionController?.paused == true ? "Paused" : "On") : "Off")") { showContributions = true }
                     .buttonStyle(.museum(.secondary, size: .small))
+                if active.isMixed {
+                    Button("Scheduled CTA connection · Review plan") { showTransit = true }
+                        .buttonStyle(.museum(.secondary, size: .small))
+                }
                 bottomCard
             }
             .padding(.horizontal, Museum.Spacing.pageHorizontal)
@@ -177,14 +188,22 @@ struct ActiveTourView: View {
                         .font(Museum.title(24)).foregroundStyle(Museum.text)
                     Text("This itinerary remains in use until you explicitly choose a different revision.")
                         .font(Museum.bodyFont(14)).foregroundStyle(Museum.muted)
-                    TripJourneyView(tour: active.tour, mode: active.mode, journey: active.route?.journey ?? revision.snapshot?.routes[active.mode]?.journey)
+                    if active.isMixed {
+                        Text("Walking sections and scheduled rail remain separate. Review the retained CTA plan from the active trip; switching revision requires a new explicit plan choice.")
+                    } else {
+                        TripJourneyView(tour: active.tour, mode: active.mode, journey: active.route?.journey ?? revision.snapshot?.routes[active.mode]?.journey)
+                    }
                     Button(active.checkingUpdate ? "Checking…" : "Check for an update") { Task { await active.checkForUpdate() } }
                         .buttonStyle(.museum(.secondary))
                         .disabled(active.checkingUpdate || updateBusy)
                     if let error = active.updateError { MuseumInlineHint(text: error, tint: Museum.danger, isError: true) }
                     if let candidate = active.availableUpdate, let snapshot = candidate.snapshot {
                         Text("Available revision \(candidate.number)").font(Museum.title(22)).foregroundStyle(Museum.text)
-                        TripJourneyView(tour: snapshot.tour, mode: active.mode, journey: snapshot.routes[active.mode]?.journey)
+                        if candidate.isMixed(mode: active.mode) {
+                            Text("This is a mixed walking and scheduled CTA itinerary. Its transit choice stays separate from your current revision.")
+                        } else {
+                            TripJourneyView(tour: snapshot.tour, mode: active.mode, journey: snapshot.routes[active.mode]?.journey)
+                        }
                         Text("Only visits to unchanged stops carry forward by stop ID. New or changed stops remain unvisited. Your old revision's progress stays separate.")
                             .font(Museum.bodyFont(14)).foregroundStyle(Museum.muted)
                         Button(updateBusy ? "Switching…" : "Use revision \(candidate.number)") { confirmUpdate = true }
@@ -260,8 +279,10 @@ struct ActiveTourView: View {
                     HStack(spacing: 10) {
                         Button { contributionController?.lifecycle(.manualArrival); active.markArrivedAtNextStop() } label: { Label("I'm here", systemImage: "checkmark.circle") }
                             .buttonStyle(.museum(.primary, size: .small))
-                        Button { active.openNextStopInMaps() } label: { Label("Open in Maps", systemImage: "map") }
-                            .buttonStyle(.museum(.secondary, size: .small))
+                        if !active.transitInterval {
+                            Button { active.openNextStopInMaps() } label: { Label("Open in Maps", systemImage: "map") }
+                                .buttonStyle(.museum(.secondary, size: .small))
+                        }
                         if model.narration.isPlaying {
                             Button { model.narration.stop() } label: { Image(systemName: "stop.fill").frame(width: 36, height: 36) }
                                 .buttonStyle(.museum(.secondary, size: .icon))
@@ -274,7 +295,7 @@ struct ActiveTourView: View {
             MuseumCard(fill: Museum.surface) {
                 VStack(alignment: .leading, spacing: 10) {
                     Overline(text: "Tour complete", color: Museum.success)
-                    Text("You walked every stop of \(active.tour.tour.title).")
+                    Text("You visited every stop of \(active.tour.tour.title).")
                         .font(Museum.title(18))
                         .foregroundStyle(Museum.text)
                     if !model.isSignedIn {
@@ -293,7 +314,7 @@ struct ActiveTourView: View {
 
     private func updateContributionVisibility() {
         guard let controller = contributionController else { return }
-        let visible = scenePhase == .active && !active.revoked && !active.isComplete && active.arrivedStop == nil && !showTripReview && !showReport && !showEndConfirm
+        let visible = scenePhase == .active && !showTransit && !active.revoked && !active.isComplete && active.arrivedStop == nil && !showTripReview && !showReport && !showEndConfirm
         controller.setForeground(visible)
         if visible { Task { await controller.refresh() } }
     }

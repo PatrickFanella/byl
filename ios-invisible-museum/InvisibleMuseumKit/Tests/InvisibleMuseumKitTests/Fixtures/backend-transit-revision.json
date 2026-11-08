@@ -1,0 +1,524 @@
+{
+	"id": "a1f10ed0-80bd-49f0-91de-b055d0a2a2c7",
+	"tour_id": "00000000-0000-4000-8000-00000000e0e1",
+	"number": 4,
+	"draft_version": 1,
+	"published_at": "2026-11-08T13:59:22.979544-06:00",
+	"snapshot": {
+		"tour": {
+			"transit": {
+				"version": 1,
+				"intent": {
+					"version": 1,
+					"provider": "cta_gtfs_blue_v1",
+					"mode": "walk",
+					"from_stop_id": "c77fc1fd-f196-4501-bf9b-1a7b47d20242",
+					"to_stop_id": "09e36a5e-672b-4ef1-8166-54c7ae96816c",
+					"board_stop_id": "30374",
+					"alight_stop_id": "30077",
+					"walk_to_stop_seconds": 300,
+					"walk_from_stop_seconds": 600,
+					"boarding_buffer_seconds": 180,
+					"walking_assumptions": "Explicit synthetic time assumptions; not evidence of real station access."
+				},
+				"board": {
+					"id": "30374",
+					"name": "Clark/Lake (Subway)",
+					"parent_id": "40380",
+					"latitude": 41.885737,
+					"longitude": -87.630886
+				},
+				"alight": {
+					"id": "30077",
+					"name": "Forest Park",
+					"parent_id": "40390",
+					"latitude": 41.874257,
+					"longitude": -87.817318
+				},
+				"source": {
+					"url": "https://www.transitchicago.com/downloads/sch_data/google_transit.zip",
+					"publisher": "Chicago Transit Authority",
+					"sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					"retrieved_at": "2026-11-08T19:59:22.907940766Z",
+					"license_url": "https://www.transitchicago.com/developers/terms/",
+					"timezone": "America/Chicago"
+				},
+				"reviewed_at": "2026-11-08T19:59:22.907940766Z",
+				"walking_legs": [
+					{
+						"from_position": 2,
+						"to_position": 3,
+						"distance_m": 180.8935734358185,
+						"duration_s": 139,
+						"geometry": [
+							[-88.0099, 41.7952],
+							[-88.0118, 41.7944]
+						]
+					},
+					{
+						"from_position": 3,
+						"to_position": 4,
+						"distance_m": 1546.698240834816,
+						"duration_s": 1190,
+						"geometry": [
+							[-88.0118, 41.7944],
+							[-88.0111, 41.8083]
+						]
+					}
+				]
+			},
+			"journeys": {
+				"bike": {
+					"version": 1,
+					"state": "usable",
+					"computation": "ready",
+					"quality": "pass",
+					"usable": true,
+					"issue_codes": [],
+					"travel_distance_m": 1824.6789127518243,
+					"travel_duration_s": 405,
+					"dwell_duration_s": 720,
+					"narration_duration_s": 480,
+					"itinerary_duration_s": 1605,
+					"round_trip_duration_s": null,
+					"return_plan": {
+						"status": "unplanned",
+						"distance_m": null,
+						"duration_s": null
+					},
+					"segments": [],
+					"assumptions": [
+						"Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+						"Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+						"An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+					]
+				},
+				"walk": {
+					"version": 1,
+					"state": "missing",
+					"computation": "missing",
+					"quality": "unreviewed",
+					"usable": false,
+					"issue_codes": [],
+					"travel_distance_m": null,
+					"travel_duration_s": null,
+					"dwell_duration_s": 720,
+					"narration_duration_s": 480,
+					"itinerary_duration_s": null,
+					"round_trip_duration_s": null,
+					"return_plan": {
+						"status": "unplanned",
+						"distance_m": null,
+						"duration_s": null
+					},
+					"segments": [],
+					"assumptions": [
+						"Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+						"Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+						"An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+					]
+				}
+			},
+			"draft_version": 1,
+			"route_version": 0,
+			"revision_id": "a1f10ed0-80bd-49f0-91de-b055d0a2a2c7",
+			"revision_number": 4,
+			"id": "00000000-0000-4000-8000-00000000e0e1",
+			"city_id": "00000000-0000-4000-8000-0000000000c1",
+			"city_ids": ["00000000-0000-4000-8000-0000000000c1"],
+			"slug": "downtown-memory-loop",
+			"title": "Downtown Memory Loop",
+			"summary": "A short loop from the station to the theater, the park, and the museum campus: how a railroad stop became a town, and what it does after dark.",
+			"topic_id": "00000000-0000-4000-8000-00000000a0a1",
+			"topic": {
+				"id": "00000000-0000-4000-8000-00000000a0a1",
+				"city_id": "00000000-0000-4000-8000-0000000000c1",
+				"city_ids": ["00000000-0000-4000-8000-0000000000c1"],
+				"slug": "rail-and-the-commuter-town",
+				"name": "Rail and the Commuter Town",
+				"description": "How the Chicago, Burlington & Quincy line turned a farm settlement into a railroad suburb, and how the daily commute still shapes downtown.",
+				"moment_count": 4
+			},
+			"modes": ["walk", "bike"],
+			"hero_media": null,
+			"status": "published",
+			"visibility": "public",
+			"owner_account_id": null,
+			"stop_count": 4,
+			"routes": {
+				"bike": {
+					"quality": {
+						"report_id": "33a5f4d0-b58f-4a39-ad2b-b0e9d010a239",
+						"input_current": true,
+						"version": 1,
+						"status": "pass",
+						"issues": [],
+						"checked_at": "2026-11-08T19:59:22.961646579Z"
+					},
+					"mode": "bike",
+					"status": "ready",
+					"distance_m": 1824.6789127518243,
+					"duration_s": 405,
+					"estimated_minutes": 7,
+					"computed_at": "2026-11-08T19:59:22.656963Z"
+				}
+			},
+			"created_at": "2026-11-08T19:59:21.308413Z",
+			"updated_at": "2026-11-08T19:59:22.979544Z",
+			"stops": [
+				{
+					"id": "c77fc1fd-f196-4501-bf9b-1a7b47d20242",
+					"position": 1,
+					"place": {
+						"id": "00000000-0000-4000-8000-00000000b0b1",
+						"city_id": "00000000-0000-4000-8000-0000000000c1",
+						"slug": "main-street-station",
+						"name": "Main Street Station",
+						"summary": "A downtown railway stop shaped by the 1864 arrival of the Burlington line, the surviving 1911 passenger station, and generations of commuter travel.",
+						"kind": "station",
+						"latitude": 41.7959,
+						"longitude": -88.0092,
+						"arrival_radius_m": 50,
+						"arrival_point": null,
+						"arrival_version": 0,
+						"address": "5001 Main St, Downers Grove, IL",
+						"status": "published",
+						"primary_moment_id": "00000000-0000-4000-8000-00000000d0d1",
+						"moment_count": 3,
+						"created_at": "2026-11-08T19:59:21.308413Z",
+						"updated_at": "2026-11-08T19:59:21.308413Z"
+					},
+					"featured_moment_id": "00000000-0000-4000-8000-00000000d0d1",
+					"featured_moment": {
+						"id": "00000000-0000-4000-8000-00000000d0d1",
+						"place_id": "00000000-0000-4000-8000-00000000b0b1",
+						"slug": "the-burlington-arrives",
+						"title": "The Burlington Arrives",
+						"excerpt": "The arrival of the Chicago, Burlington & Quincy Railroad in 1864 changed the scale of life in Downers Grove. A farming settlement could now exchange goods and passengers with Chicago along a regular rail corridor. The Main Street stop…",
+						"date_start": "1864-01-01",
+						"date_end": "1873-12-31",
+						"date_precision": "year",
+						"date_display": "1864",
+						"hero_media": {
+							"id": "00000000-0000-4000-8000-00000000f0f1",
+							"kind": "image",
+							"external": false,
+							"public_url": "https://byl.subcult.tv/media/files/library/images/main-street-station.jpg",
+							"mime_type": "image/jpeg",
+							"width": 1280,
+							"height": 960,
+							"duration_seconds": null,
+							"caption": "Main Street station, May 11, 2004. A later view of the rail corridor. Resized by Wikimedia.",
+							"credit": "David Wilson",
+							"license": "CC-BY-2.0",
+							"license_url": "https://creativecommons.org/licenses/by/2.0",
+							"source_url": "https://commons.wikimedia.org/wiki/File:20040511_29_Metra_Downers_Grove,_IL.jpg",
+							"status": "published",
+							"created_at": "2026-11-08T19:59:21.32309Z",
+							"updated_at": "2026-11-08T19:59:21.32309Z"
+						},
+						"has_narration": false,
+						"status": "published",
+						"topic_ids": ["00000000-0000-4000-8000-00000000a0a1"]
+					},
+					"note": "Start where the town started: the tracks."
+				},
+				{
+					"id": "09e36a5e-672b-4ef1-8166-54c7ae96816c",
+					"position": 2,
+					"place": {
+						"id": "00000000-0000-4000-8000-00000000b0b2",
+						"city_id": "00000000-0000-4000-8000-0000000000c1",
+						"slug": "tivoli-theatre",
+						"name": "Tivoli Theatre",
+						"summary": "A working cinema and mixed-use landmark that opened in 1928 as talking pictures changed moviegoing.",
+						"kind": "building",
+						"latitude": 41.7952,
+						"longitude": -88.0099,
+						"arrival_radius_m": 40,
+						"arrival_point": null,
+						"arrival_version": 0,
+						"address": "5021 Highland Ave, Downers Grove, IL",
+						"status": "published",
+						"primary_moment_id": "00000000-0000-4000-8000-00000000d0d3",
+						"moment_count": 1,
+						"created_at": "2026-11-08T19:59:21.308413Z",
+						"updated_at": "2026-11-08T19:59:21.308413Z"
+					},
+					"featured_moment_id": "00000000-0000-4000-8000-00000000d0d3",
+					"featured_moment": {
+						"id": "00000000-0000-4000-8000-00000000d0d3",
+						"place_id": "00000000-0000-4000-8000-00000000b0b2",
+						"slug": "built-for-talkies",
+						"title": "Built for the Talkies",
+						"excerpt": "When the Tivoli opened on Christmas Day in 1928, cinema was undergoing a fundamental change: recorded speech and music were becoming part of the film itself. The Downers Grove Historical Society identifies the theatre as an early building…",
+						"date_start": "1928-12-25",
+						"date_end": "1928-12-25",
+						"date_precision": "day",
+						"date_display": "December 25, 1928",
+						"hero_media": {
+							"id": "00000000-0000-4000-8000-00000000f0f2",
+							"kind": "image",
+							"external": false,
+							"public_url": "https://byl.subcult.tv/media/files/library/images/tivoli-theatre.jpg",
+							"mime_type": "image/jpeg",
+							"width": 1280,
+							"height": 1707,
+							"duration_seconds": null,
+							"caption": "The Tivoli marquee in August 2009. Resized by Wikimedia.",
+							"credit": "User: (WT-shared) Ethajek at  wts wikivoyage",
+							"license": "PD",
+							"license_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG#Licensing",
+							"source_url": "https://commons.wikimedia.org/wiki/File:Tivolitheatre.JPG",
+							"status": "published",
+							"created_at": "2026-11-08T19:59:21.32309Z",
+							"updated_at": "2026-11-08T19:59:21.32309Z"
+						},
+						"has_narration": false,
+						"status": "published",
+						"topic_ids": [
+							"00000000-0000-4000-8000-00000000a0a2",
+							"00000000-0000-4000-8000-00000000a0a1"
+						]
+					},
+					"note": "The railroad brought people; the theater gave them a reason to stay downtown."
+				},
+				{
+					"id": "2c67cd61-1ce7-4cdb-bb2e-cc78b99f883e",
+					"position": 3,
+					"place": {
+						"id": "00000000-0000-4000-8000-00000000b0b3",
+						"city_id": "00000000-0000-4000-8000-0000000000c1",
+						"slug": "fishel-park",
+						"name": "Fishel Park",
+						"summary": "A downtown gathering place with an earlier school site, a concert pavilion, and a history of local remembrance.",
+						"kind": "park",
+						"latitude": 41.7944,
+						"longitude": -88.0118,
+						"arrival_radius_m": 60,
+						"arrival_point": null,
+						"arrival_version": 0,
+						"address": "1036 Grove St, Downers Grove, IL",
+						"status": "published",
+						"primary_moment_id": "00000000-0000-4000-8000-00000000d0d4",
+						"moment_count": 1,
+						"created_at": "2026-11-08T19:59:21.308413Z",
+						"updated_at": "2026-11-08T19:59:21.308413Z"
+					},
+					"featured_moment_id": null,
+					"featured_moment": {
+						"id": "00000000-0000-4000-8000-00000000d0d4",
+						"place_id": "00000000-0000-4000-8000-00000000b0b3",
+						"slug": "summer-concert-lawn",
+						"title": "A School Site Becomes a Gathering Place",
+						"excerpt": "Fishel Park's open lawn has a history that predates the concert pavilion. In 1912, a kindergarten opened on Grove Street just west of Main Street, on the site now occupied by the park. The village's architectural and historical survey…",
+						"date_start": null,
+						"date_end": null,
+						"date_precision": "circa",
+						"date_display": "Summer evenings",
+						"hero_media": {
+							"id": "00000000-0000-4000-8000-00000000f0f3",
+							"kind": "image",
+							"external": false,
+							"public_url": "https://byl.subcult.tv/media/files/library/images/fishel-school.jpg",
+							"mime_type": "image/jpeg",
+							"width": 899,
+							"height": 899,
+							"duration_seconds": null,
+							"caption": "The former Downers Grove School, later Junior Elementary School, circa 1915, on the site now occupied by Fishel Park. The building no longer stands.",
+							"credit": "The Avery Coonley School",
+							"license": "CC-BY-SA-3.0",
+							"license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+							"source_url": "https://commons.wikimedia.org/wiki/File:Downers_Grove_School.JPG",
+							"status": "published",
+							"created_at": "2026-11-08T19:59:21.32309Z",
+							"updated_at": "2026-11-08T19:59:21.32309Z"
+						},
+						"has_narration": false,
+						"status": "published",
+						"topic_ids": ["00000000-0000-4000-8000-00000000a0a3"]
+					},
+					"note": "A breather on the lawn before the longer leg north."
+				},
+				{
+					"id": "7cb0a95c-d655-4da1-b30b-2384100594f0",
+					"position": 4,
+					"place": {
+						"id": "00000000-0000-4000-8000-00000000b0b4",
+						"city_id": "00000000-0000-4000-8000-0000000000c1",
+						"slug": "downers-grove-museum",
+						"name": "Downers Grove Museum",
+						"summary": "A local-history campus with two distinct Blodgett houses: the 1846 home associated with the Underground Railroad and the 1892 Charles Blodgett house.",
+						"kind": "site",
+						"latitude": 41.8083,
+						"longitude": -88.0111,
+						"arrival_radius_m": 60,
+						"arrival_point": null,
+						"arrival_version": 0,
+						"address": "831 Maple Ave, Downers Grove, IL",
+						"status": "published",
+						"primary_moment_id": "00000000-0000-4000-8000-00000000d0d5",
+						"moment_count": 2,
+						"created_at": "2026-11-08T19:59:21.308413Z",
+						"updated_at": "2026-11-08T19:59:21.308413Z"
+					},
+					"featured_moment_id": "00000000-0000-4000-8000-00000000d0d5",
+					"featured_moment": {
+						"id": "00000000-0000-4000-8000-00000000d0d5",
+						"place_id": "00000000-0000-4000-8000-00000000b0b4",
+						"slug": "blodgett-house",
+						"title": "Israel and Avis Blodgett and the Underground Railroad",
+						"excerpt": "The 1846 house at the museum campus belonged to Israel and Avis Blodgett, abolitionists whose home offered shelter and help to people escaping slavery. Its history connects an ordinary domestic building in Downers Grove with a much wider…",
+						"date_start": "1846-01-01",
+						"date_end": "1846-12-31",
+						"date_precision": "year",
+						"date_display": "1846",
+						"hero_media": {
+							"id": "00000000-0000-4000-8000-00000000f0f4",
+							"kind": "image",
+							"external": false,
+							"public_url": "https://byl.subcult.tv/media/files/library/images/blodgett-family.jpg",
+							"mime_type": "image/jpeg",
+							"width": 1280,
+							"height": 1461,
+							"duration_seconds": null,
+							"caption": "Family portrait: Henry Williams Blodgett, son of Israel and Avis, painted in 1875 by Alden Finney Brooks. Smithsonian National Portrait Gallery. Resized by Wikimedia.",
+							"credit": "Alden Finney Brooks (1840-c. 1938)",
+							"license": "CC0-1.0",
+							"license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+							"source_url": "https://commons.wikimedia.org/wiki/File:Henry_Williams_Blodgett.jpg",
+							"status": "published",
+							"created_at": "2026-11-08T19:59:21.32309Z",
+							"updated_at": "2026-11-08T19:59:21.32309Z"
+						},
+						"has_narration": false,
+						"status": "published",
+						"topic_ids": ["00000000-0000-4000-8000-00000000a0a4"]
+					},
+					"note": "End a generation before the railroad, in the blacksmith's house."
+				}
+			]
+		},
+		"moments": {},
+		"routes": {
+			"bike": {
+				"journey": {
+					"version": 1,
+					"state": "usable",
+					"computation": "ready",
+					"quality": "pass",
+					"usable": true,
+					"issue_codes": [],
+					"travel_distance_m": 1824.6789127518243,
+					"travel_duration_s": 405,
+					"dwell_duration_s": 720,
+					"narration_duration_s": 480,
+					"itinerary_duration_s": 1605,
+					"round_trip_duration_s": null,
+					"return_plan": {
+						"status": "unplanned",
+						"distance_m": null,
+						"duration_s": null
+					},
+					"segments": [],
+					"assumptions": [
+						"Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+						"Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+						"An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+					]
+				},
+				"quality": {
+					"report_id": "33a5f4d0-b58f-4a39-ad2b-b0e9d010a239",
+					"input_current": true,
+					"version": 1,
+					"status": "pass",
+					"issues": [],
+					"checked_at": "2026-11-08T19:59:22.961646579Z"
+				},
+				"id": "26e7d052-e257-43f9-ba13-151cc2d9a10e",
+				"tour_id": "00000000-0000-4000-8000-00000000e0e1",
+				"mode": "bike",
+				"status": "ready",
+				"provider": "valhalla",
+				"distance_m": 1824.6789127518243,
+				"duration_s": 405,
+				"geometry": {
+					"type": "LineString",
+					"coordinates": [
+						[-88.0092, 41.7959],
+						[-88.0099, 41.7952],
+						[-88.0118, 41.7944],
+						[-88.0111, 41.8083]
+					]
+				},
+				"legs": [
+					{
+						"from_position": 1,
+						"to_position": 2,
+						"distance_m": 97.08709848118981,
+						"duration_s": 22,
+						"geometry": [
+							[-88.0092, 41.7959],
+							[-88.0099, 41.7952]
+						]
+					},
+					{
+						"from_position": 2,
+						"to_position": 3,
+						"distance_m": 180.8935734358185,
+						"duration_s": 40,
+						"geometry": [
+							[-88.0099, 41.7952],
+							[-88.0118, 41.7944]
+						]
+					},
+					{
+						"from_position": 3,
+						"to_position": 4,
+						"distance_m": 1546.698240834816,
+						"duration_s": 344,
+						"geometry": [
+							[-88.0118, 41.7944],
+							[-88.0111, 41.8083]
+						]
+					}
+				],
+				"computed_at": "2026-11-08T19:59:22.656963Z"
+			}
+		},
+		"routing_intent": {
+			"modes": ["walk", "bike"],
+			"stops": [
+				{
+					"stop_id": "c77fc1fd-f196-4501-bf9b-1a7b47d20242",
+					"latitude": 41.7959,
+					"place_id": "00000000-0000-4000-8000-00000000b0b1",
+					"longitude": -88.0092,
+					"arrival_point": null
+				},
+				{
+					"stop_id": "09e36a5e-672b-4ef1-8166-54c7ae96816c",
+					"latitude": 41.7952,
+					"place_id": "00000000-0000-4000-8000-00000000b0b2",
+					"longitude": -88.0099,
+					"arrival_point": null
+				},
+				{
+					"stop_id": "2c67cd61-1ce7-4cdb-bb2e-cc78b99f883e",
+					"latitude": 41.7944,
+					"place_id": "00000000-0000-4000-8000-00000000b0b3",
+					"longitude": -88.0118,
+					"arrival_point": null
+				},
+				{
+					"stop_id": "7cb0a95c-d655-4da1-b30b-2384100594f0",
+					"latitude": 41.8083,
+					"place_id": "00000000-0000-4000-8000-00000000b0b4",
+					"longitude": -88.0111,
+					"arrival_point": null
+				}
+			],
+			"coordinate_source": "historical_site"
+		}
+	}
+}

@@ -341,6 +341,10 @@ public struct TourStop: Codable, Identifiable, Equatable {
 public struct TourDetail: Codable, Identifiable, Equatable {
     private let transitJSON: RetainedTransitJSON?
     public var hasTransit: Bool { transitJSON != nil }
+    public var transit: ApprovedTransit? {
+        guard let transitJSON, let data = try? JSONEncoder().encode(transitJSON) else { return nil }
+        return try? JSONDecoder().decode(ApprovedTransit.self, from: data)
+    }
     public let corridor: ReviewedCorridor?
     public let journeys: [String: RouteJourney]?
     public let tour: TourSummary
@@ -370,8 +374,8 @@ public struct TourDetail: Codable, Identifiable, Equatable {
         try container.encodeIfPresent(transitJSON, forKey: .transit)
     }
 
-    // Preserve unsupported transit metadata through cache round-trips. This is
-    // an exclusion for observation, not a transit presentation or planning API.
+    // Preserve unknown transit metadata through cache round-trips. A malformed or newer
+    // selection stays mixed/unsupported rather than silently becoming an ordinary walk.
     private enum RetainedTransitJSON: Codable, Equatable {
         case null, bool(Bool), number(Double), string(String), array([Self]), object([String: Self])
         init(from decoder: Decoder) throws {

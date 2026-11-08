@@ -43,7 +43,23 @@ private struct TourDetailContent: View {
                 header(tour)
                 modes(tour)
                 ForEach(tour.tour.modes, id: \.self) { mode in
-                    TripJourneyView(tour: tour, mode: mode, journey: tour.journeys?[mode])
+                    if tour.transit?.intent.mode != mode {
+                        TripJourneyView(tour: tour, mode: mode, journey: tour.journeys?[mode])
+                    }
+                }
+                if let choice = tour.transit {
+                    MuseumCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Walking + scheduled CTA Blue Line").font(Museum.title(20))
+                            Text("Board: \(choice.board.name) · platform \(choice.board.id)")
+                            Text("Alight: \(choice.alight.name) · platform \(choice.alight.id)")
+                            Text(choice.intent.walkingAssumptions)
+                            Text("Open the mixed trip to choose and review a departure from its first connector story stop. Times are scheduled, not live arrivals; platform locations do not certify street access.")
+                            if detail.transitEnabled != true {
+                                MuseumInlineHint(text: "Scheduled transit is unavailable or its gate could not be confirmed.")
+                            }
+                        }.font(Museum.bodyFont(14)).foregroundStyle(Museum.text)
+                    }
                 }
                 actions(tour)
                 stops(tour)
@@ -73,7 +89,7 @@ private struct TourDetailContent: View {
                 Overline(text: "Getting around")
                 ForEach(tour.tour.modes, id: \.self) { mode in
                     HStack {
-                        Label(mode == "bike" ? "Biking" : "Walking", systemImage: mode == "bike" ? "bicycle" : "figure.walk")
+                        Label(tour.transit?.intent.mode == mode ? "Walking + CTA" : (mode == "bike" ? "Biking" : "Walking"), systemImage: mode == "bike" ? "bicycle" : "figure.walk")
                             .font(Museum.bodyFont(15, weight: .semibold))
                             .foregroundStyle(Museum.text)
                         Spacer()
@@ -81,6 +97,8 @@ private struct TourDetailContent: View {
                             Text([estimate, detail.distanceText(mode: mode)].compactMap { $0 }.joined(separator: " · "))
                                 .font(Museum.bodyFont(13))
                                 .foregroundStyle(Museum.muted)
+                        } else if tour.transit?.intent.mode == mode {
+                            Text("Scheduled connection").font(Museum.bodyFont(13)).foregroundStyle(Museum.muted)
                         } else if tour.tour.routes[mode]?.status == "failed" {
                             Text("Route unavailable")
                                 .font(Museum.bodyFont(13))
@@ -113,7 +131,7 @@ private struct TourDetailContent: View {
                             catch { startError = error.museumMessage }
                         }
                     } label: {
-                        Label(mode == "bike" ? "Start riding" : "Start walking", systemImage: mode == "bike" ? "bicycle" : "figure.walk")
+                        Label(tour.transit?.intent.mode == mode ? "Open mixed trip" : (mode == "bike" ? "Start riding" : "Start walking"), systemImage: mode == "bike" ? "bicycle" : "figure.walk")
                     }
                     .buttonStyle(.museum(mode == tour.tour.modes.first ? .primary : .secondary, size: .large))
                     .disabled(startBusy || !detail.canStart(mode: mode))
