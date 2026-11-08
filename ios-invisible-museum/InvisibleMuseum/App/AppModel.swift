@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import UIKit
 import InvisibleMuseumKit
 
 /// App-wide state: API access, the session, the selected city, and the tour being walked.
@@ -29,6 +30,11 @@ final class AppModel {
     var selectedCity: City?
     /// The tour being walked or ridden, if any.
     var active: ActiveTourModel?
+    var contributions: TripContributions?
+    var contributionError: String?
+    var contributionSessionVersion = 0
+    var appIsActive = true
+    private var privateContributionStore: ContributionStore?
     var activeTour: TourDetail? { active?.tour }
     var activeMode: String? { active?.mode }
     var activeTourID: String? { active?.tour.tour.id }
@@ -50,7 +56,15 @@ final class AppModel {
             ?? (try! DiskCache(directory: FileManager.default.temporaryDirectory.appendingPathComponent("InvisibleMuseum")))
         self.account = nil
         session.onChange = { [weak self] in
-            Task { @MainActor [weak self] in self?.account = self?.session.account }
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.account = self.session.account
+                self.contributionSessionVersion += 1
+                self.contributions?.identityChanged()
+            }
+        }
+        location.onAuthorizationChange = { [weak self] state in
+            if state != .authorized { self?.contributions?.lifecycle(.permissionLost) }
         }
         client.onUnauthorized = { [weak self] token in
             Task { @MainActor [weak self] in self?.handleUnauthorized(token: token) }
@@ -98,11 +112,45 @@ final class AppModel {
 
     /// Foreground: push any progress the server has not seen yet.
     func didBecomeActive() {
+        appIsActive = true
+        if let contributions { Task { await contributions.refresh() } }
         guard let active else { return }
         Task {
             await active.loadRoute()
             if active.revoked { narration.stop() }
             await active.syncIfNeeded()
+        }
+    }
+
+    func didLeaveForeground() {
+        appIsActive = false
+        contributions?.setForeground(false)
+    }
+
+    func contributionModel(for trip: ActiveTourModel? = nil) -> TripContributions? {
+        do {
+            let store: ContributionStore
+            if let existing = privateContributionStore { store = existing }
+            else {
+                // Do not use navigation's temporary-cache fallback for erasure capabilities.
+                let support = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+                store = try ContributionStore(directory: support.appendingPathComponent("InvisibleMuseum/RouteContributions", isDirectory: true))
+                privateContributionStore = store
+            }
+            let origin = trip?.api.client.baseURL ?? client.baseURL
+            let owner = trip == nil ? session.account?.id : trip?.owningAccountID
+            let token: String?
+            if let trip { token = trip.api.client.tokenProvider() }
+            else { token = session.token }
+            let controller = TripContributions(store: store, api: ContributionHTTPAPI(origin: origin, token: token), owner: owner, origin: origin, revision: trip?.revision, mode: trip?.mode ?? "walk", sameIdentity: { [weak self] in
+                guard let self, owner != nil else { return false }
+                return self.session.account?.id == owner && self.session.token == token && self.client.baseURL == origin
+            })
+            contributionError = nil
+            return controller
+        } catch {
+            contributionError = "Private contribution storage is unavailable. Route improvement is off; navigation still works."
+            return nil
         }
     }
 
@@ -248,12 +296,23 @@ final class AppModel {
     }
 
     private func attach(_ model: ActiveTourModel) {
+        contributions?.lifecycle(.end)
+        contributions?.setForeground(false)
+        contributions = contributionModel(for: model)
         model.audioEnabled = audioGuideEnabled
         model.onArrive = { [weak self, weak model] stop in
             guard let self, let model, model.audioEnabled else { return }
             Task { await self.playNarration(for: stop, requireGuide: true) }
         }
-        location.onLocation = { [weak model] location in model?.handle(location: location) }
+        location.onLocation = { [weak self, weak model] location in
+            guard let self, let model, self.active === model else { return }
+            model.handle(location: location)
+            guard let contributions = self.contributions else { return }
+            if model.revoked || model.isComplete { contributions.lifecycle(.end); return }
+            if model.arrivedStop != nil { contributions.lifecycle(.manualArrival); return }
+            guard UIApplication.shared.applicationState == .active else { contributions.setForeground(false); return }
+            contributions.observe(DeviationFix(point: DeviationPoint(lat: location.coordinate.latitude, lng: location.coordinate.longitude), accuracyM: location.horizontalAccuracy, timestampMs: (location.timestamp.timeIntervalSince1970 * 1000).rounded(.down)), authorizationGranted: self.location.authorizationState == .authorized)
+        }
         if let here = location.currentLocation { model.handle(location: here) }
         active = model
         Task {
@@ -263,6 +322,9 @@ final class AppModel {
     }
 
     func endTour(resetProgress: Bool) {
+        contributions?.lifecycle(.end)
+        contributions?.setForeground(false)
+        contributions = nil
         let ending = active
         if resetProgress { active?.resetProgress() }
         active?.end()
@@ -314,5 +376,7 @@ final class AppModel {
         if let url = URL(string: Self.resolveBaseURL()) {
             client.baseURL = url
         }
+        contributionSessionVersion += 1
+        contributions?.identityChanged()
     }
 }
