@@ -677,7 +677,7 @@ test('a lost investigation response replays the retained selection and key after
 	await page.getByRole('button', { name: 'Send private report', exact: true }).click();
 	await expect(page).toHaveURL(/\/routes\/reports\/[0-9a-f-]+\?submitted=1$/);
 	const id = new URL(page.url()).pathname.split('/').at(-1)!;
-	await signIn(page, 'admin@example.com');
+	await signIn(page, 'report-investigator@example.com');
 	await page.goto(`/admin/queue/reports/${id}`);
 	await expect(page.getByRole('region', { name: 'Original report' })).toContainText(
 		'Retained investigation retry fixture'
