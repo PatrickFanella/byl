@@ -1,0 +1,112 @@
+[
+  {
+    "id": "depot-record",
+    "url": "https://www.invillapark.com/DocumentCenter/View/594/1926-Chicago-Great-Western-Railroad-Depot-PDF",
+    "title": "1926 Chicago Great Western Railroad Depot preservation record, 2001",
+    "publisher": "Villa Park Historic Preservation Commission",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant primary text inspected unless explicitly identified as a location reference.",
+    "claims": [
+      "Dates the depot to 1926 and the railway through Villa Park to 1886–87.",
+      "Describes freight for Ovaltine, coal and building supplies including Sears kits; records preservation recognition in 2001."
+    ],
+    "limitations": [
+      "Actual PDF text was read through the web reader, not an indexed snippet. Local byte retrieval and visual screenshot failed with TLS/redirect errors; no byte hash or photograph inspection is claimed.",
+      "Historical park uses and plans do not establish present access."
+    ],
+    "media_reuse": "No photographs or PDF pages copied."
+  },
+  {
+    "id": "villa-district",
+    "url": "https://www.invillapark.com/DocumentCenter/View/561",
+    "title": "Villa Historic Landmark District, PDF pages 1–2",
+    "publisher": "Villa Park Historic Preservation Commission",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant primary text inspected unless explicitly identified as a location reference.",
+    "claims": [
+      "Separately identifies the CA&E museum/station and CGW depot.",
+      "Describes an access path connecting the Prairie Path, Cortesi Park, Great Western bike path and Lions Field."
+    ],
+    "limitations": [
+      "Historic district interpretation is not a current crossing or arrival inspection."
+    ],
+    "media_reuse": "No photographs or PDF pages copied."
+  },
+  {
+    "id": "cortesi-facility",
+    "url": "https://www.invillapark.com/facilities/facility/details/Cortesi-Veterans-Memorial-Park-1",
+    "title": "Cortesi Veterans Memorial Park facility record",
+    "publisher": "Village of Villa Park",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant primary text inspected unless explicitly identified as a location reference.",
+    "claims": [
+      "Lists the depot among park features at 318 E Kenilworth and park hours of 6 a.m. to sunset."
+    ],
+    "limitations": [
+      "A listed facility/hour is an access lead; posted conditions, closures, interior use and stopping space need review."
+    ],
+    "media_reuse": "No photographs or PDF pages copied."
+  },
+  {
+    "id": "cortesi-location",
+    "url": "https://www.hmdb.org/m.asp?m=244906",
+    "title": "Cortesi Veterans Memorial Park location reference",
+    "publisher": "Historical Marker Database; original photographs by Sean P. Flynn, April 12, 2024",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant primary text inspected unless explicitly identified as a location reference.",
+    "claims": [
+      "Provides an independent park-memorial location reference near Kenilworth and Myrtle."
+    ],
+    "limitations": [
+      "Its coordinate identifies the memorial, not an exact depot door or building survey. Photographs are not reused and permission is unresolved."
+    ],
+    "media_reuse": "No photographs or PDF pages copied."
+  },
+  {
+    "id": "lombard-storymap",
+    "url": "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e",
+    "title": "Village of Lombard Sesquicentennial Story in Maps, point 16",
+    "publisher": "Village of Lombard Public Works",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant primary text inspected unless explicitly identified as a location reference.",
+    "claims": [
+      "Point 16 labels a 1949 train-station photograph and locates the former CGW depot south of the tracks near North Charlotte Street.",
+      "Point 42 separately describes the CA&E Main Street crossing."
+    ],
+    "limitations": [
+      "Public ArcGIS item/data were actually read; owner metadata identifies the municipal publisher. The map anchor is not an exact former footprint or a surviving-building claim.",
+      "Historical photographs are not copied. The separate CA&E point is excluded from this GWT itinerary."
+    ],
+    "media_reuse": "No photographs or PDF pages copied."
+  },
+  {
+    "id": "county-plan",
+    "url": "https://www.dupagecounty.gov/Transportation/Documents/2024-0212%20DUPAGE%20TRAILS%20PLAN%20ADOPTED.pdf",
+    "title": "2024 DuPage Trails Plan, PDF page 11 / printed page 7",
+    "publisher": "DuPage County Division of Transportation",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant primary text inspected unless explicitly identified as a location reference.",
+    "claims": [
+      "Describes the separate Great Western regional trail on former railway right-of-way from Villa Park to West Chicago."
+    ],
+    "limitations": [
+      "The complete 37 MB PDF was directly downloaded; relevant text and rendered page inspected. This planning overview is not detailed node topology or a current all-clear notice."
+    ],
+    "media_reuse": "No photographs or PDF pages copied."
+  },
+  {
+    "id": "lombard-biking",
+    "url": "https://villageoflombard.org/411/Walking-Biking-in-Lombard",
+    "title": "Walking and biking in Lombard",
+    "publisher": "Village of Lombard",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant primary text inspected unless explicitly identified as a location reference.",
+    "claims": [
+      "Provides municipal trail/planning references and distinguishes two regional trails through the municipality."
+    ],
+    "limitations": [
+      "No present route-specific closure or crossing approval established by this general page."
+    ],
+    "media_reuse": "No photographs or PDF pages copied."
+  }
+]

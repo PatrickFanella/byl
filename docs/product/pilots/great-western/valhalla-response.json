@@ -1,0 +1,51 @@
+{
+  "trip": {
+    "summary": {
+      "has_time_restrictions": false,
+      "has_toll": false,
+      "has_highway": false,
+      "has_ferry": false,
+      "min_lat": 41.886665,
+      "min_lon": -88.018089,
+      "max_lat": 41.891273,
+      "max_lon": -87.970627,
+      "time": 2061.701,
+      "length": 8.27,
+      "cost": 2958.578
+    },
+    "legs": [
+      {
+        "summary": {
+          "has_time_restrictions": false,
+          "has_toll": false,
+          "has_highway": false,
+          "has_ferry": false,
+          "min_lat": 41.886665,
+          "min_lon": -88.018089,
+          "max_lat": 41.891273,
+          "max_lon": -87.970627,
+          "time": 1030.369,
+          "length": 4.135,
+          "cost": 1482.344
+        },
+        "shape": "q{p{nApshxfDMA_Aj@_LVeA_AcBKSFgAZkA^_Ar@iC|FoJ|FwYf_I{NzvDMdDO|DiWzhHG~AKtCqp@~sQqNBmKN@pD?jFzYO}C`iA}KrnCKxBEhBGhBmCfcAuKvtCkDjy@gInuBa@bLyAda@]pB{F`Tq@dEGtCVnBjAjEtAjGG`FCbBgAlEmMf^qAzDi@`GTzFtB~GnDrI~@|E\\pDO|EO~EwDj_A{@lUgC|m@qWb_IcHpaBKrCGlAM~CeHpnB"
+      },
+      {
+        "summary": {
+          "has_time_restrictions": false,
+          "has_toll": false,
+          "has_highway": false,
+          "has_ferry": false,
+          "min_lat": 41.886665,
+          "min_lon": -88.018089,
+          "max_lat": 41.891273,
+          "max_lon": -87.970627,
+          "time": 1031.332,
+          "length": 4.135,
+          "cost": 1476.234
+        },
+        "shape": "q{y{nArie{fDdHqnBL_DFmAJsCbHqaBpWc_IfC}m@z@mUvDk_AN_FN}E]qD_A}EoDsIuB_HU{Fh@aGpA{DlMg^fAmEBcBFaFuAkGkAkEWoBFuCp@eEzFaT\\qBxAea@`@cLfIouBjDky@tKwtClCgcAFiBDiBJyB|KsnC|CaiA{YN?kFAqDlKOpNCpp@_tQJuCF_BhW{hHN}DLeDzN{vDvYg_InJ}FhC}F~@s@jA_@fA[RGbBJdA~@~KW~@k@L@"
+      }
+    ]
+  }
+}

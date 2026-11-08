@@ -1,0 +1,80 @@
+[
+  {
+    "key": "cortesi-depot",
+    "name": "Cortesi Park / CGW depot interpretation point",
+    "municipality": "Villa Park",
+    "address": "318 E Kenilworth Avenue, Villa Park, IL",
+    "position": {
+      "latitude": 41.88675,
+      "longitude": -87.9704333,
+      "kind": "Public historical-interpretation location lead, not a depot footprint/entrance survey",
+      "source_url": "https://www.hmdb.org/m.asp?m=244906"
+    },
+    "proposed_arrival": {
+      "latitude": 41.8866716,
+      "longitude": -87.9706324,
+      "osm_node_id": 388140714,
+      "kind": "proposed mapped path interpretation/turnaround point",
+      "status": "needs_review",
+      "access_status": "unknown",
+      "source_url": "https://www.openstreetmap.org/node/388140714"
+    },
+    "public_arrival": null,
+    "source_ids": [
+      "depot-record",
+      "villa-district",
+      "cortesi-facility",
+      "cortesi-location"
+    ],
+    "moment_title": "A 1926 depot serving railway freight and local industry",
+    "date_start": "1926-01-01",
+    "date_precision": "year",
+    "date_storage_note": "January 1 stores year precision; 1949 is the source photograph label, not the depot construction date.",
+    "body": "The Village’s preservation record dates the Chicago Great Western depot to 1926. It describes railway freight serving Ovaltine and local building suppliers, including Sears house kits. The depot is distinct from Villa Park’s CA&E stations. This chapter uses a park interpretation location near the memorial reference, without asserting an exact depot doorway or a surveyed building position. Current exterior viewing and any interior use remain separate review questions.",
+    "status": "draft",
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 2,
+    "gaps": [
+      "Current exterior viewpoint, exact depot identity/location and permitted approach need curator review.",
+      "No complete public history, reusable illustration or approved arrival."
+    ]
+  },
+  {
+    "key": "lombard-former-cgw",
+    "name": "Former Lombard CGW station / trail interpretation point",
+    "municipality": "Lombard",
+    "address": "Great Western Trail near North Charlotte Street, Lombard, IL",
+    "position": {
+      "latitude": 41.89118916663432,
+      "longitude": -88.0179440974977,
+      "kind": "Public historical-interpretation location lead, not a depot footprint/entrance survey",
+      "source_url": "https://storymaps.arcgis.com/stories/4440335cef514505ad70687dca5e6f3e"
+    },
+    "proposed_arrival": {
+      "latitude": 41.891273,
+      "longitude": -88.0180898,
+      "osm_node_id": 13796112983,
+      "kind": "proposed mapped path interpretation/turnaround point",
+      "status": "needs_review",
+      "access_status": "unknown",
+      "source_url": "https://www.openstreetmap.org/node/13796112983"
+    },
+    "public_arrival": null,
+    "source_ids": [
+      "lombard-storymap",
+      "county-plan"
+    ],
+    "moment_title": "A former Great Western depot in a municipal photograph",
+    "date_start": "1949-01-01",
+    "date_precision": "year",
+    "date_storage_note": "January 1 stores year precision; 1949 is the source photograph label, not the depot construction date.",
+    "body": "The Village of Lombard’s municipal StoryMap labels a 1949 train-station photograph and describes the CGW depot south of the old tracks near North Charlotte Street. This is the western interpretation anchor and turnaround for the bounded draft. It does not claim that a station building survives here. The separately mapped CA&E Main Street crossing is a different site, and the trail point is not presented as a survey of the former depot footprint.",
+    "status": "draft",
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 2,
+    "gaps": [
+      "Current exterior viewpoint, exact depot identity/location and permitted approach need curator review.",
+      "No complete public history, reusable illustration or approved arrival."
+    ]
+  }
+]

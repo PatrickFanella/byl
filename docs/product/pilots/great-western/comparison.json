@@ -1,0 +1,21 @@
+{
+  "method": "Directed decoded provider vertices to the full retained source chain; proximity does not establish topology/access.",
+  "legs": [
+    {
+      "leg": 1,
+      "role": "outbound",
+      "vertices": 65,
+      "maximum_separation_m": 0.7355658357218919,
+      "p95_separation_m": 0.050085771782199,
+      "over_25m": 0
+    },
+    {
+      "leg": 2,
+      "role": "return_without_repeated_narration",
+      "vertices": 65,
+      "maximum_separation_m": 0.7355658357218919,
+      "p95_separation_m": 0.050085771782199,
+      "over_25m": 0
+    }
+  ]
+}
