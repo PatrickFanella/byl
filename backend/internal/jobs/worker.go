@@ -118,7 +118,7 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 // uses a context that survives cancellation so a shutdown mid-job still leaves the row queued
 // or done rather than stuck in running.
 func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runErr error) error {
-	fenced := job.Kind == models.JobKindResearchBrief || job.Kind == models.JobKindFetchEvidence
+	fenced := job.Kind == models.JobKindResearchBrief || job.Kind == models.JobKindFetchEvidence || job.Kind == models.JobKindInvestigateRouteReport
 	wctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 15*time.Second)
 	defer cancel()
 	if runErr == nil {
@@ -165,6 +165,8 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runEr
 // dispatch runs the job and returns its completion note (empty for most kinds) or error.
 func (w *Worker) dispatch(ctx context.Context, job *models.Job) (string, error) {
 	switch job.Kind {
+	case models.JobKindInvestigateRouteReport:
+		return w.investigateRouteReport(ctx, job)
 	case models.JobKindFetchEvidence:
 		return w.fetchEvidence(ctx, job)
 	case models.JobKindResearchBrief:
