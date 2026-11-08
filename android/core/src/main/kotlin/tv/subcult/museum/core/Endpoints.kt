@@ -37,6 +37,9 @@ class Endpoints(val client: ApiClient) {
     suspend fun place(ref: String, city: String? = null): PlaceDetail =
         client.get("/api/v1/places/$ref", if (city != null) mapOf("city" to city) else emptyMap())
 
+    suspend fun happenings(place: String, cursor: String = ""): ListPage<Happening> =
+        client.get("/api/v1/places/$place/happenings", mapOf("limit" to "20", "cursor" to cursor))
+
     suspend fun moment(id: String): MomentDetail = client.get("/api/v1/moments/$id")
 
     suspend fun tour(ref: String): TourDetail = client.get("/api/v1/tours/$ref")

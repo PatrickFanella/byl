@@ -7,6 +7,7 @@
 	import MediaFigure from '#lib/components/visitor/MediaFigure.svelte';
 	import MediaGallery from '#lib/components/visitor/MediaGallery.svelte';
 	import SectionHeader from '#lib/components/visitor/SectionHeader.svelte';
+	import HappeningsPanel from '#lib/components/visitor/HappeningsPanel.svelte';
 
 	const ref = $derived(page.params.ref ?? '');
 	const featuredID = $derived(page.url.searchParams.get('featured'));
@@ -44,6 +45,7 @@
 		<h1 class="text-3xl font-semibold">{p.name}</h1>
 		{#if p.address}<p class="mt-1 text-sm text-byl-muted">{p.address}</p>{/if}
 		{#if p.summary}<p class="mt-3 max-w-2xl text-byl-muted">{p.summary}</p>{/if}
+		<div class="mt-6"><HappeningsPanel placeID={p.id} /></div>
 		{#if hero}<div class="mt-6"><MediaFigure asset={hero} /></div>{/if}
 
 		{#if p.moments.length > 1}

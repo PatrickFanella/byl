@@ -1,0 +1,614 @@
+{
+	"schema_version": 1,
+	"provenance": "Synthetic schema-21 API response shapes and explicitly named defensive/forward-compatibility cases. No real occurrence or field observation.",
+	"now": "2026-11-08T16:00:00Z",
+	"place_id": "00000000-0000-4000-8000-000000000001",
+	"cases": [
+		{
+			"name": "active",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["active"]
+		},
+		{
+			"name": "future",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-10",
+						"ends_on": "2026-11-10",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "upcoming",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-11",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["upcoming"]
+		},
+		{
+			"name": "expired",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-06",
+						"ends_on": "2026-11-06",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "expired",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-07",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["expired"]
+		},
+		{
+			"name": "cancelled",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "cancelled",
+						"state": "cancelled",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["cancelled"]
+		},
+		{
+			"name": "date_conflict",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "date_conflict",
+						"state": "date_conflict",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["date_conflict"]
+		},
+		{
+			"name": "unavailable_source",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "source_unavailable",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unavailable",
+						"issues": ["source_unavailable"],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["source_unavailable"]
+		},
+		{
+			"name": "changed_source",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "needs_review",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "changed",
+						"issues": ["source_changed"],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["needs_review"]
+		},
+		{
+			"name": "pending_source",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "needs_review",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "pending",
+						"issues": ["source_pending"],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["needs_review"]
+		},
+		{
+			"name": "stale_active_response",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-01T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["needs_review"]
+		},
+		{
+			"name": "expired_active_response",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-07",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["expired"]
+		},
+		{
+			"name": "ended_active_response",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-06",
+						"ends_on": "2026-11-07",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["ended"]
+		},
+		{
+			"name": "unknown_state",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "future_contract_state",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["unavailable"]
+		},
+		{
+			"name": "invalid_date",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-31",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["unavailable"]
+		},
+		{
+			"name": "unknown_timezone",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "Unknown/Zone",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["unavailable"]
+		},
+		{
+			"name": "empty",
+			"response": {
+				"items": [],
+				"next_cursor": ""
+			},
+			"expected_statuses": []
+		},
+		{
+			"name": "invalid_checked_time",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-31T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": [
+							{
+								"url": "https://organizer.example/synthetic-announcement",
+								"title": "Synthetic organizer announcement",
+								"publisher": "Fixture Parks",
+								"version": "0b206434ad5497efb380c87284748261e5b502c8fc5c6d87eadeeccd85c2a827",
+								"retrieved_on": "2026-11-08",
+								"license": "unresolved",
+								"license_url": ""
+							}
+						]
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["unavailable"]
+		},
+		{
+			"name": "missing_sources",
+			"response": {
+				"items": [
+					{
+						"id": "00000000-0000-4000-8000-000000000058",
+						"revision_id": "00000000-0000-4000-8000-000000000059",
+						"place_id": "00000000-0000-4000-8000-000000000001",
+						"title": "Synthetic organizer history talk",
+						"summary": "A recorded contract fixture, not a real event.",
+						"organizer": "Fixture Parks",
+						"starts_on": "2026-11-08",
+						"ends_on": "2026-11-08",
+						"timezone": "America/Chicago",
+						"declared_state": "scheduled",
+						"state": "active",
+						"review_on": "2026-11-09",
+						"expires_on": "2026-11-10",
+						"last_checked_at": "2026-11-08T15:00:00Z",
+						"source_health": "unchanged",
+						"issues": [],
+						"sources": []
+					}
+				],
+				"next_cursor": ""
+			},
+			"expected_statuses": ["needs_review"]
+		}
+	]
+}

@@ -2,6 +2,8 @@
 
 package tv.subcult.museum.ui.tours
 
+import tv.subcult.museum.ui.places.HappeningsSection
+
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -297,6 +299,7 @@ private fun ArrivalSheet(model: AppViewModel, active: ActiveTour, stop: TourStop
         } else {
             EmptyCard("No moment featured here", "This stop is a waypoint; look around and carry on.")
         }
+        HappeningsSection(stop.place.id, active.origin, tripContext = true)
         val others = place.data?.moments?.filter { it.id != featured?.id } ?: emptyList()
         if (others.isNotEmpty()) {
             Overline("Also at this place")

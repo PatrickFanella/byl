@@ -49,6 +49,7 @@ fun PlaceScreen(model: AppViewModel, ref: String, featuredId: String?, onOpenMom
                 if (p.address.isNotEmpty()) Text(p.address, color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
                 if (p.summary.isNotEmpty()) Text(p.summary, color = Museum.text.copy(alpha = 0.85f), style = MaterialTheme.typography.bodyLarge)
             }
+            HappeningsSection(p.id, model.api.client.baseUrl)
             val featured = p.moments.firstOrNull { it.id == featuredId } ?: p.primaryMoment
             val others = p.moments.filter { it.id != featured?.id }
             if (featured != null) {

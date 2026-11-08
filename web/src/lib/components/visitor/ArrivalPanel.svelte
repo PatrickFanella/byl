@@ -1,4 +1,5 @@
 <script lang="ts">
+	import HappeningsPanel from './HappeningsPanel.svelte';
 	import { modal } from '#lib/modal.ts';
 	import type { TourStop, PlaceDetail, MomentDetail } from '#lib/visitor.ts';
 	import { getPlace } from '#lib/visitor.ts';
@@ -78,6 +79,7 @@
 		</div>
 	{/if}
 
+	<div class="mt-5"><HappeningsPanel placeID={stop.place.id} tripContext /></div>
 	{#if !pinned && stop.place.moment_count > 1}
 		<div class="mt-5 space-y-2">
 			<div class="text-xs font-bold tracking-normal text-byl-action">Also at this place</div>

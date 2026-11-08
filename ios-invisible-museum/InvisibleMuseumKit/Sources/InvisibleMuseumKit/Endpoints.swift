@@ -50,6 +50,10 @@ public struct Endpoints {
         return try await client.get("/api/v1/places/\(ref)", query: q)
     }
 
+    public func happenings(place: String, cursor: String = "") async throws -> ListPage<Happening> {
+        try await client.get("/api/v1/places/\(place)/happenings", query: ["limit": "20", "cursor": cursor])
+    }
+
     public func moment(_ id: String) async throws -> MomentDetail {
         try await client.get("/api/v1/moments/\(id)")
     }
