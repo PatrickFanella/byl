@@ -9,6 +9,7 @@ final class StubURLProtocol: URLProtocol {
         let path: String
         let query: String?
         let body: Data?
+        let headers: [String: String]
     }
 
     nonisolated(unsafe) static var handler: ((String, String) -> (Int, Data))?
@@ -25,7 +26,7 @@ final class StubURLProtocol: URLProtocol {
     override func startLoading() {
         let method = request.httpMethod ?? "GET"
         let path = request.url?.path ?? ""
-        Self.requests.append(Recorded(method: method, path: path, query: request.url?.query, body: Self.readBody(request)))
+        Self.requests.append(Recorded(method: method, path: path, query: request.url?.query, body: Self.readBody(request), headers: request.allHTTPHeaderFields ?? [:]))
         let (status, data) = Self.handler?(method, path) ?? (404, Data("{\"error\":{\"code\":\"not_found\",\"message\":\"no stub\"}}".utf8))
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: ["Content-Type": "application/json"])!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)

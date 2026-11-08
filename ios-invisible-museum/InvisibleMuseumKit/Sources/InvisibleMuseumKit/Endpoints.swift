@@ -106,6 +106,23 @@ public struct Endpoints {
     }
 
     // Me
+    public func suggestionIntake() async throws -> SuggestionIntake {
+        try await client.get("/api/v1/route-brief-intake")
+    }
+
+    public func suggestions(offset: Int = 0) async throws -> [RouteSuggestion] {
+        let page: ListPage<RouteSuggestion> = try await client.get("/api/v1/me/route-briefs", query: ["offset": String(max(0, offset)), "limit": "21"])
+        return page.items
+    }
+
+    public func suggestion(_ id: String) async throws -> RouteSuggestion {
+        try await client.get("/api/v1/me/route-briefs/\(id)")
+    }
+
+    public func submitSuggestion(_ input: RouteSuggestionInput, key: String) async throws -> RouteSuggestion {
+        try await client.post("/api/v1/me/route-briefs", body: input, headers: ["Idempotency-Key": key])
+    }
+
     public func myTours() async throws -> [TourSummary] {
         let page: ListPage<TourSummary> = try await client.get("/api/v1/me/tours")
         return page.items
