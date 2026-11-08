@@ -51,6 +51,7 @@ import tv.subcult.museum.core.PlaceDetail
 import tv.subcult.museum.core.TourStop
 import tv.subcult.museum.core.distanceText
 import tv.subcult.museum.ui.AppViewModel
+import tv.subcult.museum.ui.routes.RouteReportsScreen
 import tv.subcult.museum.ui.components.EmptyCard
 import tv.subcult.museum.ui.components.LoadState
 import tv.subcult.museum.ui.components.MomentCard
@@ -76,6 +77,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     var granted by remember { mutableStateOf(model.container.location.hasPermission()) }
     var showEnd by remember { mutableStateOf(false) }
     var showReview by remember(active) { mutableStateOf(false) }
+    var showReport by remember(active) { mutableStateOf(false) }
     var confirmUpdate by remember(active) { mutableStateOf(false) }
     var updateBusy by remember(active) { mutableStateOf(false) }
     var updateError by remember(active) { mutableStateOf<String?>(null) }
@@ -116,6 +118,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         Row(Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Pill(onClick = { showEnd = true }) { Text("End") }
             Pill(onClick = { showReview = true }) { Text(if (active.revision != null) "Trip · Revision ${active.revision?.number}" else active.tour.title, style = MaterialTheme.typography.titleMedium) }
+            if (active.revision != null) Pill(onClick = { showReport = true }) { Text("Report") }
             Pill(onClick = { model.setAudioGuide(!app.audioEnabled) }) { Text(if (app.audioEnabled) "🔊" else "🔇") }
         }
 
@@ -192,6 +195,17 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         )
     }
 
+    if (showReport) {
+        ModalBottomSheet(onDismissRequest = { showReport = false }, containerColor = Museum.background) {
+            active.revision?.let { revision ->
+                RouteReportsScreen(model, onBack = { showReport = false }, onOpenTour = { showReport = false; showReview = true },
+                    tourId = revision.tourId, revisionId = revision.id, mode = active.mode, cachedRevision = revision,
+                    initialTarget = state.nextStop?.let { "entrance:${it.id}" }, onReviewUpdate = {
+                        showReport = false; showReview = true; scope.launch { active.checkForUpdate() }
+                    })
+            }
+        }
+    }
     if (showReview) {
         ModalBottomSheet(onDismissRequest = { showReview = false }, containerColor = Museum.background) {
             Column(Modifier.verticalScroll(rememberScrollState()).padding(18.dp).navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(16.dp)) {

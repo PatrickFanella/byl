@@ -116,6 +116,21 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         }
     }
 
+    fun routeReportApi(owner: Session): Endpoints {
+        val origin = container.client.baseUrl
+        val client = ApiClient(origin) { owner.token }
+        client.onUnauthorized = { token -> if (container.client.baseUrl == origin) handleUnauthorized(token) }
+        return Endpoints(client)
+    }
+
+    fun routeReports(owner: Session, context: tv.subcult.museum.core.RouteReportContext? = null, initialTarget: String? = null): tv.subcult.museum.core.RouteReports {
+        val origin = container.client.baseUrl
+        return tv.subcult.museum.core.RouteReports(routeReportApi(owner), container.reportStore, owner.account.id, context, initialTarget) {
+            val current = container.session.state.value
+            current != null && current.account.id == owner.account.id && current.token == owner.token && container.client.baseUrl == origin
+        }
+    }
+
     fun signOut() {
         val token = container.session.token
         val previousApi = Endpoints(ApiClient(container.client.baseUrl) { token })

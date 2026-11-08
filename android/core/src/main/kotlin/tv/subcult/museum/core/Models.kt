@@ -172,7 +172,10 @@ data class RouteLeg(
     @SerialName("to_position") val toPosition: Int,
     @SerialName("distance_m") val distanceM: Double = 0.0,
     @SerialName("duration_s") val durationS: Int = 0,
-    val geometry: List<List<Double>> = emptyList()
+    val geometry: List<List<Double>> = emptyList(),
+    @SerialName("from_stop_id") val fromStopId: String? = null,
+    @SerialName("to_stop_id") val toStopId: String? = null,
+    @SerialName("return") val isReturn: Boolean = false
 )
 
 @Serializable

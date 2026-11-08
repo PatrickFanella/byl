@@ -20,6 +20,7 @@ class AppContainer(context: Context) {
 
     val session = SessionStore(EncryptedTokenStorage(app))
     val store: KeyValueStore = FileKeyValueStore(app.filesDir.resolve("museum-cache"))
+    val reportStore: KeyValueStore = FileKeyValueStore(app.noBackupFilesDir.resolve("route-reports"))
     val client = ApiClient(resolveBaseUrl()) { session.token }
     val api = Endpoints(client)
     val location = LocationSource(app)
