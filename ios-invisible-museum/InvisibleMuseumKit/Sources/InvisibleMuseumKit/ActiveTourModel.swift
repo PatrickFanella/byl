@@ -260,7 +260,7 @@ public final class ActiveTourModel: Identifiable {
         return try ActiveTourModel(api: api, revision: target, mode: mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID)
     }
 
-    /// Loads the route from the API, falling back to the cached copy when the request fails.
+    /// Uses cached geometry for transient failures, never authoritative removal.
     public func loadRoute() async {
         guard !revoked else { return }
         if let revision {
@@ -302,7 +302,10 @@ public final class ActiveTourModel: Identifiable {
             routeState = .loaded
             if fresh.status == "ready" { cache.save(fresh, key: key) }
         } catch {
-            if let cached = cache.load(TourRoute.self, key: key) {
+            if let apiError = error as? APIError, [403, 404].contains(apiError.status) {
+                cache.remove(key)
+                revoke()
+            } else if let cached = cache.load(TourRoute.self, key: key) {
                 route = cached
                 routeFromCache = true
                 routeState = .loaded

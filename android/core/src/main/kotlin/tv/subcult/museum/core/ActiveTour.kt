@@ -200,7 +200,7 @@ class ActiveTour(
 
     // MARK: Route
 
-    /** Loads the route from the API, falling back to the cached copy when the request fails. */
+    /** Uses cached geometry for transient failures, never authoritative removal. */
     suspend fun loadRoute() {
         if (!canUse) return
         if (revision != null) {
@@ -237,11 +237,16 @@ class ActiveTour(
                 )
             }
         } catch (e: Exception) {
-            val cached = store.getJson<TourRoute>(key)
-            if (cached != null) {
-                _state.update { it.copy(route = cached, routeFromCache = true, routeStatus = LoadStatus.READY, routeMessage = null) }
+            if (e is ApiException && e.status in listOf(403, 404)) {
+                runCatching { store.remove(key) }
+                revoke()
             } else {
-                _state.update { it.copy(route = null, routeStatus = LoadStatus.ERROR, routeMessage = (e as? ApiException)?.message ?: e.message ?: "Route unavailable") }
+                val cached = store.getJson<TourRoute>(key)
+                if (cached != null) {
+                    _state.update { it.copy(route = cached, routeFromCache = true, routeStatus = LoadStatus.READY, routeMessage = null) }
+                } else {
+                    _state.update { it.copy(route = null, routeStatus = LoadStatus.ERROR, routeMessage = (e as? ApiException)?.message ?: e.message ?: "Route unavailable") }
+                }
             }
         }
         recomputeLegs()

@@ -179,6 +179,24 @@ class ActiveTourTest {
     }
 
     @Test
+    fun `authoritative unavailable route cannot fall back to cached geometry`() = runTest {
+        for (status in listOf(403, 404)) {
+            routeStatus = 200
+            model(false).loadRoute()
+            assertNotNull(store.getJson<TourRoute>(ActiveTour.routeKey(tourId, "walk")))
+            routeStatus = status
+            val denied = model(false)
+            denied.loadRoute()
+            assertTrue(denied.state.value.revoked, "HTTP $status")
+            assertNull(denied.state.value.route)
+            assertNull(denied.state.value.nextStop)
+            assertNull(store.getJson<TourRoute>(ActiveTour.routeKey(tourId, "walk")))
+            denied.handleFix(fix(tour.stops[0]))
+            assertNull(denied.state.value.arrivedStop)
+        }
+    }
+
+    @Test
     fun `a pending route never replaces a cached ready route`() = runTest {
         val m = model(false)
         m.loadRoute()

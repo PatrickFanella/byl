@@ -170,6 +170,23 @@ final class ActiveTourModelTests: XCTestCase {
         XCTAssertEqual(offline.route?.legs.count, 3)
     }
 
+    func testAuthoritativeUnavailableRouteCannotFallBackToCachedGeometry() async {
+        for status in [403, 404] {
+            stubRouteAndProgress()
+            await model(signedIn: false).loadRoute()
+            XCTAssertNotNil(cache.load(TourRoute.self, key: ActiveTourModel.routeKey(tourID: tourID, mode: "walk")))
+            stubRouteAndProgress(routeStatus: status)
+            let denied = model(signedIn: false)
+            await denied.loadRoute()
+            XCTAssertTrue(denied.revoked, "HTTP \(status)")
+            XCTAssertNil(denied.route)
+            XCTAssertNil(denied.nextStop)
+            XCTAssertNil(cache.load(TourRoute.self, key: ActiveTourModel.routeKey(tourID: tourID, mode: "walk")))
+            denied.handle(location: fix(at: tour.stops[0]))
+            XCTAssertNil(denied.arrivedStop)
+        }
+    }
+
     func testPendingRouteKeepsCachedGeometryUntilReplacementIsReady() async {
         stubRouteAndProgress()
         let m = model(signedIn: false)
