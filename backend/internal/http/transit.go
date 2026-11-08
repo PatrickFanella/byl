@@ -36,7 +36,9 @@ func (d Deps) transitCapable(r *http.Request) bool {
 func (d Deps) requireTransitClient(w http.ResponseWriter, r *http.Request) bool {
 	transitHeaders(w)
 	if !d.transitCapable(r) {
-		writeError(w, http.StatusConflict, "unsupported_itinerary", "this revision requires enabled scheduled-transit support in the client")
+		// Existing clients treat 403 as authoritative unavailability. A conflict
+		// may fall back to an older, unpinned walking tour in the local cache.
+		writeError(w, http.StatusForbidden, "unsupported_itinerary", "this revision requires enabled scheduled-transit support in the client")
 		return false
 	}
 	return true
