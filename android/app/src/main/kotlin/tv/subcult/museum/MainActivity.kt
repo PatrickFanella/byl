@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Museum
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -28,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -136,7 +138,7 @@ fun MuseumNavHost(model: AppViewModel) {
                             selected = route == tab.route || route.startsWith(tab.route + "/"),
                             onClick = { nav.navigateTab(tab.route) },
                             icon = { Icon(tab.icon, contentDescription = tab.label) },
-                            label = { Text(tab.label) },
+                            label = { Text(tab.label, style = MaterialTheme.typography.labelSmall, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) },
                             colors = NavigationBarItemDefaults.colors(selectedIconColor = Museum.actionText, indicatorColor = Museum.action, selectedTextColor = Museum.text, unselectedIconColor = Museum.muted, unselectedTextColor = Museum.muted)
                         )
                     }
