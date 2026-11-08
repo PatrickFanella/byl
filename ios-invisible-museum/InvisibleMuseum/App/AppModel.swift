@@ -106,7 +106,9 @@ final class AppModel {
         let origin = client.baseURL
         guard active == nil, let restored = ActiveTourModel.restore(api: activeTourAPI(), cache: cache, isSignedIn: { [weak self] in
             self?.isSignedIn == true && self?.session.account?.id == accountID && self?.session.token == token && self?.client.baseURL == origin
-        }, accountID: accountID) else { return }
+        }, accountID: accountID, isCurrentSession: { [weak self] in
+            self?.session.account?.id == accountID && self?.session.token == token && self?.client.baseURL == origin
+        }) else { return }
         attach(restored)
     }
 
@@ -189,6 +191,7 @@ final class AppModel {
     }
 
     func signOut() async {
+        active?.transit?.invalidate()
         try? await api.signOut()
         session.clear()
         account = nil
@@ -199,6 +202,7 @@ final class AppModel {
     /// shows sign-in, but never touches the tour being walked (Review Focus 3).
     func handleUnauthorized(token: String?) {
         guard session.isSignedIn, token == nil || token == session.token else { return }
+        active?.transit?.invalidate()
         session.clear()
         account = nil
         savedTourIDs = []
@@ -232,9 +236,15 @@ final class AppModel {
               revision.id == revisionID, revision.tourID == tour.id else {
             throw APIError(status: 0, code: "trip_changed", message: "The trip or session changed. Open the tour again before starting.")
         }
+        let transitEnabled = revision.isMixed(mode: mode) ? try await api.itineraryCapabilities().scheduledTransitV1 : nil
+        guard session.account?.id == accountID, session.token == token, client.baseURL == origin, active == nil else {
+            throw APIError(status: 0, code: "trip_changed", message: "The session changed. Open the tour again.")
+        }
         let model = try ActiveTourModel(api: api, revision: revision, mode: mode, cache: cache, isSignedIn: { [weak self] in
             self?.isSignedIn == true && self?.session.account?.id == accountID && self?.session.token == token && self?.client.baseURL == origin
-        }, accountID: accountID)
+        }, accountID: accountID, transitEnabled: transitEnabled, isCurrentSession: { [weak self] in
+            self?.session.account?.id == accountID && self?.session.token == token && self?.client.baseURL == origin
+        })
         attach(model)
     }
 
@@ -251,7 +261,14 @@ final class AppModel {
               confirmed.tourID == expected.tour.id, confirmed.unavailableReason(mode: expected.mode) == nil else {
             throw APIError(status: 0, code: "trip_changed", message: "The active trip or session changed. Check the trip again.")
         }
-        let replacement = try expected.adoptingUpdate()
+        let transitEnabled = candidate.isMixed(mode: expected.mode) ? try await expected.api.itineraryCapabilities().scheduledTransitV1 : nil
+        guard active === expected, expected.owningAccountID == session.account?.id,
+              expected.availableUpdate?.id == candidate.id,
+              expected.api.client.tokenProvider() == session.token, expected.api.client.baseURL == client.baseURL else {
+            throw APIError(status: 0, code: "trip_changed", message: "The session changed. Check the trip again.")
+        }
+        let replacement = try expected.adoptingUpdate(transitEnabled: transitEnabled)
+        expected.end()
         narration.stop()
         attach(replacement)
     }

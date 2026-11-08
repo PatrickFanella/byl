@@ -8,6 +8,8 @@ public struct Endpoints {
         self.client = client
     }
 
+    private var itineraryHeaders: [String: String] { ["X-Byl-Capabilities": "scheduled-transit-v1"] }
+
     // Public
     public func cities() async throws -> [City] {
         let page: ListPage<City> = try await client.get("/api/v1/cities")
@@ -22,7 +24,7 @@ public struct Endpoints {
         var q: [String: String] = [:]
         if let topic { q["topic"] = topic }
         if let mode { q["mode"] = mode }
-        let page: ListPage<TourSummary> = try await client.get("/api/v1/cities/\(city)/tours", query: q)
+        let page: ListPage<TourSummary> = try await client.get("/api/v1/cities/\(city)/tours", query: q, headers: itineraryHeaders)
         return page.items
     }
 
@@ -59,15 +61,15 @@ public struct Endpoints {
     }
 
     public func tour(_ ref: String) async throws -> TourDetail {
-        try await client.get("/api/v1/tours/\(ref)")
+        try await client.get("/api/v1/tours/\(ref)", headers: itineraryHeaders)
     }
 
     public func route(tour: String, mode: String) async throws -> TourRoute {
-        try await client.get("/api/v1/tours/\(tour)/route", query: ["mode": mode])
+        try await client.get("/api/v1/tours/\(tour)/route", query: ["mode": mode], headers: itineraryHeaders)
     }
 
     public func revision(tour: String, revision: String) async throws -> TourRevision {
-        try await client.get("/api/v1/tours/\(tour)/revisions/\(revision)")
+        try await client.get("/api/v1/tours/\(tour)/revisions/\(revision)", headers: itineraryHeaders)
     }
 
     /// Revision metadata is ordered newest-first and stays authoritative even while a legacy
@@ -78,11 +80,19 @@ public struct Endpoints {
     }
 
     public func revisionProgress(tour: String, revision: String) async throws -> RevisionProgress? {
-        try await client.get("/api/v1/me/progress/\(tour)/revisions/\(revision)")
+        try await client.get("/api/v1/me/progress/\(tour)/revisions/\(revision)", headers: itineraryHeaders)
     }
 
     public func putRevisionProgress(tour: String, revision: String, _ body: RevisionProgressRequest) async throws -> RevisionProgress {
-        try await client.put("/api/v1/me/progress/\(tour)/revisions/\(revision)", body: body)
+        try await client.put("/api/v1/me/progress/\(tour)/revisions/\(revision)", body: body, headers: itineraryHeaders)
+    }
+
+    public func itineraryCapabilities() async throws -> ItineraryCapabilities {
+        try await client.get("/api/v1/itinerary-capabilities")
+    }
+
+    public func transitPlan(tour: String, revision: String, departure: String) async throws -> ScheduledTransitPlan {
+        try await client.post("/api/v1/tours/\(tour)/revisions/\(revision)/transit-plan", body: TransitPlanRequest(version: 1, departureAt: departure), headers: itineraryHeaders)
     }
 
     // Auth

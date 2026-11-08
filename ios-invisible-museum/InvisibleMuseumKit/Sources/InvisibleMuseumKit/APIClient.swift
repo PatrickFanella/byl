@@ -39,16 +39,16 @@ public final class APIClient: @unchecked Sendable {
         encoder.outputFormatting = [.sortedKeys]
     }
 
-    public func get<T: Decodable>(_ path: String, query: [String: String] = [:]) async throws -> T {
-        try await request("GET", path, query: query, body: Optional<Int>.none)
+    public func get<T: Decodable>(_ path: String, query: [String: String] = [:], headers: [String: String] = [:]) async throws -> T {
+        try await request("GET", path, query: query, body: Optional<Int>.none, headers: headers)
     }
 
     public func post<T: Decodable, B: Encodable>(_ path: String, body: B?, headers: [String: String] = [:]) async throws -> T {
         try await request("POST", path, query: [:], body: body, headers: headers)
     }
 
-    public func put<T: Decodable, B: Encodable>(_ path: String, body: B?) async throws -> T {
-        try await request("PUT", path, query: [:], body: body)
+    public func put<T: Decodable, B: Encodable>(_ path: String, body: B?, headers: [String: String] = [:]) async throws -> T {
+        try await request("PUT", path, query: [:], body: body, headers: headers)
     }
 
     public func patch<T: Decodable, B: Encodable>(_ path: String, body: B?) async throws -> T {
