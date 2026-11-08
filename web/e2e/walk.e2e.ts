@@ -32,9 +32,19 @@ test('with location denied the walk still works through "I\'m here"', async ({ b
 });
 
 test('the audio guide plays the featured moment once on arrival', async ({ browser }) => {
-	// Review fix: the auto-play effect must not loop (fetch → play → stop → fetch …).
+	// Revision-aware trips narrate retained text without fetching mutable moments.
 	const context = await browser.newContext({ geolocation: station, permissions: ['geolocation'] });
-	await context.addInitScript(() => localStorage.setItem('invisible-museum.audio', '1'));
+	await context.addInitScript(() => {
+		localStorage.setItem('invisible-museum.audio', '1');
+		Object.defineProperty(speechSynthesis, 'speak', {
+			value: (utterance: SpeechSynthesisUtterance) => {
+				document.documentElement.dataset.narrationCalls = String(
+					Number(document.documentElement.dataset.narrationCalls ?? 0) + 1
+				);
+				document.documentElement.dataset.narrationText = utterance.text;
+			}
+		});
+	});
 	const page = await context.newPage();
 	let momentFetches = 0;
 	page.on('request', (r) => {
@@ -42,8 +52,22 @@ test('the audio guide plays the featured moment once on arrival', async ({ brows
 	});
 	await page.goto('/tours/downtown-memory-loop/walk?mode=walk');
 	await expect(page.getByText(/you have arrived/i)).toBeVisible({ timeout: 15_000 });
+	await expect
+		.poll(() => page.evaluate(() => document.documentElement.dataset.narrationCalls))
+		.toBe('1');
+	const tour = await (
+		await context.request.get(`${apiUrl}/api/v1/tours/downtown-memory-loop`)
+	).json();
+	const revision = await (
+		await context.request.get(`${apiUrl}/api/v1/tours/${tour.id}/revisions/${tour.revision_id}`)
+	).json();
+	const id = revision.snapshot.tour.stops[0].featured_moment.id;
+	expect(await page.evaluate(() => document.documentElement.dataset.narrationText)).toBe(
+		revision.snapshot.moments[id].body.replace(/\s+/g, ' ').trim()
+	);
 	await page.waitForTimeout(3000);
-	expect(momentFetches).toBe(1);
+	expect(await page.evaluate(() => document.documentElement.dataset.narrationCalls)).toBe('1');
+	expect(momentFetches).toBe(0);
 	await context.close();
 });
 

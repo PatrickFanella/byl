@@ -26,7 +26,9 @@ export type MomentDetail = MomentSummary & {
 	topics: Topic[];
 	narration?: MediaAsset | null;
 };
-export type TourDetail = TourSummary & { stops: TourStop[] };
+export type TourDetail = Schemas['TourDetail'];
+export type TourRevision = Schemas['TourRevision'];
+export type RevisionProgress = Schemas['RevisionProgress'];
 export type Account = Schemas['Account'];
 
 function qs(params: Record<string, string | number | undefined | null>): string {
@@ -47,6 +49,25 @@ export const getTour = (ref: string) =>
 	api.get<TourDetail>(`/api/v1/tours/${encodeURIComponent(ref)}`);
 export const getRoute = (tour: string, mode: string) =>
 	api.get<TourRoute>(`/api/v1/tours/${encodeURIComponent(tour)}/route${qs({ mode })}`);
+export const getTourRevision = (tour: string, revision: string) =>
+	api.get<TourRevision>(
+		`/api/v1/tours/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`
+	);
+export const listTourRevisions = (tour: string) =>
+	api.list<TourRevision>(`/api/v1/tours/${encodeURIComponent(tour)}/revisions?limit=20`);
+export const getRevisionProgress = (tour: string, revision: string) =>
+	api.get<RevisionProgress>(
+		`/api/v1/me/progress/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`
+	);
+export const putRevisionProgress = (
+	tour: string,
+	revision: string,
+	body: { mode: 'walk' | 'bike'; visited_stop_ids: string[]; completed: boolean; reset?: boolean }
+) =>
+	api.put<RevisionProgress>(
+		`/api/v1/me/progress/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`,
+		{ ...body, reset: body.reset ?? false }
+	);
 export const listPlaces = async (city: string) => {
 	const items: PlaceSummary[] = [];
 	let cursor = '';
