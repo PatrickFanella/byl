@@ -739,6 +739,40 @@ research snapshots, candidates and later curator work during image recovery;
 new out-and-back brief values may be uneditable in an older client until the
 current application is restored. Prefer a forward fix when later work exists.
 
+## Web trips pinned to published revisions, schema 16 unchanged
+
+The web trip reader loads one immutable revision containing the itinerary, paths
+and complete selected stories. It stores the whole revision together and keeps
+an active pointer per account and tour. Local and authenticated progress use
+stable stop IDs within that revision. Legacy position records are retained but
+are never copied into revision-aware progress or mapped onto reordered stops.
+Saved tours link back to the active revision and its progress.
+
+A newer release appears as an explicit update. Visitors can compare its stop
+order and modes before adopting it with separate revision progress. Changed
+stop notes from a newer published curated revision appear as updated reviewed
+guidance while the active geometry remains pinned. This uses published tour
+notes; it introduces no independent urgent-notice feed or automatic detour.
+
+During an API outage, the reader can use its coherent saved revision. If no copy
+exists, it asks for reconnection without substituting a newer route. An online
+403 or 404 refuses cached fallback and clears the visible trip, retaining local
+progress for recovery. Offline resume still requires the web application itself
+to be available; this change does not add a service worker or cache remote map
+tiles and media files. Referenced media may become unavailable independently.
+
+Arrival, map pins and external directions use the retained public arrival point
+when present. Path readiness, trail connectors, return assumptions and travel,
+stop and narration times remain distinct. Blocked or unsupported travel modes
+cannot open a guided trip. Older APIs without revision IDs retain the legacy
+reader with an explicit warning that the trip is not pinned.
+
+No migration or host admission change is required. OpenAPI now marks fields
+already always emitted on revisions and snapshots as required. Rolling back the
+web image leaves revision caches and stable-ID progress intact, but the older
+client does not understand those local records. Do not copy their contents into
+position-based keys to make an older client appear to resume the trip.
+
 ## Atomic curator package publication, schema 16 unchanged
 
 Curators inspect a prepared tour through the private route-brief review package,
@@ -762,3 +796,24 @@ publisher also remain on the revision row. This private provenance is omitted
 from the typed public snapshot and all revision responses; do not expose raw
 snapshot JSON through a public endpoint. No migration or host admission change
 is needed. No production content is approved by deploying this API.
+
+The curator brief page provides package review beside the saved-brief editor.
+Select a prepared tour, load the package, compare each story and picture with
+its retained source passages and uncertainty, and inspect each mode's geometry
+and path evidence. The affected-record list distinguishes selected prepared
+dependencies from contextual candidates and unapplied shared edits. Editing
+links open the existing record editors in separate tabs. Reload the package
+after editing and review it again before confirming publication.
+
+Targeted history research uses explicitly selected inspected sources for pending
+candidates. Resuming an incomplete research run retains its completed checkpoints.
+Neither action replaces editor text. A research request or stale-version response
+requires another package load before a decision. Returning or declining a brief
+requires a reason and uses the saved version; publication uses the exact package
+version and an explicit review checkbox.
+
+Saved-brief reloads retain unsaved form text. If another curator changed the
+submitted fields, the editor retains its earlier expected version, so saving
+cannot overwrite those changes. Copy any local text you need, then use
+**Replace editor with saved brief** to adopt the newer fields. Status-only
+refreshes keep the editor usable without discarding unsaved work.

@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { ActiveWalk, type WalkDeps } from './walk.svelte';
-import type { TourDetail, TourRoute } from '#lib/visitor.ts';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ActiveWalk, activeRevisionKey, revisionCacheKey, type WalkDeps } from './walk.svelte';
+import type { TourDetail, TourRoute, TourRevision } from '#lib/visitor.ts';
+import { ApiError } from '#lib/api/index.ts';
 
 class MemoryStorage implements Storage {
 	private m = new Map<string, string>();
@@ -194,5 +195,172 @@ describe('ActiveWalk', () => {
 		await w.load();
 		expect(w.arrivedStop?.position).toBe(1);
 		expect(w.nextStop?.position).toBe(2);
+	});
+});
+
+describe('revision-pinned trips', () => {
+	it('clears the displayed trip instead of writing visits after an account switch', async () => {
+		const f = revisions();
+		let account = 'account-a';
+		f.d.accountID = () => account;
+		const w = new ActiveWalk('loop', 'walk', f.d);
+		await w.load();
+		account = 'account-b';
+		w.markArrived();
+		expect(w.status).toBe('error');
+		expect(w.message).toContain('account changed');
+		expect(w.tour).toBeNull();
+		expect(w.visited.size).toBe(0);
+	});
+	function revisions() {
+		const storage = new MemoryStorage();
+		let latest = 1;
+		const snapshot = (n: number): TourRevision => {
+			const t = structuredClone(tour);
+			if (n > 1)
+				t.stops = [t.stops[1], t.stops[0], ...t.stops.slice(2)].map((s, i) => ({
+					...s,
+					position: i + 1
+				}));
+			t.revision_id = `rev-${n}`;
+			t.revision_number = n;
+			if (n > 1) t.stops[0].note = 'Urgent reviewed access update: use the east entrance.';
+			return {
+				id: `rev-${n}`,
+				tour_id: TOUR,
+				number: n,
+				draft_version: n,
+				published_at: '2026-11-07T00:00:00Z',
+				snapshot: {
+					tour: t,
+					routes: { walk: { ...structuredClone(route), id: `route-${n}` } },
+					moments: { 'm-1': { id: 'm-1', body: `Reviewed narrative ${n}` } },
+					routing_intent: {}
+				}
+			} as unknown as TourRevision;
+		};
+		const d: WalkDeps = {
+			...deps(storage),
+			fetchTour: async () => snapshot(latest).snapshot!.tour,
+			fetchRoute: vi.fn(async () => {
+				throw new Error('must not fetch mutable geometry');
+			}),
+			fetchRevision: async (_t, id) => snapshot(Number(id.split('-')[1])),
+			listRevisions: async () => [snapshot(latest)],
+			revisionProgressApi: () => ({ get: async () => null, put: async () => ({}) })
+		};
+		return { storage, d, snapshot, publish: () => latest++ };
+	}
+	it('arrival uses the retained public entrance and online revocation clears the visible trip', async () => {
+		const f = revisions();
+		f.d.fetchRevision = async () => {
+			const r = f.snapshot(1);
+			r.snapshot!.tour.stops[0].place.arrival_point = {
+				point: { latitude: 41.9, longitude: -88.1 }
+			} as TourDetail['stops'][number]['place']['arrival_point'];
+			return r;
+		};
+		const w = new ActiveWalk('loop', 'walk', f.d);
+		await w.load();
+		await vi.waitFor(() => expect(w.updateBusy).toBe(false));
+		w.handleFix(at(0));
+		expect(w.visited.size).toBe(0);
+		w.handleFix({ lat: 41.9, lng: -88.1, accuracy: 5 });
+		expect([...w.visited]).toEqual(['s-1']);
+		f.d.listRevisions = async () => {
+			throw new ApiError(404, 'not_found', 'revoked');
+		};
+		await w.checkForUpdate();
+		expect(w.status).toBe('error');
+		expect(w.tour).toBeNull();
+		expect(w.route).toBeNull();
+		expect(w.arrivedStop).toBeNull();
+	});
+	it('loads a coherent snapshot and retains it through publication and explicit reordered adoption', async () => {
+		const f = revisions();
+		const w = new ActiveWalk('loop', 'walk', f.d);
+		await w.load();
+		await vi.waitFor(() => expect(w.updateBusy).toBe(false));
+		w.markArrived();
+		f.publish();
+		await w.checkForUpdate();
+		expect(w.revision?.id).toBe('rev-1');
+		expect(w.route?.id).toBe('route-1');
+		expect([...w.visited]).toEqual(['s-1']);
+		expect(w.pinnedMoment('m-1')?.body).toBe('Reviewed narrative 1');
+		expect(w.updatedGuidance[0].note).toContain('Urgent reviewed access update');
+		await w.adoptLatest();
+		expect(w.revision?.id).toBe('rev-2');
+		expect(w.route?.id).toBe('route-2');
+		expect(w.nextStop?.id).toBe('s-2');
+		expect(w.visited.size).toBe(0);
+		w.markArrived();
+		const resumed = new ActiveWalk('loop', 'walk', f.d);
+		await resumed.load();
+		expect([...resumed.visited]).toEqual(['s-2']);
+		expect(resumed.nextStop?.id).toBe('s-1');
+		expect(f.d.fetchRoute).not.toHaveBeenCalled();
+	});
+	it('resumes the same cached revision offline and refuses an online revocation', async () => {
+		const f = revisions();
+		const first = new ActiveWalk('loop', 'walk', f.d);
+		await first.load();
+		first.markArrived();
+		f.publish();
+		f.d.fetchRevision = async () => {
+			throw new TypeError('offline');
+		};
+		const cached = new ActiveWalk('loop', 'walk', f.d);
+		await cached.load();
+		expect(cached.status).toBe('ready');
+		expect(cached.fromCache).toBe(true);
+		expect(cached.revision?.id).toBe('rev-1');
+		expect([...cached.visited]).toEqual(['s-1']);
+		f.d.fetchRevision = async () => {
+			throw new ApiError(404, 'not_found', 'revoked');
+		};
+		const revoked = new ActiveWalk('loop', 'walk', f.d);
+		await revoked.load();
+		expect(revoked.status).toBe('error');
+		expect(revoked.message).toContain('no longer available');
+		expect(revoked.revision).toBeNull();
+		expect(JSON.parse(f.storage.getItem(activeRevisionKey('loop'))!).revisionID).toBe('rev-1');
+	});
+	it('does not substitute live geometry when the pinned revision has no saved copy', async () => {
+		const f = revisions();
+		f.storage.setItem(
+			activeRevisionKey('loop'),
+			JSON.stringify({ tourID: TOUR, revisionID: 'rev-1' })
+		);
+		f.d.fetchRevision = async () => {
+			throw new TypeError('offline');
+		};
+		const w = new ActiveWalk('loop', 'walk', f.d);
+		await w.load();
+		expect(w.status).toBe('error');
+		expect(w.message).toContain('no saved copy');
+		expect(f.d.fetchRoute).not.toHaveBeenCalled();
+	});
+	it('refuses unsupported modes and cannot pair a returned path with another tour', async () => {
+		const f = revisions();
+		f.d.fetchRevision = async () => {
+			const r = f.snapshot(1);
+			r.snapshot!.tour.modes = ['walk'];
+			return r;
+		};
+		const bike = new ActiveWalk('loop', 'bike', f.d);
+		await bike.load();
+		expect(bike.status).toBe('error');
+		expect(bike.message).toContain('not available');
+		f.d.fetchRevision = async () => {
+			const r = f.snapshot(1);
+			r.snapshot!.routes.walk.tour_id = 'another';
+			return r;
+		};
+		const bad = new ActiveWalk('loop', 'walk', f.d);
+		await bad.load();
+		expect(bad.status).toBe('error');
+		expect(bad.message).toContain('does not match');
+		expect(f.storage.getItem(revisionCacheKey(TOUR, 'rev-1'))).toBeNull();
 	});
 });

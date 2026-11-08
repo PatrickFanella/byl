@@ -349,4 +349,32 @@ class RouteSuggestionsTest {
         assertEquals(1, server.requestCount)
         assertEquals("Could not save the draft on this device. No submission was sent.", flow.state.value.message)
     }
+
+    @Test
+    fun confirmedSubmissionSurvivesDraftCleanupFailureWithItsRetryIdentity() = runTest {
+        val values = mutableMapOf<String, String>()
+        val store = object : KeyValueStore {
+            override fun get(key: String) = values[key]
+            override fun put(key: String, value: String) { values[key] = value }
+            override fun remove(key: String) { throw IOException("Synthetic cleanup error") }
+        }
+        val flow = flow(store)
+        flow.edit(SuggestionFields("Question", "Region"))
+        open(flow)
+        server.enqueue(response(code = 201))
+
+        assertEquals(fixture, flow.submit())
+        val original = request()
+        assertEquals(fixture, flow.state.value.selected)
+        assertNotNull(flow.state.value.pending)
+        assertTrue(flow.state.value.message?.contains("Saved on the server") == true)
+
+        val recovered = flow(store)
+        open(recovered)
+        server.enqueue(response(code = 200))
+        assertEquals(fixture, recovered.submit())
+        val retry = request()
+        assertEquals(original.getHeader("Idempotency-Key"), retry.getHeader("Idempotency-Key"))
+        assertEquals(original.body.readUtf8(), retry.body.readUtf8())
+    }
 }

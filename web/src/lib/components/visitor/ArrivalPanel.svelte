@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { modal } from '#lib/modal.ts';
-	import type { TourStop, PlaceDetail } from '#lib/visitor.ts';
+	import type { TourStop, PlaceDetail, MomentDetail } from '#lib/visitor.ts';
 	import { getPlace } from '#lib/visitor.ts';
 	import { Loader } from '#lib/loader.svelte.ts';
 	import MomentCard from './MomentCard.svelte';
@@ -10,12 +10,16 @@
 		stop,
 		isLast = false,
 		playing = false,
+		pinned = false,
+		pinnedMoment = null,
 		onlisten,
 		oncontinue
 	}: {
 		stop: TourStop;
 		isLast?: boolean;
 		playing?: boolean;
+		pinned?: boolean;
+		pinnedMoment?: MomentDetail | null;
 		onlisten?: () => void;
 		oncontinue: () => void;
 	} = $props();
@@ -23,7 +27,7 @@
 	const featured = $derived(stop.featured_moment ?? null);
 	const place = new Loader<PlaceDetail>(() => getPlace(stop.place.id));
 	$effect(() => {
-		if (stop.place.moment_count > 1) place.run();
+		if (!pinned && stop.place.moment_count > 1) place.run();
 	});
 	const others = $derived((place.data?.moments ?? []).filter((m) => m.id !== featured?.id));
 </script>
@@ -45,11 +49,18 @@
 	{#if featured}
 		<div class="mt-4"><MomentCard moment={featured} prominent testid="arrival-moment" /></div>
 		<div class="mt-3 flex gap-2">
-			<a
-				href="/moments/{featured.id}"
-				class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
-				>Read the full story</a
-			>
+			{#if pinned}<details>
+					<summary class="cursor-pointer rounded-lg border border-byl-border px-3 py-2 text-sm"
+						>Read the reviewed story</summary
+					>
+					<p class="mt-3 whitespace-pre-wrap">{pinnedMoment?.body ?? featured.excerpt}</p>
+				</details>{:else}
+				<a
+					href="/moments/{featured.id}"
+					class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
+					>Read the full story</a
+				>
+			{/if}
 			{#if onlisten}
 				<button
 					class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
@@ -67,7 +78,7 @@
 		</div>
 	{/if}
 
-	{#if stop.place.moment_count > 1}
+	{#if !pinned && stop.place.moment_count > 1}
 		<div class="mt-5 space-y-2">
 			<div class="text-xs font-bold tracking-normal text-byl-action">Also at this place</div>
 			<LoadState

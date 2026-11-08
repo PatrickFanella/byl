@@ -6,6 +6,7 @@
 	import {
 		getRoute,
 		getTour,
+		getTourRevision,
 		mySaved,
 		saveTour,
 		unsaveTour,
@@ -19,6 +20,7 @@
 	import TourCard from '#lib/components/visitor/TourCard.svelte';
 	import SignInPrompt from '#lib/components/visitor/SignInPrompt.svelte';
 	import Map from '#lib/components/Map.svelte';
+	import JourneySummary from '#lib/components/visitor/JourneySummary.svelte';
 
 	const current = session.store;
 	const ref = $derived(page.params.ref ?? '');
@@ -41,8 +43,13 @@
 			route = null;
 			return;
 		}
-		getRoute(t.id, mode)
-			.then((r) => (route = r))
+		(t.revision_id
+			? getTourRevision(t.id, t.revision_id).then((r) => r.snapshot?.routes[mode] ?? null)
+			: getRoute(t.id, mode)
+		)
+			.then((r) => {
+				if (tour.data === t) route = r;
+			})
 			.catch(() => (route = null));
 	});
 	$effect(() => {
@@ -75,8 +82,8 @@
 
 	const stopMarkers = $derived(
 		(tour.data?.stops ?? []).map((s) => ({
-			lat: s.place.latitude,
-			lng: s.place.longitude,
+			lat: s.place.arrival_point?.point?.latitude ?? s.place.latitude,
+			lng: s.place.arrival_point?.point?.longitude ?? s.place.longitude,
 			label: `${s.position}. ${s.place.name}`
 		}))
 	);
@@ -120,18 +127,29 @@
 								</li>
 							{/each}
 						</ul>
+						{#each ['walk', 'bike'].filter((m) => !t.modes.includes(m as 'walk' | 'bike')) as unavailable (unavailable)}<p
+								class="mt-2 text-sm text-byl-muted"
+							>
+								{modeLabel(unavailable)} is not offered on this revision.
+							</p>{/each}
+						{#each t.modes as mode (mode)}<JourneySummary
+								{mode}
+								journey={t.journeys?.[mode]}
+							/>{/each}
 					</div>
 
 					<div class="flex flex-wrap gap-2">
 						{#if t.status === 'published'}
 							{#each t.modes as mode (mode)}
-								<a
-									href="/tours/{t.slug}/walk?mode={mode}"
-									class="rounded-lg px-4 py-2 text-sm font-semibold {mode === t.modes[0]
-										? 'bg-byl-action text-byl-action-text'
-										: 'border border-byl-border hover:bg-byl-surface'}"
-									>{mode === 'bike' ? 'Start riding' : 'Start walking'}</a
-								>
+								{#if t.journeys?.[mode]?.state !== 'blocked'}
+									<a
+										href="/tours/{t.slug}/walk?mode={mode}"
+										class="rounded-lg px-4 py-2 text-sm font-semibold {mode === t.modes[0]
+											? 'bg-byl-action text-byl-action-text'
+											: 'border border-byl-border hover:bg-byl-surface'}"
+										>{mode === 'bike' ? 'Start riding' : 'Start walking'}</a
+									>
+								{/if}
 							{/each}
 							<button
 								class="rounded-lg border border-byl-border px-4 py-2 text-sm hover:bg-byl-surface disabled:opacity-50"
