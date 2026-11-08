@@ -35,14 +35,14 @@ class ApiClient(
     @Volatile
     var onUnauthorized: ((String?) -> Unit)? = null
 
-    suspend inline fun <reified T> get(path: String, query: Map<String, String> = emptyMap()): T =
-        MuseumJson.decodeFromString(serializer(), request("GET", path, query, null))
+    suspend inline fun <reified T> get(path: String, query: Map<String, String> = emptyMap(), headers: Map<String, String> = emptyMap()): T =
+        MuseumJson.decodeFromString(serializer(), request("GET", path, query, null, headers))
 
     suspend inline fun <reified T, reified B> post(path: String, body: B?, headers: Map<String, String> = emptyMap()): T =
         MuseumJson.decodeFromString(serializer(), request("POST", path, emptyMap(), body?.let { MuseumJson.encodeToString(it) }, headers))
 
-    suspend inline fun <reified T, reified B> put(path: String, body: B?): T =
-        MuseumJson.decodeFromString(serializer(), request("PUT", path, emptyMap(), body?.let { MuseumJson.encodeToString(it) }))
+    suspend inline fun <reified T, reified B> put(path: String, body: B?, headers: Map<String, String> = emptyMap()): T =
+        MuseumJson.decodeFromString(serializer(), request("PUT", path, emptyMap(), body?.let { MuseumJson.encodeToString(it) }, headers))
 
     suspend inline fun <reified T, reified B> patch(path: String, body: B?): T =
         MuseumJson.decodeFromString(serializer(), request("PATCH", path, emptyMap(), body?.let { MuseumJson.encodeToString(it) }))
