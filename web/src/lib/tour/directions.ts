@@ -15,3 +15,18 @@ export function mapsURL(
 	}
 	return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${mode === 'bike' ? 'bicycling' : 'walking'}`;
 }
+
+/** Station walks transfer control to another app; only public reference points are sent. */
+export function walkingHandoffURL(
+	destination: { lat: number; lng: number },
+	userAgent: string,
+	origin?: { lat: number; lng: number }
+) {
+	const url = new URL(mapsURL(destination.lat, destination.lng, 'walk', userAgent));
+	if (origin)
+		url.searchParams.set(
+			isAppleDevice(userAgent) ? 'saddr' : 'origin',
+			`${origin.lat},${origin.lng}`
+		);
+	return url.href;
+}
