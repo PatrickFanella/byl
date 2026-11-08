@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { darkTheme } from '#lib/theme.ts';
 	import 'maplibre-gl/dist/maplibre-gl.css';
+	import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
 	export interface Marker {
 		lat: number;
@@ -167,6 +168,7 @@
 		(async () => {
 			lib = await import('maplibre-gl');
 			if (cancelled) return;
+			lib.setWorkerUrl(mapWorkerUrl);
 			map = new lib.Map({
 				container,
 				style: $darkTheme
