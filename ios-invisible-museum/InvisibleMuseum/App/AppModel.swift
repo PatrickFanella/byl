@@ -238,6 +238,15 @@ final class AppModel {
         }
     }
 
+    func routeReports(accountID: String, context: RouteReportContext? = nil, initialTarget: String? = nil) -> RouteReportsModel {
+        let token = session.token
+        let origin = client.baseURL
+        return RouteReportsModel(api: activeTourAPI(), cache: cache, accountID: accountID, context: context, initialTarget: initialTarget) { [weak self] in
+            guard let self else { return false }
+            return self.account?.id == accountID && self.session.token == token && self.client.baseURL == origin
+        }
+    }
+
     private func attach(_ model: ActiveTourModel) {
         model.audioEnabled = audioGuideEnabled
         model.onArrive = { [weak self, weak model] stop in
