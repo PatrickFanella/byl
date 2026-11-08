@@ -36,6 +36,7 @@ type Deps struct {
 	Apple          auth.Verifier
 	Google         auth.Verifier
 	DevAuth        bool
+	BriefIntake    bool
 	IsBootstrap    func(email string) bool
 	Blob           blob.Store
 	MediaFSDir     string
@@ -78,6 +79,7 @@ func NewRouter(d Deps) http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Use(d.optionalAuth)
 		r.Get("/cities", d.listCities)
+		r.Get("/route-brief-intake", d.routeBriefIntakeStatus)
 		r.Get("/cities/{city}", d.getCity)
 		r.Get("/cities/{city}/places", d.listPlaces)
 		r.Get("/cities/{city}/tours", d.listTours)
@@ -108,7 +110,7 @@ func NewRouter(d Deps) http.Handler {
 			r.Get("/me/route-reports", d.listRouteReports(false))
 			r.Get("/me/route-reports/{id}", d.getRouteReport(false))
 			r.Get("/me/route-briefs", d.listRouteBriefs(false))
-			r.Post("/me/route-briefs", d.routeBriefIntakeDisabled)
+			r.Post("/me/route-briefs", d.createMyRouteBrief)
 			r.Get("/me/route-briefs/{id}", d.getRouteBrief(false))
 			r.Get("/me/route-briefs/{id}/research", d.getBriefResearch(false))
 			r.Put("/me/route-briefs/{id}", d.routeBriefIntakeDisabled)

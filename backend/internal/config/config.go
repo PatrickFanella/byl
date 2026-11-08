@@ -17,6 +17,7 @@ type Config struct {
 	PublicBaseURL string
 
 	DevAuthEnabled       bool
+	PublicBriefIntake    bool
 	AppleClientIDs       []string
 	GoogleClientIDs      []string
 	AdminBootstrapEmails []string
@@ -69,6 +70,7 @@ func Load() (Config, error) {
 		DatabaseURL:        strings.TrimSpace(os.Getenv("DATABASE_URL")),
 		PublicBaseURL:      strings.TrimRight(envOr("PUBLIC_BASE_URL", "http://localhost:8080"), "/"),
 		DevAuthEnabled:     envBool("DEV_AUTH_ENABLED"),
+		PublicBriefIntake:  envBool("PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED"),
 		AppleClientIDs:     envList("APPLE_CLIENT_IDS"),
 		GoogleClientIDs:    envList("GOOGLE_CLIENT_IDS"),
 		RoutingProvider:    envOr("ROUTING_PROVIDER", "straightline"),

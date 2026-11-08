@@ -34,6 +34,8 @@ api_port="$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1", 0
 export API_ADDR="127.0.0.1:$api_port"
 export PUBLIC_BASE_URL="http://$API_ADDR"
 export DEV_AUTH_ENABLED=true
+# This isolated fixture exercises public suggestion intake; production defaults off.
+export PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED="${PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED:-true}"
 export ADMIN_BOOTSTRAP_EMAILS=admin@example.com
 export MEDIA_FS_DIR="$test_dir/media"
 cd "$repo_root/backend"

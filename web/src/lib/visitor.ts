@@ -30,6 +30,8 @@ export type TourDetail = Schemas['TourDetail'];
 export type TourRevision = Schemas['TourRevision'];
 export type RevisionProgress = Schemas['RevisionProgress'];
 export type Account = Schemas['Account'];
+export type RouteSuggestion = Schemas['RouteBrief'];
+export type RouteSuggestionInput = Schemas['RouteBriefInput'];
 
 function qs(params: Record<string, string | number | undefined | null>): string {
 	const u = new URLSearchParams();
@@ -106,3 +108,15 @@ export const createTour = (body: Record<string, unknown>) =>
 export const updateTour = (id: string, body: Record<string, unknown>) =>
 	api.patch<TourDetail>(`/api/v1/me/tours/${encodeURIComponent(id)}`, body);
 export const deleteTour = (id: string) => api.del(`/api/v1/me/tours/${encodeURIComponent(id)}`);
+
+// Research suggestions are separate from personal route planning and publication.
+export const routeSuggestionIntake = () =>
+	api.get<{ enabled: boolean }>('/api/v1/route-brief-intake');
+export const myRouteSuggestions = (offset = 0) =>
+	api.list<RouteSuggestion>(`/api/v1/me/route-briefs${qs({ limit: 21, offset })}`);
+export const getRouteSuggestion = (id: string) =>
+	api.get<RouteSuggestion>(`/api/v1/me/route-briefs/${encodeURIComponent(id)}`);
+export const submitRouteSuggestion = (input: RouteSuggestionInput, key: string) =>
+	api.request<RouteSuggestion>('POST', '/api/v1/me/route-briefs', input, false, {
+		'Idempotency-Key': key
+	});
