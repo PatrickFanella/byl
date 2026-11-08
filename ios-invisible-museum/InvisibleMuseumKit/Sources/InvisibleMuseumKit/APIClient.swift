@@ -35,14 +35,16 @@ public final class APIClient: @unchecked Sendable {
         self.baseURL = baseURL
         self.session = session
         self.tokenProvider = tokenProvider
+        // Idempotent retries must encode an unchanged body to the same bytes after relaunch.
+        encoder.outputFormatting = [.sortedKeys]
     }
 
     public func get<T: Decodable>(_ path: String, query: [String: String] = [:]) async throws -> T {
         try await request("GET", path, query: query, body: Optional<Int>.none)
     }
 
-    public func post<T: Decodable, B: Encodable>(_ path: String, body: B?) async throws -> T {
-        try await request("POST", path, query: [:], body: body)
+    public func post<T: Decodable, B: Encodable>(_ path: String, body: B?, headers: [String: String] = [:]) async throws -> T {
+        try await request("POST", path, query: [:], body: body, headers: headers)
     }
 
     public func put<T: Decodable, B: Encodable>(_ path: String, body: B?) async throws -> T {
@@ -64,7 +66,7 @@ public final class APIClient: @unchecked Sendable {
 
     public struct Empty: Decodable { public init() {} }
 
-    private func request<T: Decodable, B: Encodable>(_ method: String, _ path: String, query: [String: String], body: B?) async throws -> T {
+    private func request<T: Decodable, B: Encodable>(_ method: String, _ path: String, query: [String: String], body: B?, headers: [String: String] = [:]) async throws -> T {
         var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
         if !query.isEmpty {
             components?.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) }
@@ -75,6 +77,7 @@ public final class APIClient: @unchecked Sendable {
         var req = URLRequest(url: url)
         req.httpMethod = method
         req.setValue("application/json", forHTTPHeaderField: "Accept")
+        for (name, value) in headers { req.setValue(value, forHTTPHeaderField: name) }
         let token = tokenProvider()
         if let token {
             req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")

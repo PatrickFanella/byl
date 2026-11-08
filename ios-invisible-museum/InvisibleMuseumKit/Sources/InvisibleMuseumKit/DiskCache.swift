@@ -23,6 +23,24 @@ public final class DiskCache: @unchecked Sendable {
         try? data.write(to: url(for: key), options: .atomic)
     }
 
+    /// Private unfinished input must be durable before sending a request and stay out of backups.
+    public func savePrivate<T: Encodable>(_ value: T, key: String) throws {
+        let data = try encoder.encode(value)
+        var destination = url(for: key)
+        #if os(iOS)
+        try data.write(to: destination, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        #else
+        try data.write(to: destination, options: .atomic)
+        #endif
+        var resources = URLResourceValues()
+        resources.isExcludedFromBackup = true
+        try destination.setResourceValues(resources)
+    }
+
+    public func removeChecked(_ key: String) throws {
+        if has(key) { try FileManager.default.removeItem(at: url(for: key)) }
+    }
+
     public func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
         guard let data = try? Data(contentsOf: url(for: key)) else { return nil }
         return try? decoder.decode(type, from: data)

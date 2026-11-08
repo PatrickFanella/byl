@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB48AD9BB0764728B49A2B81 /* RouteSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA24822E248E170FD97F9F /* RouteSuggestionsView.swift */; };
 		B11000000000000000000001 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = B11000000000000000000002; };
 		6164E378BE85A428B74F556E /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F088E1B0110F20830CDB5228 /* AppModel.swift */; };
 		426B9A32E5413106CAFBA26D /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B482DE4088D34533AC0908D /* RootView.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6FAA24822E248E170FD97F9F /* RouteSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSuggestionsView.swift; sourceTree = "<group>"; };
 		B11000000000000000000002 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 		F088E1B0110F20830CDB5228 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		3B482DE4088D34533AC0908D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 			children = (
 				7F544BA9466900CDBD535826 /* MyRoutesView.swift */,
 				C43BCDDE68D76E2C7F708397 /* RouteBuilderView.swift */,
+				6FAA24822E248E170FD97F9F /* RouteSuggestionsView.swift */,
 			);
 			path = Routes;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				C739A436846843F7BDC71569 /* ProfileView.swift in Sources */,
 				CE82A4BBD552B6F8F1B03E86 /* MyRoutesView.swift in Sources */,
 				C548EB780906E61BDF745910 /* RouteBuilderView.swift in Sources */,
+				DB48AD9BB0764728B49A2B81 /* RouteSuggestionsView.swift in Sources */,
 				B20FC479804E520B1B579D11 /* SavedView.swift in Sources */,
 				58F2A6185D8E69548E5AC566 /* ActiveTourView.swift in Sources */,
 				C88388D0D4534DD02F19B02B /* StopMomentSheet.swift in Sources */,

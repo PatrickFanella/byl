@@ -177,6 +177,22 @@ final class AppModel {
         return Endpoints(client: scoped)
     }
 
+    func routeSuggestions(accountID: String) -> RouteSuggestionsModel {
+        let token = session.token
+        let origin = client.baseURL
+        let scoped = APIClient(baseURL: origin, tokenProvider: { token })
+        scoped.onUnauthorized = { [weak self] rejected in
+            Task { @MainActor [weak self] in
+                guard let self, self.client.baseURL == origin else { return }
+                self.handleUnauthorized(token: rejected)
+            }
+        }
+        return RouteSuggestionsModel(api: Endpoints(client: scoped), cache: cache, accountID: accountID) { [weak self] in
+            guard let self else { return false }
+            return self.account?.id == accountID && self.session.token == token && self.client.baseURL == origin
+        }
+    }
+
     private func attach(_ model: ActiveTourModel) {
         model.audioEnabled = audioGuideEnabled
         model.onArrive = { [weak self, weak model] stop in

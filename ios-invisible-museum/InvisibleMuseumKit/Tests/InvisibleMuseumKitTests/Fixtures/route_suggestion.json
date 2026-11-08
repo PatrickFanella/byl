@@ -1,0 +1,30 @@
+{
+  "id": "40000000-0000-4000-8000-000000000001",
+  "owner_account_id": "50000000-0000-4000-8000-000000000001",
+  "submitted": {
+    "topic": "Rail workers",
+    "area": "Downers Grove",
+    "notes": "An unverified route idea.",
+    "place_leads": [
+      "Old depot, address unknown"
+    ],
+    "event_leads": [],
+    "source_links": [
+      "https://example.org/lead"
+    ],
+    "modes": [
+      "walk",
+      "bike"
+    ],
+    "trip_shape": "flexible",
+    "duration_minutes": null,
+    "start_preference": "",
+    "end_preference": "",
+    "pilot_id": ""
+  },
+  "status": "needs_research",
+  "reason": "An operator source is still needed.",
+  "version": 3,
+  "created_at": "2026-11-08T00:00:00Z",
+  "updated_at": "2026-11-08T01:00:00Z"
+}

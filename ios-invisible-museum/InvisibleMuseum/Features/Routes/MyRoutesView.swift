@@ -21,6 +21,12 @@ struct MyRoutesView: View {
                         .font(Museum.bodyFont(15))
                         .foregroundStyle(Museum.muted)
                 }
+                NavigationLink {
+                    RouteSuggestionsView()
+                } label: {
+                    Label("Suggest a route for curator review", systemImage: "text.bubble")
+                }
+                .buttonStyle(.museum(.secondary, size: .large))
                 if !model.isSignedIn {
                     SignInPrompt(reason: "Sign in to build routes that follow you to every device.")
                 } else {
