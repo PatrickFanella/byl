@@ -1068,6 +1068,58 @@ paths:
         "200": { description: Private report, content: { application/json: { schema: { $ref: "#/components/schemas/RouteReport" } } } }
         "401": { description: Authentication required }
         "404": { description: Owned report not found }
+  /api/v1/me/route-reports/{id}/correction:
+    get:
+      summary: Read the released correction outcome for this account's report
+      description: Returns only old/new public revision IDs and reassessment context. Does not expose private investigation, reviewer or other-tour identifiers. Responses are no-store with Vary Authorization.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: Owned correction outcome, content: { application/json: { schema: { $ref: "#/components/schemas/RouteCorrectionOutcome" } } } }
+        "401": { description: Authentication required }
+        "404": { description: Owned report or released correction not found }
+  /api/v1/admin/route-reports/{id}/correction-comparison:
+    get:
+      summary: Inspect a current route-correction release comparison
+      description: Captures the reported revision, retained investigation, full prepared snapshot, current path evidence, blockers and exact shared-reference impact flags in one repeatable read. A report or proposed line has no publication authority. Responses are no-store with Vary Authorization.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: investigation_id, in: query, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: Private current comparison, content: { application/json: { schema: { $ref: "#/components/schemas/RouteCorrectionComparison" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Report or investigation not found }
+  /api/v1/admin/route-reports/{id}/corrections:
+    post:
+      summary: Release the exact inspected prepared correction atomically
+      description: Requires the complete current comparison hash, a completed investigation, unchanged reported release and separately approved durable routing intent for the reported mode. Retains the old revision, accepts only the seed report and flags shared-reference tours without editing them. An exact body replay by the same curator returns the retained result; a changed review returns 409. Temporary detours require a future review date within one year on first approval. Request limit 16 KiB. Responses are no-store with Vary Authorization.
+      security: [{ bearer: [] }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ApproveRouteCorrectionRequest" } } } }
+      responses:
+        "200": { description: Retained private correction release, content: { application/json: { schema: { $ref: "#/components/schemas/RouteCorrection" } } } }
+        "400": { description: Malformed or oversized JSON or unknown fields }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Report or investigation not found }
+        "409": { description: Changed comparison, unresolved publication tasks or conflicting previous approval }
+        "422": { description: Invalid decision or temporary review date }
+  /api/v1/admin/route-corrections:
+    get:
+      summary: List retained correction releases and due reassessments
+      description: Passing a review date marks reassessment required. It does not remove a detour, reopen a closure or rewrite a published revision. Responses are no-store with Vary Authorization.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: due, in: query, schema: { type: boolean, default: false } }
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200": { description: Private correction list, content: { application/json: { schema: { type: object, required: [items], properties: { items: { type: array, items: { $ref: "#/components/schemas/RouteCorrection" } } } } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "422": { description: Invalid due filter }
   /api/v1/admin/route-reports:
     get:
       summary: List private route reports for curator review
@@ -1534,6 +1586,54 @@ components:
         review_note: { type: string }
         created_at: { type: string, format: date-time }
         reviewed_at: { type: string, format: date-time, nullable: true }
+    ApproveRouteCorrectionRequest:
+      type: object
+      additionalProperties: false
+      required: [version, investigation_id, note]
+      properties:
+        version: { type: string, minLength: 64, maxLength: 64 }
+        investigation_id: { type: string, format: uuid }
+        note: { type: string, minLength: 1, maxLength: 2000 }
+        temporary: { type: boolean, default: false }
+        review_on: { type: string, format: date, nullable: true, description: Required for temporary corrections; a first approval needs a future date within one year }
+    RouteCorrectionComparison:
+      type: object
+      required: [version, report, investigation, before, prepared, path_reports, potentially_affected_tours, blockers, ready_to_publish]
+      properties:
+        version: { type: string }
+        report: { $ref: "#/components/schemas/RouteReport" }
+        investigation: { $ref: "#/components/schemas/RouteInvestigation" }
+        before: { $ref: "#/components/schemas/TourRevision" }
+        prepared: { $ref: "#/components/schemas/TourSnapshot" }
+        path_reports: { type: object, additionalProperties: { $ref: "#/components/schemas/PathQualityReport" } }
+        potentially_affected_tours: { type: array, maxItems: 201, items: { type: string, format: uuid }, description: Exact shared stop-place or selected reviewed OSM-way references; private leads requiring manual assessment. More than 200 blocks release. }
+        blockers: { type: array, items: { type: string } }
+        ready_to_publish: { type: boolean }
+    RouteCorrectionOutcome:
+      type: object
+      required: [revision_id, previous_revision_id, temporary, review_on, reassessment_required]
+      properties:
+        revision_id: { type: string, format: uuid }
+        previous_revision_id: { type: string, format: uuid }
+        temporary: { type: boolean }
+        review_on: { type: string, format: date, nullable: true }
+        reassessment_required: { type: boolean }
+    RouteCorrection:
+      allOf:
+        - { $ref: "#/components/schemas/RouteCorrectionOutcome" }
+        - type: object
+          required: [id, report_id, investigation_id, tour_id, comparison_version, corridor_id, reviewed_by, note, potentially_affected_tours, created_at]
+          properties:
+            id: { type: string, format: uuid }
+            report_id: { type: string, format: uuid }
+            investigation_id: { type: string, format: uuid }
+            tour_id: { type: string, format: uuid }
+            comparison_version: { type: string }
+            corridor_id: { type: string, format: uuid }
+            reviewed_by: { type: string, format: uuid }
+            note: { type: string }
+            potentially_affected_tours: { type: array, items: { type: string, format: uuid } }
+            created_at: { type: string, format: date-time }
     RouteInvestigationRequest:
       type: object
       additionalProperties: false
