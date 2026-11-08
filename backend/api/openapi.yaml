@@ -1204,6 +1204,33 @@ paths:
         "404": { description: Accessible tour/revision/transit selection not found }
         "403": { description: Public feature disabled or client does not advertise support }
         "422": { description: Invalid version/departure, departure in the past/beyond seven days, or public draft_version supplied }
+  /api/v1/admin/route-contribution-reviews:
+    get:
+      summary: Read live curator review tasks from uncalibrated contribution counts
+      description: Curator only, no-store. Fixed UTC Monday weeks remain separate by retained revision, segment, mode and direction. Current and preceding three weeks are considered. A task needs at least five distinct account scopes, three scopes with departures, and departures in at least 30 percent of eligible observed scope-day passages. Counts represent opted-in observations, never total visitors or verified people. No identities, consent IDs or scope hashes are returned. Missing observations are excluded; replays do not add observations. Withdrawal and expiry update the next read. No task approves or changes a public itinerary. Related reports share the revision and mode only; their relationship to the logical corridor section is unverified. Supplying all five detail selectors returns current counts even after a flag clears. Unknown or repeated parameters are rejected.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: revision_id, in: query, schema: { type: string, format: uuid } }
+        - { name: segment_id, in: query, schema: { type: string, maxLength: 120 } }
+        - { name: mode, in: query, schema: { type: string, enum: [walk, bike] } }
+        - { name: direction, in: query, schema: { type: string, enum: [forward, reverse] } }
+        - { name: window_start, in: query, schema: { type: string, format: date }, description: UTC Monday; all five detail selectors are required together }
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 100 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
+      responses:
+        "200":
+          description: Live tasks or a selected task's current counts
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/ContributionReview" } }
+        "401": { description: Sign-in required }
+        "403": { description: Curator role required }
+        "404": { description: Retained selected section unavailable }
+        "422": { description: Invalid detail selectors or window }
   /api/v1/route-contribution-intake:
     get:
       summary: Read the independent route-improvement collection gate
@@ -1650,6 +1677,51 @@ components:
         id: { type: string, format: uuid }
         deletion_handle: { type: string, minLength: 64, maxLength: 64, description: Sensitive random-looking 256-bit scoped deletion capability; retain privately and never put in URLs or logs }
         expires_on: { type: string, format: date, description: Original UTC consent day plus 30 days; retries never extend this }
+    ContributionReview:
+      type: object
+      required: [tour_id, tour_title, revision_id, revision_number, segment_id, segment_kind, mode, direction, window_start, window_end, observed_through, qualified_passages, departure_rejoins, contributor_scopes, departure_scopes, flagged, thresholds, reports, reports_truncated]
+      properties:
+        tour_id: { type: string }
+        tour_title: { type: string }
+        revision_id: { type: string }
+        revision_number: { type: integer }
+        segment_id: { type: string }
+        segment_kind: { type: string }
+        mode: { type: string, enum: [walk, bike] }
+        direction: { type: string, enum: [forward, reverse] }
+        window_start: { type: string, format: date }
+        window_end: { type: string, format: date, description: Exclusive UTC boundary }
+        observed_through: { type: string, format: date }
+        qualified_passages: { type: integer }
+        departure_rejoins: { type: integer }
+        contributor_scopes: { type: integer, description: Distinct account scopes within this retained route and mode; not verified people }
+        departure_scopes: { type: integer }
+        flagged: { type: boolean }
+        thresholds:
+          type: object
+          required: [version, minimum_scopes, minimum_departure_scopes, minimum_departure_percent]
+          properties:
+            version: { type: string }
+            minimum_scopes: { type: integer }
+            minimum_departure_scopes: { type: integer }
+            minimum_departure_percent: { type: integer }
+        geometry:
+          type: object
+          required: [type, coordinates]
+          properties:
+            type: { type: string, const: LineString }
+            coordinates: { type: array, items: { type: array, items: { type: number } } }
+        reports:
+          type: array
+          items:
+            type: object
+            required: [id, status, reason, affected]
+            properties:
+              id: { type: string }
+              status: { $ref: "#/components/schemas/BriefStatus" }
+              reason: { type: string }
+              affected: { $ref: "#/components/schemas/ReportLocation" }
+        reports_truncated: { type: boolean }
     ContributionSummary:
       type: object
       additionalProperties: false

@@ -304,3 +304,17 @@ export const reviewCorridor = (tour: string, id: string, body: Schemas['Corridor
 		`/api/v1/admin/tours/${encodeURIComponent(tour)}/corridors/${encodeURIComponent(id)}/review`,
 		body
 	);
+
+export type ContributionReview = Schemas['ContributionReview'];
+export type ContributionReviewSelection = Pick<
+	ContributionReview,
+	'revision_id' | 'segment_id' | 'mode' | 'direction' | 'window_start'
+>;
+export const listContributionReviews = (offset = 0) =>
+	api.list<ContributionReview>(
+		`/api/v1/admin/route-contribution-reviews${qs({ limit: 50, offset })}`
+	);
+export const getContributionReview = (selected: ContributionReviewSelection) =>
+	api.list<ContributionReview>(`/api/v1/admin/route-contribution-reviews${qs({ ...selected })}`);
+export const contributionReviewURL = (selected: ContributionReviewSelection) =>
+	`/admin/queue/contributions${qs({ revision_id: selected.revision_id, segment_id: selected.segment_id, mode: selected.mode, direction: selected.direction, window_start: selected.window_start })}`;
