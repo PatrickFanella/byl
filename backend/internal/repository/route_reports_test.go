@@ -273,3 +273,35 @@ func TestRouteReportCanTargetDeclaredClosingLeg(t *testing.T) {
 		t.Fatalf("two-story return selected the reversed outgoing leg: %v", err)
 	}
 }
+
+func TestRouteReportQueuePrioritizesClosuresAndKeepsOwnerChronology(t *testing.T) {
+	s, ctx, author, revision := revisionFixture(t)
+	closed := reportInput(revision)
+	closed.Reason = "closed"
+	first, _, err := s.CreateRouteReport(ctx, author, closed, "closure")
+	if err != nil {
+		t.Fatal(err)
+	}
+	improvement := reportInput(revision)
+	improvement.Reason = "improvement"
+	improvement.Better = "Synthetic alternative surface"
+	second, _, err := s.CreateRouteReport(ctx, author, improvement, "improvement")
+	if err != nil {
+		t.Fatal(err)
+	}
+	admin, err := s.ListRouteReports(ctx, "", models.BriefReview, 20, 0)
+	if err != nil || len(admin) != 2 || admin[0].ID != first.ID {
+		t.Fatalf("closure priority %+v %v", admin, err)
+	}
+	owner, err := s.ListRouteReports(ctx, author, "", 20, 0)
+	if err != nil || len(owner) != 2 || owner[0].ID != second.ID {
+		t.Fatalf("owner chronology %+v %v", owner, err)
+	}
+	if _, err = s.SetRouteReportState(ctx, first.ID, models.BriefStateRequest{Version: 1, Status: models.BriefDeclined, Reason: "Already assessed; not a current closure"}); err != nil {
+		t.Fatal(err)
+	}
+	admin, err = s.ListRouteReports(ctx, "", "", 20, 0)
+	if err != nil || len(admin) != 2 || admin[0].ID != second.ID {
+		t.Fatal("completed closure hid an unresolved report")
+	}
+}

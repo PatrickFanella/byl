@@ -36,10 +36,13 @@ export PUBLIC_BASE_URL="http://$API_ADDR"
 export DEV_AUTH_ENABLED=true
 # This isolated fixture exercises public suggestion intake; production defaults off.
 export PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED="${PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED:-true}"
-export ADMIN_BOOTSTRAP_EMAILS=admin@example.com
+# Keep real investigation brief quotas separate from suggestion/content tests.
+export ADMIN_BOOTSTRAP_EMAILS=admin@example.com,report-investigator@example.com
 export MEDIA_FS_DIR="$test_dir/media"
 cd "$repo_root/backend"
 go run ./cmd/migrate up
+# This build-tagged tool targets only the isolated museum_test fixture database.
+BYL_E2E_FIXTURE=1 go run -tags=e2e ./cmd/e2e-fixture
 go build -o "$test_dir/api" ./cmd/api
 "$test_dir/api" >"$test_dir/api.log" 2>&1 &
 api_pid=$!

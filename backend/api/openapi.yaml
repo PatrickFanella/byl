@@ -1123,6 +1123,7 @@ paths:
   /api/v1/admin/route-reports:
     get:
       summary: List private route reports for curator review
+      description: Unresolved reports are listed before completed dispositions; closure, blocked-path and safety observations are prioritized within that group. These remain unverified reports. Owner lists retain newest-first chronology.
       security: [{ bearer: [] }]
       parameters:
         - { name: status, in: query, schema: { $ref: "#/components/schemas/BriefStatus" } }
