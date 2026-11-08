@@ -3,8 +3,11 @@
 Issue #35 adds one curator-selected Blue Line ride between adjacent story stops.
 The backend represents ordinary walking, walking to a platform, boarding wait,
 scheduled rail travel and walking from a platform as separate sections. Public
-use defaults off. Web/iOS/Android presentation and retained trip plans remain
-issues #54–#56; this change does not activate the capability in production.
+use defaults off. Client presentation and retained trip behavior are documented
+in [web scheduled transit](web-scheduled-transit.md),
+[iOS scheduled transit](ios-scheduled-transit.md) and
+[Android scheduled transit](android-scheduled-transit.md). Client source changes
+do not activate the capability in production.
 
 ## Provider and scope
 

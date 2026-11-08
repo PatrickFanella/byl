@@ -82,6 +82,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     var granted by remember { mutableStateOf(model.container.location.hasPermission()) }
     var showEnd by remember { mutableStateOf(false) }
     var showReview by remember(active) { mutableStateOf(false) }
+    var showTransit by remember(active) { mutableStateOf(false) }
     var showReport by remember(active) { mutableStateOf(false) }
     var confirmUpdate by remember(active) { mutableStateOf(false) }
     var updateBusy by remember(active) { mutableStateOf(false) }
@@ -116,7 +117,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         }
     } }
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
-    val contributionVisible = !showEnd && !showReview && !showReport && state.arrivedStop == null && !state.isComplete
+    val contributionVisible = !showEnd && !showReview && !showReport && !showTransit && state.arrivedStop == null && !state.isComplete
     DisposableEffect(contributions, lifecycle, contributionVisible) {
         fun update() {
             val visible = contributionVisible && lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
@@ -160,6 +161,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
 
         Column(Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Pill(onClick = { showContributions = true }) { Text("Route improvement", color = Museum.text) }
+            if (active.isMixed) Pill(onClick = { showTransit = true }) { Text("Scheduled CTA connection · Review plan", color = Museum.text) }
             if (state.legacyResume) Pill { Text("Older saved trip · Cached itinerary and local progress. End it to start a reviewed revision.", color = Museum.muted, style = MaterialTheme.typography.bodySmall) }
             if (state.availableUpdate != null) Pill(onClick = { showReview = true }) { Text("New revision available · Review update", color = Museum.text) }
             if (state.routeFromCache) Pill { Text("Using the saved route", style = MaterialTheme.typography.bodySmall, color = Museum.muted) }
@@ -186,7 +188,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                         state.syncError?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = Museum.danger) }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { contributions?.lifecycle(DeviationDetector.Control.MANUAL_ARRIVAL); active.markArrived() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("I'm here") }
-                            OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
+                            if (!active.transitInterval) OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
                                 val nav = active.navigationUri()?.let { Intent(Intent.ACTION_VIEW, Uri.parse(it)) }
                                 try {
                                     if (nav != null) context.startActivity(nav) else throw ActivityNotFoundException()
@@ -200,7 +202,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Overline("Tour complete", Museum.success)
-                        Text("You walked every stop of ${active.tour.title}.", style = MaterialTheme.typography.titleMedium, color = Museum.text)
+                        Text("You visited every stop of ${active.tour.title}.", style = MaterialTheme.typography.titleMedium, color = Museum.text)
                         if (!app.isSignedIn) Text("Sign in to keep this on your account.", style = MaterialTheme.typography.bodySmall, color = Museum.muted)
                         state.syncError?.let { Text(it, color = Museum.danger) }
                         Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { if (model.endTour(false)) onEnded() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("Done") }
@@ -214,6 +216,12 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         val dismiss = { active.acknowledgeArrival(); model.container.narration.stop() }
         ModalBottomSheet(onDismissRequest = dismiss, containerColor = Museum.background) {
             ArrivalSheet(model, active, stop, isLast = state.isComplete, playing = playing, onOpenMoment = { active.acknowledgeArrival(); onOpenMoment(it) }, onContinue = dismiss)
+        }
+    }
+
+    if (showTransit) active.transit?.let { trip ->
+        ModalBottomSheet(onDismissRequest = { showTransit = false }, containerColor = Museum.background) {
+            TransitConnection(trip) { showTransit = false }
         }
     }
 
@@ -257,14 +265,16 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                 Text(active.tour.title, color = Museum.text, style = MaterialTheme.typography.headlineSmall)
                 Text("Started revision ${active.revision?.number ?: "unavailable"}", color = Museum.text, style = MaterialTheme.typography.headlineSmall)
                 Text("This itinerary remains in use until you explicitly choose a different revision.", color = Museum.muted)
-                TripJourney(active.tour, active.mode, state.route?.journey)
+                if (active.isMixed) Text("Walking sections and scheduled rail stay separate. Review the CTA plan from the active trip; switching revision needs a new explicit plan choice.", color = Museum.muted)
+                else TripJourney(active.tour, active.mode, state.route?.journey)
                 OutlinedButton(onClick = { scope.launch { active.checkForUpdate() } }, enabled = active.revision != null && !state.checkingUpdate && !updateBusy) { Text(if (state.checkingUpdate) "Checking…" else "Check for an update") }
                 state.updateError?.let { Text(it, color = Museum.danger) }
                 state.availableUpdate?.let { candidate ->
                     Text("Available revision ${candidate.number}", color = Museum.text, style = MaterialTheme.typography.headlineSmall)
                     candidate.snapshot?.let {
                         Text(it.tour.title, color = Museum.text, style = MaterialTheme.typography.titleLarge)
-                        TripJourney(it.tour, active.mode, it.routes[active.mode]?.journey)
+                        if (candidate.isMixed(active.mode)) Text("This is a mixed walking and scheduled CTA itinerary. Its transit choice stays separate from your current revision.", color = Museum.muted)
+                        else TripJourney(it.tour, active.mode, it.routes[active.mode]?.journey)
                     }
                     Text("Only visits to unchanged stops carry forward by stop ID. New or changed stops remain unvisited. Your old revision's progress stays separate.", color = Museum.muted)
                     Button(onClick = { confirmUpdate = true }, enabled = !updateBusy && candidate.unavailableReason(active.mode) == null) { Text(if (updateBusy) "Switching…" else "Use revision ${candidate.number}") }

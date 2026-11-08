@@ -56,12 +56,21 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
     var wantSave by remember { mutableStateOf(false) }
     var startBusy by remember(ref) { mutableStateOf(false) }
     var startError by remember(ref) { mutableStateOf<String?>(null) }
+    var retained by remember(ref) { mutableStateOf<tv.subcult.museum.core.TourRevision?>(null) }
+    var transitEnabled by remember(ref) { mutableStateOf<Boolean?>(null) }
     val scope = rememberCoroutineScope()
 
     suspend fun load() {
         state = UiState(LoadStatus.LOADING)
         state = try {
-            UiState(LoadStatus.READY, model.api.tour(ref))
+            val tour = model.api.tour(ref)
+            retained = null; transitEnabled = null
+            val revisionId = tour.revisionId
+            if (tour.transit != null && revisionId != null) {
+                retained = model.api.revision(tour.id, revisionId).takeIf { it.id == revisionId && it.tourId == tour.id }
+                transitEnabled = runCatching { model.api.itineraryCapabilities().scheduledTransitV1 }.getOrNull()
+            }
+            UiState(LoadStatus.READY, tour)
         } catch (e: Exception) {
             UiState(LoadStatus.ERROR, message = (e as? ApiException)?.message ?: "Could not load the tour.")
         }
@@ -81,10 +90,11 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
                     tour.modes.forEach { mode ->
                         val r = tour.routes[mode]
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(modeLabel(mode), style = MaterialTheme.typography.titleMedium, color = Museum.text)
-                            val est = estimateText(r)
+                            Text(if (tour.approvedTransit?.intent?.mode == mode) "Walking + CTA" else modeLabel(mode), style = MaterialTheme.typography.titleMedium, color = Museum.text)
+                            val est = if (tour.approvedTransit?.intent?.mode == mode) null else estimateText(r)
                             Text(
                                 when {
+                                    tour.approvedTransit?.intent?.mode == mode -> "Scheduled connection"
                                     est != null -> "$est · ${distanceText(r?.distanceM ?: 0.0)}"
                                     r?.status == "failed" -> "Route unavailable"
                                     else -> "Route being computed"
@@ -97,12 +107,26 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
                 }
             }
 
-            tour.modes.forEach { mode -> TripJourney(tour, mode, tour.journeys?.get(mode)) }
+            tour.modes.filter { tour.approvedTransit?.intent?.mode != it }.forEach { mode -> TripJourney(tour, mode, tour.journeys?.get(mode)) }
+            tour.approvedTransit?.let { choice ->
+                Card {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Walking + scheduled CTA Blue Line", color = Museum.text, style = MaterialTheme.typography.titleLarge)
+                        Text("Board: ${choice.board.name} · platform ${choice.board.id}", color = Museum.text)
+                        Text("Alight: ${choice.alight.name} · platform ${choice.alight.id}", color = Museum.text)
+                        Text(choice.intent.walkingAssumptions, color = Museum.muted)
+                        Text("Open the mixed trip to choose and review a departure from its first connector story stop. Times are scheduled, not live arrivals. Platform points do not certify street access.", color = Museum.muted)
+                        if (transitEnabled != true) Text("Scheduled transit is unavailable or its gate could not be confirmed.", color = Museum.danger)
+                    }
+                }
+            }
 
             if (tour.status != "published") Text("Draft · Only you can open this route. Its path needs review before publication or sharing.", color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
             else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 tour.modes.forEachIndexed { i, mode ->
-                    val label = if (mode == "bike") "Start riding" else "Start walking"
+                    val mixed = tour.approvedTransit?.intent?.mode == mode
+                    val canStart = if (mixed) transitEnabled == true && retained?.unavailableReason(mode) == null && retained != null else (tour.transit == null || tour.approvedTransit?.valid(tour) == true) && tour.canStart(mode)
+                    val label = if (mixed) "Open mixed trip" else if (mode == "bike") "Start riding" else "Start walking"
                     val start = {
                         startBusy = true
                         startError = null
@@ -114,8 +138,8 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
                         }
                         Unit
                     }
-                    if (i == 0) Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = start, enabled = !startBusy && tour.canStart(mode), modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text(if (startBusy) "Starting…" else label) }
-                    else OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = start, enabled = !startBusy && tour.canStart(mode), modifier = Modifier.fillMaxWidth()) { Text(if (startBusy) "Starting…" else label) }
+                    if (i == 0) Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = start, enabled = !startBusy && canStart, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text(if (startBusy) "Starting…" else label) }
+                    else OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = start, enabled = !startBusy && canStart, modifier = Modifier.fillMaxWidth()) { Text(if (startBusy) "Starting…" else label) }
                 }
                 if (tour.revisionId == null) Text("A reviewed revision is required before starting this tour.", color = Museum.muted)
                 startError?.let { Text(it, color = Museum.danger) }

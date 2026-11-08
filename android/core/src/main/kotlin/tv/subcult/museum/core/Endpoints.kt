@@ -2,6 +2,8 @@ package tv.subcult.museum.core
 
 /** Typed calls for every public, auth, and /me route the app uses. */
 class Endpoints(val client: ApiClient) {
+    private val itineraryHeaders = mapOf("X-Byl-Capabilities" to "scheduled-transit-v1")
+
     // Public
     suspend fun cities(): List<City> = client.get<ListPage<City>>("/api/v1/cities").items
 
@@ -12,7 +14,7 @@ class Endpoints(val client: ApiClient) {
             if (topic != null) put("topic", topic)
             if (mode != null) put("mode", mode)
         }
-        return client.get<ListPage<TourSummary>>("/api/v1/cities/$city/tours", q).items
+        return client.get<ListPage<TourSummary>>("/api/v1/cities/$city/tours", q, itineraryHeaders).items
     }
 
     suspend fun places(city: String, near: Pair<Double, Double>? = null, radiusM: Int = 2000, topic: String? = null): List<PlaceSummary> {
@@ -42,23 +44,28 @@ class Endpoints(val client: ApiClient) {
 
     suspend fun moment(id: String): MomentDetail = client.get("/api/v1/moments/$id")
 
-    suspend fun tour(ref: String): TourDetail = client.get("/api/v1/tours/$ref")
+    suspend fun tour(ref: String): TourDetail = client.get("/api/v1/tours/$ref", headers = itineraryHeaders)
 
     suspend fun route(tour: String, mode: String): TourRoute =
-        client.get("/api/v1/tours/$tour/route", mapOf("mode" to mode))
+        client.get("/api/v1/tours/$tour/route", mapOf("mode" to mode), itineraryHeaders)
 
     suspend fun revision(tour: String, revision: String): TourRevision =
-        client.get("/api/v1/tours/$tour/revisions/$revision")
+        client.get("/api/v1/tours/$tour/revisions/$revision", headers = itineraryHeaders)
 
     /** Release metadata is ordered newest-first and is independent of legacy progress pins. */
     suspend fun latestRevision(tour: String): TourRevision? =
         client.get<ListPage<TourRevision>>("/api/v1/tours/$tour/revisions", mapOf("limit" to "1")).items.firstOrNull()
 
     suspend fun revisionProgress(tour: String, revision: String): RevisionProgress? =
-        client.get("/api/v1/me/progress/$tour/revisions/$revision")
+        client.get("/api/v1/me/progress/$tour/revisions/$revision", headers = itineraryHeaders)
 
     suspend fun putRevisionProgress(tour: String, revision: String, body: RevisionProgressRequest): RevisionProgress =
-        client.put("/api/v1/me/progress/$tour/revisions/$revision", body)
+        client.put("/api/v1/me/progress/$tour/revisions/$revision", body, itineraryHeaders)
+
+    suspend fun itineraryCapabilities(): ItineraryCapabilities = client.get("/api/v1/itinerary-capabilities")
+
+    suspend fun transitPlan(tour: String, revision: String, departure: String): ScheduledTransitPlan =
+        client.post("/api/v1/tours/$tour/revisions/$revision/transit-plan", TransitPlanRequest(1, departure), itineraryHeaders)
 
     // Auth
     suspend fun signInGoogle(idToken: String, displayName: String = ""): Session =
