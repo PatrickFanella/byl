@@ -1,0 +1,1958 @@
+{
+  "schema_version": 1,
+  "version": "5603772fc4988f083e67e12cb9275e3ede4f48e6c53b1fdd8f38ea5fde5a2cda",
+  "state": "needs_research",
+  "ready_to_publish": false,
+  "brief": {
+    "id": "39c3728c-e896-4b96-adf4-debf34916044",
+    "owner_account_id": "6f72a9f6-e3d9-4548-af86-bbaba43df316",
+    "submitted": {
+      "topic": "Haymarket and the eight-hour day: meeting, trial and public memory",
+      "area": "Chicago, Illinois",
+      "notes": "Private compact draft. Keep the Chicago memorial and Forest Park cemetery monument distinct. Exclude unconverted historical-address leads and unsupported surviving-building assertions. No stop-count padding or production publication. Former courthouse chapter is an exterior interpretation anchor, not the surviving 1886 courtroom.",
+      "place_leads": [
+        "Haymarket meeting-site memorial",
+        "Former criminal courthouse site / Courthouse Place exterior"
+      ],
+      "event_leads": [
+        "Eight-hour-day organizing",
+        "May 4, 1886 meeting",
+        "Haymarket trial and public memory"
+      ],
+      "source_links": [
+        "https://www.chicagohistory.org/haymarket/",
+        "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1322",
+        "https://www.illinoislaborhistory.org/chicago",
+        "https://www.chicagohistoryresources.org/hadc/transcript/volumei/301-350/I325-335.htm",
+        "https://www.chicagohistoryresources.org/hadc/transcript/volumei/000-050/I002-018.htm",
+        "https://www.chicagohistoryresources.org/hadc/visuals/26V1380.htm",
+        "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+        "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1283",
+        "https://www.nps.gov/places/haymarket-martyr-s-monument.htm"
+      ],
+      "modes": [
+        "walk"
+      ],
+      "trip_shape": "point_to_point",
+      "duration_minutes": null,
+      "start_preference": "Haymarket meeting-site memorial",
+      "end_preference": "Former criminal courthouse site / Courthouse Place exterior",
+      "pilot_id": "haymarket-v1"
+    },
+    "status": "review",
+    "reason": "Research stages completed; curator review required.",
+    "version": 3,
+    "created_at": "2026-11-08T15:34:20.352054-06:00",
+    "updated_at": "2026-11-08T15:34:20.897883-06:00"
+  },
+  "research": {
+    "id": "d6818850-28a9-48f3-a1cd-90354081e856",
+    "brief_id": "39c3728c-e896-4b96-adf4-debf34916044",
+    "job_id": "ff7dda99-5e55-4d7e-ab30-cb7e08136217",
+    "source_version": 1,
+    "brief_version": 2,
+    "status": "completed",
+    "reason": "",
+    "requests_used": 2,
+    "tokens_reserved": 4000,
+    "request_limit": 12,
+    "token_limit": 20000,
+    "deadline_at": "2026-11-08T15:49:20.72412-06:00",
+    "created_at": "2026-11-08T15:34:20.72412-06:00",
+    "stages": [
+      {
+        "stage": "research",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "reconciliation",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "drafting",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "assembly",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      }
+    ]
+  },
+  "submitted": {
+    "topic": "Haymarket and the eight-hour day: meeting, trial and public memory",
+    "area": "Chicago, Illinois",
+    "notes": "Private compact draft. Keep the Chicago memorial and Forest Park cemetery monument distinct. Exclude unconverted historical-address leads and unsupported surviving-building assertions. No stop-count padding or production publication. Former courthouse chapter is an exterior interpretation anchor, not the surviving 1886 courtroom.",
+    "place_leads": [
+      "Haymarket meeting-site memorial",
+      "Former criminal courthouse site / Courthouse Place exterior"
+    ],
+    "event_leads": [
+      "Eight-hour-day organizing",
+      "May 4, 1886 meeting",
+      "Haymarket trial and public memory"
+    ],
+    "source_links": [
+      "https://www.chicagohistory.org/haymarket/",
+      "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1322",
+      "https://www.illinoislaborhistory.org/chicago",
+      "https://www.chicagohistoryresources.org/hadc/transcript/volumei/301-350/I325-335.htm",
+      "https://www.chicagohistoryresources.org/hadc/transcript/volumei/000-050/I002-018.htm",
+      "https://www.chicagohistoryresources.org/hadc/visuals/26V1380.htm",
+      "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+      "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1283",
+      "https://www.nps.gov/places/haymarket-martyr-s-monument.htm"
+    ],
+    "modes": [
+      "walk"
+    ],
+    "trip_shape": "point_to_point",
+    "duration_minutes": null,
+    "start_preference": "Haymarket meeting-site memorial",
+    "end_preference": "Former criminal courthouse site / Courthouse Place exterior",
+    "pilot_id": "haymarket-v1"
+  },
+  "proposal": {
+    "version": 1,
+    "status": "draft",
+    "created_at": "2026-11-08T15:34:20.863857241-06:00",
+    "title": "Haymarket and the eight-hour day: meeting, trial and public memory \u2014 Chicago, Illinois",
+    "introduction": "Explore Haymarket and the eight-hour day: meeting, trial and public memory in Chicago, Illinois through 2 researched locations and their selected historical accounts. This is a private proposal; current viewing guidance, connecting paths and publication still require review.",
+    "requested_shape": "point_to_point",
+    "trip_shape": "point_to_point",
+    "modes": [
+      "walk"
+    ],
+    "target_duration_minutes": null,
+    "travel_minutes": null,
+    "travel_state": "not_computed",
+    "planned_dwell_minutes": 6,
+    "planned_narration_minutes": 2,
+    "stops": [
+      {
+        "material": {
+          "record_id": "82d442ce-0e1b-4b11-95ec-b600a0299167",
+          "review_version": 1,
+          "place_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+          "place_name": "Haymarket meeting-site memorial",
+          "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+          "latitude": 41.8848807,
+          "longitude": -87.6441288,
+          "moment_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+          "moment_title": "Eight-hour organizing and the May 4 meeting",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "4a3af322a70aa50c69cf950728653ee0e29a09dd76d747dd2d60396206018d09",
+          "source_urls": [
+            "https://www.chicagohistory.org/haymarket/",
+            "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1322",
+            "https://www.illinoislaborhistory.org/chicago"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: eight, hour, day, meeting, event: May 4, 1886 meeting",
+        "what_to_notice": "Curator research question: what traces of \u201cEight-hour organizing and the May 4 meeting\u201d can be observed at Haymarket meeting-site memorial today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with \u201cThe trial site and the building that replaced it\u201d at Former criminal courthouse site / Courthouse Place exterior. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "f02919f6-db3c-468d-8233-147bd78ed2c3",
+          "review_version": 1,
+          "place_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+          "place_name": "Former criminal courthouse site / Courthouse Place exterior",
+          "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+          "latitude": 41.8902314,
+          "longitude": -87.6301348,
+          "moment_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+          "moment_title": "The trial site and the building that replaced it",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "e2d36b870422c9f67950425c512f3e8e2a7dde99ef283f86cc9fdf2d14feeb61",
+          "source_urls": [
+            "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+            "https://www.chicagohistoryresources.org/hadc/visuals/26V1380.htm",
+            "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1283"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: haymarket, day, trial",
+        "what_to_notice": "Curator research question: what traces of \u201cThe trial site and the building that replaced it\u201d can be observed at Former criminal courthouse site / Courthouse Place exterior today? Confirm visible features before writing viewing guidance.",
+        "transition": "",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      }
+    ],
+    "travel_sequence": [
+      0,
+      1
+    ],
+    "excluded": [],
+    "research_gaps": [],
+    "assumptions": [
+      "Historical paragraphs are reused from retained material; their inclusion is not a new factual review.",
+      "What to notice is a curator research question, not verified current viewing guidance.",
+      "Plan three minutes of dwell per stop, plus narration at 130 words per minute; actual travel and access still require computation and review.",
+      "No duration was supplied; the geography screen uses a provisional 60-minute planning budget."
+    ]
+  },
+  "tour": {
+    "journeys": {
+      "walk": {
+        "version": 1,
+        "state": "blocked",
+        "computation": "ready",
+        "quality": "blocked",
+        "usable": false,
+        "issue_codes": [
+          "arrival_unknown",
+          "corridor_reference_missing",
+          "strict_attribution_unavailable"
+        ],
+        "travel_distance_m": 1716,
+        "travel_duration_s": 1300,
+        "dwell_duration_s": 360,
+        "narration_duration_s": 240,
+        "itinerary_duration_s": 1900,
+        "round_trip_duration_s": null,
+        "return_plan": {
+          "status": "unplanned",
+          "distance_m": null,
+          "duration_s": null
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      }
+    },
+    "draft_version": 0,
+    "route_version": 0,
+    "revision_id": null,
+    "revision_number": 0,
+    "id": "bea20156-aaf4-40f9-820f-4c2884d0f0d7",
+    "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+    "city_ids": [
+      "8e2d7e21-4833-4d32-ba60-2e89e56d4be2"
+    ],
+    "slug": "haymarket-and-the-eight-hour-day-private-pilot",
+    "title": "Haymarket and the eight-hour day \u2014 private pilot",
+    "summary": "",
+    "topic_id": null,
+    "topic": null,
+    "modes": [
+      "walk"
+    ],
+    "hero_media": null,
+    "status": "draft",
+    "visibility": "public",
+    "owner_account_id": null,
+    "stop_count": 2,
+    "routes": {
+      "walk": {
+        "quality": {
+          "report_id": "4709252a-7237-495a-92b2-6fc5d1930af8",
+          "input_current": true,
+          "version": 1,
+          "status": "blocked",
+          "issues": [
+            {
+              "code": "arrival_unknown",
+              "severity": "blocked",
+              "origin": "curator_assertion",
+              "detail": "Each story stop requires an independently allowed arrival for this mode."
+            },
+            {
+              "code": "corridor_reference_missing",
+              "severity": "needs_research",
+              "origin": "unknown",
+              "detail": "Provide a reviewed network reference and inspected access evidence."
+            },
+            {
+              "code": "strict_attribution_unavailable",
+              "severity": "needs_research",
+              "origin": "unknown",
+              "detail": "Strict network attribution is unavailable; no alternate path or map-snap result was accepted."
+            }
+          ],
+          "checked_at": "2026-11-08T15:34:21.042345451-06:00"
+        },
+        "mode": "walk",
+        "status": "ready",
+        "distance_m": 1716,
+        "duration_s": 1300,
+        "estimated_minutes": 22,
+        "computed_at": "2026-11-08T15:34:21.046154-06:00"
+      }
+    },
+    "created_at": "2026-11-08T15:34:20.998234-06:00",
+    "updated_at": "2026-11-08T15:34:20.998234-06:00",
+    "stops": [
+      {
+        "id": "5f6fa389-74a4-4a22-8a2c-964ddec71187",
+        "position": 1,
+        "place": {
+          "id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+          "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+          "slug": "haymarket-meeting-site-memorial",
+          "name": "Haymarket meeting-site memorial",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.8848807,
+          "longitude": -87.6441288,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "175 North Desplaines Street, Chicago, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:34:20.55367-06:00",
+          "updated_at": "2026-11-08T15:34:20.55367-06:00"
+        },
+        "featured_moment_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+        "featured_moment": {
+          "id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+          "place_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+          "slug": "eight-hour-organizing-and-the-may-4-meeting",
+          "title": "Eight-hour organizing and the May 4 meeting",
+          "excerpt": "The Chicago History Museum connects the May 4, 1886 meeting with the eight-hour-day struggle and police violence at McCormick the previous day. The City\u2019s landmark record locates the meeting area on Desplaines north of Randolph. The\u2026",
+          "date_start": "1886-05-04",
+          "date_end": null,
+          "date_precision": "day",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "0b6a3292-eb5b-4a19-a542-2c4f61c0e77e",
+        "position": 2,
+        "place": {
+          "id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+          "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+          "slug": "former-criminal-courthouse-site-courthouse-place-exterior",
+          "name": "Former criminal courthouse site / Courthouse Place exterior",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.8902314,
+          "longitude": -87.6301348,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "54 West Hubbard Street, Chicago, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:34:20.640325-06:00",
+          "updated_at": "2026-11-08T15:34:20.640325-06:00"
+        },
+        "featured_moment_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+        "featured_moment": {
+          "id": "18458d6a-e319-481d-a9db-d81e044839bb",
+          "place_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+          "slug": "the-trial-site-and-the-building-that-replaced-it",
+          "title": "The trial site and the building that replaced it",
+          "excerpt": "The Haymarket trial took place in an earlier criminal courthouse at Hubbard and Dearborn. The museum\u2019s account says that building was demolished in 1892 and replaced; the City lists today\u2019s Courthouse Place as built in 1893. This exterior\u2026",
+          "date_start": "1886-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      }
+    ]
+  },
+  "routes": {
+    "walk": {
+      "journey": {
+        "version": 1,
+        "state": "blocked",
+        "computation": "ready",
+        "quality": "blocked",
+        "usable": false,
+        "issue_codes": [
+          "arrival_unknown",
+          "corridor_reference_missing",
+          "strict_attribution_unavailable"
+        ],
+        "travel_distance_m": 1716,
+        "travel_duration_s": 1300,
+        "dwell_duration_s": 360,
+        "narration_duration_s": 240,
+        "itinerary_duration_s": 1900,
+        "round_trip_duration_s": null,
+        "return_plan": {
+          "status": "unplanned",
+          "distance_m": null,
+          "duration_s": null
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      },
+      "quality": {
+        "report_id": "4709252a-7237-495a-92b2-6fc5d1930af8",
+        "input_current": true,
+        "version": 1,
+        "status": "blocked",
+        "issues": [
+          {
+            "code": "arrival_unknown",
+            "severity": "blocked",
+            "origin": "curator_assertion",
+            "detail": "Each story stop requires an independently allowed arrival for this mode."
+          },
+          {
+            "code": "corridor_reference_missing",
+            "severity": "needs_research",
+            "origin": "unknown",
+            "detail": "Provide a reviewed network reference and inspected access evidence."
+          },
+          {
+            "code": "strict_attribution_unavailable",
+            "severity": "needs_research",
+            "origin": "unknown",
+            "detail": "Strict network attribution is unavailable; no alternate path or map-snap result was accepted."
+          }
+        ],
+        "checked_at": "2026-11-08T15:34:21.042345451-06:00"
+      },
+      "id": "0eeb2e2d-a437-4a9b-a6cf-5ec5e7fe0c7e",
+      "tour_id": "bea20156-aaf4-40f9-820f-4c2884d0f0d7",
+      "mode": "walk",
+      "status": "ready",
+      "provider": "valhalla",
+      "distance_m": 1716,
+      "duration_s": 1300,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.644106,
+            41.884881
+          ],
+          [
+            -87.644113,
+            41.885199
+          ],
+          [
+            -87.644122,
+            41.885632
+          ],
+          [
+            -87.644123,
+            41.885643
+          ],
+          [
+            -87.644122,
+            41.885711
+          ],
+          [
+            -87.644123,
+            41.885781
+          ],
+          [
+            -87.644124,
+            41.885795
+          ],
+          [
+            -87.64413,
+            41.886069
+          ],
+          [
+            -87.644144,
+            41.88671
+          ],
+          [
+            -87.643531,
+            41.886717
+          ],
+          [
+            -87.643411,
+            41.886718
+          ],
+          [
+            -87.64294,
+            41.886723
+          ],
+          [
+            -87.642941,
+            41.886748
+          ],
+          [
+            -87.642934,
+            41.886809
+          ],
+          [
+            -87.642929,
+            41.886886
+          ],
+          [
+            -87.64293,
+            41.886915
+          ],
+          [
+            -87.642913,
+            41.886915
+          ],
+          [
+            -87.642805,
+            41.886915
+          ],
+          [
+            -87.642721,
+            41.886915
+          ],
+          [
+            -87.642688,
+            41.886915
+          ],
+          [
+            -87.642068,
+            41.886916
+          ],
+          [
+            -87.641474,
+            41.886917
+          ],
+          [
+            -87.641438,
+            41.886918
+          ],
+          [
+            -87.641355,
+            41.886919
+          ],
+          [
+            -87.641251,
+            41.886919
+          ],
+          [
+            -87.641215,
+            41.88692
+          ],
+          [
+            -87.640612,
+            41.886923
+          ],
+          [
+            -87.640372,
+            41.886924
+          ],
+          [
+            -87.640192,
+            41.887064
+          ],
+          [
+            -87.640016,
+            41.8872
+          ],
+          [
+            -87.640023,
+            41.887374
+          ],
+          [
+            -87.64003,
+            41.887531
+          ],
+          [
+            -87.64003,
+            41.887604
+          ],
+          [
+            -87.640032,
+            41.887676
+          ],
+          [
+            -87.640039,
+            41.888007
+          ],
+          [
+            -87.64004,
+            41.88803
+          ],
+          [
+            -87.640051,
+            41.88838
+          ],
+          [
+            -87.640055,
+            41.888486
+          ],
+          [
+            -87.640057,
+            41.888521
+          ],
+          [
+            -87.640076,
+            41.889004
+          ],
+          [
+            -87.640076,
+            41.889013
+          ],
+          [
+            -87.640072,
+            41.889067
+          ],
+          [
+            -87.640011,
+            41.889064
+          ],
+          [
+            -87.639841,
+            41.889058
+          ],
+          [
+            -87.639793,
+            41.889049
+          ],
+          [
+            -87.639723,
+            41.889037
+          ],
+          [
+            -87.639256,
+            41.889074
+          ],
+          [
+            -87.639075,
+            41.889089
+          ],
+          [
+            -87.638968,
+            41.889117
+          ],
+          [
+            -87.638682,
+            41.889115
+          ],
+          [
+            -87.638224,
+            41.889119
+          ],
+          [
+            -87.638119,
+            41.889119
+          ],
+          [
+            -87.638025,
+            41.88912
+          ],
+          [
+            -87.637294,
+            41.889132
+          ],
+          [
+            -87.637171,
+            41.889134
+          ],
+          [
+            -87.637125,
+            41.889133
+          ],
+          [
+            -87.636984,
+            41.88913
+          ],
+          [
+            -87.636747,
+            41.889126
+          ],
+          [
+            -87.636604,
+            41.889122
+          ],
+          [
+            -87.636239,
+            41.889128
+          ],
+          [
+            -87.63569,
+            41.889134
+          ],
+          [
+            -87.635506,
+            41.889136
+          ],
+          [
+            -87.635372,
+            41.889138
+          ],
+          [
+            -87.634256,
+            41.889151
+          ],
+          [
+            -87.634151,
+            41.889155
+          ],
+          [
+            -87.634144,
+            41.889155
+          ],
+          [
+            -87.634021,
+            41.889159
+          ],
+          [
+            -87.633879,
+            41.889162
+          ],
+          [
+            -87.633487,
+            41.889172
+          ],
+          [
+            -87.633105,
+            41.889178
+          ],
+          [
+            -87.632924,
+            41.88918
+          ],
+          [
+            -87.632786,
+            41.889182
+          ],
+          [
+            -87.63275,
+            41.889184
+          ],
+          [
+            -87.632657,
+            41.889185
+          ],
+          [
+            -87.632543,
+            41.889187
+          ],
+          [
+            -87.632435,
+            41.889189
+          ],
+          [
+            -87.632329,
+            41.889192
+          ],
+          [
+            -87.6323,
+            41.889193
+          ],
+          [
+            -87.632227,
+            41.889195
+          ],
+          [
+            -87.632073,
+            41.889199
+          ],
+          [
+            -87.63195,
+            41.889202
+          ],
+          [
+            -87.631771,
+            41.889207
+          ],
+          [
+            -87.631619,
+            41.88921
+          ],
+          [
+            -87.631549,
+            41.889211
+          ],
+          [
+            -87.631282,
+            41.889216
+          ],
+          [
+            -87.631223,
+            41.889216
+          ],
+          [
+            -87.631201,
+            41.889216
+          ],
+          [
+            -87.631063,
+            41.889218
+          ],
+          [
+            -87.630941,
+            41.889221
+          ],
+          [
+            -87.63094,
+            41.889282
+          ],
+          [
+            -87.630941,
+            41.889311
+          ],
+          [
+            -87.630969,
+            41.889945
+          ],
+          [
+            -87.63097,
+            41.889965
+          ],
+          [
+            -87.630969,
+            41.890024
+          ],
+          [
+            -87.630968,
+            41.89009
+          ],
+          [
+            -87.630969,
+            41.890118
+          ],
+          [
+            -87.630536,
+            41.890122
+          ],
+          [
+            -87.630133,
+            41.890127
+          ]
+        ]
+      },
+      "legs": [
+        {
+          "from_position": 1,
+          "to_position": 2,
+          "distance_m": 1716,
+          "duration_s": 1300,
+          "geometry": [
+            [
+              -87.644106,
+              41.884881
+            ],
+            [
+              -87.644113,
+              41.885199
+            ],
+            [
+              -87.644122,
+              41.885632
+            ],
+            [
+              -87.644123,
+              41.885643
+            ],
+            [
+              -87.644122,
+              41.885711
+            ],
+            [
+              -87.644123,
+              41.885781
+            ],
+            [
+              -87.644124,
+              41.885795
+            ],
+            [
+              -87.64413,
+              41.886069
+            ],
+            [
+              -87.644144,
+              41.88671
+            ],
+            [
+              -87.643531,
+              41.886717
+            ],
+            [
+              -87.643411,
+              41.886718
+            ],
+            [
+              -87.64294,
+              41.886723
+            ],
+            [
+              -87.642941,
+              41.886748
+            ],
+            [
+              -87.642934,
+              41.886809
+            ],
+            [
+              -87.642929,
+              41.886886
+            ],
+            [
+              -87.64293,
+              41.886915
+            ],
+            [
+              -87.642913,
+              41.886915
+            ],
+            [
+              -87.642805,
+              41.886915
+            ],
+            [
+              -87.642721,
+              41.886915
+            ],
+            [
+              -87.642688,
+              41.886915
+            ],
+            [
+              -87.642068,
+              41.886916
+            ],
+            [
+              -87.641474,
+              41.886917
+            ],
+            [
+              -87.641438,
+              41.886918
+            ],
+            [
+              -87.641355,
+              41.886919
+            ],
+            [
+              -87.641251,
+              41.886919
+            ],
+            [
+              -87.641215,
+              41.88692
+            ],
+            [
+              -87.640612,
+              41.886923
+            ],
+            [
+              -87.640372,
+              41.886924
+            ],
+            [
+              -87.640192,
+              41.887064
+            ],
+            [
+              -87.640016,
+              41.8872
+            ],
+            [
+              -87.640023,
+              41.887374
+            ],
+            [
+              -87.64003,
+              41.887531
+            ],
+            [
+              -87.64003,
+              41.887604
+            ],
+            [
+              -87.640032,
+              41.887676
+            ],
+            [
+              -87.640039,
+              41.888007
+            ],
+            [
+              -87.64004,
+              41.88803
+            ],
+            [
+              -87.640051,
+              41.88838
+            ],
+            [
+              -87.640055,
+              41.888486
+            ],
+            [
+              -87.640057,
+              41.888521
+            ],
+            [
+              -87.640076,
+              41.889004
+            ],
+            [
+              -87.640076,
+              41.889013
+            ],
+            [
+              -87.640072,
+              41.889067
+            ],
+            [
+              -87.640011,
+              41.889064
+            ],
+            [
+              -87.639841,
+              41.889058
+            ],
+            [
+              -87.639793,
+              41.889049
+            ],
+            [
+              -87.639723,
+              41.889037
+            ],
+            [
+              -87.639256,
+              41.889074
+            ],
+            [
+              -87.639075,
+              41.889089
+            ],
+            [
+              -87.638968,
+              41.889117
+            ],
+            [
+              -87.638682,
+              41.889115
+            ],
+            [
+              -87.638224,
+              41.889119
+            ],
+            [
+              -87.638119,
+              41.889119
+            ],
+            [
+              -87.638025,
+              41.88912
+            ],
+            [
+              -87.637294,
+              41.889132
+            ],
+            [
+              -87.637171,
+              41.889134
+            ],
+            [
+              -87.637125,
+              41.889133
+            ],
+            [
+              -87.636984,
+              41.88913
+            ],
+            [
+              -87.636747,
+              41.889126
+            ],
+            [
+              -87.636604,
+              41.889122
+            ],
+            [
+              -87.636239,
+              41.889128
+            ],
+            [
+              -87.63569,
+              41.889134
+            ],
+            [
+              -87.635506,
+              41.889136
+            ],
+            [
+              -87.635372,
+              41.889138
+            ],
+            [
+              -87.634256,
+              41.889151
+            ],
+            [
+              -87.634151,
+              41.889155
+            ],
+            [
+              -87.634144,
+              41.889155
+            ],
+            [
+              -87.634021,
+              41.889159
+            ],
+            [
+              -87.633879,
+              41.889162
+            ],
+            [
+              -87.633487,
+              41.889172
+            ],
+            [
+              -87.633105,
+              41.889178
+            ],
+            [
+              -87.632924,
+              41.88918
+            ],
+            [
+              -87.632786,
+              41.889182
+            ],
+            [
+              -87.63275,
+              41.889184
+            ],
+            [
+              -87.632657,
+              41.889185
+            ],
+            [
+              -87.632543,
+              41.889187
+            ],
+            [
+              -87.632435,
+              41.889189
+            ],
+            [
+              -87.632329,
+              41.889192
+            ],
+            [
+              -87.6323,
+              41.889193
+            ],
+            [
+              -87.632227,
+              41.889195
+            ],
+            [
+              -87.632073,
+              41.889199
+            ],
+            [
+              -87.63195,
+              41.889202
+            ],
+            [
+              -87.631771,
+              41.889207
+            ],
+            [
+              -87.631619,
+              41.88921
+            ],
+            [
+              -87.631549,
+              41.889211
+            ],
+            [
+              -87.631282,
+              41.889216
+            ],
+            [
+              -87.631223,
+              41.889216
+            ],
+            [
+              -87.631201,
+              41.889216
+            ],
+            [
+              -87.631063,
+              41.889218
+            ],
+            [
+              -87.630941,
+              41.889221
+            ],
+            [
+              -87.63094,
+              41.889282
+            ],
+            [
+              -87.630941,
+              41.889311
+            ],
+            [
+              -87.630969,
+              41.889945
+            ],
+            [
+              -87.63097,
+              41.889965
+            ],
+            [
+              -87.630969,
+              41.890024
+            ],
+            [
+              -87.630968,
+              41.89009
+            ],
+            [
+              -87.630969,
+              41.890118
+            ],
+            [
+              -87.630536,
+              41.890122
+            ],
+            [
+              -87.630133,
+              41.890127
+            ]
+          ]
+        }
+      ],
+      "computed_at": "2026-11-08T15:34:21.046154-06:00"
+    }
+  },
+  "path_reports": {
+    "walk": {
+      "route_sha256": "fab420e940d040797676d4aca0e4ecba8d5b1c375c43adc65468f3d616361012",
+      "report_id": "4709252a-7237-495a-92b2-6fc5d1930af8",
+      "input_current": true,
+      "version": 1,
+      "status": "blocked",
+      "issues": [
+        {
+          "code": "arrival_unknown",
+          "severity": "blocked",
+          "origin": "curator_assertion",
+          "detail": "Each story stop requires an independently allowed arrival for this mode."
+        },
+        {
+          "code": "corridor_reference_missing",
+          "severity": "needs_research",
+          "origin": "unknown",
+          "detail": "Provide a reviewed network reference and inspected access evidence."
+        },
+        {
+          "code": "strict_attribution_unavailable",
+          "severity": "needs_research",
+          "origin": "unknown",
+          "detail": "Strict network attribution is unavailable; no alternate path or map-snap result was accepted."
+        }
+      ],
+      "checked_at": "2026-11-08T15:34:21.042345451-06:00",
+      "input_hash": "e99df1d1baf8623c5a79c561855b5250",
+      "mode": "walk",
+      "provider": "valhalla",
+      "inspections": [],
+      "attribution": {
+        "provider": "valhalla",
+        "method": "trace_attributes/edge_walk",
+        "legs": [],
+        "failure": "exact_match_unavailable"
+      }
+    }
+  },
+  "reconciliation": [
+    {
+      "id": "82d442ce-0e1b-4b11-95ec-b600a0299167",
+      "identity_key": "1bff5ea99a11b5b4d34286ea5e6904c314f52d7116537df2143600fadf960f3f",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Haymarket meeting-site memorial",
+          "text": "",
+          "url": "https://www.chicagohistory.org/haymarket/",
+          "lat": 41.8848807,
+          "lng": -87.6441288,
+          "area": "Chicago",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+            "place_name": "Haymarket meeting-site memorial",
+            "address": "175 North Desplaines Street, Chicago, IL"
+          }
+        },
+        "key": "1bff5ea99a11b5b4d34286ea5e6904c314f52d7116537df2143600fadf960f3f",
+        "place_key": "12fb6dc2e16180cd70cb47b3bbaddbec1b89cde32227f783248a9158a91f1135",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Haymarket meeting-site memorial",
+          "text": "",
+          "url": "https://www.chicagohistory.org/haymarket/",
+          "lat": 41.8848807,
+          "lng": -87.6441288,
+          "area": "Chicago",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+            "place_name": "Haymarket meeting-site memorial",
+            "address": "175 North Desplaines Street, Chicago, IL"
+          }
+        },
+        "key": "1bff5ea99a11b5b4d34286ea5e6904c314f52d7116537df2143600fadf960f3f",
+        "place_key": "12fb6dc2e16180cd70cb47b3bbaddbec1b89cde32227f783248a9158a91f1135",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "d2a310cd-e369-479c-a024-11124266830e",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+        "moment_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "6f72a9f6-e3d9-4548-af86-bbaba43df316"
+      },
+      "created_at": "2026-11-08T15:34:20.386278-06:00"
+    },
+    {
+      "id": "f02919f6-db3c-468d-8233-147bd78ed2c3",
+      "identity_key": "b4709c927e50bd60854693b3057d674c7ab317ef61c5ece6b197db8e3b1ee09c",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Former criminal courthouse site / Courthouse Place exterior",
+          "text": "",
+          "url": "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+          "lat": 41.8902314,
+          "lng": -87.6301348,
+          "area": "Chicago",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+            "place_name": "Former criminal courthouse site / Courthouse Place exterior",
+            "address": "54 West Hubbard Street, Chicago, IL"
+          }
+        },
+        "key": "b4709c927e50bd60854693b3057d674c7ab317ef61c5ece6b197db8e3b1ee09c",
+        "place_key": "6f743e1730c5853af51a3d6f28bd2a77579f6a34ef2b689e6a496e566317ac94",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Former criminal courthouse site / Courthouse Place exterior",
+          "text": "",
+          "url": "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+          "lat": 41.8902314,
+          "lng": -87.6301348,
+          "area": "Chicago",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+            "place_name": "Former criminal courthouse site / Courthouse Place exterior",
+            "address": "54 West Hubbard Street, Chicago, IL"
+          }
+        },
+        "key": "b4709c927e50bd60854693b3057d674c7ab317ef61c5ece6b197db8e3b1ee09c",
+        "place_key": "6f743e1730c5853af51a3d6f28bd2a77579f6a34ef2b689e6a496e566317ac94",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "eaea327c-ad1e-4dd0-88e7-66f486ec6d93",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+        "moment_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "6f72a9f6-e3d9-4548-af86-bbaba43df316"
+      },
+      "created_at": "2026-11-08T15:34:20.47714-06:00"
+    },
+    {
+      "id": "ce0179f2-0296-41f5-8a9f-77412476c733",
+      "identity_key": "cf011804eae5247d9192956b05ec1c89cce110de5c2887774d0cd9c7b95ff276",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+          "title": "Eight-hour organizing and the May 4 meeting",
+          "text": "",
+          "url": "https://www.chicagohistory.org/haymarket/",
+          "area": "Chicago",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "cf011804eae5247d9192956b05ec1c89cce110de5c2887774d0cd9c7b95ff276",
+        "place_key": "de9466a54fbd739ec5dede8c767abc28432b5d0cf16100ebdfe396f7c1d3759a",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+        "moment_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+          "title": "Eight-hour organizing and the May 4 meeting",
+          "text": "",
+          "url": "https://www.chicagohistory.org/haymarket/",
+          "area": "Chicago",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "cf011804eae5247d9192956b05ec1c89cce110de5c2887774d0cd9c7b95ff276",
+        "place_key": "de9466a54fbd739ec5dede8c767abc28432b5d0cf16100ebdfe396f7c1d3759a",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+        "moment_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:34:20.811659-06:00"
+    },
+    {
+      "id": "d615d8c3-7ea0-4174-ad10-fbb1b6ba0dbf",
+      "identity_key": "cbebab5d995d69ab679b01aa71b90748cd1c8100fa8ed90e7d5d87e2009b821e",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+          "title": "The trial site and the building that replaced it",
+          "text": "",
+          "url": "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+          "area": "Chicago",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "cbebab5d995d69ab679b01aa71b90748cd1c8100fa8ed90e7d5d87e2009b821e",
+        "place_key": "de49a47fdaafa9581f57a603c83ba1a078a58b388d73cbc5a98be6ea14d39c09",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+        "moment_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+          "title": "The trial site and the building that replaced it",
+          "text": "",
+          "url": "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+          "area": "Chicago",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "cbebab5d995d69ab679b01aa71b90748cd1c8100fa8ed90e7d5d87e2009b821e",
+        "place_key": "de49a47fdaafa9581f57a603c83ba1a078a58b388d73cbc5a98be6ea14d39c09",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "place_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+        "moment_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:34:20.811659-06:00"
+    }
+  ],
+  "entities": [
+    {
+      "key": "place:f5d14dcf-c737-4d79-b625-41b2df66642f",
+      "kind": "place",
+      "id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "slug": "haymarket-meeting-site-memorial",
+        "name": "Haymarket meeting-site memorial",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8848807,
+        "longitude": -87.6441288,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "175 North Desplaines Street, Chicago, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:34:20.55367-06:00",
+        "updated_at": "2026-11-08T15:34:20.55367-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:d2a310cd-e369-479c-a024-11124266830e",
+      "kind": "place",
+      "id": "d2a310cd-e369-479c-a024-11124266830e",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "slug": "haymarket-meeting-site-memorial",
+        "name": "Haymarket meeting-site memorial",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8848807,
+        "longitude": -87.6441288,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "175 North Desplaines Street, Chicago, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:34:20.55367-06:00",
+        "updated_at": "2026-11-08T15:34:20.55367-06:00"
+      },
+      "candidate": {
+        "id": "d2a310cd-e369-479c-a024-11124266830e",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "12fb6dc2e16180cd70cb47b3bbaddbec1b89cde32227f783248a9158a91f1135",
+        "submitted_by_account_id": "6f72a9f6-e3d9-4548-af86-bbaba43df316",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Haymarket meeting-site memorial",
+          "slug": "",
+          "address": "175 North Desplaines Street, Chicago, IL",
+          "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+          "summary": "",
+          "latitude": 41.8848807,
+          "longitude": -87.6441288,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "6f72a9f6-e3d9-4548-af86-bbaba43df316",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+        "reviewed_at": "2026-11-08T15:34:20.55367-06:00",
+        "created_at": "2026-11-08T15:34:20.386278-06:00",
+        "updated_at": "2026-11-08T15:34:20.55367-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Haymarket meeting-site memorial",
+        "slug": "",
+        "address": "175 North Desplaines Street, Chicago, IL",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "summary": "",
+        "latitude": 41.8848807,
+        "longitude": -87.6441288,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:3ad3baab-542d-492a-86eb-43c79c62e0af",
+      "kind": "place",
+      "id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "slug": "former-criminal-courthouse-site-courthouse-place-exterior",
+        "name": "Former criminal courthouse site / Courthouse Place exterior",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8902314,
+        "longitude": -87.6301348,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "54 West Hubbard Street, Chicago, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:34:20.640325-06:00",
+        "updated_at": "2026-11-08T15:34:20.640325-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:eaea327c-ad1e-4dd0-88e7-66f486ec6d93",
+      "kind": "place",
+      "id": "eaea327c-ad1e-4dd0-88e7-66f486ec6d93",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "slug": "former-criminal-courthouse-site-courthouse-place-exterior",
+        "name": "Former criminal courthouse site / Courthouse Place exterior",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8902314,
+        "longitude": -87.6301348,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "54 West Hubbard Street, Chicago, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:34:20.640325-06:00",
+        "updated_at": "2026-11-08T15:34:20.640325-06:00"
+      },
+      "candidate": {
+        "id": "eaea327c-ad1e-4dd0-88e7-66f486ec6d93",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "6f743e1730c5853af51a3d6f28bd2a77579f6a34ef2b689e6a496e566317ac94",
+        "submitted_by_account_id": "6f72a9f6-e3d9-4548-af86-bbaba43df316",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Former criminal courthouse site / Courthouse Place exterior",
+          "slug": "",
+          "address": "54 West Hubbard Street, Chicago, IL",
+          "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+          "summary": "",
+          "latitude": 41.8902314,
+          "longitude": -87.6301348,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "6f72a9f6-e3d9-4548-af86-bbaba43df316",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+        "reviewed_at": "2026-11-08T15:34:20.640325-06:00",
+        "created_at": "2026-11-08T15:34:20.47714-06:00",
+        "updated_at": "2026-11-08T15:34:20.640325-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Former criminal courthouse site / Courthouse Place exterior",
+        "slug": "",
+        "address": "54 West Hubbard Street, Chicago, IL",
+        "city_id": "8e2d7e21-4833-4d32-ba60-2e89e56d4be2",
+        "summary": "",
+        "latitude": 41.8902314,
+        "longitude": -87.6301348,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "moment:c5a4483a-4497-47d4-aa52-34b6a0aee305",
+      "kind": "moment",
+      "id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+        "place_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+        "slug": "eight-hour-organizing-and-the-may-4-meeting",
+        "title": "Eight-hour organizing and the May 4 meeting",
+        "excerpt": "The Chicago History Museum connects the May 4, 1886 meeting with the eight-hour-day struggle and police violence at McCormick the previous day. The City\u2019s landmark record locates the meeting area on Desplaines north of Randolph. The\u2026",
+        "date_start": "1886-05-04",
+        "date_end": null,
+        "date_precision": "day",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "The Haymarket Affair",
+            "url": "https://www.chicagohistory.org/haymarket/",
+            "publisher": "Chicago History Museum",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Site of the Haymarket Tragedy",
+            "url": "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1322",
+            "publisher": "City of Chicago",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Chicago labor-history sites",
+            "url": "https://www.illinoislaborhistory.org/chicago",
+            "publisher": "Illinois Labor History Society",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:34:20.57133-06:00",
+        "updated_at": "2026-11-08T15:34:20.57133-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:18458d6a-e319-481d-a9db-d81e044839bb",
+      "kind": "moment",
+      "id": "18458d6a-e319-481d-a9db-d81e044839bb",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "18458d6a-e319-481d-a9db-d81e044839bb",
+        "place_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+        "slug": "the-trial-site-and-the-building-that-replaced-it",
+        "title": "The trial site and the building that replaced it",
+        "excerpt": "The Haymarket trial took place in an earlier criminal courthouse at Hubbard and Dearborn. The museum\u2019s account says that building was demolished in 1892 and replaced; the City lists today\u2019s Courthouse Place as built in 1893. This exterior\u2026",
+        "date_start": "1886-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Cook County Criminal Courthouse area caption",
+            "url": "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+            "publisher": "Chicago History Museum / Northwestern University, The Dramas of Haymarket",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Cook County Criminal Court Building and jail, circa 1879, catalogue record",
+            "url": "https://www.chicagohistoryresources.org/hadc/visuals/26V1380.htm",
+            "publisher": "Chicago History Museum, Haymarket Affair Digital Collection",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Courthouse Place",
+            "url": "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1283",
+            "publisher": "City of Chicago",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:34:20.657476-06:00",
+        "updated_at": "2026-11-08T15:34:20.657476-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    }
+  ],
+  "evidence": [],
+  "tasks": [
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:f5d14dcf-c737-4d79-b625-41b2df66642f",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:c5a4483a-4497-47d4-aa52-34b6a0aee305",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:c5a4483a-4497-47d4-aa52-34b6a0aee305",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:c5a4483a-4497-47d4-aa52-34b6a0aee305",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:3ad3baab-542d-492a-86eb-43c79c62e0af",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:18458d6a-e319-481d-a9db-d81e044839bb",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:18458d6a-e319-481d-a9db-d81e044839bb",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:18458d6a-e319-481d-a9db-d81e044839bb",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "route_not_usable",
+      "entity_key": "walk",
+      "detail": "Route readiness is blocked; inspect the mode's retained quality report."
+    }
+  ],
+  "visitor_stories": [
+    {
+      "position": 1,
+      "place_id": "f5d14dcf-c737-4d79-b625-41b2df66642f",
+      "moment_id": "c5a4483a-4497-47d4-aa52-34b6a0aee305",
+      "candidate_id": "",
+      "title": "Eight-hour organizing and the May 4 meeting",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://www.chicagohistory.org/haymarket/",
+        "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1322",
+        "https://www.illinoislaborhistory.org/chicago"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 2,
+      "place_id": "3ad3baab-542d-492a-86eb-43c79c62e0af",
+      "moment_id": "18458d6a-e319-481d-a9db-d81e044839bb",
+      "candidate_id": "",
+      "title": "The trial site and the building that replaced it",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+        "https://www.chicagohistoryresources.org/hadc/visuals/26V1380.htm",
+        "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1283"
+      ],
+      "evidence_ids": []
+    }
+  ]
+}

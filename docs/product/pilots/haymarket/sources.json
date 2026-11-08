@@ -1,0 +1,147 @@
+[
+  {
+    "id": "chm-overview",
+    "url": "https://www.chicagohistory.org/haymarket/",
+    "title": "The Haymarket Affair",
+    "publisher": "Chicago History Museum",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Connects the eight-hour movement, May 3 McCormick violence and May 4 meeting on Desplaines north of Randolph.",
+      "The account leaves the bomber unidentified."
+    ],
+    "limitations": [
+      "An interpretation, not a current route/access source. Casualty totals and some details differ from other accounts; do not silently harmonize."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  },
+  {
+    "id": "chicago-site",
+    "url": "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1322",
+    "title": "Site of the Haymarket Tragedy",
+    "publisher": "City of Chicago",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Municipal landmark describes 151–199 N Desplaines and the rally near Crane’s Alley north of Randolph.",
+      "Landmark designation is March 25, 1991."
+    ],
+    "limitations": [
+      "The address is a landmark range, not the footprint of a reviewed visitor arrival."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  },
+  {
+    "id": "ilhs-chicago",
+    "url": "https://www.illinoislaborhistory.org/chicago",
+    "title": "Chicago labor-history sites",
+    "publisher": "Illinois Labor History Society",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Identifies the Mary Brogger meeting-site memorial at 175 N Desplaines, commemorated in 2004.",
+      "Separately lists the cemetery monument at 863 Desplaines Avenue, Forest Park."
+    ],
+    "limitations": [
+      "Similar street names and subject matter do not identify the same place. Current cemetery access is unverified."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  },
+  {
+    "id": "greif-testimony",
+    "url": "https://www.chicagohistoryresources.org/hadc/transcript/volumei/301-350/I325-335.htm",
+    "title": "Testimony of Thomas Greif, July 19, 1886, volume I pp. 325–335",
+    "publisher": "Chicago History Museum, Haymarket Affair Digital Collection",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Greif testified for the prosecution and was cross-examined. He gave 54 West Lake and a location east of Clinton.",
+      "The account describes hall and basement use and the limits of his knowledge."
+    ],
+    "limitations": [
+      "Testimony is attributed evidence, not an independently established conspiracy narrative. The old number is not a modern geocode. Current parcel/building continuity remains unresolved."
+    ],
+    "media_reuse": "unresolved; no image copied",
+    "passage": "A 54 West Lake Street."
+  },
+  {
+    "id": "bushick-testimony",
+    "url": "https://www.chicagohistoryresources.org/hadc/transcript/volumei/000-050/I002-018.htm",
+    "title": "Testimony of Felix V. Bushick, July 16, 1886, volume I pp. 2–18",
+    "publisher": "Chicago History Museum, Haymarket Affair Digital Collection",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Bushick placed Greif’s Hall on the north side of Lake east of Clinton and gave the historical 54 West Lake number.",
+      "The testimony separately describes Zepf’s Hall at Lake and Desplaines."
+    ],
+    "limitations": [
+      "Witness uncertainty about storey counts remains uncertainty. Neither transcript supplies a modern parcel mapping or surviving-building inspection."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  },
+  {
+    "id": "court-photo-catalogue",
+    "url": "https://www.chicagohistoryresources.org/hadc/visuals/26V1380.htm",
+    "title": "Cook County Criminal Court Building and jail, circa 1879, catalogue record",
+    "publisher": "Chicago History Museum, Haymarket Affair Digital Collection",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Catalogue identifies the earlier courthouse/jail with the trial and execution courtyard.",
+      "Credits Alexander J. Copelin, accession 1986.0453 / ICHi 00462."
+    ],
+    "limitations": [
+      "Catalogue direction says northeast corner, conflicting with the museum’s separate west-side description. Do not infer an exact courtyard point from this text. The historical photograph is not copied."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  },
+  {
+    "id": "court-replacement",
+    "url": "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+    "title": "Cook County Criminal Courthouse area caption",
+    "publisher": "Chicago History Museum / Northwestern University, The Dramas of Haymarket",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Describes the 1874 courthouse on Michigan, now Hubbard, at Dearborn.",
+      "States the courthouse was demolished in 1892 for a replacement, later called Courthouse Place; the old jail site became a firehouse."
+    ],
+    "limitations": [
+      "Do not present the extant building as the 1886 trial courtroom. Narrative calls replacement the 1892 courthouse; city lists built 1893, so retain the construction/completion distinction."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  },
+  {
+    "id": "city-courthouse",
+    "url": "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1283",
+    "title": "Courthouse Place",
+    "publisher": "City of Chicago",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Identifies 54 W Hubbard, built 1893, architect Otto H. Matz.",
+      "The surviving structure’s later trials are distinct from the Haymarket-era building."
+    ],
+    "limitations": [
+      "An exterior interpretation anchor, not permission to enter offices or the former jail site."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  },
+  {
+    "id": "nps-forest-park",
+    "url": "https://www.nps.gov/places/haymarket-martyr-s-monument.htm",
+    "title": "Haymarket Martyr’s Monument",
+    "publisher": "National Park Service",
+    "retrieved_at": "2026-11-08",
+    "inspection": "page text inspected",
+    "claims": [
+      "Locates the monument in Forest Home Cemetery, Forest Park, separate from the Chicago meeting site.",
+      "Dates dedication to June 23, 1893 and identifies the Pioneer Aid and Support Association."
+    ],
+    "limitations": [
+      "Use for monument identity/dedication. Do not repeat every general-history assertion or infer contemporary cemetery access or a transit itinerary."
+    ],
+    "media_reuse": "unresolved; no image copied"
+  }
+]

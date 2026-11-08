@@ -1,0 +1,33 @@
+{
+  "topic": "Haymarket and the eight-hour day: meeting, trial and public memory",
+  "area": "Chicago, Illinois",
+  "notes": "Private compact draft. Keep the Chicago memorial and Forest Park cemetery monument distinct. Exclude unconverted historical-address leads and unsupported surviving-building assertions. No stop-count padding or production publication. Former courthouse chapter is an exterior interpretation anchor, not the surviving 1886 courtroom.",
+  "place_leads": [
+    "Haymarket meeting-site memorial",
+    "Former criminal courthouse site / Courthouse Place exterior"
+  ],
+  "event_leads": [
+    "Eight-hour-day organizing",
+    "May 4, 1886 meeting",
+    "Haymarket trial and public memory"
+  ],
+  "source_links": [
+    "https://www.chicagohistory.org/haymarket/",
+    "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1322",
+    "https://www.illinoislaborhistory.org/chicago",
+    "https://www.chicagohistoryresources.org/hadc/transcript/volumei/301-350/I325-335.htm",
+    "https://www.chicagohistoryresources.org/hadc/transcript/volumei/000-050/I002-018.htm",
+    "https://www.chicagohistoryresources.org/hadc/visuals/26V1380.htm",
+    "https://www.chicagohistoryresources.org/dramas/act3/anarchyOnTrial/courthouseArea_c.htm",
+    "https://webapps1.chicago.gov/landmarksweb/web/landmarkdetails.htm?lanId=1283",
+    "https://www.nps.gov/places/haymarket-martyr-s-monument.htm"
+  ],
+  "modes": [
+    "walk"
+  ],
+  "trip_shape": "point_to_point",
+  "duration_minutes": null,
+  "start_preference": "Haymarket meeting-site memorial",
+  "end_preference": "Former criminal courthouse site / Courthouse Place exterior",
+  "pilot_id": "haymarket-v1"
+}
