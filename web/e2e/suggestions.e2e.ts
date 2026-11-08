@@ -170,6 +170,85 @@ test('a lost submission response survives reload and retries the same body and k
 	await expect(page.getByLabel('Topic (required)')).toHaveValue('');
 });
 
+test('unwritable session storage blocks a suggestion before its retry identity can be sent', async ({
+	page,
+	request
+}) => {
+	await requireOpenIntake(request);
+	await signIn(page);
+	let posts = 0;
+	await page.route('**/api/v1/me/route-briefs', (route) => {
+		if (route.request().method() === 'POST') posts++;
+		return route.continue();
+	});
+	await page.goto('/routes/suggestions');
+	await page.evaluate(() => {
+		Object.defineProperty(Storage.prototype, 'setItem', {
+			configurable: true,
+			value: () => {
+				throw new DOMException('storage is unavailable', 'QuotaExceededError');
+			}
+		});
+	});
+	await page.getByLabel('Topic (required)').fill('Durable retry identity');
+	await page.getByLabel('Area (required)').fill('Downers Grove');
+	await page.getByRole('button', { name: 'Submit suggestion', exact: true }).click();
+	await expect(page.getByRole('alert')).toContainText('could not save the retry details');
+	expect(posts).toBe(0);
+	await expect(
+		page.getByRole('button', { name: 'Retry same suggestion', exact: true })
+	).toBeEnabled();
+});
+
+test('a failed local discard keeps the pending suggestion and retry identity', async ({
+	page,
+	request
+}) => {
+	await requireOpenIntake(request);
+	await signIn(page);
+	const ownerID = await page.evaluate(() => {
+		const raw = localStorage.getItem('invisible-museum.session');
+		return JSON.parse(raw ?? '{}').account.id as string;
+	});
+	await page.evaluate((key) => {
+		sessionStorage.setItem(
+			key,
+			JSON.stringify({
+				values: {
+					topic: 'Do not discard this retry',
+					area: 'Downers Grove',
+					notes: '',
+					place_leads: '',
+					event_leads: '',
+					source_links: ''
+				},
+				pending: {
+					key: '00000000-0000-4000-8000-000000000047',
+					submitted: { topic: 'Do not discard this retry', area: 'Downers Grove' }
+				}
+			})
+		);
+	}, `byl.route-suggestion.v1:${ownerID}`);
+	await page.goto('/routes/suggestions');
+	await expect(
+		page.getByRole('button', { name: 'Retry same suggestion', exact: true })
+	).toBeVisible();
+	await page.evaluate(() => {
+		Object.defineProperty(Storage.prototype, 'setItem', {
+			configurable: true,
+			value: () => {
+				throw new DOMException('storage is unavailable', 'QuotaExceededError');
+			}
+		});
+	});
+	await page.getByRole('button', { name: 'Discard local draft', exact: true }).click();
+	await expect(page.getByRole('alert')).toContainText('could not clear the saved retry data');
+	await expect(
+		page.getByRole('button', { name: 'Retry same suggestion', exact: true })
+	).toBeVisible();
+	await expect(page.getByLabel('Topic (required)')).toHaveValue('Do not discard this retry');
+});
+
 test('owners follow research, review and decision states while another account cannot read them', async ({
 	page,
 	request,
