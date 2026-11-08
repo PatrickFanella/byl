@@ -1,0 +1,7 @@
+{
+  "method": "Each decoded provider vertex to the nearest segment in the full 401-node OSM Main Stem reference, local equirectangular metres. Geometry proximity alone cannot establish network identity.",
+  "vertices": 410,
+  "maximum_separation_m": 0.06684325879282166,
+  "p95_separation_m": 0.055010234564299224,
+  "over_25m": 0
+}

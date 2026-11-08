@@ -1,0 +1,33 @@
+{
+  "topic": "Illinois Prairie Path Main Stem: Villa Avenue and Ardmore stations, electric railway and volunteer conversion at Founders Park",
+  "area": "Villa Park to Wheaton, Illinois",
+  "notes": "Private point-to-point bike draft along the Main Stem. Elgin/Aurora branches and Great Western remain separate. Museum/station exteriors and a commemorative interpretation point are distinct from specific event sites. Crossings and shaping controls add no stories. No production publication or access approval. Arrange return separately.",
+  "place_leads": [
+    "Villa Park Historical Museum / former Villa Avenue CA&E station",
+    "Former Ardmore Avenue CA&E station",
+    "Founders Park / Main Stem interpretation point"
+  ],
+  "event_leads": [
+    "CA&E station history",
+    "Volunteer railway-to-path conversion",
+    "May Watts and collective public-path campaign"
+  ],
+  "source_links": [
+    "https://ipp.org/history/",
+    "https://ipp.org/about-the-trail/",
+    "https://ipp.org/pdf/IPP-free-map-color-updated.pdf",
+    "https://www.invillapark.com/262/Historical-Preservation-Commission",
+    "https://www.ipp.org/wp-content/uploads/IPP-2017-DECEMBER-Newsletter-.pdf",
+    "https://www.wheaton.il.us/AgendaCenter/ViewFile/Agenda/_06232025-2882?packet=true",
+    "https://openlands.org/regional-trails/illinois-prairie-path/",
+    "https://ipp.org/construction-updates/"
+  ],
+  "modes": [
+    "bike"
+  ],
+  "trip_shape": "point_to_point",
+  "duration_minutes": null,
+  "start_preference": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+  "end_preference": "Founders Park / Main Stem interpretation point",
+  "pilot_id": "prairie-path-v1"
+}

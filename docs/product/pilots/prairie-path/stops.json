@@ -1,0 +1,120 @@
+[
+  {
+    "key": "villa-avenue-station",
+    "name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+    "municipality": "Villa Park",
+    "address": "220 S Villa Avenue, Villa Park, IL",
+    "position": {
+      "latitude": 41.8856864,
+      "longitude": -87.9695738,
+      "kind": "Historical building location lead",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=220+South+Villa+Avenue%2C+Villa+Park%2C+Illinois&format=jsonv2&limit=3&addressdetails=1"
+    },
+    "proposed_arrival": {
+      "latitude": 41.8858235,
+      "longitude": -87.9695911,
+      "osm_node_id": 14003176326,
+      "kind": "proposed exterior viewpoint on mapped Main Stem",
+      "status": "needs_review",
+      "access_status": "unknown",
+      "source_url": "https://www.openstreetmap.org/node/14003176326",
+      "note": "Desktop selection only; current access, sightline and stopping space require review."
+    },
+    "public_arrival": null,
+    "source_ids": [
+      "villa-park-stations",
+      "ipp-overview"
+    ],
+    "moment_title": "The former interurban station as an interpretation anchor",
+    "date_start": "1929-01-01",
+    "date_precision": "year",
+    "body": "The Village distinguishes the 1929 Villa Avenue station from Ardmore’s earlier station. The museum address is 220 S Villa Avenue. This exterior chapter introduces the former electric railway corridor; it does not promise entry into the museum or establish a current entrance.",
+    "status": "draft",
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "gaps": [
+      "No approved current arrival or crossing/access inspection.",
+      "Short supported history; illustration rights unresolved."
+    ],
+    "date_storage_note": "January 1 stores year precision, not an exact-day event."
+  },
+  {
+    "key": "ardmore-station",
+    "name": "Former Ardmore Avenue CA&E station",
+    "municipality": "Villa Park",
+    "address": "10 W Park Boulevard, Villa Park, IL",
+    "position": {
+      "latitude": 41.8833524,
+      "longitude": -87.9796374,
+      "kind": "Historical building location lead",
+      "source_url": "https://nominatim.openstreetmap.org/search?q=10+West+Park+Boulevard%2C+Villa+Park%2C+Illinois&format=jsonv2&limit=3&addressdetails=1"
+    },
+    "proposed_arrival": {
+      "latitude": 41.8834778,
+      "longitude": -87.9796543,
+      "osm_node_id": 14003176325,
+      "kind": "proposed exterior viewpoint on mapped Main Stem",
+      "status": "needs_review",
+      "access_status": "unknown",
+      "source_url": "https://www.openstreetmap.org/node/14003176325",
+      "note": "Desktop selection only; current access, sightline and stopping space require review."
+    },
+    "public_arrival": null,
+    "source_ids": [
+      "villa-park-stations"
+    ],
+    "moment_title": "An earlier station and a developing suburb",
+    "date_start": "1910-01-01",
+    "date_precision": "year",
+    "body": "The Village dates Ardmore station to 1910 and connects the electric railway with suburban development. This is a separate station identity from Villa Avenue and the Great Western depot. The draft uses an exterior interpretation point, with current approach and business access left for review.",
+    "status": "draft",
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "gaps": [
+      "No approved current arrival or crossing/access inspection.",
+      "Short supported history; illustration rights unresolved."
+    ],
+    "date_storage_note": "January 1 stores year precision, not an exact-day event."
+  },
+  {
+    "key": "founders-interpretation",
+    "name": "Founders Park / Main Stem interpretation point",
+    "municipality": "Wheaton",
+    "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL",
+    "position": {
+      "latitude": 41.8641389,
+      "longitude": -88.1115835,
+      "kind": "Mapped trail interpretation anchor within sourced park-location bounds; not a boulder survey",
+      "source_url": "https://www.openstreetmap.org/node/9765679096"
+    },
+    "proposed_arrival": {
+      "latitude": 41.8641389,
+      "longitude": -88.1115835,
+      "osm_node_id": 9765679096,
+      "kind": "proposed exterior viewpoint on mapped Main Stem",
+      "status": "needs_review",
+      "access_status": "unknown",
+      "source_url": "https://www.openstreetmap.org/node/9765679096",
+      "note": "Desktop selection only; current access, sightline and stopping space require review."
+    },
+    "public_arrival": null,
+    "source_ids": [
+      "ipp-history",
+      "founders-newsletter",
+      "wheaton-location",
+      "openlands"
+    ],
+    "moment_title": "Remembering the campaign to turn railway land into a path",
+    "date_start": "1963-09-30",
+    "date_precision": "day",
+    "body": "The Prairie Path history traces the campaign to May Watts’s 1963 letter and the work of many volunteers. Founders Park provides a later place to interpret that effort. The newsletter and City locate the park along Liberty Drive. This mapped trail point lies within that described area; it is not asserted to be the exact memorial boulder or the place where the campaign’s events occurred.",
+    "status": "draft",
+    "planned_dwell_minutes": 3,
+    "planned_narration_minutes": 1,
+    "gaps": [
+      "No approved current arrival or crossing/access inspection.",
+      "Short supported history; illustration rights unresolved."
+    ],
+    "date_storage_note": "January 1 stores year precision, not an exact-day event."
+  }
+]
