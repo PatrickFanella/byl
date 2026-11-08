@@ -247,6 +247,9 @@ public struct RouteSummary: Codable, Equatable {
 }
 
 public struct RouteLeg: Codable, Equatable {
+    public var fromStopID: String? = nil
+    public var toStopID: String? = nil
+    public var isReturn: Bool? = nil
     public let fromPosition: Int
     public let toPosition: Int
     public let distanceM: Double
@@ -255,6 +258,7 @@ public struct RouteLeg: Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case geometry
+        case fromStopID = "from_stop_id", toStopID = "to_stop_id", isReturn = "return"
         case fromPosition = "from_position"
         case toPosition = "to_position"
         case distanceM = "distance_m"

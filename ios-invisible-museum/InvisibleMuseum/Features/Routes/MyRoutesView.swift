@@ -27,6 +27,8 @@ struct MyRoutesView: View {
                     Label("Suggest a route for curator review", systemImage: "text.bubble")
                 }
                 .buttonStyle(.museum(.secondary, size: .large))
+                NavigationLink("Your route reports") { RouteReportsView() }
+                    .buttonStyle(.museum(.secondary))
                 if !model.isSignedIn {
                     SignInPrompt(reason: "Sign in to build routes that follow you to every device.")
                 } else {

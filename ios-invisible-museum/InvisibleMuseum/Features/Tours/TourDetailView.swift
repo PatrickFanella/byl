@@ -121,6 +121,13 @@ private struct TourDetailContent: View {
                 if tour.tour.revisionID == nil {
                     MuseumInlineHint(text: "A reviewed revision is required before starting this tour.")
                 }
+                if let revisionID = tour.tour.revisionID {
+                    ForEach(tour.tour.modes, id: \.self) { mode in
+                        NavigationLink(mode == "bike" ? "Suggest a cycling route change" : "Suggest a walking route change") {
+                            RouteReportEntryView(tourID: tour.id, revisionID: revisionID, mode: mode)
+                        }.buttonStyle(.museum(.secondary))
+                    }
+                }
                 if let startError { MuseumInlineHint(text: startError, tint: Museum.danger, isError: true) }
                 Button {
                     if model.isSignedIn {
