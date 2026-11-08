@@ -198,6 +198,7 @@ struct ContributionControls: View {
                         .buttonStyle(.museum(.primary)).disabled(controller.busy || !controller.admitted)
                 }
             }
+            if !allowOptIn { Text("Saved summaries wait until you explicitly resume the matching trip. Deletion retries are available here.").font(Museum.bodyFont(12)).foregroundStyle(Museum.muted) }
             Text("\(controller.pending) saved summaries · \(controller.deletionPending) pending deletions")
                 .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
             Button("Retry checks and pending work") { Task { await controller.refresh() } }

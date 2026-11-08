@@ -57,6 +57,7 @@ enum ContributionDay {
 /// Every write/read is bounded and checked before any consent or upload request.
 @MainActor
 public final class ContributionStore {
+    private var erasureWritePending = false
     private(set) var choiceGeneration = 0
     public let directory: URL
     private let file: URL
@@ -111,6 +112,7 @@ public final class ContributionStore {
         change(&records[i]); try write(records)
     }
     func prune() throws {
+        if erasureWritePending { try stopAll() }
         let date = now(), today = ContributionDay.string(date)
         var records = try read().filter { r in
             if let consent = r.consent { return consent.expiresOn > today }
@@ -125,9 +127,11 @@ public final class ContributionStore {
     }
     func stopAll() throws {
         choiceGeneration += 1
+        erasureWritePending = true
         var records = try read()
         for i in records.indices { records[i].enabled = false; records[i].withdrawing = true; records[i].queue = [] }
         try write(records)
+        erasureWritePending = false
     }
     static func validSummary(_ s: DeviationSummary) -> Bool {
         s.schemaVersion == 1 && s.detectorVersion == DeviationDetector.version && !s.calibrated &&

@@ -30,6 +30,7 @@ public final class TripContributions {
     private var foreground = false
     private var ended = false
     private var stopped = false
+    private var uploadsAuthorized = false
     private var storageBroken = false
     private var manualSuspended = false
     private var permissionSuspended = false
@@ -91,7 +92,7 @@ public final class TripContributions {
     public func identityChanged() {
         guard !sameIdentity() else { return }
         choiceEpoch += 1
-        stopped = true; optedIn = false; confirmedConsent = nil; detectors = []; samplingSince = .infinity
+        stopped = true; uploadsAuthorized = false; optedIn = false; confirmedConsent = nil; detectors = []; samplingSince = .infinity
         message = "Reopen this trip after changing accounts or servers before choosing to contribute. Saved deletion details remain available in Profile."
     }
     public func lifecycle(_ event: DeviationDetector.Input) {
@@ -100,7 +101,7 @@ public final class TripContributions {
         case .permissionLost: permissionSuspended = true
         case .manualArrival: manualSuspended = true
         case .resume: manualSuspended = false
-        case .end: ended = true; choiceEpoch += 1
+        case .end: ended = true; uploadsAuthorized = false; choiceEpoch += 1
         case .pause: manualSuspended = true
         }
         for detector in detectors { _ = detector.push(event) }
@@ -109,8 +110,9 @@ public final class TripContributions {
         if ended { detectors = []; confirmedConsent = nil }
     }
     public func setPaused(_ value: Bool) async {
-        if value { choiceEpoch += 1; paused = true; pauseEpisode(); return }
+        if value { choiceEpoch += 1; uploadsAuthorized = false; paused = true; pauseEpisode(); return }
         guard !ended, !storageBroken, !stopped, acceptedGeneration == store.choiceGeneration, sameIdentity() else { return }
+        uploadsAuthorized = true
         await refresh()
         guard optedIn, freshGate, !stopped else { return }
         paused = false; resumeSampling()
@@ -158,7 +160,7 @@ public final class TripContributions {
                 records.append(ContributionRecord(origin: origin, owner: owner, choice: ContributionChoice(tourID: revision.tourID, revisionID: revision.id, mode: mode, requestedOn: ContributionDay.string(now())), key: key(), enabled: true, withdrawing: false, consent: nil, queue: []))
             }
             // The original choice and retry key must be durable before POST.
-            try store.write(records); acceptedGeneration = generation; stopped = false; try restore()
+            try store.write(records); acceptedGeneration = generation; stopped = false; uploadsAuthorized = true; try restore()
             await flush(); try restore()
             guard epoch == choiceEpoch, generation == store.choiceGeneration, !ended, optedIn, freshGate, !stopped, sameIdentity() else { return }
             paused = false; resumeSampling()
@@ -167,7 +169,7 @@ public final class TripContributions {
 
     public func observe(_ fix: DeviationFix, authorizationGranted: Bool) {
         guard acceptedGeneration == store.choiceGeneration else {
-            stopped = true; optedIn = false; paused = true; confirmedConsent = nil; detectors = []; samplingSince = .infinity
+            stopped = true; uploadsAuthorized = false; optedIn = false; paused = true; confirmedConsent = nil; detectors = []; samplingSince = .infinity
             return
         }
         guard authorizationGranted else { lifecycle(.permissionLost); return }
@@ -206,7 +208,7 @@ public final class TripContributions {
     public func eraseAll() async {
         actions += 1; busy = true
         defer { actions -= 1; busy = actions > 0 }
-        stopped = true; optedIn = false; paused = true; confirmedConsent = nil
+        stopped = true; uploadsAuthorized = false; optedIn = false; paused = true; confirmedConsent = nil
         choiceEpoch += 1
         detectors = []; samplingSince = .infinity
         do {
@@ -251,16 +253,16 @@ public final class TripContributions {
                     try store.write(store.read().filter { $0.id != record.id || $0.key != record.key })
                     continue
                 }
-                guard !stopped, acceptedGeneration == store.choiceGeneration, foreground, record.enabled, freshGate, sameIdentity(), record.owner == owner, record.origin == origin else { continue }
+                guard !stopped, uploadsAuthorized, acceptedGeneration == store.choiceGeneration, foreground, record.enabled, freshGate, sameIdentity(), record.owner == owner, record.origin == origin else { continue }
                 if !freshlyConfirmed {
                     let checked = try await api.grant(record.choice, key: record.key)
                     guard checked == consent else { throw ContributionFailure.invalidContract }
                 }
-                guard let current = try store.read().first(where: { $0.id == record.id && $0.key == record.key }), current.enabled, !current.withdrawing, sameIdentity(), foreground, !stopped, acceptedGeneration == store.choiceGeneration, freshGate else { continue }
+                guard let current = try store.read().first(where: { $0.id == record.id && $0.key == record.key }), current.enabled, !current.withdrawing, sameIdentity(), foreground, !stopped, uploadsAuthorized, acceptedGeneration == store.choiceGeneration, freshGate else { continue }
                 if current.id == recordID { confirmedConsent = (current.key, now()) }
                 for pending in current.queue {
                     try store.prune()
-                    guard foreground, !stopped, acceptedGeneration == store.choiceGeneration, freshGate, sameIdentity(),
+                    guard foreground, !stopped, uploadsAuthorized, acceptedGeneration == store.choiceGeneration, freshGate, sameIdentity(),
                           let before = try store.read().first(where: { $0.id == current.id && $0.key == current.key }), before.enabled, !before.withdrawing,
                           before.queue.contains(where: { $0.key == pending.key }), let receipt = before.consent else { break }
                     do { try await api.submit(consent: receipt, summary: pending.summary, key: pending.key) }

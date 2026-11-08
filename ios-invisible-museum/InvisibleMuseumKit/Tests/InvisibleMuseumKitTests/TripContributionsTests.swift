@@ -121,6 +121,12 @@ final class TripContributionsTests: XCTestCase {
         XCTAssertFalse(active.optedIn)
         await active.flush()
         XCTAssertTrue(api.submissions.isEmpty)
+        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: directory.path)
+        let reopenedProfile = try model(settings: true)
+        await reopenedProfile.refresh()
+        XCTAssertTrue(api.submissions.isEmpty)
+        XCTAssertEqual(api.withdrawals.count, 1)
+        XCTAssertTrue(try store.read().isEmpty)
     }
 
     func testNavigationHasNoImplicitConsentAndClosedGateCannotGrant() async throws {
@@ -174,6 +180,15 @@ final class TripContributionsTests: XCTestCase {
         XCTAssertEqual(api.submissions.first?.0, api.submissions.last?.0)
         XCTAssertEqual(api.submissions.last?.1, pending.key)
         XCTAssertEqual(model.pending, 0)
+    }
+
+    func testRestoredTripsAndProfileCannotUploadUntilExplicitResume() async throws {
+        let active = try model(); await active.optIn(); await passage(active)
+        let restored = try model(); let profile = try model(settings: true)
+        await restored.refresh(); await profile.refresh()
+        XCTAssertTrue(api.submissions.isEmpty); XCTAssertTrue(restored.paused)
+        await restored.setPaused(false)
+        XCTAssertEqual(api.submissions.count, 1); XCTAssertFalse(restored.paused)
     }
 
     func testSevenDayExpiryRemovesOfflineSummariesBeforeAnyUpload() async throws {

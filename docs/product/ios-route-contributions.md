@@ -17,7 +17,9 @@ the foreground. Backgrounding, permission loss, a stop arrival, revision switch,
 account/server change, revocation and ending the trip discard the current raw
 window. Arrival and explicit pause require an explicit continuation. Returning
 to the foreground requires a fresh gate and consent check. Restarted trips
-always start paused and require Resume. Cached fixes from before the choice
+always start paused and require Resume. Uploads likewise require an explicit
+choice or Resume on the matching active trip. Profile retries deletion without
+uploading summaries. Cached fixes from before the choice
 cannot begin a passage. Gate/consent checks expire after 60 seconds; visible
 trips refresh every 30 seconds. Observation never requests extra permissions or
 runs background collection.
