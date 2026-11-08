@@ -37,15 +37,17 @@ import tv.subcult.museum.ui.theme.Museum
 
 /** A moment in full: date, media, body, topics, and the sources it rests on. */
 @Composable
-fun MomentScreen(model: AppViewModel, id: String) {
-    var state by remember(id) { mutableStateOf(UiState<MomentDetail>()) }
+fun MomentScreen(model: AppViewModel, id: String, retained: MomentDetail? = null, revisionOnly: Boolean = false, revisionKey: String? = null) {
+    var state by remember(id, retained, revisionOnly, revisionKey) { mutableStateOf(UiState<MomentDetail>()) }
     val scope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
     suspend fun load() {
+        if (retained != null) { state = UiState(LoadStatus.READY, retained); return }
+        if (revisionOnly) { state = UiState(LoadStatus.ERROR, message = "This story is unavailable in the started revision. End the trip to browse the current catalogue."); return }
         state = UiState(LoadStatus.LOADING)
         state = try { UiState(LoadStatus.READY, model.api.moment(id)) } catch (e: Exception) { UiState(LoadStatus.ERROR, message = (e as? ApiException)?.message ?: "Could not load the moment.") }
     }
-    LaunchedEffect(id) { load() }
+    LaunchedEffect(id, retained, revisionOnly, revisionKey) { load() }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         LoadState(state, onRetry = { scope.launch { load() } }) { m ->

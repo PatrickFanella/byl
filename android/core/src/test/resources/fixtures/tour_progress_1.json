@@ -1,0 +1,12 @@
+{
+  "account_id": "b5e4fe4c-e456-4233-889c-f3ead6b7fc93",
+  "completed_at": null,
+  "mode": "walk",
+  "revision_id": "57467d07-921d-4705-bef7-6e1b8800c4e2",
+  "started_at": "2026-11-07T04:02:00.569122-06:00",
+  "tour_id": "b61b2ac5-306e-4e4c-b68e-74a3dc8d2a4b",
+  "updated_at": "2026-11-07T04:02:00.569122-06:00",
+  "visited_stop_ids": [
+    "0152ed8c-ef31-483a-81da-fd0c1fc9ad7a"
+  ]
+}
