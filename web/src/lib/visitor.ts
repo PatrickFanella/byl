@@ -26,8 +26,12 @@ export type MomentDetail = MomentSummary & {
 	topics: Topic[];
 	narration?: MediaAsset | null;
 };
-export type TourDetail = TourSummary & { stops: TourStop[] };
+export type TourDetail = Schemas['TourDetail'];
+export type TourRevision = Schemas['TourRevision'];
+export type RevisionProgress = Schemas['RevisionProgress'];
 export type Account = Schemas['Account'];
+export type RouteSuggestion = Schemas['RouteBrief'];
+export type RouteSuggestionInput = Schemas['RouteBriefInput'];
 
 function qs(params: Record<string, string | number | undefined | null>): string {
 	const u = new URLSearchParams();
@@ -47,6 +51,25 @@ export const getTour = (ref: string) =>
 	api.get<TourDetail>(`/api/v1/tours/${encodeURIComponent(ref)}`);
 export const getRoute = (tour: string, mode: string) =>
 	api.get<TourRoute>(`/api/v1/tours/${encodeURIComponent(tour)}/route${qs({ mode })}`);
+export const getTourRevision = (tour: string, revision: string) =>
+	api.get<TourRevision>(
+		`/api/v1/tours/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`
+	);
+export const listTourRevisions = (tour: string) =>
+	api.list<TourRevision>(`/api/v1/tours/${encodeURIComponent(tour)}/revisions?limit=20`);
+export const getRevisionProgress = (tour: string, revision: string) =>
+	api.get<RevisionProgress>(
+		`/api/v1/me/progress/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`
+	);
+export const putRevisionProgress = (
+	tour: string,
+	revision: string,
+	body: { mode: 'walk' | 'bike'; visited_stop_ids: string[]; completed: boolean; reset?: boolean }
+) =>
+	api.put<RevisionProgress>(
+		`/api/v1/me/progress/${encodeURIComponent(tour)}/revisions/${encodeURIComponent(revision)}`,
+		{ ...body, reset: body.reset ?? false }
+	);
 export const listPlaces = async (city: string) => {
 	const items: PlaceSummary[] = [];
 	let cursor = '';
@@ -85,3 +108,15 @@ export const createTour = (body: Record<string, unknown>) =>
 export const updateTour = (id: string, body: Record<string, unknown>) =>
 	api.patch<TourDetail>(`/api/v1/me/tours/${encodeURIComponent(id)}`, body);
 export const deleteTour = (id: string) => api.del(`/api/v1/me/tours/${encodeURIComponent(id)}`);
+
+// Research suggestions are separate from personal route planning and publication.
+export const routeSuggestionIntake = () =>
+	api.get<{ enabled: boolean }>('/api/v1/route-brief-intake');
+export const myRouteSuggestions = (offset = 0) =>
+	api.list<RouteSuggestion>(`/api/v1/me/route-briefs${qs({ limit: 21, offset })}`);
+export const getRouteSuggestion = (id: string) =>
+	api.get<RouteSuggestion>(`/api/v1/me/route-briefs/${encodeURIComponent(id)}`);
+export const submitRouteSuggestion = (input: RouteSuggestionInput, key: string) =>
+	api.request<RouteSuggestion>('POST', '/api/v1/me/route-briefs', input, false, {
+		'Idempotency-Key': key
+	});

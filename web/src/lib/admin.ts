@@ -206,3 +206,33 @@ export const startBriefResearch = (id: string, version: number) =>
 		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/research`,
 		{ version }
 	);
+
+export type CuratorReviewPackage = Schemas['CuratorReviewPackage'];
+export const getReviewPackage = (id: string, tour_id = '', expected_version?: string) =>
+	api.get<CuratorReviewPackage>(
+		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/review-package${qs({ tour_id, expected_version })}`
+	);
+export const publishReviewPackage = (
+	id: string,
+	input: { version: string; run_id: string; tour_id: string; note: string }
+) =>
+	api.post<Schemas['TourRevision']>(
+		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/review-package/publish`,
+		input
+	);
+export const decideRouteBrief = (
+	id: string,
+	version: number,
+	status: 'needs_research' | 'declined',
+	reason: string
+) =>
+	api.post<RouteBrief>(`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/state`, {
+		version,
+		status,
+		reason
+	});
+export const resumeBriefResearch = (id: string, version: number, run_id: string) =>
+	api.post<Schemas['ResearchRun']>(
+		`/api/v1/admin/route-briefs/${encodeURIComponent(id)}/research/resume`,
+		{ version, run_id }
+	);

@@ -627,6 +627,12 @@ paths:
         "404": { description: Brief not found or not owned }
         "409": { description: Version or lifecycle conflict }
         "422": { description: Field validation failed }
+  /api/v1/route-brief-intake:
+    get:
+      summary: Read whether visitor route suggestions are open
+      description: Controlled by PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED, false by default. This capability is not permission to publish or start research. Returns no-store; clients fail closed if unavailable.
+      responses:
+        "200": { description: Current intake gate, content: { application/json: { schema: { type: object, required: [enabled], properties: { enabled: { type: boolean } } } } } }
   /api/v1/me/route-briefs:
     get:
       summary: List the signed-in account's own private briefs
@@ -643,9 +649,21 @@ paths:
         "409": { description: Version or lifecycle conflict }
         "422": { description: Field validation failed }
     post:
-      summary: Public intake is disabled
+      summary: Submit a private research suggestion when visitor intake is open
+      description: Only topic and area are required. Submitted prose remains an unverified lead. Creation stores a private draft for curator triage; it starts no research and publishes no route. Default-off server gate applies to every creation request, including retries. Existing owner status remains readable when intake closes. Uses 10 new briefs per 24 hours and 20 unresolved briefs per account. Responses are no-store with Vary Authorization.
       security: [{ bearer: [] }]
-      responses: { "401": { description: Authentication required }, "403": { description: Public intake disabled (intake_disabled) } }
+      parameters:
+        - { name: Idempotency-Key, in: header, schema: { type: string, maxLength: 128, pattern: '^[!-~]+$' }, description: Optional owner-scoped retry key; reuse the exact normalized body to recover a lost response }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RouteBriefInput" } } } }
+      responses:
+        "201": { description: Private suggestion created, content: { application/json: { schema: { $ref: "#/components/schemas/RouteBrief" } } } }
+        "200": { description: Existing suggestion for this retry key, content: { application/json: { schema: { $ref: "#/components/schemas/RouteBrief" } } } }
+        "400": { description: Malformed JSON or unknown fields }
+        "401": { description: Authentication required }
+        "403": { description: Public intake disabled (intake_disabled) }
+        "409": { description: Retry key used for different input }
+        "422": { description: Invalid suggestion or retry key }
+        "429": { description: Owner submission quota reached }
   /api/v1/me/route-briefs/{id}:
     parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
     get:
@@ -698,6 +716,33 @@ paths:
         "404": { description: Brief/run/tour unavailable or run belongs to another brief }
         "409": { description: Exact reviewed version changed }
         "422": { description: Invalid version token or package exceeds bounded read size }
+  /api/v1/admin/route-briefs/{id}/review-package/publish:
+    post:
+      operationId: adminPublishCuratorReviewPackage
+      summary: Publish the exact reviewed package atomically
+      description: Curator approval rechecks the complete package version in a serializable transaction, publishes selected prepared dependencies and a retained tour revision, and accepts the brief. Contextual candidates and proposed shared edits remain untouched. Private approval provenance is retained internally and excluded from public revision responses.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version, run_id, tour_id]
+              properties:
+                version: { type: string, pattern: '^[a-f0-9]{64}$' }
+                run_id: { type: string, format: uuid }
+                tour_id: { type: string, format: uuid }
+                note: { type: string, maxLength: 2000, description: Decision reason visible to the brief owner }
+      responses:
+        "200": { description: Published immutable revision, content: { application/json: { schema: { $ref: "#/components/schemas/TourRevision" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Selected brief, run or tour unavailable }
+        "409": { description: Stale, incomplete or concurrently changed review; no package changes committed }
+        "422": { description: Invalid request }
   /api/v1/admin/route-briefs/{id}/itinerary:
     get:
       summary: Inspect a private source-linked itinerary proposal
@@ -716,7 +761,7 @@ paths:
     parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
     get:
       summary: Get the latest private research progress (curators only)
-      description: Source content, submitted snapshots, raw provider errors and stage output are excluded. Owners cannot read another owner's progress. No public intake is enabled.
+      description: Source content, submitted snapshots, raw provider errors and stage output are excluded. Owners cannot read another owner's progress. This status read does not enable intake or research.
       security: [{ bearer: [] }]
       responses:
         "200": { description: Private progress, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchRun" } } } }
@@ -741,7 +786,7 @@ paths:
     parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
     get:
       summary: Get the latest research progress for an owned brief
-      description: Source content, submitted snapshots, raw provider errors and stage output are excluded. Owners cannot read another owner's progress. No public intake is enabled.
+      description: Source content, submitted snapshots, raw provider errors and stage output are excluded. Owners cannot read another owner's progress. This status read does not enable intake or research.
       security: [{ bearer: [] }]
       responses:
         "200": { description: Private progress, content: { application/json: { schema: { $ref: "#/components/schemas/ResearchRun" } } } }
@@ -1607,6 +1652,7 @@ components:
         current_revision_id: { type: string, format: uuid, nullable: true, description: Null before first release; compare the current published pointer as well as the working draft }
     TourSnapshot:
       type: object
+      required: [tour, moments, routes, routing_intent]
       properties:
         tour: { $ref: "#/components/schemas/TourDetail" }
         moments: { type: object, additionalProperties: { $ref: "#/components/schemas/MomentDetail" }, description: Full reviewed selected stories and source/media metadata as captured at release }
@@ -1627,6 +1673,7 @@ components:
             stops: { type: array, items: { type: object, properties: { stop_id: { type: string }, place_id: { type: string }, latitude: { type: number }, longitude: { type: number }, site_latitude: { type: number, description: Present for approved navigation }, site_longitude: { type: number, description: Present for approved navigation }, arrival_point: { $ref: "#/components/schemas/ApprovedArrival", nullable: true } } } }
     TourRevision:
       type: object
+      required: [id, tour_id, number, draft_version, published_at]
       properties:
         id: { type: string, format: uuid }
         tour_id: { type: string, format: uuid }
@@ -2236,6 +2283,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/MomentSummary"
         - type: object
+          required: [body, media, sources, topics]
           properties:
             body: { type: string, description: Markdown }
             media: { type: array, items: { $ref: "#/components/schemas/MediaAsset" } }
@@ -2380,6 +2428,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/TourSummary"
         - type: object
+          required: [stops]
           properties:
             journeys:
               type: object

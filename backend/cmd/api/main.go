@@ -57,6 +57,7 @@ func main() {
 		Sessions:       sessions,
 		SessionManager: sessions,
 		DevAuth:        cfg.DevAuthEnabled,
+		BriefIntake:    cfg.PublicBriefIntake,
 		IsBootstrap:    cfg.IsBootstrapAdmin,
 		Blob:           prov.Blob,
 		MediaFSDir:     prov.MediaFSDir,

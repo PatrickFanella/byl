@@ -7,7 +7,7 @@ import (
 
 func setEnv(t *testing.T, kv map[string]string) {
 	t.Helper()
-	for _, k := range []string{"API_ADDR", "DATABASE_URL", "ROUTING_PROVIDER", "NARRATION_PROVIDER", "MEDIA_STORE", "JOB_WORKERS", "SESSION_TTL_HOURS", "APPLE_CLIENT_IDS", "ADMIN_BOOTSTRAP_EMAILS", "DEV_AUTH_ENABLED", "LLM_PROVIDER", "BRIEF_DISCOVERY_PROVIDERS", "BRIEF_DISCOVERY_SEED_URLS"} {
+	for _, k := range []string{"API_ADDR", "DATABASE_URL", "ROUTING_PROVIDER", "NARRATION_PROVIDER", "MEDIA_STORE", "JOB_WORKERS", "SESSION_TTL_HOURS", "APPLE_CLIENT_IDS", "ADMIN_BOOTSTRAP_EMAILS", "DEV_AUTH_ENABLED", "PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED", "LLM_PROVIDER", "BRIEF_DISCOVERY_PROVIDERS", "BRIEF_DISCOVERY_SEED_URLS"} {
 		t.Setenv(k, "")
 	}
 	for k, v := range kv {
@@ -108,5 +108,20 @@ func TestLoadSourcesSettings(t *testing.T) {
 	}
 	if !strings.HasPrefix(cfg.SourcesUserAgent, "InvisibleMuseum/") {
 		t.Fatalf("ua %q", cfg.SourcesUserAgent)
+	}
+}
+
+func TestPublicBriefIntakeIsExplicitAndDefaultOff(t *testing.T) {
+	for _, tc := range []struct {
+		value   string
+		enabled bool
+	}{{"", false}, {"false", false}, {"true", true}, {"not-enabled", false}} {
+		t.Run(tc.value, func(t *testing.T) {
+			setEnv(t, map[string]string{"DATABASE_URL": "postgres://x", "PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED": tc.value})
+			cfg, err := Load()
+			if err != nil || cfg.PublicBriefIntake != tc.enabled {
+				t.Fatalf("intake gate %v %v", cfg.PublicBriefIntake, err)
+			}
+		})
 	}
 }

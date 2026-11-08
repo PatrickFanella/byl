@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { invalidateAll } from '$app/navigation';
 	import BriefItineraryPanel from '#lib/components/BriefItineraryPanel.svelte';
+	import CuratorPackagePanel from '#lib/components/CuratorPackagePanel.svelte';
 	import RouteBriefForm from '#lib/components/RouteBriefForm.svelte';
 	import { when } from '#lib/format.ts';
 	import type { PageProps } from './$types';
@@ -18,7 +19,8 @@
 					processing: 'Research is in progress. Editing is paused until processing stops.',
 					needs_research: 'More research is needed before this brief can move forward.',
 					review: 'This brief is ready for curator review.',
-					accepted: 'A curator accepted this brief. Tour publication is a separate review step.',
+					accepted:
+						'A curator accepted this brief. Check the package review below for the publication result.',
 					declined: 'A curator declined this brief. Saving edits creates a draft for fresh review.'
 				}[data.brief.status]
 	);
@@ -55,7 +57,7 @@
 	>
 		Brief saved.
 	</p>{/if}
-{#key `${data.brief.id}:${data.brief.version}`}
+{#key data.brief.id}
 	<RouteBriefForm
 		brief={data.brief}
 		onsaved={async () => {
@@ -69,3 +71,7 @@
 	brief={data.brief}
 	onresearchrequested={(id, version) => (requestedKey = `${id}:${version}`)}
 />
+
+{#key data.brief.id}
+	<CuratorPackagePanel brief={data.brief} onchanged={refresh} />
+{/key}
