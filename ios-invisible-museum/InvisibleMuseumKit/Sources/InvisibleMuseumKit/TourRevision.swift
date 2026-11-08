@@ -13,11 +13,23 @@ public struct ReviewedCorridor: Codable, Equatable {
         public struct Segment: Codable, Equatable {
             public let id: String
             public let access: [Access]?
+            public let geometry: LineString?
+            public let signalReferences: [String: ReviewedSignalReference]?
+            enum CodingKeys: String, CodingKey { case id, access, geometry; case signalReferences = "signal_references" }
+            public init(from decoder: Decoder) throws {
+                let c = try decoder.container(keyedBy: CodingKeys.self)
+                id = try c.decode(String.self, forKey: .id)
+                access = try c.decodeIfPresent([Access].self, forKey: .access)
+                // Optional observation metadata must never break historical navigation.
+                geometry = try? c.decodeIfPresent(LineString.self, forKey: .geometry)
+                signalReferences = try? c.decodeIfPresent([String: ReviewedSignalReference].self, forKey: .signalReferences)
+            }
         }
         public struct Selection: Codable, Equatable {
             public struct Traversal: Codable, Equatable {
                 public let segmentID: String
-                enum CodingKeys: String, CodingKey { case segmentID = "segment_id" }
+                public let reverse: Bool?
+                enum CodingKeys: String, CodingKey { case segmentID = "segment_id", reverse }
             }
             public let mode: String
             public let path: [Traversal]

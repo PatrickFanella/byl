@@ -339,6 +339,8 @@ public struct TourStop: Codable, Identifiable, Equatable {
 }
 
 public struct TourDetail: Codable, Identifiable, Equatable {
+    private let transitJSON: RetainedTransitJSON?
+    public var hasTransit: Bool { transitJSON != nil }
     public let corridor: ReviewedCorridor?
     public let journeys: [String: RouteJourney]?
     public let tour: TourSummary
@@ -347,7 +349,7 @@ public struct TourDetail: Codable, Identifiable, Equatable {
     public var id: String { tour.id }
 
     enum CodingKeys: String, CodingKey {
-        case stops, journeys, corridor
+        case stops, journeys, corridor, transit
     }
 
     public init(from decoder: Decoder) throws {
@@ -356,6 +358,7 @@ public struct TourDetail: Codable, Identifiable, Equatable {
         stops = try container.decodeIfPresent([TourStop].self, forKey: .stops) ?? []
         journeys = try container.decodeIfPresent([String: RouteJourney].self, forKey: .journeys)
         corridor = try container.decodeIfPresent(ReviewedCorridor.self, forKey: .corridor)
+        transitJSON = try container.decodeIfPresent(RetainedTransitJSON.self, forKey: .transit)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -364,6 +367,33 @@ public struct TourDetail: Codable, Identifiable, Equatable {
         try container.encode(stops, forKey: .stops)
         try container.encodeIfPresent(journeys, forKey: .journeys)
         try container.encodeIfPresent(corridor, forKey: .corridor)
+        try container.encodeIfPresent(transitJSON, forKey: .transit)
+    }
+
+    // Preserve unsupported transit metadata through cache round-trips. This is
+    // an exclusion for observation, not a transit presentation or planning API.
+    private enum RetainedTransitJSON: Codable, Equatable {
+        case null, bool(Bool), number(Double), string(String), array([Self]), object([String: Self])
+        init(from decoder: Decoder) throws {
+            let c = try decoder.singleValueContainer()
+            if c.decodeNil() { self = .null }
+            else if let v = try? c.decode(Bool.self) { self = .bool(v) }
+            else if let v = try? c.decode(Double.self) { self = .number(v) }
+            else if let v = try? c.decode(String.self) { self = .string(v) }
+            else if let v = try? c.decode([Self].self) { self = .array(v) }
+            else { self = .object(try c.decode([String: Self].self)) }
+        }
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.singleValueContainer()
+            switch self {
+            case .null: try c.encodeNil()
+            case .bool(let v): try c.encode(v)
+            case .number(let v): try c.encode(v)
+            case .string(let v): try c.encode(v)
+            case .array(let v): try c.encode(v)
+            case .object(let v): try c.encode(v)
+            }
+        }
     }
 }
 

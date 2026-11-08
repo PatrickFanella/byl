@@ -5,6 +5,8 @@ import InvisibleMuseumKit
 struct ProfileView: View {
     @AppStorage("byl.appearance") private var appearance: BylAppearance = .system
     @Environment(AppModel.self) private var model
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var contributions: TripContributions?
     @State private var baseURL = AppModel.resolveBaseURL()
     @State private var audioGuide = false
     @State private var signingOut = false
@@ -29,10 +31,23 @@ struct ProfileView: View {
                     .foregroundStyle(Museum.text)
                 }
                 preferences
+                if let contributions { MuseumCard { ContributionControls(controller: contributions, allowOptIn: false) } }
+                if let error = model.contributionError { MuseumInlineHint(text: error, tint: Museum.danger, isError: true) }
                 developer
                 about
             }
             .onAppear { audioGuide = model.audioGuideEnabled }
+            .task(id: model.contributionSessionVersion) {
+                contributions?.setForeground(false)
+                contributions = model.contributionModel()
+                contributions?.setForeground(scenePhase == .active)
+                await contributions?.refresh()
+            }
+            .onDisappear { contributions?.setForeground(false) }
+            .onChange(of: scenePhase) { _, phase in
+                contributions?.setForeground(phase == .active)
+                if phase == .active { Task { await contributions?.refresh() } }
+            }
         }
     }
 
@@ -154,6 +169,50 @@ struct ProfileView: View {
         case .authorized: return "Allowed while using"
         case .denied: return "Off"
         case .unknown: return "Not asked yet"
+        }
+    }
+}
+
+
+/// Shared privacy controls remain available after sign-out for retained deletion handles.
+struct ContributionControls: View {
+    let controller: TripContributions
+    let allowOptIn: Bool
+    @State private var confirmErase = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Overline(text: "Route improvement")
+            Text(controller.message).font(Museum.bodyFont(14)).foregroundStyle(Museum.text)
+            Text("Optional contributions use location only while this trip is visible and you have chosen to contribute. Raw fixes stay in memory. Qualified summaries contain a route segment, direction, UTC day and counts; they are linked to your account, not anonymous. Navigation works with contributions off.")
+                .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
+            Text("Unsent summaries expire after seven UTC days. Server contributions and consent expire after 30 days. Restarting the app pauses collection until you choose Resume. This does not report closures or prove that a route is safe or accessible.")
+                .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
+            if allowOptIn && controller.eligible && controller.identityAvailable {
+                if controller.optedIn {
+                    Button(controller.paused ? "Resume contributions" : "Pause contributions") {
+                        Task { await controller.setPaused(!controller.paused) }
+                    }.buttonStyle(.museum(.secondary)).disabled(controller.busy)
+                } else {
+                    Button("Contribute for this revision and mode") { Task { await controller.optIn() } }
+                        .buttonStyle(.museum(.primary)).disabled(controller.busy || !controller.admitted)
+                }
+            }
+            if !allowOptIn { Text("Saved summaries wait until you explicitly resume the matching trip. Deletion retries are available here.").font(Museum.bodyFont(12)).foregroundStyle(Museum.muted) }
+            Text("\(controller.pending) saved summaries · \(controller.deletionPending) pending deletions")
+                .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
+            Button("Retry checks and pending work") { Task { await controller.refresh() } }
+                .buttonStyle(.museum(.secondary)).disabled(controller.busy)
+            Button("Stop and delete retained contributions", role: .destructive) { confirmErase = true }
+                .buttonStyle(.museum(.secondary)).disabled(controller.retainedCount == 0)
+            Text("Deletion covers retained choices on this device, including other servers. A lost consent receipt needs the original account and server to recover it. Keep pending deletion details until the server confirms deletion. Other devices and lost deletion handles need separate attention.")
+                .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
+        }
+        .confirmationDialog("Stop and delete retained contributions?", isPresented: $confirmErase, titleVisibility: .visible) {
+            Button("Stop and delete", role: .destructive) { Task { await controller.eraseAll() } }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Collection stops and unsent summaries are erased immediately. Saved deletion details remain until each server confirms removal or the original consent expires.")
         }
     }
 }

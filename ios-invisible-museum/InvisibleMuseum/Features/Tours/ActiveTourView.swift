@@ -5,6 +5,8 @@ import InvisibleMuseumKit
 /// Apple Maps handoff, the audio toggle, and progress.
 struct ActiveTourView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var showContributions = false
     let active: ActiveTourModel
     @State private var showEndConfirm = false
     @State private var path = NavigationPath()
@@ -60,6 +62,16 @@ struct ActiveTourView: View {
                     .presentationDetents([.medium, .large])
                     .presentationBackground(Museum.background)
             }
+            .sheet(isPresented: $showContributions) {
+                NavigationStack {
+                    MuseumScreen {
+                        if let controller = contributionController { ContributionControls(controller: controller, allowOptIn: true) }
+                        if let error = model.contributionError { MuseumInlineHint(text: error, tint: Museum.danger, isError: true) }
+                    }
+                    .navigationTitle("Route improvement")
+                    .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { showContributions = false } } }
+                }
+            }
             .sheet(isPresented: $showTripReview) { tripReview }
             .sheet(isPresented: $showReport, onDismiss: {
                 if reviewAfterReport { reviewAfterReport = false; showTripReview = true }
@@ -91,8 +103,25 @@ struct ActiveTourView: View {
                 }
                 await active.checkForUpdate()
             }
+            .task(id: ObjectIdentifier(active)) {
+                guard let controller = contributionController else { return }
+                updateContributionVisibility()
+                while !Task.isCancelled && model.active === active {
+                    if scenePhase == .active { await controller.refresh() }
+                    do { try await Task.sleep(for: .seconds(30)) } catch { return }
+                }
+            }
+            .onChange(of: scenePhase) { _, _ in updateContributionVisibility() }
+            .onChange(of: showTripReview) { _, _ in updateContributionVisibility() }
+            .onChange(of: showReport) { _, _ in updateContributionVisibility() }
+            .onChange(of: showEndConfirm) { _, _ in updateContributionVisibility() }
+            .onChange(of: active.arrivedStop?.id) { _, id in
+                contributionController?.lifecycle(id == nil ? .resume : .manualArrival)
+                updateContributionVisibility()
+            }
+            .onDisappear { contributionController?.setForeground(false) }
             .onChange(of: active.revoked) { _, revoked in
-                if revoked { model.narration.stop(); model.location.stop(); showTripReview = false; showReport = false }
+                if revoked { contributionController?.lifecycle(.end); contributionController?.setForeground(false); model.narration.stop(); model.location.stop(); showTripReview = false; showReport = false }
             }
             .onAppear {
                 model.location.requestWhenInUseAuthorization()
@@ -131,6 +160,8 @@ struct ActiveTourView: View {
                     Text("Route being computed. Stops still work.")
                         .font(Museum.bodyFont(12)).foregroundStyle(Museum.muted)
                 }
+                Button("Route improvement · \(contributionController?.optedIn == true ? (contributionController?.paused == true ? "Paused" : "On") : "Off")") { showContributions = true }
+                    .buttonStyle(.museum(.secondary, size: .small))
                 bottomCard
             }
             .padding(.horizontal, Museum.Spacing.pageHorizontal)
@@ -227,7 +258,7 @@ struct ActiveTourView: View {
                         MuseumInlineHint(text: "Location is off. Tap I'm here at each stop, or allow location in Settings.", tint: Museum.muted)
                     }
                     HStack(spacing: 10) {
-                        Button { active.markArrivedAtNextStop() } label: { Label("I'm here", systemImage: "checkmark.circle") }
+                        Button { contributionController?.lifecycle(.manualArrival); active.markArrivedAtNextStop() } label: { Label("I'm here", systemImage: "checkmark.circle") }
                             .buttonStyle(.museum(.primary, size: .small))
                         Button { active.openNextStopInMaps() } label: { Label("Open in Maps", systemImage: "map") }
                             .buttonStyle(.museum(.secondary, size: .small))
@@ -256,6 +287,15 @@ struct ActiveTourView: View {
                 }
             }
         }
+    }
+
+    private var contributionController: TripContributions? { model.active === active ? model.contributions : nil }
+
+    private func updateContributionVisibility() {
+        guard let controller = contributionController else { return }
+        let visible = scenePhase == .active && !active.revoked && !active.isComplete && active.arrivedStop == nil && !showTripReview && !showReport && !showEndConfirm
+        controller.setForeground(visible)
+        if visible { Task { await controller.refresh() } }
     }
 
     private var distanceLabel: String {
