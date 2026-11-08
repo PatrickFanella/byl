@@ -181,7 +181,7 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     fun endTour(reset: Boolean) {
         val tour = _state.value.active ?: return
         if (reset) tour.resetProgress()
-        tour.end()
+        if (!tour.end()) return
         narrationJob?.cancel()
         container.narration.stop()
         _state.update { if (it.active === tour) it.copy(active = null) else it }
