@@ -9,6 +9,7 @@ struct StopMomentSheet: View {
     @State private var place: Loadable<PlaceDetail> = .idle
 
     let stop: TourStop
+    var active: ActiveTourModel? = nil
     var isLast = false
 
     var body: some View {
@@ -27,10 +28,10 @@ struct StopMomentSheet: View {
                     }
                 }
                 if let featured = stop.featuredMoment {
-                    NavigationLink(value: MomentRoute(id: featured.id)) { MomentCard(moment: featured, prominent: true) }
+                    storyLink(featured) { MomentCard(moment: featured, prominent: true) }
                         .buttonStyle(.plain)
                     HStack(spacing: 10) {
-                        NavigationLink(value: MomentRoute(id: featured.id)) {
+                        storyLink(featured) {
                             Label("Read the full story", systemImage: "book")
                         }
                         .buttonStyle(.museum(.secondary))
@@ -75,12 +76,21 @@ struct StopMomentSheet: View {
     }
 
     private func loadPlace() async {
-        guard stop.place.momentCount > 1 else { return }
+        guard active?.revision == nil, active?.legacyResume != true, stop.place.momentCount > 1 else { return }
         place = .loading
         do {
             place = .loaded(try await model.api.place(stop.place.id))
         } catch {
             place = .failed(error.museumMessage)
+        }
+    }
+
+    @ViewBuilder
+    private func storyLink<Label: View>(_ moment: MomentSummary, @ViewBuilder label: () -> Label) -> some View {
+        if let active, active.revision != nil || active.legacyResume {
+            NavigationLink { MomentView(id: moment.id, retained: active.retainedMoment(moment.id), revisionOnly: true) } label: { label() }
+        } else {
+            NavigationLink(value: MomentRoute(id: moment.id)) { label() }
         }
     }
 }

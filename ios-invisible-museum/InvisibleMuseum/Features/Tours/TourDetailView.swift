@@ -29,6 +29,8 @@ struct TourDetailView: View {
 private struct TourDetailContent: View {
     @Environment(AppModel.self) private var model
     let detail: TourDetailModel
+    @State private var startBusy = false
+    @State private var startError: String?
 
     var body: some View {
         switch detail.state {
@@ -40,6 +42,9 @@ private struct TourDetailContent: View {
             if let tour = detail.tour {
                 header(tour)
                 modes(tour)
+                ForEach(tour.tour.modes, id: \.self) { mode in
+                    TripJourneyView(tour: tour, mode: mode, journey: tour.journeys?[mode])
+                }
                 actions(tour)
                 stops(tour)
             }
@@ -100,13 +105,23 @@ private struct TourDetailContent: View {
             } else {
                 ForEach(tour.tour.modes, id: \.self) { mode in
                     Button {
-                        model.startTour(tour, mode: mode)
+                        startBusy = true
+                        startError = nil
+                        Task {
+                            defer { startBusy = false }
+                            do { try await model.startTour(tour, mode: mode) }
+                            catch { startError = error.museumMessage }
+                        }
                     } label: {
                         Label(mode == "bike" ? "Start riding" : "Start walking", systemImage: mode == "bike" ? "bicycle" : "figure.walk")
                     }
                     .buttonStyle(.museum(mode == tour.tour.modes.first ? .primary : .secondary, size: .large))
-                    .disabled(tour.stops.isEmpty)
+                    .disabled(startBusy || !detail.canStart(mode: mode))
                 }
+                if tour.tour.revisionID == nil {
+                    MuseumInlineHint(text: "A reviewed revision is required before starting this tour.")
+                }
+                if let startError { MuseumInlineHint(text: startError, tint: Museum.danger, isError: true) }
                 Button {
                     if model.isSignedIn {
                         Task {

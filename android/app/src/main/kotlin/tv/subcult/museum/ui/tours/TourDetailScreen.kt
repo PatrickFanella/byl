@@ -26,12 +26,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import tv.subcult.museum.core.ApiException
 import tv.subcult.museum.core.LoadStatus
 import tv.subcult.museum.core.TourDetail
 import tv.subcult.museum.core.distanceText
 import tv.subcult.museum.core.estimateText
 import tv.subcult.museum.core.modeLabel
+import tv.subcult.museum.core.canStart
 import tv.subcult.museum.ui.AppViewModel
 import tv.subcult.museum.ui.components.Card
 import tv.subcult.museum.ui.components.EmptyCard
@@ -52,6 +54,8 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
     var saved by remember { mutableStateOf(false) }
     var saveError by remember { mutableStateOf<String?>(null) }
     var wantSave by remember { mutableStateOf(false) }
+    var startBusy by remember(ref) { mutableStateOf(false) }
+    var startError by remember(ref) { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
     suspend fun load() {
@@ -93,13 +97,28 @@ fun TourDetailScreen(model: AppViewModel, ref: String, onOpenPlace: (placeId: St
                 }
             }
 
+            tour.modes.forEach { mode -> TripJourney(tour, mode, tour.journeys?.get(mode)) }
+
             if (tour.status != "published") Text("Draft · Only you can open this route. Its path needs review before publication or sharing.", color = Museum.muted, style = MaterialTheme.typography.bodyMedium)
             else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 tour.modes.forEachIndexed { i, mode ->
                     val label = if (mode == "bike") "Start riding" else "Start walking"
-                    if (i == 0) Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.startTour(tour, mode) }, enabled = tour.stops.isNotEmpty(), modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text(label) }
-                    else OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.startTour(tour, mode) }, enabled = tour.stops.isNotEmpty(), modifier = Modifier.fillMaxWidth()) { Text(label) }
+                    val start = {
+                        startBusy = true
+                        startError = null
+                        scope.launch {
+                            try { model.startTour(tour, mode) }
+                            catch (e: CancellationException) { throw e }
+                            catch (e: Exception) { startError = (e as? ApiException)?.message ?: "Could not start this reviewed trip." }
+                            finally { startBusy = false }
+                        }
+                        Unit
+                    }
+                    if (i == 0) Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = start, enabled = !startBusy && tour.canStart(mode), modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text(if (startBusy) "Starting…" else label) }
+                    else OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = start, enabled = !startBusy && tour.canStart(mode), modifier = Modifier.fillMaxWidth()) { Text(if (startBusy) "Starting…" else label) }
                 }
+                if (tour.revisionId == null) Text("A reviewed revision is required before starting this tour.", color = Museum.muted)
+                startError?.let { Text(it, color = Museum.danger) }
                 OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                     onClick = {
                         if (!app.isSignedIn) { wantSave = true; return@OutlinedButton }

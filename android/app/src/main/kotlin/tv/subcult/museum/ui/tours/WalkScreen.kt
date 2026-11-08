@@ -35,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import tv.subcult.museum.core.ApiException
+import tv.subcult.museum.core.ActiveTour
 import tv.subcult.museum.core.LoadStatus
 import tv.subcult.museum.core.PlaceDetail
 import tv.subcult.museum.core.TourStop
@@ -55,6 +57,8 @@ import tv.subcult.museum.ui.components.MomentCard
 import tv.subcult.museum.ui.components.Overline
 import tv.subcult.museum.ui.components.UiState
 import tv.subcult.museum.ui.theme.Museum
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 
 /** Walking or riding mode: map, next stop with distance, arrival by GPS or by hand, directions, audio, progress. */
 @Composable
@@ -71,6 +75,20 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     val context = LocalContext.current
     var granted by remember { mutableStateOf(model.container.location.hasPermission()) }
     var showEnd by remember { mutableStateOf(false) }
+    var showReview by remember(active) { mutableStateOf(false) }
+    var confirmUpdate by remember(active) { mutableStateOf(false) }
+    var updateBusy by remember(active) { mutableStateOf(false) }
+    var updateError by remember(active) { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    if (!active.canUse) {
+        LaunchedEffect(active, state.revoked, app.session) { model.container.narration.stop(); model.container.location.stop() }
+        Column(Modifier.fillMaxSize().background(Museum.background).statusBarsPadding().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(if (state.revoked) "This revision is no longer available to this account." else "This trip belongs to a different session. Its saved revision is kept for the account that started it.", color = Museum.text)
+            state.syncError?.let { Text(it, color = Museum.danger) }
+            Button(onClick = { if (model.endTour(false)) onEnded() }) { Text("End trip") }
+        }
+        return
+    }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { r ->
         granted = r.values.any { it }
         if (granted) model.container.location.start()
@@ -80,7 +98,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
         if (!granted) permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
     }
     LocationWhileStarted(model, granted)
-    LaunchedEffect(fix) { fix?.let { active.handleFix(it) } }
+    LaunchedEffect(fix, active) { fix?.let { active.handleFix(it) } }
     // Arrival: with the guide on, play the featured moment once per announcement. The sheet is
     // driven by state.arrivedStop and cleared through acknowledgeArrival, so rotation does not replay it.
     LaunchedEffect(state.arrivedStop?.id) {
@@ -92,16 +110,19 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     val next = state.nextStop
 
     Box(Modifier.fillMaxSize().background(Museum.background)) {
-        TourMap(stops, state, fix, Modifier.fillMaxSize())
+        val mapStops = stops.mapNotNull { stop -> active.navigationPoint(stop)?.let { point -> stop.copy(place = stop.place.copy(latitude = point.lat, longitude = point.lng)) } }
+        TourMap(mapStops, state, fix, Modifier.fillMaxSize())
 
         Row(Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Pill(onClick = { showEnd = true }) { Text("End") }
-            Pill { Text(active.tour.title, style = MaterialTheme.typography.titleMedium) }
+            Pill(onClick = { showReview = true }) { Text(if (active.revision != null) "Trip · Revision ${active.revision?.number}" else active.tour.title, style = MaterialTheme.typography.titleMedium) }
             Pill(onClick = { model.setAudioGuide(!app.audioEnabled) }) { Text(if (app.audioEnabled) "🔊" else "🔇") }
         }
 
         Column(Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (state.routeFromCache) Pill { Text("Offline: using the saved route", style = MaterialTheme.typography.bodySmall, color = Museum.muted) }
+            if (state.legacyResume) Pill { Text("Older saved trip · Cached itinerary and local progress. End it to start a reviewed revision.", color = Museum.muted, style = MaterialTheme.typography.bodySmall) }
+            if (state.availableUpdate != null) Pill(onClick = { showReview = true }) { Text("New revision available · Review update", color = Museum.text) }
+            if (state.routeFromCache) Pill { Text("Using the saved route", style = MaterialTheme.typography.bodySmall, color = Museum.muted) }
             state.routeMessage?.let { Pill { Text("$it. Stops still work; use Directions.", style = MaterialTheme.typography.bodySmall, color = Color(0xFFFDE68A)) } }
 
             Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Museum.background).padding(16.dp)) {
@@ -122,7 +143,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                             !granted -> Text("Location is off. Tap I'm here at each stop, or allow location in Settings.", style = MaterialTheme.typography.bodySmall, color = Museum.muted)
                             fix == null -> Text("Waiting for your location…", style = MaterialTheme.typography.bodySmall, color = Museum.muted)
                         }
-                        state.syncError?.let { Text("Progress saved on this device; the server will catch up later.", style = MaterialTheme.typography.bodySmall, color = Color(0xFFFDE68A)) }
+                        state.syncError?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = Museum.danger) }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { active.markArrived() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("I'm here") }
                             OutlinedButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = {
@@ -141,7 +162,8 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
                         Overline("Tour complete", Museum.success)
                         Text("You walked every stop of ${active.tour.title}.", style = MaterialTheme.typography.titleMedium, color = Museum.text)
                         if (!app.isSignedIn) Text("Sign in to keep this on your account.", style = MaterialTheme.typography.bodySmall, color = Museum.muted)
-                        Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { model.endTour(false); onEnded() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("Done") }
+                        state.syncError?.let { Text(it, color = Museum.danger) }
+                        Button(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { if (model.endTour(false)) onEnded() }, colors = ButtonDefaults.buttonColors(containerColor = Museum.action, contentColor = Museum.actionText)) { Text("Done") }
                     }
                 }
             }
@@ -151,7 +173,7 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
     state.arrivedStop?.let { stop ->
         val dismiss = { active.acknowledgeArrival(); model.container.narration.stop() }
         ModalBottomSheet(onDismissRequest = dismiss, containerColor = Museum.background) {
-            ArrivalSheet(model, stop, isLast = state.isComplete, playing = playing, onOpenMoment = { active.acknowledgeArrival(); onOpenMoment(it) }, onContinue = dismiss)
+            ArrivalSheet(model, active, stop, isLast = state.isComplete, playing = playing, onOpenMoment = { active.acknowledgeArrival(); onOpenMoment(it) }, onContinue = dismiss)
         }
     }
 
@@ -160,14 +182,53 @@ fun WalkScreen(model: AppViewModel, onOpenMoment: (String) -> Unit, onEnded: () 
             onDismissRequest = { showEnd = false },
             title = { Text("End this tour?") },
             text = { Text(active.progressText) },
-            confirmButton = { TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false; model.endTour(false); onEnded() }) { Text("Keep my progress and end") } },
+            confirmButton = { TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false; if (model.endTour(false)) onEnded() }) { Text("Keep my progress and end") } },
             dismissButton = {
                 Row {
-                    TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false; model.endTour(true); onEnded() }) { Text("Start over next time", color = Museum.danger) }
+                    TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false; if (model.endTour(true)) onEnded() }) { Text("Start over next time", color = Museum.danger) }
                     TextButton(shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp), onClick = { showEnd = false }) { Text("Cancel") }
                 }
             }
         )
+    }
+
+    if (showReview) {
+        ModalBottomSheet(onDismissRequest = { showReview = false }, containerColor = Museum.background) {
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(18.dp).navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(active.tour.title, color = Museum.text, style = MaterialTheme.typography.headlineSmall)
+                Text("Started revision ${active.revision?.number ?: "unavailable"}", color = Museum.text, style = MaterialTheme.typography.headlineSmall)
+                Text("This itinerary remains in use until you explicitly choose a different revision.", color = Museum.muted)
+                TripJourney(active.tour, active.mode, state.route?.journey)
+                OutlinedButton(onClick = { scope.launch { active.checkForUpdate() } }, enabled = active.revision != null && !state.checkingUpdate && !updateBusy) { Text(if (state.checkingUpdate) "Checking…" else "Check for an update") }
+                state.updateError?.let { Text(it, color = Museum.danger) }
+                state.availableUpdate?.let { candidate ->
+                    Text("Available revision ${candidate.number}", color = Museum.text, style = MaterialTheme.typography.headlineSmall)
+                    candidate.snapshot?.let {
+                        Text(it.tour.title, color = Museum.text, style = MaterialTheme.typography.titleLarge)
+                        TripJourney(it.tour, active.mode, it.routes[active.mode]?.journey)
+                    }
+                    Text("Only visits to unchanged stops carry forward by stop ID. New or changed stops remain unvisited. Your old revision's progress stays separate.", color = Museum.muted)
+                    Button(onClick = { confirmUpdate = true }, enabled = !updateBusy && candidate.unavailableReason(active.mode) == null) { Text(if (updateBusy) "Switching…" else "Use revision ${candidate.number}") }
+                }
+                updateError?.let { Text(it, color = Museum.danger) }
+                TextButton(onClick = { showReview = false }) { Text("Done") }
+            }
+        }
+    }
+    if (confirmUpdate) {
+        AlertDialog(onDismissRequest = { confirmUpdate = false }, title = { Text("Switch to the reviewed update?") }, text = { Text("The route and stop order may change. Only unchanged stop identities keep their visited state. Your old revision remains saved separately.") }, confirmButton = {
+            TextButton(onClick = {
+                confirmUpdate = false
+                updateBusy = true
+                updateError = null
+                scope.launch {
+                    try { model.adoptUpdate(active); showReview = false }
+                    catch (e: CancellationException) { throw e }
+                    catch (e: Exception) { updateError = (e as? ApiException)?.message ?: "Could not switch this trip. Try again when connected." }
+                    finally { updateBusy = false }
+                }
+            }) { Text("Switch revision") }
+        }, dismissButton = { TextButton(onClick = { confirmUpdate = false }) { Text("Cancel") } })
     }
 }
 
@@ -200,10 +261,10 @@ private fun Pill(onClick: (() -> Unit)? = null, content: @Composable () -> Unit)
 
 /** Shown on arrival: the featured moment with Listen, and the place's other moments. */
 @Composable
-private fun ArrivalSheet(model: AppViewModel, stop: TourStop, isLast: Boolean, playing: Boolean, onOpenMoment: (String) -> Unit, onContinue: () -> Unit) {
+private fun ArrivalSheet(model: AppViewModel, active: ActiveTour, stop: TourStop, isLast: Boolean, playing: Boolean, onOpenMoment: (String) -> Unit, onContinue: () -> Unit) {
     var place by remember(stop.id) { mutableStateOf(UiState<PlaceDetail>(LoadStatus.IDLE)) }
     LaunchedEffect(stop.id) {
-        if (stop.place.momentCount > 1) {
+        if (active.revision == null && !active.state.value.legacyResume && stop.place.momentCount > 1) {
             place = UiState(LoadStatus.LOADING)
             place = try { UiState(LoadStatus.READY, model.api.place(stop.place.id)) } catch (e: Exception) { UiState(LoadStatus.ERROR, message = (e as? ApiException)?.message ?: "") }
         }

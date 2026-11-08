@@ -14,6 +14,10 @@ The files contain no session credentials.
   the next release.
 
 The existing native fixtures continue to cover older responses without revision
-fields. These captures support the later client revision work without changing
-web, iOS or Android navigation behavior in this PR. `TestRevisionClientFixtures`
-checks decoding and the relationship between the retained visit and both releases.
+fields. `TestRevisionClientFixtures` checks decoding and the relationship between
+the retained visit and both releases in Go.
+
+The iOS and Android revision clients use byte-identical test resource copies. Their tests
+explicitly add synthetic usable-path and arrival assertions when exercising
+start/update behavior. Those test assertions do not qualify the captured
+straight-line routes or establish public access.

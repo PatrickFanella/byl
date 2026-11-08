@@ -7,6 +7,8 @@ struct MomentView: View {
     @State private var state: Loadable<MomentDetail> = .idle
 
     let id: String
+    var retained: MomentDetail? = nil
+    var revisionOnly = false
 
     var body: some View {
         MuseumScreen {
@@ -82,6 +84,11 @@ struct MomentView: View {
     }
 
     private func load() async {
+        if let retained { state = .loaded(retained); return }
+        if revisionOnly {
+            state = .failed("This story is unavailable in the started revision. End the trip to browse the current catalogue.")
+            return
+        }
         state = .loading
         do {
             state = .loaded(try await model.api.moment(id))

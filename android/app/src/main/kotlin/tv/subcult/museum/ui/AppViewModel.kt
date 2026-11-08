@@ -46,6 +46,7 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     val api get() = container.api
     private var signInAfterTour = false
     private var narrationJob: Job? = null
+    private var endingProgress: Job? = null
     private var foreground = true
 
     init {
@@ -149,22 +150,51 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
 
     // Active tour
 
-    fun startTour(tour: TourDetail, mode: String) {
+    suspend fun startTour(tour: TourDetail, mode: String) {
+        // Finish the previous trip's queued writes before starting another progress generation.
+        endingProgress?.join()
         val owner = container.session.state.value
         val accountId = owner?.account?.id
-        attach(ActiveTour(activeTourApi(owner), tour, mode, container.store, { container.session.isSignedIn && container.session.state.value?.account?.id == accountId }, container.scope, accountId))
+        val origin = container.client.baseUrl.trimEnd('/')
+        val revisionId = tour.revisionId ?: throw ApiException(0, "revision_unavailable", "This tour has no reviewed revision to start.")
+        val api = activeTourApi(owner)
+        val revision = api.revision(tour.id, revisionId)
+        if (!sameSession(owner, origin) || _state.value.active != null || revision.id != revisionId || revision.tourId != tour.id)
+            throw ApiException(0, "trip_changed", "The trip or session changed. Open the tour again before starting.")
+        val active = ActiveTour.startPinned(api, revision, mode, container.store, { owner != null && sameSession(owner, origin) }, container.scope, accountId) { sameSession(owner, origin) }
+        if (!sameSession(owner, origin)) throw ApiException(0, "trip_changed", "The session changed before this trip could open.")
+        attach(active)
+    }
+
+    suspend fun adoptUpdate(expected: ActiveTour) {
+        if (_state.value.active !== expected) throw ApiException(0, "trip_changed", "The active trip changed. Review it again.")
+        val replacement = expected.adoptingUpdate()
+        if (_state.value.active !== expected || !replacement.canUse) throw ApiException(0, "trip_changed", "The trip or session changed. Review it again.")
+        expected.end()
+        narrationJob?.cancel()
+        container.narration.stop()
+        attach(replacement)
+    }
+
+    private fun sameSession(owner: Session?, origin: String): Boolean {
+        val current = container.session.state.value
+        return current?.account?.id == owner?.account?.id && current?.token == owner?.token && container.client.baseUrl.trimEnd('/') == origin
     }
 
     private fun resumeActiveTour() {
         if (_state.value.active != null) return
         val owner = container.session.state.value
         val accountId = owner?.account?.id
-        ActiveTour.restore(activeTourApi(owner), container.store, { container.session.isSignedIn && container.session.state.value?.account?.id == accountId }, container.scope, accountId)?.let { attach(it) }
+        val origin = container.client.baseUrl.trimEnd('/')
+        runCatching {
+            ActiveTour.restore(activeTourApi(owner), container.store, { owner != null && sameSession(owner, origin) }, container.scope, accountId) { sameSession(owner, origin) }
+        }.getOrNull()?.let { attach(it) }
     }
 
     private fun activeTourApi(owner: Session?): Endpoints {
-        val client = ApiClient(container.client.baseUrl) { owner?.token }
-        client.onUnauthorized = ::handleUnauthorized
+        val origin = container.client.baseUrl.trimEnd('/')
+        val client = ApiClient(origin) { owner?.token }
+        client.onUnauthorized = { token -> if (container.client.baseUrl.trimEnd('/') == origin) handleUnauthorized(token) }
         return Endpoints(client)
     }
 
@@ -172,16 +202,18 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         _state.update { it.copy(active = tour) }
         viewModelScope.launch {
             tour.loadRoute()
+            if (tour.state.value.revoked) container.narration.stop()
             tour.loadRemoteProgress()
             tour.syncIfNeeded()
+            tour.checkForUpdate()
         }
     }
 
     /** Ends the walk now (state and resume record first) and lets any pending PUT finish behind it. */
-    fun endTour(reset: Boolean) {
-        val tour = _state.value.active ?: return
+    fun endTour(reset: Boolean): Boolean {
+        val tour = _state.value.active ?: return true
         if (reset) tour.resetProgress()
-        if (!tour.end()) return
+        if (!tour.end()) return false
         narrationJob?.cancel()
         container.narration.stop()
         _state.update { if (it.active === tour) it.copy(active = null) else it }
@@ -189,12 +221,17 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
             signInAfterTour = false
             _state.update { it.copy(showSignIn = true) }
         }
-        container.scope.launch { tour.flush() }
+        endingProgress = container.scope.launch { tour.flush() }
+        return true
     }
 
     fun onResume() {
         foreground = true
-        _state.value.active?.let { tour -> viewModelScope.launch { tour.syncIfNeeded() } }
+        _state.value.active?.let { tour -> viewModelScope.launch {
+            tour.loadRoute()
+            if (!tour.canUse) container.narration.stop()
+            tour.syncIfNeeded()
+        } }
     }
 
     /** The activity left the foreground: no narration and no GPS until it is back. */
@@ -219,14 +256,15 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     /** Plays the featured moment at a stop: recorded narration, else the body read aloud. */
     fun playNarration(stop: TourStop, requireGuide: Boolean = false) {
         val expected = _state.value.active ?: return
+        if (!expected.canUse) return
         val featured = stop.featuredMoment ?: return
         narrationJob?.cancel()
         narrationJob = viewModelScope.launch {
             val key = "moment.${featured.id}"
-            val detail = runCatching { api.moment(featured.id) }.getOrNull()?.also { container.store.putJson(key, it) }
-                ?: container.store.getJson(key)
+            val detail = if (expected.revision != null || expected.state.value.legacyResume) expected.retainedMoment(featured.id)
+                else runCatching { api.moment(featured.id) }.getOrNull()?.also { container.store.putJson(key, it) } ?: container.store.getJson(key)
             coroutineContext.ensureActive()
-            if (!foreground || _state.value.active !== expected || (requireGuide && !_state.value.audioEnabled) || expected.state.value.arrivedStop?.id != stop.id) return@launch
+            if (!foreground || _state.value.active !== expected || !expected.canUse || (requireGuide && !_state.value.audioEnabled) || expected.state.value.arrivedStop?.id != stop.id) return@launch
             container.narration.play(planNarration(detail?.narration?.publicUrl, detail?.body ?: featured.excerpt))
         }
     }

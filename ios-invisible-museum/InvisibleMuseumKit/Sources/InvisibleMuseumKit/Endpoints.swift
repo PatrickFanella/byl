@@ -62,6 +62,25 @@ public struct Endpoints {
         try await client.get("/api/v1/tours/\(tour)/route", query: ["mode": mode])
     }
 
+    public func revision(tour: String, revision: String) async throws -> TourRevision {
+        try await client.get("/api/v1/tours/\(tour)/revisions/\(revision)")
+    }
+
+    /// Revision metadata is ordered newest-first and stays authoritative even while a legacy
+    /// progress pin makes the generic tour endpoint serve an older itinerary.
+    public func revisions(tour: String, limit: Int = 20) async throws -> [TourRevision] {
+        let page: ListPage<TourRevision> = try await client.get("/api/v1/tours/\(tour)/revisions", query: ["limit": String(max(1, limit))])
+        return page.items
+    }
+
+    public func revisionProgress(tour: String, revision: String) async throws -> RevisionProgress? {
+        try await client.get("/api/v1/me/progress/\(tour)/revisions/\(revision)")
+    }
+
+    public func putRevisionProgress(tour: String, revision: String, _ body: RevisionProgressRequest) async throws -> RevisionProgress {
+        try await client.put("/api/v1/me/progress/\(tour)/revisions/\(revision)", body: body)
+    }
+
     // Auth
     public struct AppleSignIn: Encodable {
         public let identityToken: String
@@ -106,6 +125,23 @@ public struct Endpoints {
     }
 
     // Me
+    public func suggestionIntake() async throws -> SuggestionIntake {
+        try await client.get("/api/v1/route-brief-intake")
+    }
+
+    public func suggestions(offset: Int = 0) async throws -> [RouteSuggestion] {
+        let page: ListPage<RouteSuggestion> = try await client.get("/api/v1/me/route-briefs", query: ["offset": String(max(0, offset)), "limit": "21"])
+        return page.items
+    }
+
+    public func suggestion(_ id: String) async throws -> RouteSuggestion {
+        try await client.get("/api/v1/me/route-briefs/\(id)")
+    }
+
+    public func submitSuggestion(_ input: RouteSuggestionInput, key: String) async throws -> RouteSuggestion {
+        try await client.post("/api/v1/me/route-briefs", body: input, headers: ["Idempotency-Key": key])
+    }
+
     public func myTours() async throws -> [TourSummary] {
         let page: ListPage<TourSummary> = try await client.get("/api/v1/me/tours")
         return page.items
