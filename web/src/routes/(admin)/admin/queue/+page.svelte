@@ -33,6 +33,10 @@
 	>
 </div>
 
+<p class="mt-4 text-sm">
+	<a class="underline" href="/admin/queue/contributions">Review route contribution patterns</a>
+</p>
+
 <form class="mt-4 flex flex-wrap items-end gap-3 text-sm" onsubmit={apply}>
 	<label
 		>Status<select
