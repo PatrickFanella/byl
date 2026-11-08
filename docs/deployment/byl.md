@@ -735,3 +735,27 @@ revision and route fields should match the prior release. Retain existing schema
 research snapshots, candidates and later curator work during image recovery;
 new out-and-back brief values may be uneditable in an older client until the
 current application is restored. Prefer a forward fix when later work exists.
+
+## Atomic curator package publication, schema 16 unchanged
+
+Curators inspect a prepared tour through the private route-brief review package,
+then POST `version`, `run_id`, `tour_id` and an optional `note` to
+`/api/v1/admin/route-briefs/{id}/review-package/publish`. The version must match
+the complete reviewed response. An incomplete package or changed dependency
+returns 409; reload and review before trying again. A note becomes the brief's
+decision reason and is visible to its owner.
+
+One serializable transaction publishes selected prepared media, histories and
+places, retains a new immutable tour revision, queues narration for newly
+published histories and accepts the brief. A failure rolls everything back.
+Previous revisions remain available. Candidate approval/materialization is an
+earlier explicit draft-review step: this operation leaves contextual candidates
+and proposed shared-content edits untouched. Unresolved, declined and
+needs-research packages cannot be released.
+
+The revision's existing JSON stores `_curator_package_approval` with the brief,
+research run, reviewed version, reviewer and decision note. Publication time and
+publisher also remain on the revision row. This private provenance is omitted
+from the typed public snapshot and all revision responses; do not expose raw
+snapshot JSON through a public endpoint. No migration or host admission change
+is needed. No production content is approved by deploying this API.

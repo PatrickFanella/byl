@@ -2,6 +2,24 @@ package models
 
 import "encoding/json"
 
+// PublishPackageRequest approves exactly one previously inspected package.
+type PublishPackageRequest struct {
+	Version string `json:"version"`
+	RunID   string `json:"run_id"`
+	TourID  string `json:"tour_id"`
+	Note    string `json:"note"`
+}
+
+// PackageApproval is private provenance stored in the immutable revision JSON.
+// It is deliberately absent from TourSnapshot and all public revision responses.
+type PackageApproval struct {
+	BriefID    string `json:"brief_id"`
+	RunID      string `json:"run_id"`
+	Version    string `json:"version"`
+	ReviewedBy string `json:"reviewed_by"`
+	Note       string `json:"note"`
+}
+
 // CuratorReviewPackage is private, including for a brief's ordinary owner.
 // Version identifies the full read set; no publication authority is implied.
 type CuratorReviewPackage struct {

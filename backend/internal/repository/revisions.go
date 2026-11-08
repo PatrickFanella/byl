@@ -143,6 +143,10 @@ func bumpTourDraftTx(ctx context.Context, tx pgx.Tx, id string, routeChanged boo
 }
 
 func (s *Store) publishRevisionTx(ctx context.Context, tourID, author string, in models.PublishRevisionRequest, explicit bool) (*models.TourRevision, error) {
+	return s.publishRevisionWithApprovalTx(ctx, tourID, author, in, explicit, nil)
+}
+
+func (s *Store) publishRevisionWithApprovalTx(ctx context.Context, tourID, author string, in models.PublishRevisionRequest, explicit bool, approval json.RawMessage) (*models.TourRevision, error) {
 	var version int64
 	var current *string
 	if err := s.pool.QueryRow(ctx, `SELECT draft_version,current_revision_id FROM tour_revision_state WHERE tour_id=$1 AND deleted_at IS NULL`, tourID).Scan(&version, &current); err != nil {
@@ -186,7 +190,9 @@ func (s *Store) publishRevisionTx(ctx context.Context, tourID, author string, in
 	}
 	var id string
 	err = s.pool.QueryRow(ctx, `INSERT INTO tour_revisions(tour_id,number,draft_version,snapshot,published_by)
-	 SELECT $1,COALESCE(max(number),0)+1,$2,jsonb_set(byl_tour_snapshot($1),'{tour,route_version}',to_jsonb((SELECT route_version FROM tour_revision_state WHERE tour_id=$1))),NULLIF($3,'')::uuid FROM tour_revisions WHERE tour_id=$1 RETURNING id`, tourID, version, author).Scan(&id)
+	 SELECT $1,COALESCE(max(number),0)+1,$2,jsonb_set(byl_tour_snapshot($1),'{tour,route_version}',to_jsonb((SELECT route_version FROM tour_revision_state WHERE tour_id=$1)))
+	 || CASE WHEN $4::jsonb IS NULL THEN '{}'::jsonb ELSE jsonb_build_object('_curator_package_approval',$4::jsonb) END,
+	 NULLIF($3,'')::uuid FROM tour_revisions WHERE tour_id=$1 RETURNING id`, tourID, version, author, approval).Scan(&id)
 	if err != nil {
 		return nil, mapErr(err)
 	}

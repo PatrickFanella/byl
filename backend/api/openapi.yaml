@@ -698,6 +698,33 @@ paths:
         "404": { description: Brief/run/tour unavailable or run belongs to another brief }
         "409": { description: Exact reviewed version changed }
         "422": { description: Invalid version token or package exceeds bounded read size }
+  /api/v1/admin/route-briefs/{id}/review-package/publish:
+    post:
+      operationId: adminPublishCuratorReviewPackage
+      summary: Publish the exact reviewed package atomically
+      description: Curator approval rechecks the complete package version in a serializable transaction, publishes selected prepared dependencies and a retained tour revision, and accepts the brief. Contextual candidates and proposed shared edits remain untouched. Private approval provenance is retained internally and excluded from public revision responses.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version, run_id, tour_id]
+              properties:
+                version: { type: string, pattern: '^[a-f0-9]{64}$' }
+                run_id: { type: string, format: uuid }
+                tour_id: { type: string, format: uuid }
+                note: { type: string, maxLength: 2000, description: Decision reason visible to the brief owner }
+      responses:
+        "200": { description: Published immutable revision, content: { application/json: { schema: { $ref: "#/components/schemas/TourRevision" } } } }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Selected brief, run or tour unavailable }
+        "409": { description: Stale, incomplete or concurrently changed review; no package changes committed }
+        "422": { description: Invalid request }
   /api/v1/admin/route-briefs/{id}/itinerary:
     get:
       summary: Inspect a private source-linked itinerary proposal
