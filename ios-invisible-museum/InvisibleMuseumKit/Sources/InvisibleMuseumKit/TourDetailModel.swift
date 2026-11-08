@@ -20,6 +20,8 @@ public final class TourDetailModel {
 
     public private(set) var state: State = .idle
     public private(set) var tour: TourDetail?
+    public private(set) var revision: TourRevision?
+    public private(set) var transitEnabled: Bool?
     public private(set) var isSaved: Bool
     public private(set) var saveBusy = false
     public private(set) var saveError: String?
@@ -34,6 +36,12 @@ public final class TourDetailModel {
         state = .loading
         do {
             tour = try await api.tour(ref)
+            revision = nil; transitEnabled = nil
+            if let tour, tour.hasTransit, let id = tour.tour.revisionID {
+                let retained = try await api.revision(tour: tour.id, revision: id)
+                if retained.id == id && retained.tourID == tour.id { revision = retained }
+                transitEnabled = try? await api.itineraryCapabilities().scheduledTransitV1
+            }
             state = .loaded
         } catch {
             tour = nil
@@ -45,6 +53,12 @@ public final class TourDetailModel {
     public var modes: [String] { tour?.tour.modes ?? [] }
 
     public func canStart(mode: String) -> Bool {
+        if let tour, tour.hasTransit {
+            guard let choice = tour.transit, choice.valid(for: tour) else { return false }
+            if choice.intent.mode == mode {
+                return transitEnabled == true && revision?.unavailableReason(mode: mode) == nil && revision != nil
+            }
+        }
         guard let tour, tour.tour.revisionID != nil, tour.tour.status == "published",
               tour.journeys?[mode]?.usable == true, !tour.stops.isEmpty else { return false }
         return tour.stops.allSatisfy { $0.place.arrivalPoint?.allows(mode) == true }
@@ -52,7 +66,7 @@ public final class TourDetailModel {
 
     /// "24 min walk" / "7 min ride" for a ready route, nil otherwise.
     public func estimateText(mode: String) -> String? {
-        guard let route = tour?.tour.routes[mode] else { return nil }
+        guard tour?.transit?.intent.mode != mode, let route = tour?.tour.routes[mode] else { return nil }
         return Self.estimateText(for: route)
     }
 

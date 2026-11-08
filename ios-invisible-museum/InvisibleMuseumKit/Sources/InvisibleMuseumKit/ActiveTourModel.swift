@@ -55,6 +55,8 @@ public final class ActiveTourModel: Identifiable {
     public let cache: DiskCache
     public let isSignedIn: () -> Bool
     public let revision: TourRevision?
+    public private(set) var transit: TransitTripModel?
+    private let currentSession: () -> Bool
 
     public private(set) var route: TourRoute?
     public private(set) var routeState: LoadState = .idle
@@ -100,9 +102,12 @@ public final class ActiveTourModel: Identifiable {
         self.init(api: api, tour: tour, revision: nil, mode: mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID)
     }
 
-    public convenience init(api: Endpoints, revision: TourRevision, mode: String, cache: DiskCache, isSignedIn: @escaping () -> Bool, accountID: String? = nil) throws {
+    public convenience init(api: Endpoints, revision: TourRevision, mode: String, cache: DiskCache, isSignedIn: @escaping () -> Bool, accountID: String? = nil, transitEnabled: Bool? = nil, restoringTransit: Bool = false, isCurrentSession: @escaping () -> Bool = { true }) throws {
         if let reason = revision.unavailableReason(mode: mode) {
             throw APIError(status: 0, code: "revision_unavailable", message: reason)
+        }
+        if revision.isMixed(mode: mode), transitEnabled != true && !restoringTransit {
+            throw APIError(status: 0, code: "transit_disabled", message: "Confirm enabled scheduled transit before starting this mixed trip.")
         }
         guard let snapshot = revision.snapshot else {
             throw APIError(status: 0, code: "revision_unavailable", message: "The reviewed itinerary is unavailable.")
@@ -110,16 +115,17 @@ public final class ActiveTourModel: Identifiable {
         let key = Self.revisionKey(api: api, accountID: accountID, revisionID: revision.id)
         try cache.savePrivate(revision, key: key)
         try cache.savePrivate(ActiveTourRecord(tourID: revision.tourID, mode: mode, accountID: accountID, revisionID: revision.id, origin: api.client.baseURL.absoluteString), key: ActiveTourRecord.key)
-        self.init(api: api, tour: snapshot.tour, revision: revision, mode: mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID)
+        self.init(api: api, tour: snapshot.tour, revision: revision, mode: mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID, isCurrentSession: isCurrentSession)
     }
 
-    private init(api: Endpoints, tour: TourDetail, revision: TourRevision?, mode: String, cache: DiskCache, isSignedIn: @escaping () -> Bool, accountID: String?) {
+    private init(api: Endpoints, tour: TourDetail, revision: TourRevision?, mode: String, cache: DiskCache, isSignedIn: @escaping () -> Bool, accountID: String?, isCurrentSession: @escaping () -> Bool = { true }) {
         self.api = api
         self.tour = tour
         self.mode = mode
         self.cache = cache
         self.isSignedIn = isSignedIn
         self.revision = revision
+        self.currentSession = isCurrentSession
         self.origin = api.client.baseURL.absoluteString
         self.snapshotKey = Self.revisionKey(api: api, accountID: accountID, revisionID: revision?.id ?? "legacy")
         self.id = "\(tour.tour.id).\(revision?.id ?? "legacy").\(mode)"
@@ -139,7 +145,10 @@ public final class ActiveTourModel: Identifiable {
             progress.visitedStopIDs = tour.stops.filter { visited.contains($0.position) }.map(\.id)
             progress.visitedPositions = visited.sorted()
             if visited.count != tour.stops.count { progress.completedAt = nil }
-            route = revision.snapshot?.routes[mode]
+            route = revision.isMixed(mode: mode) ? nil : revision.snapshot?.routes[mode]
+            if revision.isMixed(mode: mode) {
+                transit = TransitTripModel(api: api, revision: revision, cache: cache, accountID: accountID, isCurrent: isCurrentSession)
+            }
             routeState = .loaded
             routeFromCache = true
         } else {
@@ -152,13 +161,13 @@ public final class ActiveTourModel: Identifiable {
 
     /// Rebuilds the tour that was active when the app last ran, from the cached detail alone,
     /// so it comes back even without signal (Review Focus 2). Nil when no tour was active.
-    public static func restore(api: Endpoints, cache: DiskCache, isSignedIn: @escaping () -> Bool, accountID: String? = nil) -> ActiveTourModel? {
+    public static func restore(api: Endpoints, cache: DiskCache, isSignedIn: @escaping () -> Bool, accountID: String? = nil, isCurrentSession: @escaping () -> Bool = { true }) -> ActiveTourModel? {
         guard let record = cache.load(ActiveTourRecord.self, key: ActiveTourRecord.key), record.accountID == accountID else { return nil }
         if let revisionID = record.revisionID {
             guard record.origin == api.client.baseURL.absoluteString,
                   let revision = cache.load(TourRevision.self, key: revisionKey(api: api, accountID: accountID, revisionID: revisionID)),
                   revision.id == revisionID, revision.tourID == record.tourID else { return nil }
-            let restored = try? ActiveTourModel(api: api, revision: revision, mode: record.mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID)
+            let restored = try? ActiveTourModel(api: api, revision: revision, mode: record.mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID, restoringTransit: true, isCurrentSession: isCurrentSession)
             restored?.routeFromCache = true
             return restored
         }
@@ -170,6 +179,7 @@ public final class ActiveTourModel: Identifiable {
 
     /// Ends the walk: the tour is no longer resumed on launch. Progress stays.
     public func end() {
+        transit?.invalidate()
         if let record = cache.load(ActiveTourRecord.self, key: ActiveTourRecord.key),
            record.tourID == tour.tour.id, record.mode == mode, record.accountID == accountID, record.revisionID == revision?.id,
            record.origin == nil || record.origin == origin {
@@ -198,6 +208,7 @@ public final class ActiveTourModel: Identifiable {
     }
 
     private func revoke() {
+        transit?.invalidate()
         revoked = true
         route = nil
         routeState = .failed("This revision is no longer available to this account.")
@@ -235,10 +246,13 @@ public final class ActiveTourModel: Identifiable {
 
     /// A deliberate transition carries visits only for unchanged stable stop identities.
     /// The old revision's progress remains in its own record.
-    public func adoptingUpdate() throws -> ActiveTourModel {
-        guard !revoked, let target = availableUpdate, target.tourID == tour.id,
+    public func adoptingUpdate(transitEnabled: Bool? = nil) throws -> ActiveTourModel {
+        guard currentSession(), !revoked, let target = availableUpdate, target.tourID == tour.id,
               target.unavailableReason(mode: mode) == nil, let snapshot = target.snapshot else {
             throw APIError(status: 0, code: "revision_unavailable", message: "This update is unavailable for the selected mode.")
+        }
+        if target.isMixed(mode: mode), transitEnabled != true {
+            throw APIError(status: 0, code: "transit_disabled", message: "Confirm enabled scheduled transit before adopting this mixed revision.")
         }
         let oldStops = Dictionary(uniqueKeysWithValues: tour.stops.map { ($0.id, $0) })
         let carry = Set(snapshot.tour.stops.filter { stop in
@@ -257,14 +271,16 @@ public final class ActiveTourModel: Identifiable {
         next.syncedAt = nil
         next.completedAt = previous.union(carry) == known ? Date() : nil
         try cache.savePrivate(next, key: targetKey)
-        return try ActiveTourModel(api: api, revision: target, mode: mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID)
+        return try ActiveTourModel(api: api, revision: target, mode: mode, cache: cache, isSignedIn: isSignedIn, accountID: accountID, transitEnabled: transitEnabled, isCurrentSession: currentSession)
     }
 
     /// Uses cached geometry for transient failures, never authoritative removal.
     public func loadRoute() async {
         guard !revoked else { return }
         if let revision {
-            route = revision.snapshot?.routes[mode]
+            route = revision.isMixed(mode: mode) ? nil : revision.snapshot?.routes[mode]
+            await transit?.refreshGate()
+            guard !revoked else { return }
             routeState = .loaded
             routePending = false
             do {
@@ -316,20 +332,29 @@ public final class ActiveTourModel: Identifiable {
         }
     }
 
+    public var isMixed: Bool { revision?.isMixed(mode: mode) == true }
+    public var transitInterval: Bool {
+        guard isMixed, let choice = tour.transit, let nextStop else { return false }
+        return nextStop.id == choice.intent.toStopID && visitedStopIDs.contains(choice.intent.fromStopID)
+    }
+    private var navigationLegs: [RouteLeg]? {
+        revoked ? nil : (isMixed ? tour.transit?.walkingLegs : route?.legs)
+    }
+
     /// The leg being travelled now: from the last visited stop to the next one.
     public var activeLeg: RouteLeg? {
-        guard let next = nextStop, let legs = route?.legs else { return nil }
+        guard let next = nextStop, let legs = navigationLegs else { return nil }
         return legs.first { $0.toPosition == next.position && visited.contains($0.fromPosition) }
     }
 
     public var pastLegs: [RouteLeg] {
-        guard let legs = route?.legs else { return [] }
+        guard let legs = navigationLegs else { return [] }
         guard let next = nextStop else { return legs }
         return legs.filter { $0.fromPosition < $0.toPosition && $0.toPosition < next.position }
     }
 
     public var futureLegs: [RouteLeg] {
-        guard let legs = route?.legs, let next = nextStop else { return [] }
+        guard let legs = navigationLegs, let next = nextStop else { return [] }
         return legs.filter { $0.toPosition > next.position || $0.toPosition < $0.fromPosition }
     }
 
@@ -517,7 +542,7 @@ public final class ActiveTourModel: Identifiable {
     }
 
     public func mapItemForNextStop() -> MKMapItem? {
-        guard let next = nextStop, let coordinate = coordinate(for: next) else { return nil }
+        guard !transitInterval, let next = nextStop, let coordinate = coordinate(for: next) else { return nil }
         let placemark = MKPlacemark(coordinate: coordinate)
         let item = MKMapItem(placemark: placemark)
         item.name = next.place.name

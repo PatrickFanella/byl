@@ -107,6 +107,10 @@ public struct TourRevision: Codable, Identifiable, Equatable {
         case tourID = "tour_id", publishedAt = "published_at"
     }
 
+    public func isMixed(mode: String) -> Bool {
+        snapshot?.tour.transit?.intent.mode == mode
+    }
+
     /// A computed line alone cannot authorize starting a reviewed trip.
     public func unavailableReason(mode: String) -> String? {
         guard ["walk", "bike"].contains(mode), let snapshot, !id.isEmpty, snapshot.tour.id == tourID,
@@ -118,6 +122,19 @@ public struct TourRevision: Codable, Identifiable, Equatable {
         guard (2...30).contains(stops.count), Set(stops.map(\.id)).count == stops.count,
               !stops.contains(where: { $0.id.isEmpty }), Set(stops.map(\.position)) == Set(1...stops.count) else {
             return "The reviewed stop identities could not be read."
+        }
+        if snapshot.tour.hasTransit {
+            guard let choice = snapshot.tour.transit, choice.valid(for: snapshot.tour) else {
+                return "The retained transit selection is unsupported or needs review."
+            }
+            if choice.intent.mode == mode {
+                guard stops.allSatisfy({ $0.place.arrivalPoint?.allows(mode) == true }),
+                      stops.allSatisfy({ stop in
+                          guard let featured = stop.featuredMoment else { return true }
+                          return snapshot.moments[featured.id]?.summary.id == featured.id
+                      }) else { return "A reviewed arrival point or retained story is missing." }
+                return nil
+            }
         }
         guard let route = snapshot.routes[mode], route.mode == mode, route.tourID == tourID,
               route.status == "ready", let journey = route.journey, journey.version == 1,
