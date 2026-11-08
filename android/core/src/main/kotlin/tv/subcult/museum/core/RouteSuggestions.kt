@@ -127,12 +127,16 @@ class RouteSuggestions(
     fun edit(fields: SuggestionFields) {
         if (!current() || !_state.value.canEdit) return
         _state.update { if (!current() || !it.canEdit) it else it.copy(fields = fields, message = null, fieldErrors = emptyMap()) }
-        persist()
+        if (!persist()) _state.update { if (!current()) it else it.copy(message = "Could not save this draft on the device. Keep this screen open and try again.") }
     }
 
     fun discardLocalDraft() {
         if (!current() || _state.value.busy) return
-        store.remove(key)
+        try { store.remove(key) }
+        catch (_: Exception) {
+            _state.update { if (!current()) it else it.copy(message = "Could not remove the saved draft. Try again.") }
+            return
+        }
         _state.update { if (!current()) it else it.copy(fields = SuggestionFields(), pending = null, fieldErrors = emptyMap(), message = null) }
     }
 
