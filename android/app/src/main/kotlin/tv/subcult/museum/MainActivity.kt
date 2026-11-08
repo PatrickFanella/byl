@@ -157,7 +157,15 @@ fun MuseumNavHost(model: AppViewModel) {
                 "walk/{ref}?mode={mode}",
                 arguments = listOf(navArgument("ref") { type = NavType.StringType }, navArgument("mode") { type = NavType.StringType; defaultValue = "walk" })
             ) {
-                WalkScreen(model, onOpenMoment = { nav.navigate("moments/$it") }, onEnded = { nav.navigateTab("tours") })
+                WalkScreen(model, onOpenMoment = { nav.navigate("trip-story/${state.active?.revision?.id ?: "legacy"}/$it") }, onEnded = { nav.navigateTab("tours") })
+            }
+            composable("trip-story/{revision}/{id}", arguments = listOf(navArgument("revision") { type = NavType.StringType }, navArgument("id") { type = NavType.StringType })) { entry ->
+                val active = state.active
+                val tripState = active?.state?.collectAsStateWithLifecycle()?.value
+                val revision = entry.arguments?.getString("revision") ?: ""
+                val id = entry.arguments?.getString("id") ?: ""
+                val retained = if (active?.canUse == true && tripState?.revoked == false && active.revision?.id == revision) active.retainedMoment(id) else null
+                MomentScreen(model, id, retained = retained, revisionOnly = true, revisionKey = revision)
             }
             composable(
                 "places/{ref}?featured={featured}",

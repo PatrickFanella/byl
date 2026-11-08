@@ -44,6 +44,15 @@ class Endpoints(val client: ApiClient) {
     suspend fun route(tour: String, mode: String): TourRoute =
         client.get("/api/v1/tours/$tour/route", mapOf("mode" to mode))
 
+    suspend fun revision(tour: String, revision: String): TourRevision =
+        client.get("/api/v1/tours/$tour/revisions/$revision")
+
+    suspend fun revisionProgress(tour: String, revision: String): RevisionProgress? =
+        client.get("/api/v1/me/progress/$tour/revisions/$revision")
+
+    suspend fun putRevisionProgress(tour: String, revision: String, body: RevisionProgressRequest): RevisionProgress =
+        client.put("/api/v1/me/progress/$tour/revisions/$revision", body)
+
     // Auth
     suspend fun signInGoogle(idToken: String, displayName: String = ""): Session =
         client.post("/api/v1/auth/google", GoogleSignInRequest(idToken, displayName))

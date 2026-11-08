@@ -17,7 +17,7 @@ The existing native fixtures continue to cover older responses without revision
 fields. `TestRevisionClientFixtures` checks decoding and the relationship between
 the retained visit and both releases in Go.
 
-The iOS revision client uses byte-identical package resource copies. Its tests
+The iOS and Android revision clients use byte-identical test resource copies. Their tests
 explicitly add synthetic usable-path and arrival assertions when exercising
 start/update behavior. Those test assertions do not qualify the captured
 straight-line routes or establish public access.

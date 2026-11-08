@@ -81,7 +81,8 @@ data class PlaceSummary(
     val status: String = "",
     @SerialName("primary_moment_id") val primaryMomentId: String? = null,
     @SerialName("moment_count") val momentCount: Int = 0,
-    @SerialName("distance_m") val distanceM: Double? = null
+    @SerialName("distance_m") val distanceM: Double? = null,
+    @SerialName("arrival_point") val arrivalPoint: ApprovedArrival? = null
 )
 
 @Serializable
@@ -207,7 +208,9 @@ data class TourSummary(
     val visibility: String = "",
     @SerialName("owner_account_id") val ownerAccountId: String? = null,
     @SerialName("stop_count") val stopCount: Int = 0,
-    val routes: Map<String, RouteSummary> = emptyMap()
+    val routes: Map<String, RouteSummary> = emptyMap(),
+    @SerialName("revision_id") val revisionId: String? = null,
+    @SerialName("revision_number") val revisionNumber: Int? = null
 ) {
     val isUserRoute: Boolean get() = ownerAccountId != null
 }
@@ -239,11 +242,14 @@ data class TourDetail(
     @SerialName("stop_count") val stopCount: Int = 0,
     val routes: Map<String, RouteSummary> = emptyMap(),
     val stops: List<TourStop> = emptyList(),
-    val journeys: Map<String, RouteJourney>? = null
+    val journeys: Map<String, RouteJourney>? = null,
+    @SerialName("revision_id") val revisionId: String? = null,
+    @SerialName("revision_number") val revisionNumber: Int? = null,
+    val corridor: ReviewedCorridor? = null
 ) {
     val isUserRoute: Boolean get() = ownerAccountId != null
     val summaryOnly: TourSummary
-        get() = TourSummary(id, cityId, slug, title, summary, topicId, topic, modes, heroMedia, status, visibility, ownerAccountId, stopCount, routes)
+        get() = TourSummary(id, cityId, slug, title, summary, topicId, topic, modes, heroMedia, status, visibility, ownerAccountId, stopCount, routes, revisionId, revisionNumber)
 }
 
 @Serializable
