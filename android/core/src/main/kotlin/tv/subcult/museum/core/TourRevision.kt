@@ -64,7 +64,7 @@ data class TourRevision(
     /** A computed line alone cannot authorize a reviewed trip. */
     fun unavailableReason(mode: String): String? {
         val retained = snapshot
-        if (mode !in listOf("walk", "bike") || id.isBlank() || retained == null || retained.tour.id != tourId || retained.tour.status != "published" || mode !in retained.tour.modes)
+        if (mode !in listOf("walk", "bike") || id.isBlank() || retained == null || retained.tour.id != tourId || retained.tour.revisionId != id || retained.tour.revisionNumber != number || retained.tour.status != "published" || mode !in retained.tour.modes)
             return "The reviewed itinerary is unavailable for this mode."
         val stops = retained.tour.stops
         if (stops.size !in 2..30 || stops.any { it.id.isBlank() } || stops.map { it.id }.toSet().size != stops.size || stops.map { it.position }.toSet() != (1..stops.size).toSet())

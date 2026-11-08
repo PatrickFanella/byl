@@ -62,10 +62,11 @@ class PinnedTourTest {
         ActiveTour.startPinned(api(), revision, mode, store, { signedIn }, scope, owner, current)
 
     private fun response(value: TourRevision) = MockResponse().setBody(MuseumJson.encodeToString(value))
+    private fun latest(value: TourRevision) = MockResponse().setBody(MuseumJson.encodeToString(ListPage(items = listOf(value.copy(snapshot = null)))))
     private fun progress(value: TourRevision, ids: List<String>, account: String = owner) = RevisionProgress(account, value.tourId, value.id, "walk", ids)
     private fun request(): RecordedRequest = server.takeRequest(3, TimeUnit.SECONDS) ?: error("Expected a synthetic API request")
     private suspend fun offer(model: ActiveTour, candidate: TourRevision) {
-        server.enqueue(MockResponse().setBody(MuseumJson.encodeToString(candidate.snapshot!!.tour)))
+        server.enqueue(latest(candidate))
         server.enqueue(response(candidate))
         model.checkForUpdate()
     }
@@ -150,6 +151,31 @@ class PinnedTourTest {
     }
 
     @Test
+    fun nestedSnapshotRevisionIdentityMustMatchTheRevisionEnvelope() {
+        val first = revision()
+        val mismatched = first.copy(snapshot = first.snapshot!!.copy(tour = first.snapshot.tour.copy(revisionId = "other-revision", revisionNumber = first.number + 1)))
+        assertThrows(ApiException::class.java) { start(mismatched) }
+
+        store.putJson(ActiveTour.revisionKey(api(), owner, first.id), mismatched)
+        store.putJson(ActiveTourRecord.KEY, ActiveTourRecord(first.tourId, "walk", owner, first.id, api().client.baseUrl.trimEnd('/')))
+        assertNull(ActiveTour.restore(api(), store, { false }, scope, owner))
+    }
+
+    @Test
+    fun updateAdoptionRejectsAMismatchedNestedSnapshotRevision() = runTest {
+        val first = revision()
+        val target = revision(2)
+        val retained = target.snapshot!!
+        val mismatched = target.copy(snapshot = retained.copy(tour = retained.tour.copy(revisionId = first.id, revisionNumber = first.number)))
+        val model = start(first)
+        offer(model, mismatched)
+        assertNotNull(model.state.value.updateError)
+        server.enqueue(response(mismatched))
+        try { model.adoptingUpdate(); fail<Unit>("Mismatched retained snapshot must not be adopted") }
+        catch (_: ApiException) { }
+    }
+
+    @Test
     fun progressUsesStableIdsOnTheExactRevisionEndpoint() = runTest {
         val first = revision()
         val id = first.snapshot!!.tour.stops.first().id
@@ -178,6 +204,42 @@ class PinnedTourTest {
         server.enqueue(MockResponse().setBody(MuseumJson.encodeToString(progress(first, listOf(id, "unknown")))))
         model.loadRemoteProgress()
         assertEquals(setOf(id), model.visitedStopIds)
+    }
+
+    @Test
+    fun missingRevisionProgressIsAnEmptyRemoteRecordWithoutASyncErrorOrEmptyPut() = runTest {
+        val first = revision()
+        val model = start(first, signedIn = true)
+        server.enqueue(MockResponse().setResponseCode(404).setBody(Fixtures.text("error_not_found")))
+
+        model.loadRemoteProgress()
+
+        assertNull(model.state.value.syncError)
+        assertFalse(model.needsSync)
+        assertEquals(1, server.requestCount)
+        assertEquals("GET", request().method)
+    }
+
+    @Test
+    fun updateDiscoveryUsesRevisionMetadataInsteadOfLegacyPinnedTourDetail() = runTest {
+        val first = revision()
+        val target = revision(2)
+        val model = start(first)
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse = when (request.path) {
+                "/api/v1/tours/${first.tourId}/revisions?limit=1" -> latest(target)
+                "/api/v1/tours/${first.tourId}/revisions/${target.id}" -> response(target)
+                "/api/v1/tours/${first.tourId}" -> MockResponse().setBody(MuseumJson.encodeToString(first.snapshot!!.tour))
+                else -> MockResponse().setResponseCode(404)
+            }
+        }
+
+        model.checkForUpdate()
+
+        assertEquals(target.id, model.state.value.availableUpdate?.id)
+        assertEquals(2, server.requestCount)
+        assertEquals("/api/v1/tours/${first.tourId}/revisions?limit=1", request().path)
+        assertEquals("/api/v1/tours/${first.tourId}/revisions/${target.id}", request().path)
     }
 
     @Test

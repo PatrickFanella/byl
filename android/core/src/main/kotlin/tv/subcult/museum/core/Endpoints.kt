@@ -47,6 +47,10 @@ class Endpoints(val client: ApiClient) {
     suspend fun revision(tour: String, revision: String): TourRevision =
         client.get("/api/v1/tours/$tour/revisions/$revision")
 
+    /** Release metadata is ordered newest-first and is independent of legacy progress pins. */
+    suspend fun latestRevision(tour: String): TourRevision? =
+        client.get<ListPage<TourRevision>>("/api/v1/tours/$tour/revisions", mapOf("limit" to "1")).items.firstOrNull()
+
     suspend fun revisionProgress(tour: String, revision: String): RevisionProgress? =
         client.get("/api/v1/me/progress/$tour/revisions/$revision")
 
