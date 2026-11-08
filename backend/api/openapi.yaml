@@ -1029,6 +1029,69 @@ paths:
         "404": { description: Owned tour not found }
         "409": { description: Stale draft/published pointer, unready routes, changed routing inputs or publication blockers }
         "422": { description: Invalid expected version }
+  /api/v1/route-contribution-intake:
+    get:
+      summary: Read the independent route-improvement collection gate
+      description: Defaults off. Requires explicit runtime activation, matching database custody admission and a two-UTC-day admission hold. Filtered backups omit admission so restoring a database closes collection despite existing enable settings. Navigation and progress never grant consent. The detector is an explicitly uncalibrated reference. Responses are no-store; withdrawal remains available while intake is disabled.
+      responses:
+        "200":
+          description: Collection capability, separate from navigation readiness
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [enabled, retention_days, detector_version, calibrated, withdrawal_available]
+                properties:
+                  enabled: { type: boolean }
+                  retention_days: { type: integer, const: 30 }
+                  detector_version: { type: string, const: uncalibrated-v1 }
+                  calibrated: { type: boolean, const: false }
+                  withdrawal_available: { type: boolean, const: true }
+  /api/v1/me/route-contributions/consent:
+    post:
+      summary: Make an explicit contribution choice for one retained route and mode
+      description: Maximum body 4 KiB; no query parameters or extra fields. Requires a ready retained logical-segment itinerary and a separate accepted version-1 choice. New choices use today's or yesterday's UTC date; exact key/body retries recover an unexpired grant without extending it. The opaque owner scope differs across routes, revisions and modes. Up to 10 new choices per account per UTC day; exact retries consume no additional quota. All responses are no-store and vary on Authorization. Collection requires explicit runtime activation and custody review; it is not enabled by this contract.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128, pattern: '^[!-~]+$' }, description: Retain this key and the exact request before sending }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ContributionConsentRequest" } } } }
+      responses:
+        "201": { description: Scoped consent and deletion capability created, content: { application/json: { schema: { $ref: "#/components/schemas/ContributionConsent" } } } }
+        "200": { description: Exact unexpired consent replay, content: { application/json: { schema: { $ref: "#/components/schemas/ContributionConsent" } } } }
+        "400": { description: Malformed, oversized, unexpected or precise-time input; no submitted values are echoed }
+        "401": { description: Authentication required }
+        "403": { description: Collection disabled or this choice was withdrawn, expired or needs a fresh explicit request day }
+        "404": { description: Accessible retained route not found }
+        "409": { description: Retry key reused for a different choice }
+        "422": { description: Invalid choice, scope, request day or ready logical-segment references }
+        "429": { description: Daily consent quota reached }
+  /api/v1/me/route-contributions:
+    post:
+      summary: Contribute one minimal day-level segment summary after consent
+      description: Maximum body 4 KiB; rejects extra fields, coordinates, raw traces, precise timestamps and query parameters. Uses the pure detector's uncalibrated-v1 schema without claiming field calibration. Consent is bound to the authenticated owner, retained revision and mode. Observation day cannot precede the consent day. Logical segment and direction must be selected with allowed access in the retained usable itinerary. One summary per scoped owner/segment/direction/UTC day prevents additional keys or grants from inflating counts; a new key for that day returns already_contributed. Up to 50 new summaries per account per UTC day; exact retries consume no quota. No account/device ID or cross-route owner key is stored with contributions. Responses are no-store and vary on Authorization.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128, pattern: '^[!-~]+$' }, description: Same normalized summary/key returns the retained receipt; changed input returns 409 }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ContributionRequest" } } } }
+      responses:
+        "201": { description: Minimal private summary retained, content: { application/json: { schema: { $ref: "#/components/schemas/ContributionReceipt" } } } }
+        "200": { description: Exact key replay, content: { application/json: { schema: { $ref: "#/components/schemas/ContributionReceipt" } } } }
+        "400": { description: Malformed, oversized or unexpected data; no submitted values are echoed }
+        "401": { description: Authentication required }
+        "403": { description: Intake disabled or scoped consent is absent, withdrawn, expired or later than this observation day }
+        "404": { description: Scoped consent or accessible revision not found }
+        "409": { description: Changed retry input, expired retained receipt or already_contributed for this scoped segment/direction/day }
+        "422": { description: Invalid minimal summary, calibration marker or retained segment reference }
+        "429": { description: Daily summary quota reached }
+  /api/v1/route-contributions/withdraw:
+    post:
+      summary: Withdraw a scoped choice and erase its route-mode contributions
+      description: Authenticates the random deletion capability in a 4 KiB JSON body, including after sign-out and while collection is off. Never place capabilities in URLs or logs; query parameters are rejected. The first call revokes all currently existing grants in this owner/route/revision/mode scope, removes their summaries and immediately repairs the internal counts view. Minimal revoked grant metadata remains until its original 30-day expiry to prevent request replay. An exact withdrawal replay returns 204 and never revokes a later fresh explicit choice. A missing/expired or incorrect capability returns 404 without exposing another scope. Responses are no-store.
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ContributionWithdrawal" } } } }
+      responses:
+        "204": { description: Current scoped data erased, or withdrawal already completed }
+        "400": { description: Malformed, oversized, unexpected input or a query parameter }
+        "404": { description: Capability no longer retained or incorrect }
   /api/v1/me/route-reports:
     post:
       summary: Submit a private operational report about a frozen tour revision
@@ -1278,6 +1341,59 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    ContributionConsentRequest:
+      type: object
+      additionalProperties: false
+      required: [version, accepted, tour_id, revision_id, mode, requested_on]
+      properties:
+        version: { type: integer, const: 1 }
+        accepted: { type: boolean, const: true }
+        tour_id: { type: string, format: uuid }
+        revision_id: { type: string, format: uuid }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        requested_on: { type: string, format: date, description: UTC calendar day; new choices need today or yesterday, exact retained retries remain valid until original expiry }
+    ContributionConsent:
+      type: object
+      required: [id, deletion_handle, expires_on]
+      properties:
+        id: { type: string, format: uuid }
+        deletion_handle: { type: string, minLength: 64, maxLength: 64, description: Sensitive random-looking 256-bit scoped deletion capability; retain privately and never put in URLs or logs }
+        expires_on: { type: string, format: date, description: Original UTC consent day plus 30 days; retries never extend this }
+    ContributionSummary:
+      type: object
+      additionalProperties: false
+      required: [schema_version, detector_version, calibrated, revision_id, segment_id, mode, direction, observation_period, qualified_passages, sustained_departure_rejoins]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        detector_version: { type: string, const: uncalibrated-v1 }
+        calibrated: { type: boolean, const: false, description: Reference output only; not field qualification or independent corroboration }
+        revision_id: { type: string, format: uuid }
+        segment_id: { type: string, minLength: 1, maxLength: 120 }
+        mode: { $ref: "#/components/schemas/TravelMode" }
+        direction: { type: string, enum: [forward, reverse] }
+        observation_period: { type: string, format: date, description: One UTC day within the last 30 days, no earlier than the retained consent day; precise trip timestamps are rejected }
+        qualified_passages: { type: integer, const: 1 }
+        sustained_departure_rejoins: { type: integer, minimum: 0, maximum: 1 }
+    ContributionRequest:
+      type: object
+      additionalProperties: false
+      required: [consent_id, summary]
+      properties:
+        consent_id: { type: string, format: uuid }
+        summary: { $ref: "#/components/schemas/ContributionSummary" }
+    ContributionReceipt:
+      type: object
+      required: [id, expires_on]
+      properties:
+        id: { type: string, format: uuid }
+        expires_on: { type: string, format: date, description: No later than the original consent expiry or observation day plus 30 days }
+    ContributionWithdrawal:
+      type: object
+      additionalProperties: false
+      required: [consent_id, deletion_handle]
+      properties:
+        consent_id: { type: string, format: uuid }
+        deletion_handle: { type: string, minLength: 64, maxLength: 64 }
     DraftCandidateRequest:
       type: object
       additionalProperties: false

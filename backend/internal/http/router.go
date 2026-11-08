@@ -30,20 +30,22 @@ type SessionManager interface {
 
 // Deps holds everything the handlers need.
 type Deps struct {
-	Store          *repository.Store
-	Sessions       SessionResolver
-	SessionManager SessionManager
-	Apple          auth.Verifier
-	Google         auth.Verifier
-	DevAuth        bool
-	BriefIntake    bool
-	IsBootstrap    func(email string) bool
-	Blob           blob.Store
-	MediaFSDir     string
-	Sources        *sources.Registry
-	Drafter        llm.Drafter
-	Log            *slog.Logger
-	Ready          func(ctx context.Context) error
+	Store           *repository.Store
+	Sessions        SessionResolver
+	SessionManager  SessionManager
+	Apple           auth.Verifier
+	Google          auth.Verifier
+	DevAuth         bool
+	BriefIntake     bool
+	Contributions   bool
+	ContributionKey []byte
+	IsBootstrap     func(email string) bool
+	Blob            blob.Store
+	MediaFSDir      string
+	Sources         *sources.Registry
+	Drafter         llm.Drafter
+	Log             *slog.Logger
+	Ready           func(ctx context.Context) error
 }
 
 // drafterAvailable reports whether an LLM provider is configured.
@@ -80,6 +82,8 @@ func NewRouter(d Deps) http.Handler {
 		r.Use(d.optionalAuth)
 		r.Get("/cities", d.listCities)
 		r.Get("/route-brief-intake", d.routeBriefIntakeStatus)
+		r.Get("/route-contribution-intake", d.routeContributionIntake)
+		r.Post("/route-contributions/withdraw", d.withdrawRouteContributions)
 		r.Get("/cities/{city}", d.getCity)
 		r.Get("/cities/{city}/places", d.listPlaces)
 		r.Get("/cities/{city}/tours", d.listTours)
@@ -107,6 +111,8 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/me/tours/{id}/publish", d.publishMyTour)
 			r.Get("/me", d.me)
 			r.Post("/me/route-reports", d.createRouteReport)
+			r.Post("/me/route-contributions/consent", d.grantRouteContributionConsent)
+			r.Post("/me/route-contributions", d.createRouteContribution)
 			r.Get("/me/route-reports", d.listRouteReports(false))
 			r.Get("/me/route-reports/{id}", d.getRouteReport(false))
 			r.Get("/me/route-reports/{id}/correction", d.routeCorrectionOutcome)
