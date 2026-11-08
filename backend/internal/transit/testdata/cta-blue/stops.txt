@@ -1,0 +1,6 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,location_type,parent_station,wheelchair_boarding
+30077,,Forest Park,,41.874257,-87.817318,0,40390,1
+30374,,Clark/Lake (Subway),,41.885737,-87.630886,0,40380,1
+40380,,Clark/Lake,,41.885737,-87.630886,1,,1
+40390,,Forest Park,,41.874257,-87.817318,1,,1
+30074,,Clark/Lake (Elevated),,41.885737,-87.630886,0,40380,1

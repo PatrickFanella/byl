@@ -134,6 +134,9 @@ func (s *Store) PutProgress(ctx context.Context, in models.TourProgress, reset b
 		if err != nil {
 			return err
 		}
+		if in.RevisionID != "" && id != in.RevisionID {
+			return fmt.Errorf("%w: selected progress revision changed; reload before retrying", ErrConflict)
+		}
 		r, err := tx.GetTourRevision(ctx, in.TourID, id)
 		if err != nil {
 			return err

@@ -1,0 +1,9 @@
+{
+  "url": "https://www.transitchicago.com/downloads/sch_data/google_transit.zip",
+  "retrieved_at": "2026-11-08T12:31:57Z",
+  "sha256": "a9372be5b70fcee4ed98c9476433f86065637a9a500b8af6afbb84d000ef2746",
+  "license_url": "https://www.transitchicago.com/developers/terms/",
+  "service_date": "20261108",
+  "trip_id": "92281538010",
+  "note": "Recorded source rows only; a bounded parser fixture, not live arrivals or field verification."
+}

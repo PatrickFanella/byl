@@ -19,6 +19,7 @@ import (
 	"invisible-museum/backend/internal/repository"
 	"invisible-museum/backend/internal/seedmedia"
 	"invisible-museum/backend/internal/sources"
+	"invisible-museum/backend/internal/transit"
 )
 
 // SessionManager issues and revokes sessions in addition to resolving them.
@@ -39,6 +40,8 @@ type Deps struct {
 	BriefIntake     bool
 	Contributions   bool
 	ContributionKey []byte
+	TransitPlanner  transit.Planner
+	TransitEnabled  bool
 	IsBootstrap     func(email string) bool
 	Blob            blob.Store
 	MediaFSDir      string
@@ -83,6 +86,7 @@ func NewRouter(d Deps) http.Handler {
 		r.Get("/cities", d.listCities)
 		r.Get("/route-brief-intake", d.routeBriefIntakeStatus)
 		r.Get("/route-contribution-intake", d.routeContributionIntake)
+		r.Get("/itinerary-capabilities", d.itineraryCapabilities)
 		r.Post("/route-contributions/withdraw", d.withdrawRouteContributions)
 		r.Get("/cities/{city}", d.getCity)
 		r.Get("/cities/{city}/places", d.listPlaces)
@@ -96,6 +100,7 @@ func NewRouter(d Deps) http.Handler {
 		r.Get("/tours/{tour}/route", d.getTourRoute)
 		r.Get("/tours/{tour}/revisions", d.listTourRevisions)
 		r.Get("/tours/{tour}/revisions/{revision}", d.getTourRevision)
+		r.Post("/tours/{tour}/revisions/{revision}/transit-plan", d.revisionTransitPlan)
 		r.Get("/media/{id}", d.getMedia)
 		r.Post("/auth/dev", d.devSignIn)
 		r.Get("/auth/dev", func(w http.ResponseWriter, r *http.Request) {
@@ -200,6 +205,8 @@ func NewRouter(d Deps) http.Handler {
 			r.Get("/tours", d.adminListTours)
 			r.Post("/tours", d.adminCreateTour)
 			r.Get("/tours/{id}", d.adminGetTour)
+			r.Put("/tours/{id}/transit", d.adminSetTransit)
+			r.Post("/tours/{id}/transit-plan", d.adminTransitPlan)
 			r.Get("/tours/{id}/corridors", d.adminListCorridors)
 			r.Post("/tours/{id}/corridors", d.adminProposeCorridor)
 			r.Get("/tours/{id}/corridors/{proposal}", d.adminGetCorridor)

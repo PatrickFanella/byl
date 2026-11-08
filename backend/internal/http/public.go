@@ -145,12 +145,14 @@ func (d Deps) listPlaces(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) listTours(w http.ResponseWriter, r *http.Request) {
+	transitHeaders(w)
 	cityID, err := d.Store.ResolveCityID(r.Context(), chi.URLParam(r, "city"))
 	if err != nil {
 		d.fail(w, err)
 		return
 	}
 	f := repository.TourFilter{CityID: cityID, PublicOnly: true, Limit: queryInt(r, "limit", 50), Cursor: r.URL.Query().Get("cursor")}
+	f.IncludeTransit = d.transitCapable(r)
 	if mode := r.URL.Query().Get("mode"); mode != "" {
 		f.Mode = models.TravelMode(mode)
 		if !f.Mode.Valid() {
@@ -228,6 +230,9 @@ func (d Deps) visibleTour(w http.ResponseWriter, r *http.Request) (*models.TourD
 		return nil, false
 	}
 	if tour.Status != models.EntityStatusPublished {
+		if tour.Transit != nil && !d.requireTransitClient(w, r) {
+			return nil, false
+		}
 		return tour, true
 	}
 	account := ""
@@ -241,6 +246,9 @@ func (d Deps) visibleTour(w http.ResponseWriter, r *http.Request) (*models.TourD
 	}
 	if !canSeeTour(&served.TourSummary, accountFrom(r.Context())) {
 		writeError(w, http.StatusNotFound, "not_found", "not found")
+		return nil, false
+	}
+	if served.Transit != nil && !d.requireTransitClient(w, r) {
 		return nil, false
 	}
 	return served, true
@@ -269,6 +277,10 @@ func (d Deps) getTourRoute(w http.ResponseWriter, r *http.Request) {
 	}
 	if !mode.Valid() {
 		writeValidation(w, map[string]string{"mode": "must be walk or bike"})
+		return
+	}
+	if tour.Transit != nil && mode == models.TravelModeWalk {
+		writeError(w, http.StatusConflict, "transit_plan_required", "request an explicit scheduled transit plan for this revision; there is no continuous walking route")
 		return
 	}
 	var route *models.TourRoute

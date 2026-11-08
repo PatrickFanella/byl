@@ -10,10 +10,12 @@ import (
 	"invisible-museum/backend/internal/narration"
 	"invisible-museum/backend/internal/routing"
 	"invisible-museum/backend/internal/sources"
+	"invisible-museum/backend/internal/transit"
 )
 
 // Providers are the external dependencies the API and worker use.
 type Providers struct {
+	Transit  transit.Planner
 	Router   routing.Router
 	Narrator narration.Narrator
 	Blob     blob.Store
@@ -26,6 +28,9 @@ type Providers struct {
 // Build constructs providers from config.
 func Build(cfg config.Config) (Providers, error) {
 	var p Providers
+	if cfg.TransitProvider == "cta" {
+		p.Transit = &transit.Client{}
+	}
 	switch cfg.RoutingProvider {
 	case "valhalla":
 		p.Router = routing.NewValhalla(cfg.ValhallaURL, nil)

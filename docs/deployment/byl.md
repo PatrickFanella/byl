@@ -23,16 +23,18 @@ custom-format dump and media archive. CI never applies production migrations.
 An intentional schema change needs a separately reviewed migration and baseline
 update on the host.
 
-The repository hook now targets schema 19 for disabled voluntary contributions,
-following schema 17's private investigations and schema 18's retained corrections.
+The repository hook now targets schema 20 for gated scheduled transit,
+following schema 17's private investigations, schema 18's retained corrections
+and schema 19's disabled voluntary contributions.
 The installed schema-16 hook and
 manifest continue to refuse these images until migration admission is completed.
 See the [investigation rollout gate](../product/route-report-investigation.md#validation-and-rollout)
 and [correction rollout gate](../product/route-corrections.md#validation-and-rollout)
 for migration, retained-data and worker rollback constraints. Contribution
 collection also requires the [custody, restore and activation procedure](../product/route-contributions.md#activation-backups-and-restore).
-The schema-19 source hook excludes private contribution and admission table data
+The source hook excludes private contribution and admission table data
 from deployment dumps; the installed host hook has not been changed by this PR.
+Scheduled transit also requires its [source/client activation and rollback checks](../product/scheduled-transit.md#verification-and-rollout).
 
 The receiver replaces only API/web images and checks Docker health, exact public
 HTML and `/release.json` bytes from the image, API health, seeded city/tour
