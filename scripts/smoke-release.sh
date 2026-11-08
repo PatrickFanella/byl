@@ -21,7 +21,7 @@ if [[ $service == api ]]; then
   containers+=("$postgres")
   ready=false
   for _ in {1..60}; do
-    if docker exec "$postgres" pg_isready -U byl -d byl >/dev/null 2>&1; then ready=true; break; fi
+    if docker exec "$postgres" pg_isready -h 127.0.0.1 -U byl -d byl >/dev/null 2>&1; then ready=true; break; fi
     sleep 1
   done
   [[ $ready == true ]]
@@ -53,6 +53,8 @@ done
 if [[ $service == api ]]; then
   docker exec "$container" wget -q -O - "http://127.0.0.1:$port/api/v1/cities" > "$scratch/cities.json"
   python3 -c 'import json,sys; assert any(c["slug"] == "downers-grove" for c in json.load(open(sys.argv[1]))["items"])' "$scratch/cities.json"
+  docker exec "$container" wget -q -O - "http://127.0.0.1:$port/api/v1/itinerary-capabilities" > "$scratch/itinerary-capabilities.json"
+  python3 -c 'import json,sys; c=json.load(open(sys.argv[1])); assert c == {"scheduled_transit_v1":False,"provider":"cta_gtfs_blue_v1","live":False,"transfers":False,"bicycles":False}' "$scratch/itinerary-capabilities.json"
   if docker exec "$container" wget -S -O /dev/null --header 'Content-Type: application/json' \
     --post-data '{"email":"release-smoke@example.invalid"}' "http://127.0.0.1:$port/api/v1/auth/dev" 2> "$scratch/auth-response"; then
     echo 'Development sign-in must be disabled' >&2

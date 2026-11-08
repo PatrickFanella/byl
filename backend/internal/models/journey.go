@@ -69,6 +69,10 @@ func DescribeJourney(tour *TourDetail, route *TourRoute) *RouteJourney {
 	if route == nil {
 		return j
 	}
+	if tour.Transit != nil && route.Mode == TravelModeWalk {
+		j.State, j.Computation, j.Quality = "requires_transit_plan", "scheduled", "requires_schedule"
+		return j
+	}
 	j.Computation = string(route.Status)
 	j.State = j.Computation
 	if q := route.Quality; q != nil && q.Version == 1 {

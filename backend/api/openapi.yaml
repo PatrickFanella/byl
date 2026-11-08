@@ -1029,6 +1029,82 @@ paths:
         "404": { description: Owned tour not found }
         "409": { description: Stale draft/published pointer, unready routes, changed routing inputs or publication blockers }
         "422": { description: Invalid expected version }
+  /api/v1/itinerary-capabilities:
+    get:
+      summary: Read the independent scheduled-transit capability gate
+      description: Defaults off. TRANSIT_PROVIDER=cta configures private curator verification; SCHEDULED_TRANSIT_ENABLED separately admits public clients. Requests for mixed tours must also send X-Byl-Capabilities with the token scheduled-transit-v1. Unsupported/disabled public discovery excludes those tours; mixed detail, route, revision and progress requests return 409 rather than walking geometry. Older pinned ordinary revisions remain accessible. Responses are no-store and vary on Authorization and X-Byl-Capabilities.
+      responses:
+        "200":
+          description: Supported contract and current public admission
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [scheduled_transit_v1, provider, live, transfers, bicycles]
+                properties:
+                  scheduled_transit_v1: { type: boolean }
+                  provider: { type: string, const: cta_gtfs_blue_v1 }
+                  live: { type: boolean, const: false }
+                  transfers: { type: boolean, const: false }
+                  bicycles: { type: boolean, const: false }
+  /api/v1/admin/tours/{id}/transit:
+    put:
+      summary: Explicitly select or remove one reviewed CTA rail connector
+      description: Curator only; 16 KiB strict JSON, no query parameters. Verifies selected Blue Line platforms against the fresh official GTFS provider, retains an immutable curator choice and advances the expected tour draft. Walking times are labeled curator assumptions and require an external-directions handoff. Does not publish or alter a retained revision. Removal works while public transit is off and without a configured provider. Existing walking qualification and public-arrival publication gates still apply.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TransitSelectionRequest" } } } }
+      responses:
+        "200":
+          description: Versioned working choice or explicit removal; reload after a lost response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [transit, draft_version]
+                properties:
+                  transit: { $ref: "#/components/schemas/ApprovedTransit", nullable: true }
+                  draft_version: { type: integer, minimum: 0 }
+        "400": { description: Malformed, oversized or unexpected fields }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Tour not found }
+        "409": { description: Draft changed, or selected platforms cannot be verified against a fresh supported timetable }
+        "422": { description: Invalid selection, removal, mode, stop adjacency, walking assumptions or review note }
+        "503": { description: Provider not configured; removal remains available }
+  /api/v1/admin/tours/{id}/transit-plan:
+    post:
+      summary: Preview a fenced working transit selection without public activation
+      description: Curator only; same strict bounded planning body as public planning, with the current draft_version required. The response has revision_id null and identifies its draft_version. Preview does not publish, qualify walking access or create visitor progress.
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TransitPlanRequest" } } } }
+      responses:
+        "200": { description: Explicit schedule context or an unavailable/review state, content: { application/json: { schema: { $ref: "#/components/schemas/ScheduledTransitPlan" } } } }
+        "400": { description: Malformed, oversized or unexpected fields }
+        "401": { description: Authentication required }
+        "403": { description: Curator role required }
+        "404": { description: Tour or transit selection not found }
+        "409": { description: Draft changed }
+        "422": { description: Missing version/draft, invalid departure or departure outside the supported window }
+        "503": { description: Provider not configured }
+  /api/v1/tours/{id}/revisions/{revision}/transit-plan:
+    post:
+      summary: Plan one explicit departure against a frozen curated transit selection
+      description: Requires public activation and X-Byl-Capabilities containing scheduled-transit-v1. Uses the selected immutable revision, never a working choice. departure_at means leaving the connector's from_stop_id, not starting the whole tour; it must be in the future and within seven days. Add curator walking time and boarding buffer before selecting one scheduled Blue Line trip. No transfer or bicycle connection is inferred. A separate explicit request may use a newer feed; clients must retain the chosen plan, revision and feed hash rather than silently requerying an active trip. Source stale after 24 hours, missing/missed service, provider failure or moved platforms return explicit nonusable states with no itinerary segments. Scheduled times are not live departures or disruption information. Station connectors have no invented walking geometry; other qualified walking legs remain separate. Bodies are strict 16 KiB JSON with no query parameters. Planning creates no server trip or progress record.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: revision, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: X-Byl-Capabilities, in: header, required: true, schema: { type: string }, description: Comma-separated tokens including scheduled-transit-v1 }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TransitPlanRequest" } } } }
+      responses:
+        "200": { description: Scheduled mixed segments or an explicit unavailable state, content: { application/json: { schema: { $ref: "#/components/schemas/ScheduledTransitPlan" } } } }
+        "400": { description: Malformed, oversized or unexpected fields }
+        "404": { description: Accessible tour/revision/transit selection not found }
+        "409": { description: Public feature disabled or client does not advertise support }
+        "422": { description: Invalid version/departure, departure in the past/beyond seven days, or public draft_version supplied }
   /api/v1/route-contribution-intake:
     get:
       summary: Read the independent route-improvement collection gate
@@ -1341,6 +1417,122 @@ components:
       scheme: bearer
       description: Opaque session token from one of the /auth endpoints.
   schemas:
+    TransitIntent:
+      type: object
+      additionalProperties: false
+      required: [version, provider, mode, from_stop_id, to_stop_id, board_stop_id, alight_stop_id, walk_to_stop_seconds, walk_from_stop_seconds, boarding_buffer_seconds, walking_assumptions]
+      properties:
+        version: { type: integer, const: 1 }
+        provider: { type: string, const: cta_gtfs_blue_v1 }
+        mode: { type: string, const: walk }
+        from_stop_id: { type: string, format: uuid, description: First of two adjacent story stops in forward order }
+        to_stop_id: { type: string, format: uuid }
+        board_stop_id: { type: string, pattern: '^[0-9]{1,20}$', description: Explicit Blue Line platform ID, not an inferred nearby station }
+        alight_stop_id: { type: string, pattern: '^[0-9]{1,20}$' }
+        walk_to_stop_seconds: { type: integer, minimum: 60, maximum: 3600 }
+        walk_from_stop_seconds: { type: integer, minimum: 60, maximum: 3600 }
+        boarding_buffer_seconds: { type: integer, minimum: 60, maximum: 1800 }
+        walking_assumptions: { type: string, minLength: 1, maxLength: 2000, description: Public curator assumptions; these estimates do not establish legal access or field timing }
+    TransitSelectionRequest:
+      type: object
+      additionalProperties: false
+      required: [draft_version, review_note]
+      description: Provide intent with remove absent/false, or remove true with intent absent/null. The current tour draft fences both actions.
+      properties:
+        draft_version: { type: integer, minimum: 0 }
+        intent: { $ref: "#/components/schemas/TransitIntent", nullable: true }
+        remove: { type: boolean }
+        review_note: { type: string, minLength: 1, maxLength: 4000, description: Private curator rationale retained in append-only review history }
+    TransitPlatform:
+      type: object
+      required: [id, name, parent_id, latitude, longitude]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        parent_id: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+    TransitSource:
+      type: object
+      required: [url, publisher, sha256, retrieved_at, license_url, timezone]
+      properties:
+        url: { type: string, format: uri }
+        publisher: { type: string }
+        sha256: { type: string, pattern: '^[0-9a-f]{64}$', description: Exact source archive identity, not the identity of a trip or person }
+        retrieved_at: { type: string, format: date-time }
+        license_url: { type: string, format: uri }
+        timezone: { type: string, const: America/Chicago }
+    ApprovedTransit:
+      type: object
+      required: [version, intent, board, alight, source, reviewed_at]
+      properties:
+        version: { type: integer, minimum: 1 }
+        intent: { $ref: "#/components/schemas/TransitIntent" }
+        board: { $ref: "#/components/schemas/TransitPlatform" }
+        alight: { $ref: "#/components/schemas/TransitPlatform" }
+        source: { $ref: "#/components/schemas/TransitSource" }
+        reviewed_at: { type: string, format: date-time }
+        walking_legs: { type: array, items: { $ref: "#/components/schemas/RouteLeg" }, description: Frozen revision only; ordinary qualified legs with the transit-replaced leg omitted. No continuous walking geometry is published for the mixed mode. }
+    TransitPlanRequest:
+      type: object
+      additionalProperties: false
+      required: [version, departure_at]
+      properties:
+        version: { type: integer, const: 1 }
+        departure_at: { type: string, format: date-time, description: Future departure from the selected story stop within seven days; its preceding stories/dwell are outside this context }
+        draft_version: { type: integer, minimum: 0, nullable: true, description: Required current integer on private preview; omit or use null for a public immutable-revision request }
+    TransitConnection:
+      type: object
+      required: [state, scheduled, live, issues]
+      properties:
+        state: { type: string, enum: [scheduled, no_service, stale, provider_unavailable, unavailable, unsupported, needs_review] }
+        scheduled: { type: boolean, const: true }
+        live: { type: boolean, const: false }
+        source: { $ref: "#/components/schemas/TransitSource" }
+        board: { $ref: "#/components/schemas/TransitPlatform" }
+        alight: { $ref: "#/components/schemas/TransitPlatform" }
+        trip_id: { type: string, description: Provider timetable trip identifier, not a visitor trip identifier }
+        route_id: { type: string, const: Blue }
+        headsign: { type: string }
+        departure_at: { type: string, format: date-time }
+        arrival_at: { type: string, format: date-time }
+        issues: { type: array, items: { type: string } }
+    TransitPlanSegment:
+      type: object
+      required: [kind, duration_s, basis, navigation]
+      properties:
+        kind: { type: string, enum: [walk, walk_to_stop, boarding_wait, transit, walk_from_stop] }
+        from_stop_id: { type: string, format: uuid }
+        to_stop_id: { type: string, format: uuid }
+        from_platform_id: { type: string }
+        to_platform_id: { type: string }
+        duration_s: { type: integer, minimum: 0, description: Basis distinguishes qualified route metrics, curator estimates and the static schedule }
+        departure_at: { type: string, format: date-time }
+        arrival_at: { type: string, format: date-time }
+        basis: { type: string, enum: [retained_qualified_walking_route, curator_walking_estimate, schedule_and_curator_buffer, cta_static_schedule] }
+        navigation: { type: string, enum: [in_app_walking, external_directions_required, check_station_signs_and_alerts, scheduled_rail] }
+        geometry:
+          type: object
+          description: Present only for an ordinary retained walking section; station and rail connectors omit it
+          required: [type, coordinates]
+          properties:
+            type: { type: string, const: LineString }
+            coordinates: { type: array, minItems: 2, items: { type: array, minItems: 2, maxItems: 2, items: { type: number } } }
+    ScheduledTransitPlan:
+      type: object
+      required: [version, tour_id, revision_id, connector_version, state, requested_departure_at, departure_context_stop_id, service, segments, assumptions]
+      properties:
+        version: { type: integer, const: 1 }
+        tour_id: { type: string, format: uuid }
+        revision_id: { type: string, format: uuid, nullable: true, description: Immutable selection context; null for a private working preview }
+        draft_version: { type: integer, minimum: 0, description: Present only for a fenced working preview }
+        connector_version: { type: integer, minimum: 1 }
+        state: { type: string, enum: [scheduled, no_service, stale, provider_unavailable, unavailable, unsupported, needs_review] }
+        requested_departure_at: { type: string, format: date-time }
+        departure_context_stop_id: { type: string, format: uuid }
+        service: { $ref: "#/components/schemas/TransitConnection" }
+        segments: { type: array, items: { $ref: "#/components/schemas/TransitPlanSegment" }, description: Ordered mixed sections; empty whenever the overall plan is unavailable or needs review }
+        assumptions: { type: array, items: { type: string } }
     ContributionConsentRequest:
       type: object
       additionalProperties: false
@@ -2647,6 +2839,7 @@ components:
         - type: object
           required: [stops]
           properties:
+            transit: { $ref: "#/components/schemas/ApprovedTransit", readOnly: true, description: "Working curator selection or frozen revision selection. Mixed walk routes require scheduled-transit-v1 capability and an explicit timetable plan; they have no continuous routes.walk geometry." }
             journeys:
               type: object
               readOnly: true

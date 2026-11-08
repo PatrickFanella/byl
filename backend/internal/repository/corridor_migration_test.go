@@ -20,6 +20,11 @@ func assertNavigationMigrationPreservesRows(t *testing.T, version int64) {
 	pool := testdb.OpenVersion(t, version)
 	ctx := context.Background()
 	s := New(pool)
+	// Prepare the old-schema baseline without asking current application code to
+	// auto-publish a revision against tables that have not been migrated yet.
+	if _, err := pool.Exec(ctx, `UPDATE tour_revision_state SET release_requested_version=NULL`); err != nil {
+		t.Fatal(err)
+	}
 	readyFixtureRoutes(t, s, ctx, testdb.SeedTourID)
 	rows, err := pool.Query(ctx, `SELECT tablename FROM pg_tables WHERE schemaname=current_schema() AND tablename<>'goose_db_version' ORDER BY tablename`)
 	if err != nil {

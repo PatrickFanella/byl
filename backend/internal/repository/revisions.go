@@ -241,6 +241,14 @@ func (s *Store) publishRequestedRevisionTx(ctx context.Context, tourID string) e
 	if requested == nil || *requested != version || status != "published" {
 		return nil
 	}
+	var mixed bool
+	if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_transit_current p JOIN tour_transit_choices c ON c.id=p.choice_id WHERE p.tour_id=$1 AND c.choice IS NOT NULL)
+ OR EXISTS(SELECT 1 FROM tour_revision_state st JOIN tour_revisions r ON r.id=st.current_revision_id WHERE st.tour_id=$1 AND COALESCE(r.snapshot#>'{tour,transit}','null'::jsonb)<>'null'::jsonb)`, tourID).Scan(&mixed); err != nil {
+		return err
+	}
+	if mixed {
+		return nil
+	}
 	var corridorReleased bool
 	if err := s.pool.QueryRow(ctx, `SELECT byl_corridor_is_released($1)`, tourID).Scan(&corridorReleased); err != nil {
 		return err
@@ -312,7 +320,8 @@ func (s *Store) listPublishedTours(ctx context.Context, f TourFilter) ([]models.
 	 AND ($1='' OR (r.id IS NOT NULL AND (r.snapshot->'tour'->'city_ids') ? $1) OR (r.id IS NULL AND (t.city_id::text=$1 OR EXISTS(SELECT 1 FROM tour_stops ts JOIN places p ON p.id=ts.place_id WHERE ts.tour_id=t.id AND p.city_id::text=$1))))
 	 AND ($2='' OR (CASE WHEN r.id IS NULL THEN t.topic_id::text ELSE r.snapshot->'tour'->>'topic_id' END)=$2)
 	 AND ($3='' OR COALESCE(r.snapshot->'tour'->'modes',to_jsonb(t.modes)) ? $3)
-	 ORDER BY COALESCE(r.snapshot->'tour'->>'title',t.title),t.id LIMIT $4 OFFSET $5`, f.CityID, f.TopicID, string(f.Mode), limit+1, offset)
+	 AND ($6 OR COALESCE(r.snapshot#>'{tour,transit}','null'::jsonb)='null'::jsonb)
+	 ORDER BY COALESCE(r.snapshot->'tour'->>'title',t.title),t.id LIMIT $4 OFFSET $5`, f.CityID, f.TopicID, string(f.Mode), limit+1, offset, f.IncludeTransit)
 	if err != nil {
 		return nil, "", err
 	}

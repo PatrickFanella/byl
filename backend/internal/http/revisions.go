@@ -69,6 +69,9 @@ func (d Deps) getTourRevision(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found", "not found")
 		return
 	}
+	if revision.Snapshot.Tour.Transit != nil && !d.requireTransitClient(w, r) {
+		return
+	}
 	writeJSON(w, http.StatusOK, revision)
 }
 
@@ -85,6 +88,9 @@ func (d Deps) revisionProgress(put bool) http.HandlerFunc {
 		}
 		if !canSeeTour(&revision.Snapshot.Tour.TourSummary, accountFrom(r.Context())) {
 			writeError(w, http.StatusNotFound, "not_found", "not found")
+			return
+		}
+		if revision.Snapshot.Tour.Transit != nil && !d.requireTransitClient(w, r) {
 			return
 		}
 		account := accountFrom(r.Context()).ID

@@ -21,6 +21,8 @@ type Config struct {
 	PublicBriefIntake    bool
 	RouteContributions   bool
 	ContributionScopeKey []byte
+	TransitProvider      string
+	ScheduledTransit     bool
 	AppleClientIDs       []string
 	GoogleClientIDs      []string
 	AdminBootstrapEmails []string
@@ -75,6 +77,8 @@ func Load() (Config, error) {
 		DevAuthEnabled:     envBool("DEV_AUTH_ENABLED"),
 		PublicBriefIntake:  envBool("PUBLIC_ROUTE_BRIEF_INTAKE_ENABLED"),
 		RouteContributions: envBool("ROUTE_CONTRIBUTIONS_ENABLED"),
+		TransitProvider:    strings.TrimSpace(os.Getenv("TRANSIT_PROVIDER")),
+		ScheduledTransit:   envBool("SCHEDULED_TRANSIT_ENABLED"),
 		AppleClientIDs:     envList("APPLE_CLIENT_IDS"),
 		GoogleClientIDs:    envList("GOOGLE_CLIENT_IDS"),
 		RoutingProvider:    envOr("ROUTING_PROVIDER", "straightline"),
@@ -121,6 +125,12 @@ func Load() (Config, error) {
 		return Config{}, fmt.Errorf("route contributions require a scope key and explicit ROUTE_CONTRIBUTION_CUSTODY_APPROVED after retention, restore/deletion and backup custody review")
 	}
 	var err error
+	if err := oneOf("TRANSIT_PROVIDER", cfg.TransitProvider, []string{"", "cta"}); err != nil {
+		return Config{}, err
+	}
+	if cfg.ScheduledTransit && cfg.TransitProvider != "cta" {
+		return Config{}, fmt.Errorf("SCHEDULED_TRANSIT_ENABLED requires TRANSIT_PROVIDER=cta and qualified clients")
+	}
 	if cfg.SessionTTLHours, err = envInt("SESSION_TTL_HOURS", 2160); err != nil {
 		return Config{}, err
 	}

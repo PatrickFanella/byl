@@ -1,0 +1,2 @@
+route_id,service_id,trip_id,direction_id,block_id,shape_id,direction,wheelchair_accessible,schd_trip_id
+Blue,109209,92281538010,0,92027554458,309200002,South,1,281538010

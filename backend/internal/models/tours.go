@@ -123,6 +123,7 @@ type TourStop struct {
 
 // TourDetail is a tour with its stops.
 type TourDetail struct {
+	Transit     *ApprovedTransit             `json:"transit,omitempty"`
 	WorkingCopy bool                         `json:"-"`
 	Journeys    map[TravelMode]*RouteJourney `json:"journeys,omitempty"`
 	TourSummary

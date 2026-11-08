@@ -24,6 +24,7 @@ type TourFilter struct {
 	SavedByAccountID   string
 	PublicOnly         bool
 	IncludeUnpublished bool
+	IncludeTransit     bool
 	Limit              int
 	Cursor             string
 }
@@ -287,7 +288,12 @@ func (s *Store) GetTour(ctx context.Context, ref string, publicOnly bool) (*mode
 	if err != nil {
 		return nil, err
 	}
+	transit, err := s.GetTourTransit(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	tour := &models.TourDetail{TourSummary: tours[0], Stops: stops, Corridor: corridor, WorkingCopy: true, Journeys: map[models.TravelMode]*models.RouteJourney{}}
+	tour.Transit = transit
 	for _, mode := range tour.Modes {
 		route, err := s.GetTourRoute(ctx, id, mode)
 		if err != nil && !errors.Is(err, ErrNotFound) {
@@ -660,6 +666,20 @@ func (s *Store) SetTourStatus(ctx context.Context, id string, status models.Enti
 // TourPublishBlockers lists why a tour cannot be published: unpublished places, missing or unready routes.
 func (s *Store) TourPublishBlockers(ctx context.Context, id string) ([]string, error) {
 	var out []string
+	transitChoice, err := s.GetTourTransit(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if transitChoice != nil {
+		var valid bool
+		err = s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_stops a JOIN tour_stops b ON b.tour_id=a.tour_id AND b.position=a.position+1 JOIN tours t ON t.id=a.tour_id WHERE a.tour_id=$1 AND a.id=$2 AND b.id=$3 AND 'walk'::travel_mode=ANY(t.modes))`, id, transitChoice.Intent.FromStopID, transitChoice.Intent.ToStopID).Scan(&valid)
+		if err != nil {
+			return nil, err
+		}
+		if !valid {
+			out = append(out, "transit selection no longer matches adjacent walking story stops; review or remove it")
+		}
+	}
 	rows, err := s.pool.Query(ctx, `SELECT ts.position, p.slug, p.status FROM tour_stops ts JOIN places p ON p.id = ts.place_id WHERE ts.tour_id = $1 AND p.status <> 'published' ORDER BY ts.position`, id)
 	if err != nil {
 		return nil, mapErr(err)

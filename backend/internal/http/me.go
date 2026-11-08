@@ -205,7 +205,19 @@ func (d Deps) getProgress(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	p, err := d.Store.GetProgress(r.Context(), accountFrom(r.Context()).ID, tour.ID)
+	if tour.RevisionID == nil {
+		writeError(w, http.StatusConflict, "conflict", "a published revision is not ready")
+		return
+	}
+	var p *models.TourProgress
+	err := d.Store.Transaction(r.Context(), func(tx *repository.Store) error {
+		var err error
+		p, err = tx.GetProgress(r.Context(), accountFrom(r.Context()).ID, tour.ID)
+		if err == nil && p.RevisionID != *tour.RevisionID {
+			return repository.ErrConflict
+		}
+		return err
+	})
 	if err != nil {
 		d.fail(w, err)
 		return
@@ -214,10 +226,6 @@ func (d Deps) getProgress(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d Deps) putProgress(w http.ResponseWriter, r *http.Request) {
-	tour, ok := d.visibleTour(w, r)
-	if !ok {
-		return
-	}
 	var req models.ProgressRequest
 	if !decodeOrFail(w, r, &req) {
 		return
@@ -226,8 +234,45 @@ func (d Deps) putProgress(w http.ResponseWriter, r *http.Request) {
 		writeValidation(w, f)
 		return
 	}
+	var tour *models.TourDetail
+	if req.Reset {
+		// Reset targets the current release, not the old served legacy pin. Check
+		// that exact snapshot before the transaction is allowed to change the pin.
+		working, ok := d.visibleTourBase(w, r)
+		if !ok {
+			return
+		}
+		if working.RevisionID == nil {
+			writeError(w, http.StatusConflict, "conflict", "a published revision is not ready")
+			return
+		}
+		revision, err := d.Store.GetTourRevision(r.Context(), working.ID, *working.RevisionID)
+		if err != nil {
+			d.fail(w, err)
+			return
+		}
+		tour = &revision.Snapshot.Tour
+		if !canSeeTour(&tour.TourSummary, accountFrom(r.Context())) {
+			writeError(w, http.StatusNotFound, "not_found", "not found")
+			return
+		}
+		if tour.Transit != nil && !d.requireTransitClient(w, r) {
+			return
+		}
+	} else {
+		served, ok := d.visibleTour(w, r)
+		if !ok {
+			return
+		}
+		tour = served
+	}
+	if tour.RevisionID == nil {
+		writeError(w, http.StatusConflict, "conflict", "a published revision is not ready")
+		return
+	}
 	a := accountFrom(r.Context())
 	in := models.TourProgress{AccountID: a.ID, TourID: tour.ID, Mode: req.Mode, VisitedPositions: req.VisitedPositions}
+	in.RevisionID = *tour.RevisionID
 	if req.Completed {
 		now := time.Now()
 		in.CompletedAt = &now

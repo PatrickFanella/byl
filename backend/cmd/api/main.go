@@ -60,6 +60,8 @@ func main() {
 		BriefIntake:     cfg.PublicBriefIntake,
 		Contributions:   cfg.RouteContributions,
 		ContributionKey: cfg.ContributionScopeKey,
+		TransitPlanner:  prov.Transit,
+		TransitEnabled:  cfg.ScheduledTransit,
 		IsBootstrap:     cfg.IsBootstrapAdmin,
 		Blob:            prov.Blob,
 		MediaFSDir:      prov.MediaFSDir,
