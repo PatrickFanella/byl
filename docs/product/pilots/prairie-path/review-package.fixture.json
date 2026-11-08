@@ -1,0 +1,4729 @@
+{
+  "schema_version": 1,
+  "version": "1d8425e67e7b9507acb5465eb9903ffa7aebf6e2ff0f53d7e183ee82207c0feb",
+  "state": "needs_research",
+  "ready_to_publish": false,
+  "brief": {
+    "id": "8f12a40c-6185-4e47-b0c6-70892c36259d",
+    "owner_account_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a",
+    "submitted": {
+      "topic": "Illinois Prairie Path Main Stem: Villa Avenue and Ardmore stations, electric railway and volunteer conversion at Founders Park",
+      "area": "Villa Park to Wheaton, Illinois",
+      "notes": "Private point-to-point bike draft along the Main Stem. Elgin/Aurora branches and Great Western remain separate. Museum/station exteriors and a commemorative interpretation point are distinct from specific event sites. Crossings and shaping controls add no stories. No production publication or access approval. Arrange return separately.",
+      "place_leads": [
+        "Villa Park Historical Museum / former Villa Avenue CA&E station",
+        "Former Ardmore Avenue CA&E station",
+        "Founders Park / Main Stem interpretation point"
+      ],
+      "event_leads": [
+        "CA&E station history",
+        "Volunteer railway-to-path conversion",
+        "May Watts and collective public-path campaign"
+      ],
+      "source_links": [
+        "https://ipp.org/history/",
+        "https://ipp.org/about-the-trail/",
+        "https://ipp.org/pdf/IPP-free-map-color-updated.pdf",
+        "https://www.invillapark.com/262/Historical-Preservation-Commission",
+        "https://www.ipp.org/wp-content/uploads/IPP-2017-DECEMBER-Newsletter-.pdf",
+        "https://www.wheaton.il.us/AgendaCenter/ViewFile/Agenda/_06232025-2882?packet=true",
+        "https://openlands.org/regional-trails/illinois-prairie-path/",
+        "https://ipp.org/construction-updates/"
+      ],
+      "modes": [
+        "bike"
+      ],
+      "trip_shape": "point_to_point",
+      "duration_minutes": null,
+      "start_preference": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+      "end_preference": "Founders Park / Main Stem interpretation point",
+      "pilot_id": "prairie-path-v1"
+    },
+    "status": "review",
+    "reason": "Research stages completed; curator review required.",
+    "version": 3,
+    "created_at": "2026-11-08T15:54:07.915749-06:00",
+    "updated_at": "2026-11-08T15:54:08.61576-06:00"
+  },
+  "research": {
+    "id": "fd1191da-f605-4565-93c0-e5a170235ba8",
+    "brief_id": "8f12a40c-6185-4e47-b0c6-70892c36259d",
+    "job_id": "d4127552-5a59-458c-b4b5-71a198e2e39f",
+    "source_version": 1,
+    "brief_version": 2,
+    "status": "completed",
+    "reason": "",
+    "requests_used": 2,
+    "tokens_reserved": 4000,
+    "request_limit": 12,
+    "token_limit": 20000,
+    "deadline_at": "2026-11-08T16:09:08.435573-06:00",
+    "created_at": "2026-11-08T15:54:08.435573-06:00",
+    "stages": [
+      {
+        "stage": "research",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "reconciliation",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "drafting",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "stage": "assembly",
+        "status": "completed",
+        "attempts": 1,
+        "reason": "",
+        "candidate_ids": [],
+        "outcomes": [
+          {
+            "attempt": 1,
+            "status": "completed",
+            "reason": ""
+          }
+        ]
+      }
+    ]
+  },
+  "submitted": {
+    "topic": "Illinois Prairie Path Main Stem: Villa Avenue and Ardmore stations, electric railway and volunteer conversion at Founders Park",
+    "area": "Villa Park to Wheaton, Illinois",
+    "notes": "Private point-to-point bike draft along the Main Stem. Elgin/Aurora branches and Great Western remain separate. Museum/station exteriors and a commemorative interpretation point are distinct from specific event sites. Crossings and shaping controls add no stories. No production publication or access approval. Arrange return separately.",
+    "place_leads": [
+      "Villa Park Historical Museum / former Villa Avenue CA&E station",
+      "Former Ardmore Avenue CA&E station",
+      "Founders Park / Main Stem interpretation point"
+    ],
+    "event_leads": [
+      "CA&E station history",
+      "Volunteer railway-to-path conversion",
+      "May Watts and collective public-path campaign"
+    ],
+    "source_links": [
+      "https://ipp.org/history/",
+      "https://ipp.org/about-the-trail/",
+      "https://ipp.org/pdf/IPP-free-map-color-updated.pdf",
+      "https://www.invillapark.com/262/Historical-Preservation-Commission",
+      "https://www.ipp.org/wp-content/uploads/IPP-2017-DECEMBER-Newsletter-.pdf",
+      "https://www.wheaton.il.us/AgendaCenter/ViewFile/Agenda/_06232025-2882?packet=true",
+      "https://openlands.org/regional-trails/illinois-prairie-path/",
+      "https://ipp.org/construction-updates/"
+    ],
+    "modes": [
+      "bike"
+    ],
+    "trip_shape": "point_to_point",
+    "duration_minutes": null,
+    "start_preference": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+    "end_preference": "Founders Park / Main Stem interpretation point",
+    "pilot_id": "prairie-path-v1"
+  },
+  "proposal": {
+    "version": 1,
+    "status": "draft",
+    "created_at": "2026-11-08T15:54:08.580184127-06:00",
+    "title": "Illinois Prairie Path Main Stem: Villa Avenue and Ardmore stations, electric railway and volunteer conversion at Founders Park \u2014 Villa Park to Wheaton, Illinois",
+    "introduction": "Explore Illinois Prairie Path Main Stem: Villa Avenue and Ardmore stations, electric railway and volunteer conversion at Founders Park in Villa Park to Wheaton, Illinois through 3 researched locations and their selected historical accounts. This is a private proposal; current viewing guidance, connecting paths and publication still require review.",
+    "requested_shape": "point_to_point",
+    "trip_shape": "point_to_point",
+    "modes": [
+      "bike"
+    ],
+    "target_duration_minutes": null,
+    "travel_minutes": null,
+    "travel_state": "not_computed",
+    "planned_dwell_minutes": 9,
+    "planned_narration_minutes": 3,
+    "stops": [
+      {
+        "material": {
+          "record_id": "e8903b84-526b-4e64-b462-760846d104ab",
+          "review_version": 1,
+          "place_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+          "place_name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+          "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+          "latitude": 41.8856864,
+          "longitude": -87.9695738,
+          "moment_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+          "moment_title": "The former interurban station as an interpretation anchor",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "bf0af6fe47cd8ed4e3bc130c125aded39661790a457e8cb2f2d7dba930cee151",
+          "source_urls": [
+            "https://www.invillapark.com/262/Historical-Preservation-Commission",
+            "https://ipp.org/about-the-trail/"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: villa, avenue, ardmore, electric, railway",
+        "what_to_notice": "Curator research question: what traces of \u201cThe former interurban station as an interpretation anchor\u201d can be observed at Villa Park Historical Museum / former Villa Avenue CA&E station today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with \u201cAn earlier station and a developing suburb\u201d at Former Ardmore Avenue CA&E station. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "c9c88d78-c9f0-4f4a-b4d5-57fc0964d52a",
+          "review_version": 1,
+          "place_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+          "place_name": "Former Ardmore Avenue CA&E station",
+          "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+          "latitude": 41.8833524,
+          "longitude": -87.9796374,
+          "moment_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+          "moment_title": "An earlier station and a developing suburb",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "d2b966154f65e8dd990f14b8ec72ea05764e98fd16e7798fb82e9ff5e5ef5158",
+          "source_urls": [
+            "https://www.invillapark.com/262/Historical-Preservation-Commission"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: villa, avenue, ardmore, electric, railway",
+        "what_to_notice": "Curator research question: what traces of \u201cAn earlier station and a developing suburb\u201d can be observed at Former Ardmore Avenue CA&E station today? Confirm visible features before writing viewing guidance.",
+        "transition": "Continue the theme with \u201cRemembering the campaign to turn railway land into a path\u201d at Founders Park / Main Stem interpretation point. The connecting path still needs review.",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      },
+      {
+        "material": {
+          "record_id": "6bbd12f4-82a9-4fdf-8d01-e2dd95b9d49c",
+          "review_version": 1,
+          "place_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+          "place_name": "Founders Park / Main Stem interpretation point",
+          "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+          "latitude": 41.8641389,
+          "longitude": -88.1115835,
+          "moment_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+          "moment_title": "Remembering the campaign to turn railway land into a path",
+          "narrative": "",
+          "evidence_kind": "curated_record",
+          "content_sha256": "bb373df0b73d3e8d87e1e4385caf7cc79dfa6b57d2a508dbef8df24542f6e225",
+          "source_urls": [
+            "https://ipp.org/history/",
+            "https://www.ipp.org/wp-content/uploads/IPP-2017-DECEMBER-Newsletter-.pdf",
+            "https://www.wheaton.il.us/AgendaCenter/ViewFile/Agenda/_06232025-2882?packet=true",
+            "https://openlands.org/regional-trails/illinois-prairie-path/"
+          ],
+          "evidence_ids": []
+        },
+        "theme_reason": "Matched requested theme/event terms: prairie, path, railway, volunteer, founders, park",
+        "what_to_notice": "Curator research question: what traces of \u201cRemembering the campaign to turn railway land into a path\u201d can be observed at Founders Park / Main Stem interpretation point today? Confirm visible features before writing viewing guidance.",
+        "transition": "",
+        "planned_dwell_minutes": 3,
+        "planned_narration_minutes": 1
+      }
+    ],
+    "travel_sequence": [
+      0,
+      1,
+      2
+    ],
+    "excluded": [],
+    "research_gaps": [],
+    "assumptions": [
+      "Historical paragraphs are reused from retained material; their inclusion is not a new factual review.",
+      "What to notice is a curator research question, not verified current viewing guidance.",
+      "Plan three minutes of dwell per stop, plus narration at 130 words per minute; actual travel and access still require computation and review.",
+      "No duration was supplied; the geography screen uses a provisional 60-minute planning budget."
+    ]
+  },
+  "tour": {
+    "journeys": {
+      "bike": {
+        "version": 1,
+        "state": "unreviewed",
+        "computation": "ready",
+        "quality": "unreviewed",
+        "usable": false,
+        "issue_codes": [],
+        "travel_distance_m": 12372,
+        "travel_duration_s": 3111,
+        "dwell_duration_s": 540,
+        "narration_duration_s": 360,
+        "itinerary_duration_s": 4011,
+        "round_trip_duration_s": null,
+        "return_plan": {
+          "status": "unplanned",
+          "distance_m": null,
+          "duration_s": null
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      }
+    },
+    "draft_version": 0,
+    "route_version": 0,
+    "revision_id": null,
+    "revision_number": 0,
+    "id": "8f0a1763-adcb-4e8c-818d-9c6acb5cef55",
+    "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+    "city_ids": [
+      "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+      "d558a39b-3dab-4103-ade1-4ed31efe36b5"
+    ],
+    "slug": "prairie-path-main-stem-private-pilot",
+    "title": "Prairie Path Main Stem \u2014 private pilot",
+    "summary": "",
+    "topic_id": null,
+    "topic": null,
+    "modes": [
+      "bike"
+    ],
+    "hero_media": null,
+    "status": "draft",
+    "visibility": "public",
+    "owner_account_id": null,
+    "stop_count": 3,
+    "routes": {
+      "bike": {
+        "mode": "bike",
+        "status": "ready",
+        "distance_m": 12372,
+        "duration_s": 3111,
+        "estimated_minutes": 52,
+        "computed_at": "2026-11-08T15:54:08.809378-06:00"
+      }
+    },
+    "created_at": "2026-11-08T15:54:08.726525-06:00",
+    "updated_at": "2026-11-08T15:54:08.726525-06:00",
+    "stops": [
+      {
+        "id": "cd8a029a-f2b1-4cb1-9df5-d2c872497c64",
+        "position": 1,
+        "place": {
+          "id": "3dfa1c93-b22c-4990-858c-42088508939b",
+          "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+          "slug": "villa-park-historical-museum-former-villa-avenue-ca-e-station",
+          "name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.8856864,
+          "longitude": -87.9695738,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "220 S Villa Avenue, Villa Park, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:54:08.166719-06:00",
+          "updated_at": "2026-11-08T15:54:08.166719-06:00"
+        },
+        "featured_moment_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+        "featured_moment": {
+          "id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+          "place_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+          "slug": "the-former-interurban-station-as-an-interpretation-anchor",
+          "title": "The former interurban station as an interpretation anchor",
+          "excerpt": "The Village distinguishes the 1929 Villa Avenue station from Ardmore\u2019s earlier station. The museum address is 220 S Villa Avenue. This exterior chapter introduces the former electric railway corridor; it does not promise entry into the\u2026",
+          "date_start": "1929-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "9f0199fe-72b3-40a6-8e14-b02be292528c",
+        "position": 2,
+        "place": {
+          "id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+          "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+          "slug": "former-ardmore-avenue-ca-e-station",
+          "name": "Former Ardmore Avenue CA&E station",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.8833524,
+          "longitude": -87.9796374,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "10 W Park Boulevard, Villa Park, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:54:08.258087-06:00",
+          "updated_at": "2026-11-08T15:54:08.258087-06:00"
+        },
+        "featured_moment_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+        "featured_moment": {
+          "id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+          "place_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+          "slug": "an-earlier-station-and-a-developing-suburb",
+          "title": "An earlier station and a developing suburb",
+          "excerpt": "The Village dates Ardmore station to 1910 and connects the electric railway with suburban development. This is a separate station identity from Villa Avenue and the Great Western depot. The draft uses an exterior interpretation point, with\u2026",
+          "date_start": "1910-01-01",
+          "date_end": null,
+          "date_precision": "year",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      },
+      {
+        "id": "96c65130-b1ce-4e67-99f1-9355138062aa",
+        "position": 3,
+        "place": {
+          "id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+          "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+          "slug": "founders-park-main-stem-interpretation-point",
+          "name": "Founders Park / Main Stem interpretation point",
+          "summary": "",
+          "kind": "site",
+          "latitude": 41.8641389,
+          "longitude": -88.1115835,
+          "arrival_radius_m": 40,
+          "arrival_point": null,
+          "arrival_version": 0,
+          "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL",
+          "status": "draft",
+          "primary_moment_id": null,
+          "moment_count": 0,
+          "created_at": "2026-11-08T15:54:08.349384-06:00",
+          "updated_at": "2026-11-08T15:54:08.349384-06:00"
+        },
+        "featured_moment_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+        "featured_moment": {
+          "id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+          "place_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+          "slug": "remembering-the-campaign-to-turn-railway-land-into-a-path",
+          "title": "Remembering the campaign to turn railway land into a path",
+          "excerpt": "The Prairie Path history traces the campaign to May Watts\u2019s 1963 letter and the work of many volunteers. Founders Park provides a later place to interpret that effort. The newsletter and City locate the park along Liberty Drive. This\u2026",
+          "date_start": "1963-09-30",
+          "date_end": null,
+          "date_precision": "day",
+          "date_display": "",
+          "hero_media": null,
+          "has_narration": false,
+          "status": "draft",
+          "topic_ids": []
+        },
+        "note": ""
+      }
+    ]
+  },
+  "routes": {
+    "bike": {
+      "journey": {
+        "version": 1,
+        "state": "unreviewed",
+        "computation": "ready",
+        "quality": "unreviewed",
+        "usable": false,
+        "issue_codes": [],
+        "travel_distance_m": 12372,
+        "travel_duration_s": 3111,
+        "dwell_duration_s": 540,
+        "narration_duration_s": 360,
+        "itinerary_duration_s": 4011,
+        "round_trip_duration_s": null,
+        "return_plan": {
+          "status": "unplanned",
+          "distance_m": null,
+          "duration_s": null
+        },
+        "segments": [],
+        "assumptions": [
+          "Travel metrics describe the selected computed geometry, not field timing or proof of legal access.",
+          "Plan 180 seconds of dwell per story stop, plus 120 seconds of narration per featured story; these are assumptions, not measured audio lengths.",
+          "An unplanned return has no distance or time estimate. Itinerary totals exclude an unplanned return."
+        ]
+      },
+      "id": "c7289464-988b-4e39-a5f3-e89a58c8f82a",
+      "tour_id": "8f0a1763-adcb-4e8c-818d-9c6acb5cef55",
+      "mode": "bike",
+      "status": "ready",
+      "provider": "valhalla",
+      "distance_m": 12372,
+      "duration_s": 3111,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.969591,
+            41.885823
+          ],
+          [
+            -87.970092,
+            41.885706
+          ],
+          [
+            -87.970605,
+            41.885589
+          ],
+          [
+            -87.972428,
+            41.885148
+          ],
+          [
+            -87.973988,
+            41.884774
+          ],
+          [
+            -87.974038,
+            41.884761
+          ],
+          [
+            -87.974083,
+            41.884751
+          ],
+          [
+            -87.97415,
+            41.884737
+          ],
+          [
+            -87.974189,
+            41.884729
+          ],
+          [
+            -87.974478,
+            41.884668
+          ],
+          [
+            -87.974589,
+            41.884652
+          ],
+          [
+            -87.974683,
+            41.884652
+          ],
+          [
+            -87.974918,
+            41.884663
+          ],
+          [
+            -87.975,
+            41.884654
+          ],
+          [
+            -87.97508,
+            41.884634
+          ],
+          [
+            -87.975208,
+            41.884597
+          ],
+          [
+            -87.975302,
+            41.884575
+          ],
+          [
+            -87.975364,
+            41.884566
+          ],
+          [
+            -87.97543,
+            41.884552
+          ],
+          [
+            -87.975514,
+            41.884524
+          ],
+          [
+            -87.975656,
+            41.884469
+          ],
+          [
+            -87.97574,
+            41.884446
+          ],
+          [
+            -87.975798,
+            41.884437
+          ],
+          [
+            -87.975944,
+            41.884413
+          ],
+          [
+            -87.976115,
+            41.884382
+          ],
+          [
+            -87.976843,
+            41.884215
+          ],
+          [
+            -87.977017,
+            41.884166
+          ],
+          [
+            -87.977177,
+            41.884098
+          ],
+          [
+            -87.977411,
+            41.883984
+          ],
+          [
+            -87.977582,
+            41.88393
+          ],
+          [
+            -87.978835,
+            41.883616
+          ],
+          [
+            -87.978873,
+            41.883611
+          ],
+          [
+            -87.978917,
+            41.883606
+          ],
+          [
+            -87.978969,
+            41.8836
+          ],
+          [
+            -87.97903,
+            41.883594
+          ],
+          [
+            -87.979071,
+            41.883589
+          ],
+          [
+            -87.979091,
+            41.883587
+          ],
+          [
+            -87.979223,
+            41.88356
+          ],
+          [
+            -87.979654,
+            41.883478
+          ],
+          [
+            -87.979654,
+            41.883478
+          ],
+          [
+            -87.979654,
+            41.883478
+          ],
+          [
+            -87.979835,
+            41.883443
+          ],
+          [
+            -87.980461,
+            41.883314
+          ],
+          [
+            -87.980685,
+            41.883259
+          ],
+          [
+            -87.980795,
+            41.883225
+          ],
+          [
+            -87.981018,
+            41.883138
+          ],
+          [
+            -87.981221,
+            41.883064
+          ],
+          [
+            -87.981405,
+            41.883014
+          ],
+          [
+            -87.981566,
+            41.882977
+          ],
+          [
+            -87.981705,
+            41.882949
+          ],
+          [
+            -87.98193,
+            41.882918
+          ],
+          [
+            -87.982125,
+            41.882891
+          ],
+          [
+            -87.982453,
+            41.882836
+          ],
+          [
+            -87.982661,
+            41.882799
+          ],
+          [
+            -87.983682,
+            41.882621
+          ],
+          [
+            -87.983743,
+            41.882615
+          ],
+          [
+            -87.983796,
+            41.882612
+          ],
+          [
+            -87.983837,
+            41.88261
+          ],
+          [
+            -87.983891,
+            41.882606
+          ],
+          [
+            -87.983944,
+            41.882602
+          ],
+          [
+            -87.984245,
+            41.88256
+          ],
+          [
+            -87.984481,
+            41.882521
+          ],
+          [
+            -87.985639,
+            41.882326
+          ],
+          [
+            -87.985798,
+            41.882301
+          ],
+          [
+            -87.985939,
+            41.882291
+          ],
+          [
+            -87.986157,
+            41.882281
+          ],
+          [
+            -87.986157,
+            41.882281
+          ],
+          [
+            -87.986721,
+            41.882289
+          ],
+          [
+            -87.987772,
+            41.882265
+          ],
+          [
+            -87.988066,
+            41.882269
+          ],
+          [
+            -87.988694,
+            41.882287
+          ],
+          [
+            -87.988798,
+            41.882295
+          ],
+          [
+            -87.989521,
+            41.882293
+          ],
+          [
+            -87.99183,
+            41.882289
+          ],
+          [
+            -87.992741,
+            41.882306
+          ],
+          [
+            -87.993049,
+            41.882293
+          ],
+          [
+            -87.993538,
+            41.88229
+          ],
+          [
+            -87.99363,
+            41.882289
+          ],
+          [
+            -87.993727,
+            41.882289
+          ],
+          [
+            -87.993749,
+            41.882289
+          ],
+          [
+            -87.994318,
+            41.882285
+          ],
+          [
+            -87.994604,
+            41.882308
+          ],
+          [
+            -87.995727,
+            41.882345
+          ],
+          [
+            -87.997284,
+            41.882336
+          ],
+          [
+            -87.997315,
+            41.882336
+          ],
+          [
+            -87.997379,
+            41.882336
+          ],
+          [
+            -87.997443,
+            41.882337
+          ],
+          [
+            -87.997458,
+            41.882337
+          ],
+          [
+            -87.998256,
+            41.882359
+          ],
+          [
+            -87.998674,
+            41.882353
+          ],
+          [
+            -87.999252,
+            41.882346
+          ],
+          [
+            -88.000763,
+            41.882344
+          ],
+          [
+            -88.000826,
+            41.882344
+          ],
+          [
+            -88.000871,
+            41.882344
+          ],
+          [
+            -88.000928,
+            41.882343
+          ],
+          [
+            -88.000988,
+            41.882342
+          ],
+          [
+            -88.001138,
+            41.88234
+          ],
+          [
+            -88.001592,
+            41.882314
+          ],
+          [
+            -88.005965,
+            41.882217
+          ],
+          [
+            -88.006911,
+            41.882182
+          ],
+          [
+            -88.008233,
+            41.882162
+          ],
+          [
+            -88.008274,
+            41.882162
+          ],
+          [
+            -88.008331,
+            41.882161
+          ],
+          [
+            -88.008397,
+            41.882159
+          ],
+          [
+            -88.008445,
+            41.882157
+          ],
+          [
+            -88.00966,
+            41.882111
+          ],
+          [
+            -88.009711,
+            41.882109
+          ],
+          [
+            -88.009756,
+            41.882107
+          ],
+          [
+            -88.009804,
+            41.882105
+          ],
+          [
+            -88.009851,
+            41.882105
+          ],
+          [
+            -88.010963,
+            41.88209
+          ],
+          [
+            -88.011052,
+            41.882084
+          ],
+          [
+            -88.011093,
+            41.882081
+          ],
+          [
+            -88.011154,
+            41.882077
+          ],
+          [
+            -88.011206,
+            41.882072
+          ],
+          [
+            -88.011247,
+            41.882068
+          ],
+          [
+            -88.011341,
+            41.882059
+          ],
+          [
+            -88.012455,
+            41.882027
+          ],
+          [
+            -88.012498,
+            41.882026
+          ],
+          [
+            -88.012544,
+            41.882025
+          ],
+          [
+            -88.012595,
+            41.882025
+          ],
+          [
+            -88.012646,
+            41.882024
+          ],
+          [
+            -88.015075,
+            41.881967
+          ],
+          [
+            -88.015092,
+            41.881966
+          ],
+          [
+            -88.017847,
+            41.881896
+          ],
+          [
+            -88.018178,
+            41.881879
+          ],
+          [
+            -88.018235,
+            41.881878
+          ],
+          [
+            -88.018257,
+            41.881877
+          ],
+          [
+            -88.0183,
+            41.881876
+          ],
+          [
+            -88.018328,
+            41.881876
+          ],
+          [
+            -88.018383,
+            41.881875
+          ],
+          [
+            -88.018913,
+            41.881876
+          ],
+          [
+            -88.020994,
+            41.881842
+          ],
+          [
+            -88.021128,
+            41.881839
+          ],
+          [
+            -88.021272,
+            41.881838
+          ],
+          [
+            -88.023661,
+            41.881812
+          ],
+          [
+            -88.023727,
+            41.881811
+          ],
+          [
+            -88.023793,
+            41.881811
+          ],
+          [
+            -88.023842,
+            41.881812
+          ],
+          [
+            -88.023924,
+            41.881813
+          ],
+          [
+            -88.024276,
+            41.88182
+          ],
+          [
+            -88.025622,
+            41.8818
+          ],
+          [
+            -88.02567,
+            41.8818
+          ],
+          [
+            -88.025719,
+            41.881799
+          ],
+          [
+            -88.025779,
+            41.881798
+          ],
+          [
+            -88.025829,
+            41.881797
+          ],
+          [
+            -88.027144,
+            41.881778
+          ],
+          [
+            -88.027204,
+            41.881778
+          ],
+          [
+            -88.027244,
+            41.881777
+          ],
+          [
+            -88.027302,
+            41.881776
+          ],
+          [
+            -88.02734,
+            41.881775
+          ],
+          [
+            -88.028451,
+            41.881747
+          ],
+          [
+            -88.029487,
+            41.881745
+          ],
+          [
+            -88.029869,
+            41.88174
+          ],
+          [
+            -88.030689,
+            41.881734
+          ],
+          [
+            -88.031152,
+            41.881737
+          ],
+          [
+            -88.031345,
+            41.881723
+          ],
+          [
+            -88.031426,
+            41.881716
+          ],
+          [
+            -88.031785,
+            41.881652
+          ],
+          [
+            -88.032042,
+            41.881626
+          ],
+          [
+            -88.032297,
+            41.881607
+          ],
+          [
+            -88.033502,
+            41.881549
+          ],
+          [
+            -88.033802,
+            41.881534
+          ],
+          [
+            -88.034063,
+            41.881539
+          ],
+          [
+            -88.034411,
+            41.881565
+          ],
+          [
+            -88.034544,
+            41.881572
+          ],
+          [
+            -88.034695,
+            41.881564
+          ],
+          [
+            -88.034695,
+            41.881564
+          ],
+          [
+            -88.035087,
+            41.881534
+          ],
+          [
+            -88.035426,
+            41.881491
+          ],
+          [
+            -88.035821,
+            41.881441
+          ],
+          [
+            -88.036245,
+            41.881388
+          ],
+          [
+            -88.036376,
+            41.881379
+          ],
+          [
+            -88.036631,
+            41.881358
+          ],
+          [
+            -88.036912,
+            41.881328
+          ],
+          [
+            -88.03709,
+            41.881308
+          ],
+          [
+            -88.037264,
+            41.881297
+          ],
+          [
+            -88.037438,
+            41.881279
+          ],
+          [
+            -88.037548,
+            41.88126
+          ],
+          [
+            -88.037858,
+            41.88121
+          ],
+          [
+            -88.037992,
+            41.881193
+          ],
+          [
+            -88.038121,
+            41.881184
+          ],
+          [
+            -88.038394,
+            41.881168
+          ],
+          [
+            -88.038915,
+            41.881123
+          ],
+          [
+            -88.039294,
+            41.88108
+          ],
+          [
+            -88.039642,
+            41.881037
+          ],
+          [
+            -88.040157,
+            41.880953
+          ],
+          [
+            -88.04034,
+            41.88092
+          ],
+          [
+            -88.04042,
+            41.880902
+          ],
+          [
+            -88.040463,
+            41.880887
+          ],
+          [
+            -88.040522,
+            41.880861
+          ],
+          [
+            -88.040642,
+            41.880791
+          ],
+          [
+            -88.040771,
+            41.880709
+          ],
+          [
+            -88.040875,
+            41.880633
+          ],
+          [
+            -88.040922,
+            41.880608
+          ],
+          [
+            -88.04095,
+            41.880607
+          ],
+          [
+            -88.040987,
+            41.880634
+          ],
+          [
+            -88.041019,
+            41.880664
+          ],
+          [
+            -88.041037,
+            41.880682
+          ],
+          [
+            -88.04107,
+            41.880792
+          ],
+          [
+            -88.041207,
+            41.880838
+          ],
+          [
+            -88.042713,
+            41.880718
+          ],
+          [
+            -88.043699,
+            41.880624
+          ],
+          [
+            -88.045237,
+            41.88047
+          ],
+          [
+            -88.046361,
+            41.880336
+          ],
+          [
+            -88.047165,
+            41.880262
+          ],
+          [
+            -88.048398,
+            41.880117
+          ],
+          [
+            -88.04902,
+            41.880051
+          ],
+          [
+            -88.049639,
+            41.879969
+          ],
+          [
+            -88.049991,
+            41.879913
+          ],
+          [
+            -88.050253,
+            41.879871
+          ],
+          [
+            -88.050253,
+            41.879871
+          ],
+          [
+            -88.050748,
+            41.87978
+          ],
+          [
+            -88.050862,
+            41.879757
+          ],
+          [
+            -88.051374,
+            41.879648
+          ],
+          [
+            -88.051752,
+            41.87957
+          ],
+          [
+            -88.053116,
+            41.879213
+          ],
+          [
+            -88.053511,
+            41.879121
+          ],
+          [
+            -88.053962,
+            41.878998
+          ],
+          [
+            -88.054386,
+            41.878881
+          ],
+          [
+            -88.054885,
+            41.878749
+          ],
+          [
+            -88.055162,
+            41.87869
+          ],
+          [
+            -88.05551,
+            41.878602
+          ],
+          [
+            -88.055788,
+            41.87852
+          ],
+          [
+            -88.056606,
+            41.878296
+          ],
+          [
+            -88.057394,
+            41.87811
+          ],
+          [
+            -88.058541,
+            41.877795
+          ],
+          [
+            -88.059676,
+            41.877485
+          ],
+          [
+            -88.060028,
+            41.877364
+          ],
+          [
+            -88.060113,
+            41.877339
+          ],
+          [
+            -88.06017,
+            41.877322
+          ],
+          [
+            -88.060262,
+            41.877295
+          ],
+          [
+            -88.062735,
+            41.876647
+          ],
+          [
+            -88.062798,
+            41.876631
+          ],
+          [
+            -88.062841,
+            41.87662
+          ],
+          [
+            -88.062893,
+            41.876606
+          ],
+          [
+            -88.062945,
+            41.876592
+          ],
+          [
+            -88.063181,
+            41.876513
+          ],
+          [
+            -88.063307,
+            41.876496
+          ],
+          [
+            -88.063457,
+            41.876463
+          ],
+          [
+            -88.063672,
+            41.876381
+          ],
+          [
+            -88.063869,
+            41.876331
+          ],
+          [
+            -88.063983,
+            41.876325
+          ],
+          [
+            -88.064111,
+            41.876296
+          ],
+          [
+            -88.064149,
+            41.876274
+          ],
+          [
+            -88.064203,
+            41.876244
+          ],
+          [
+            -88.064404,
+            41.876175
+          ],
+          [
+            -88.064604,
+            41.876155
+          ],
+          [
+            -88.064663,
+            41.87615
+          ],
+          [
+            -88.064696,
+            41.876137
+          ],
+          [
+            -88.064763,
+            41.87611
+          ],
+          [
+            -88.064824,
+            41.876084
+          ],
+          [
+            -88.064839,
+            41.876078
+          ],
+          [
+            -88.064975,
+            41.876065
+          ],
+          [
+            -88.065208,
+            41.876011
+          ],
+          [
+            -88.065297,
+            41.875975
+          ],
+          [
+            -88.065482,
+            41.875941
+          ],
+          [
+            -88.065694,
+            41.875917
+          ],
+          [
+            -88.065957,
+            41.875857
+          ],
+          [
+            -88.065979,
+            41.875854
+          ],
+          [
+            -88.066234,
+            41.875814
+          ],
+          [
+            -88.06648,
+            41.875775
+          ],
+          [
+            -88.066479,
+            41.875775
+          ],
+          [
+            -88.066554,
+            41.875772
+          ],
+          [
+            -88.066601,
+            41.875778
+          ],
+          [
+            -88.06664,
+            41.875784
+          ],
+          [
+            -88.066706,
+            41.87581
+          ],
+          [
+            -88.066793,
+            41.875845
+          ],
+          [
+            -88.066817,
+            41.875854
+          ],
+          [
+            -88.067238,
+            41.875807
+          ],
+          [
+            -88.067337,
+            41.875801
+          ],
+          [
+            -88.067896,
+            41.875806
+          ],
+          [
+            -88.068442,
+            41.875794
+          ],
+          [
+            -88.069005,
+            41.875799
+          ],
+          [
+            -88.06942,
+            41.87582
+          ],
+          [
+            -88.069997,
+            41.875825
+          ],
+          [
+            -88.07003,
+            41.875825
+          ],
+          [
+            -88.070108,
+            41.875863
+          ],
+          [
+            -88.070191,
+            41.875903
+          ],
+          [
+            -88.070218,
+            41.875906
+          ],
+          [
+            -88.070776,
+            41.875967
+          ],
+          [
+            -88.071246,
+            41.876025
+          ],
+          [
+            -88.071815,
+            41.876077
+          ],
+          [
+            -88.072432,
+            41.87612
+          ],
+          [
+            -88.07273,
+            41.876148
+          ],
+          [
+            -88.073093,
+            41.87617
+          ],
+          [
+            -88.073492,
+            41.876187
+          ],
+          [
+            -88.074028,
+            41.876214
+          ],
+          [
+            -88.074529,
+            41.876239
+          ],
+          [
+            -88.074971,
+            41.876236
+          ],
+          [
+            -88.075287,
+            41.876236
+          ],
+          [
+            -88.075654,
+            41.876212
+          ],
+          [
+            -88.075993,
+            41.876188
+          ],
+          [
+            -88.076398,
+            41.87614
+          ],
+          [
+            -88.076817,
+            41.87608
+          ],
+          [
+            -88.076817,
+            41.87608
+          ],
+          [
+            -88.077256,
+            41.875996
+          ],
+          [
+            -88.077398,
+            41.875963
+          ],
+          [
+            -88.077584,
+            41.87592
+          ],
+          [
+            -88.078098,
+            41.875791
+          ],
+          [
+            -88.078425,
+            41.875696
+          ],
+          [
+            -88.078838,
+            41.875568
+          ],
+          [
+            -88.079118,
+            41.875479
+          ],
+          [
+            -88.079574,
+            41.875305
+          ],
+          [
+            -88.080009,
+            41.875122
+          ],
+          [
+            -88.08031,
+            41.874986
+          ],
+          [
+            -88.080396,
+            41.874942
+          ],
+          [
+            -88.080514,
+            41.874889
+          ],
+          [
+            -88.080662,
+            41.874817
+          ],
+          [
+            -88.080916,
+            41.874677
+          ],
+          [
+            -88.081258,
+            41.874482
+          ],
+          [
+            -88.081258,
+            41.874482
+          ],
+          [
+            -88.081688,
+            41.874203
+          ],
+          [
+            -88.082229,
+            41.873811
+          ],
+          [
+            -88.082667,
+            41.873498
+          ],
+          [
+            -88.083782,
+            41.872607
+          ],
+          [
+            -88.084017,
+            41.872412
+          ],
+          [
+            -88.085213,
+            41.871479
+          ],
+          [
+            -88.086026,
+            41.870815
+          ],
+          [
+            -88.086473,
+            41.8705
+          ],
+          [
+            -88.08713,
+            41.86997
+          ],
+          [
+            -88.087881,
+            41.869357
+          ],
+          [
+            -88.087996,
+            41.869274
+          ],
+          [
+            -88.088104,
+            41.869197
+          ],
+          [
+            -88.088331,
+            41.869196
+          ],
+          [
+            -88.088466,
+            41.869071
+          ],
+          [
+            -88.088835,
+            41.868836
+          ],
+          [
+            -88.088967,
+            41.868761
+          ],
+          [
+            -88.089307,
+            41.868576
+          ],
+          [
+            -88.089367,
+            41.868544
+          ],
+          [
+            -88.089489,
+            41.868371
+          ],
+          [
+            -88.08977,
+            41.868244
+          ],
+          [
+            -88.090238,
+            41.868031
+          ],
+          [
+            -88.090634,
+            41.867856
+          ],
+          [
+            -88.091083,
+            41.86767
+          ],
+          [
+            -88.091539,
+            41.867496
+          ],
+          [
+            -88.091539,
+            41.867496
+          ],
+          [
+            -88.091904,
+            41.867379
+          ],
+          [
+            -88.092002,
+            41.867347
+          ],
+          [
+            -88.092116,
+            41.867311
+          ],
+          [
+            -88.092775,
+            41.867123
+          ],
+          [
+            -88.093325,
+            41.866989
+          ],
+          [
+            -88.094144,
+            41.86681
+          ],
+          [
+            -88.095197,
+            41.866613
+          ],
+          [
+            -88.096449,
+            41.866351
+          ],
+          [
+            -88.096491,
+            41.866342
+          ],
+          [
+            -88.096579,
+            41.866326
+          ],
+          [
+            -88.097395,
+            41.866178
+          ],
+          [
+            -88.097612,
+            41.866136
+          ],
+          [
+            -88.098713,
+            41.865914
+          ],
+          [
+            -88.100077,
+            41.865607
+          ],
+          [
+            -88.10037,
+            41.865521
+          ],
+          [
+            -88.10089,
+            41.865403
+          ],
+          [
+            -88.101038,
+            41.865383
+          ],
+          [
+            -88.101054,
+            41.865381
+          ],
+          [
+            -88.101075,
+            41.86538
+          ],
+          [
+            -88.10118,
+            41.865416
+          ],
+          [
+            -88.101237,
+            41.865436
+          ],
+          [
+            -88.101247,
+            41.865436
+          ],
+          [
+            -88.101256,
+            41.865436
+          ],
+          [
+            -88.101271,
+            41.865437
+          ],
+          [
+            -88.101304,
+            41.865439
+          ],
+          [
+            -88.102399,
+            41.865221
+          ],
+          [
+            -88.102845,
+            41.865132
+          ],
+          [
+            -88.103563,
+            41.86499
+          ],
+          [
+            -88.10405,
+            41.864892
+          ],
+          [
+            -88.104121,
+            41.864885
+          ],
+          [
+            -88.104262,
+            41.864896
+          ],
+          [
+            -88.104415,
+            41.864876
+          ],
+          [
+            -88.105057,
+            41.864761
+          ],
+          [
+            -88.105101,
+            41.864752
+          ],
+          [
+            -88.105117,
+            41.864749
+          ],
+          [
+            -88.105167,
+            41.864739
+          ],
+          [
+            -88.105242,
+            41.864725
+          ],
+          [
+            -88.105274,
+            41.864718
+          ],
+          [
+            -88.105505,
+            41.864679
+          ],
+          [
+            -88.10592,
+            41.864577
+          ],
+          [
+            -88.10615,
+            41.864547
+          ],
+          [
+            -88.106454,
+            41.864509
+          ],
+          [
+            -88.106517,
+            41.864501
+          ],
+          [
+            -88.106544,
+            41.864499
+          ],
+          [
+            -88.106617,
+            41.864494
+          ],
+          [
+            -88.10671,
+            41.864487
+          ],
+          [
+            -88.106732,
+            41.864486
+          ],
+          [
+            -88.106899,
+            41.86447
+          ],
+          [
+            -88.107036,
+            41.864454
+          ],
+          [
+            -88.107534,
+            41.864402
+          ],
+          [
+            -88.107787,
+            41.864377
+          ],
+          [
+            -88.107967,
+            41.864363
+          ],
+          [
+            -88.108045,
+            41.864349
+          ],
+          [
+            -88.108099,
+            41.864347
+          ],
+          [
+            -88.108129,
+            41.864342
+          ],
+          [
+            -88.108197,
+            41.864332
+          ],
+          [
+            -88.108256,
+            41.864323
+          ],
+          [
+            -88.108306,
+            41.864315
+          ],
+          [
+            -88.108535,
+            41.864299
+          ],
+          [
+            -88.108972,
+            41.864263
+          ],
+          [
+            -88.109804,
+            41.864183
+          ],
+          [
+            -88.109846,
+            41.864181
+          ],
+          [
+            -88.109906,
+            41.864178
+          ],
+          [
+            -88.109983,
+            41.864174
+          ],
+          [
+            -88.110017,
+            41.864172
+          ],
+          [
+            -88.110146,
+            41.864167
+          ],
+          [
+            -88.110569,
+            41.864132
+          ],
+          [
+            -88.110762,
+            41.864127
+          ],
+          [
+            -88.111083,
+            41.864125
+          ],
+          [
+            -88.111371,
+            41.864118
+          ],
+          [
+            -88.111404,
+            41.864127
+          ],
+          [
+            -88.111472,
+            41.86413
+          ],
+          [
+            -88.111584,
+            41.864139
+          ]
+        ]
+      },
+      "legs": [
+        {
+          "from_stop_id": "cd8a029a-f2b1-4cb1-9df5-d2c872497c64",
+          "to_stop_id": "9f0199fe-72b3-40a6-8e14-b02be292528c",
+          "navigation_source": "unapproved_proposed_arrival_comparison",
+          "from_position": 1,
+          "to_position": 2,
+          "distance_m": 876,
+          "duration_s": 230,
+          "geometry": [
+            [
+              -87.969591,
+              41.885823
+            ],
+            [
+              -87.970092,
+              41.885706
+            ],
+            [
+              -87.970605,
+              41.885589
+            ],
+            [
+              -87.972428,
+              41.885148
+            ],
+            [
+              -87.973988,
+              41.884774
+            ],
+            [
+              -87.974038,
+              41.884761
+            ],
+            [
+              -87.974083,
+              41.884751
+            ],
+            [
+              -87.97415,
+              41.884737
+            ],
+            [
+              -87.974189,
+              41.884729
+            ],
+            [
+              -87.974478,
+              41.884668
+            ],
+            [
+              -87.974589,
+              41.884652
+            ],
+            [
+              -87.974683,
+              41.884652
+            ],
+            [
+              -87.974918,
+              41.884663
+            ],
+            [
+              -87.975,
+              41.884654
+            ],
+            [
+              -87.97508,
+              41.884634
+            ],
+            [
+              -87.975208,
+              41.884597
+            ],
+            [
+              -87.975302,
+              41.884575
+            ],
+            [
+              -87.975364,
+              41.884566
+            ],
+            [
+              -87.97543,
+              41.884552
+            ],
+            [
+              -87.975514,
+              41.884524
+            ],
+            [
+              -87.975656,
+              41.884469
+            ],
+            [
+              -87.97574,
+              41.884446
+            ],
+            [
+              -87.975798,
+              41.884437
+            ],
+            [
+              -87.975944,
+              41.884413
+            ],
+            [
+              -87.976115,
+              41.884382
+            ],
+            [
+              -87.976843,
+              41.884215
+            ],
+            [
+              -87.977017,
+              41.884166
+            ],
+            [
+              -87.977177,
+              41.884098
+            ],
+            [
+              -87.977411,
+              41.883984
+            ],
+            [
+              -87.977582,
+              41.88393
+            ],
+            [
+              -87.978835,
+              41.883616
+            ],
+            [
+              -87.978873,
+              41.883611
+            ],
+            [
+              -87.978917,
+              41.883606
+            ],
+            [
+              -87.978969,
+              41.8836
+            ],
+            [
+              -87.97903,
+              41.883594
+            ],
+            [
+              -87.979071,
+              41.883589
+            ],
+            [
+              -87.979091,
+              41.883587
+            ],
+            [
+              -87.979223,
+              41.88356
+            ],
+            [
+              -87.979654,
+              41.883478
+            ]
+          ]
+        },
+        {
+          "from_stop_id": "9f0199fe-72b3-40a6-8e14-b02be292528c",
+          "to_stop_id": "96c65130-b1ce-4e67-99f1-9355138062aa",
+          "navigation_source": "unapproved_proposed_arrival_comparison",
+          "from_position": 2,
+          "to_position": 3,
+          "distance_m": 11496,
+          "duration_s": 2881,
+          "geometry": [
+            [
+              -87.979654,
+              41.883478
+            ],
+            [
+              -87.979654,
+              41.883478
+            ],
+            [
+              -87.979835,
+              41.883443
+            ],
+            [
+              -87.980461,
+              41.883314
+            ],
+            [
+              -87.980685,
+              41.883259
+            ],
+            [
+              -87.980795,
+              41.883225
+            ],
+            [
+              -87.981018,
+              41.883138
+            ],
+            [
+              -87.981221,
+              41.883064
+            ],
+            [
+              -87.981405,
+              41.883014
+            ],
+            [
+              -87.981566,
+              41.882977
+            ],
+            [
+              -87.981705,
+              41.882949
+            ],
+            [
+              -87.98193,
+              41.882918
+            ],
+            [
+              -87.982125,
+              41.882891
+            ],
+            [
+              -87.982453,
+              41.882836
+            ],
+            [
+              -87.982661,
+              41.882799
+            ],
+            [
+              -87.983682,
+              41.882621
+            ],
+            [
+              -87.983743,
+              41.882615
+            ],
+            [
+              -87.983796,
+              41.882612
+            ],
+            [
+              -87.983837,
+              41.88261
+            ],
+            [
+              -87.983891,
+              41.882606
+            ],
+            [
+              -87.983944,
+              41.882602
+            ],
+            [
+              -87.984245,
+              41.88256
+            ],
+            [
+              -87.984481,
+              41.882521
+            ],
+            [
+              -87.985639,
+              41.882326
+            ],
+            [
+              -87.985798,
+              41.882301
+            ],
+            [
+              -87.985939,
+              41.882291
+            ],
+            [
+              -87.986157,
+              41.882281
+            ],
+            [
+              -87.986157,
+              41.882281
+            ],
+            [
+              -87.986721,
+              41.882289
+            ],
+            [
+              -87.987772,
+              41.882265
+            ],
+            [
+              -87.988066,
+              41.882269
+            ],
+            [
+              -87.988694,
+              41.882287
+            ],
+            [
+              -87.988798,
+              41.882295
+            ],
+            [
+              -87.989521,
+              41.882293
+            ],
+            [
+              -87.99183,
+              41.882289
+            ],
+            [
+              -87.992741,
+              41.882306
+            ],
+            [
+              -87.993049,
+              41.882293
+            ],
+            [
+              -87.993538,
+              41.88229
+            ],
+            [
+              -87.99363,
+              41.882289
+            ],
+            [
+              -87.993727,
+              41.882289
+            ],
+            [
+              -87.993749,
+              41.882289
+            ],
+            [
+              -87.994318,
+              41.882285
+            ],
+            [
+              -87.994604,
+              41.882308
+            ],
+            [
+              -87.995727,
+              41.882345
+            ],
+            [
+              -87.997284,
+              41.882336
+            ],
+            [
+              -87.997315,
+              41.882336
+            ],
+            [
+              -87.997379,
+              41.882336
+            ],
+            [
+              -87.997443,
+              41.882337
+            ],
+            [
+              -87.997458,
+              41.882337
+            ],
+            [
+              -87.998256,
+              41.882359
+            ],
+            [
+              -87.998674,
+              41.882353
+            ],
+            [
+              -87.999252,
+              41.882346
+            ],
+            [
+              -88.000763,
+              41.882344
+            ],
+            [
+              -88.000826,
+              41.882344
+            ],
+            [
+              -88.000871,
+              41.882344
+            ],
+            [
+              -88.000928,
+              41.882343
+            ],
+            [
+              -88.000988,
+              41.882342
+            ],
+            [
+              -88.001138,
+              41.88234
+            ],
+            [
+              -88.001592,
+              41.882314
+            ],
+            [
+              -88.005965,
+              41.882217
+            ],
+            [
+              -88.006911,
+              41.882182
+            ],
+            [
+              -88.008233,
+              41.882162
+            ],
+            [
+              -88.008274,
+              41.882162
+            ],
+            [
+              -88.008331,
+              41.882161
+            ],
+            [
+              -88.008397,
+              41.882159
+            ],
+            [
+              -88.008445,
+              41.882157
+            ],
+            [
+              -88.00966,
+              41.882111
+            ],
+            [
+              -88.009711,
+              41.882109
+            ],
+            [
+              -88.009756,
+              41.882107
+            ],
+            [
+              -88.009804,
+              41.882105
+            ],
+            [
+              -88.009851,
+              41.882105
+            ],
+            [
+              -88.010963,
+              41.88209
+            ],
+            [
+              -88.011052,
+              41.882084
+            ],
+            [
+              -88.011093,
+              41.882081
+            ],
+            [
+              -88.011154,
+              41.882077
+            ],
+            [
+              -88.011206,
+              41.882072
+            ],
+            [
+              -88.011247,
+              41.882068
+            ],
+            [
+              -88.011341,
+              41.882059
+            ],
+            [
+              -88.012455,
+              41.882027
+            ],
+            [
+              -88.012498,
+              41.882026
+            ],
+            [
+              -88.012544,
+              41.882025
+            ],
+            [
+              -88.012595,
+              41.882025
+            ],
+            [
+              -88.012646,
+              41.882024
+            ],
+            [
+              -88.015075,
+              41.881967
+            ],
+            [
+              -88.015092,
+              41.881966
+            ],
+            [
+              -88.017847,
+              41.881896
+            ],
+            [
+              -88.018178,
+              41.881879
+            ],
+            [
+              -88.018235,
+              41.881878
+            ],
+            [
+              -88.018257,
+              41.881877
+            ],
+            [
+              -88.0183,
+              41.881876
+            ],
+            [
+              -88.018328,
+              41.881876
+            ],
+            [
+              -88.018383,
+              41.881875
+            ],
+            [
+              -88.018913,
+              41.881876
+            ],
+            [
+              -88.020994,
+              41.881842
+            ],
+            [
+              -88.021128,
+              41.881839
+            ],
+            [
+              -88.021272,
+              41.881838
+            ],
+            [
+              -88.023661,
+              41.881812
+            ],
+            [
+              -88.023727,
+              41.881811
+            ],
+            [
+              -88.023793,
+              41.881811
+            ],
+            [
+              -88.023842,
+              41.881812
+            ],
+            [
+              -88.023924,
+              41.881813
+            ],
+            [
+              -88.024276,
+              41.88182
+            ],
+            [
+              -88.025622,
+              41.8818
+            ],
+            [
+              -88.02567,
+              41.8818
+            ],
+            [
+              -88.025719,
+              41.881799
+            ],
+            [
+              -88.025779,
+              41.881798
+            ],
+            [
+              -88.025829,
+              41.881797
+            ],
+            [
+              -88.027144,
+              41.881778
+            ],
+            [
+              -88.027204,
+              41.881778
+            ],
+            [
+              -88.027244,
+              41.881777
+            ],
+            [
+              -88.027302,
+              41.881776
+            ],
+            [
+              -88.02734,
+              41.881775
+            ],
+            [
+              -88.028451,
+              41.881747
+            ],
+            [
+              -88.029487,
+              41.881745
+            ],
+            [
+              -88.029869,
+              41.88174
+            ],
+            [
+              -88.030689,
+              41.881734
+            ],
+            [
+              -88.031152,
+              41.881737
+            ],
+            [
+              -88.031345,
+              41.881723
+            ],
+            [
+              -88.031426,
+              41.881716
+            ],
+            [
+              -88.031785,
+              41.881652
+            ],
+            [
+              -88.032042,
+              41.881626
+            ],
+            [
+              -88.032297,
+              41.881607
+            ],
+            [
+              -88.033502,
+              41.881549
+            ],
+            [
+              -88.033802,
+              41.881534
+            ],
+            [
+              -88.034063,
+              41.881539
+            ],
+            [
+              -88.034411,
+              41.881565
+            ],
+            [
+              -88.034544,
+              41.881572
+            ],
+            [
+              -88.034695,
+              41.881564
+            ],
+            [
+              -88.034695,
+              41.881564
+            ],
+            [
+              -88.035087,
+              41.881534
+            ],
+            [
+              -88.035426,
+              41.881491
+            ],
+            [
+              -88.035821,
+              41.881441
+            ],
+            [
+              -88.036245,
+              41.881388
+            ],
+            [
+              -88.036376,
+              41.881379
+            ],
+            [
+              -88.036631,
+              41.881358
+            ],
+            [
+              -88.036912,
+              41.881328
+            ],
+            [
+              -88.03709,
+              41.881308
+            ],
+            [
+              -88.037264,
+              41.881297
+            ],
+            [
+              -88.037438,
+              41.881279
+            ],
+            [
+              -88.037548,
+              41.88126
+            ],
+            [
+              -88.037858,
+              41.88121
+            ],
+            [
+              -88.037992,
+              41.881193
+            ],
+            [
+              -88.038121,
+              41.881184
+            ],
+            [
+              -88.038394,
+              41.881168
+            ],
+            [
+              -88.038915,
+              41.881123
+            ],
+            [
+              -88.039294,
+              41.88108
+            ],
+            [
+              -88.039642,
+              41.881037
+            ],
+            [
+              -88.040157,
+              41.880953
+            ],
+            [
+              -88.04034,
+              41.88092
+            ],
+            [
+              -88.04042,
+              41.880902
+            ],
+            [
+              -88.040463,
+              41.880887
+            ],
+            [
+              -88.040522,
+              41.880861
+            ],
+            [
+              -88.040642,
+              41.880791
+            ],
+            [
+              -88.040771,
+              41.880709
+            ],
+            [
+              -88.040875,
+              41.880633
+            ],
+            [
+              -88.040922,
+              41.880608
+            ],
+            [
+              -88.04095,
+              41.880607
+            ],
+            [
+              -88.040987,
+              41.880634
+            ],
+            [
+              -88.041019,
+              41.880664
+            ],
+            [
+              -88.041037,
+              41.880682
+            ],
+            [
+              -88.04107,
+              41.880792
+            ],
+            [
+              -88.041207,
+              41.880838
+            ],
+            [
+              -88.042713,
+              41.880718
+            ],
+            [
+              -88.043699,
+              41.880624
+            ],
+            [
+              -88.045237,
+              41.88047
+            ],
+            [
+              -88.046361,
+              41.880336
+            ],
+            [
+              -88.047165,
+              41.880262
+            ],
+            [
+              -88.048398,
+              41.880117
+            ],
+            [
+              -88.04902,
+              41.880051
+            ],
+            [
+              -88.049639,
+              41.879969
+            ],
+            [
+              -88.049991,
+              41.879913
+            ],
+            [
+              -88.050253,
+              41.879871
+            ],
+            [
+              -88.050253,
+              41.879871
+            ],
+            [
+              -88.050748,
+              41.87978
+            ],
+            [
+              -88.050862,
+              41.879757
+            ],
+            [
+              -88.051374,
+              41.879648
+            ],
+            [
+              -88.051752,
+              41.87957
+            ],
+            [
+              -88.053116,
+              41.879213
+            ],
+            [
+              -88.053511,
+              41.879121
+            ],
+            [
+              -88.053962,
+              41.878998
+            ],
+            [
+              -88.054386,
+              41.878881
+            ],
+            [
+              -88.054885,
+              41.878749
+            ],
+            [
+              -88.055162,
+              41.87869
+            ],
+            [
+              -88.05551,
+              41.878602
+            ],
+            [
+              -88.055788,
+              41.87852
+            ],
+            [
+              -88.056606,
+              41.878296
+            ],
+            [
+              -88.057394,
+              41.87811
+            ],
+            [
+              -88.058541,
+              41.877795
+            ],
+            [
+              -88.059676,
+              41.877485
+            ],
+            [
+              -88.060028,
+              41.877364
+            ],
+            [
+              -88.060113,
+              41.877339
+            ],
+            [
+              -88.06017,
+              41.877322
+            ],
+            [
+              -88.060262,
+              41.877295
+            ],
+            [
+              -88.062735,
+              41.876647
+            ],
+            [
+              -88.062798,
+              41.876631
+            ],
+            [
+              -88.062841,
+              41.87662
+            ],
+            [
+              -88.062893,
+              41.876606
+            ],
+            [
+              -88.062945,
+              41.876592
+            ],
+            [
+              -88.063181,
+              41.876513
+            ],
+            [
+              -88.063307,
+              41.876496
+            ],
+            [
+              -88.063457,
+              41.876463
+            ],
+            [
+              -88.063672,
+              41.876381
+            ],
+            [
+              -88.063869,
+              41.876331
+            ],
+            [
+              -88.063983,
+              41.876325
+            ],
+            [
+              -88.064111,
+              41.876296
+            ],
+            [
+              -88.064149,
+              41.876274
+            ],
+            [
+              -88.064203,
+              41.876244
+            ],
+            [
+              -88.064404,
+              41.876175
+            ],
+            [
+              -88.064604,
+              41.876155
+            ],
+            [
+              -88.064663,
+              41.87615
+            ],
+            [
+              -88.064696,
+              41.876137
+            ],
+            [
+              -88.064763,
+              41.87611
+            ],
+            [
+              -88.064824,
+              41.876084
+            ],
+            [
+              -88.064839,
+              41.876078
+            ],
+            [
+              -88.064975,
+              41.876065
+            ],
+            [
+              -88.065208,
+              41.876011
+            ],
+            [
+              -88.065297,
+              41.875975
+            ],
+            [
+              -88.065482,
+              41.875941
+            ],
+            [
+              -88.065694,
+              41.875917
+            ],
+            [
+              -88.065957,
+              41.875857
+            ],
+            [
+              -88.065979,
+              41.875854
+            ],
+            [
+              -88.066234,
+              41.875814
+            ],
+            [
+              -88.06648,
+              41.875775
+            ],
+            [
+              -88.066479,
+              41.875775
+            ],
+            [
+              -88.066554,
+              41.875772
+            ],
+            [
+              -88.066601,
+              41.875778
+            ],
+            [
+              -88.06664,
+              41.875784
+            ],
+            [
+              -88.066706,
+              41.87581
+            ],
+            [
+              -88.066793,
+              41.875845
+            ],
+            [
+              -88.066817,
+              41.875854
+            ],
+            [
+              -88.067238,
+              41.875807
+            ],
+            [
+              -88.067337,
+              41.875801
+            ],
+            [
+              -88.067896,
+              41.875806
+            ],
+            [
+              -88.068442,
+              41.875794
+            ],
+            [
+              -88.069005,
+              41.875799
+            ],
+            [
+              -88.06942,
+              41.87582
+            ],
+            [
+              -88.069997,
+              41.875825
+            ],
+            [
+              -88.07003,
+              41.875825
+            ],
+            [
+              -88.070108,
+              41.875863
+            ],
+            [
+              -88.070191,
+              41.875903
+            ],
+            [
+              -88.070218,
+              41.875906
+            ],
+            [
+              -88.070776,
+              41.875967
+            ],
+            [
+              -88.071246,
+              41.876025
+            ],
+            [
+              -88.071815,
+              41.876077
+            ],
+            [
+              -88.072432,
+              41.87612
+            ],
+            [
+              -88.07273,
+              41.876148
+            ],
+            [
+              -88.073093,
+              41.87617
+            ],
+            [
+              -88.073492,
+              41.876187
+            ],
+            [
+              -88.074028,
+              41.876214
+            ],
+            [
+              -88.074529,
+              41.876239
+            ],
+            [
+              -88.074971,
+              41.876236
+            ],
+            [
+              -88.075287,
+              41.876236
+            ],
+            [
+              -88.075654,
+              41.876212
+            ],
+            [
+              -88.075993,
+              41.876188
+            ],
+            [
+              -88.076398,
+              41.87614
+            ],
+            [
+              -88.076817,
+              41.87608
+            ],
+            [
+              -88.076817,
+              41.87608
+            ],
+            [
+              -88.077256,
+              41.875996
+            ],
+            [
+              -88.077398,
+              41.875963
+            ],
+            [
+              -88.077584,
+              41.87592
+            ],
+            [
+              -88.078098,
+              41.875791
+            ],
+            [
+              -88.078425,
+              41.875696
+            ],
+            [
+              -88.078838,
+              41.875568
+            ],
+            [
+              -88.079118,
+              41.875479
+            ],
+            [
+              -88.079574,
+              41.875305
+            ],
+            [
+              -88.080009,
+              41.875122
+            ],
+            [
+              -88.08031,
+              41.874986
+            ],
+            [
+              -88.080396,
+              41.874942
+            ],
+            [
+              -88.080514,
+              41.874889
+            ],
+            [
+              -88.080662,
+              41.874817
+            ],
+            [
+              -88.080916,
+              41.874677
+            ],
+            [
+              -88.081258,
+              41.874482
+            ],
+            [
+              -88.081258,
+              41.874482
+            ],
+            [
+              -88.081688,
+              41.874203
+            ],
+            [
+              -88.082229,
+              41.873811
+            ],
+            [
+              -88.082667,
+              41.873498
+            ],
+            [
+              -88.083782,
+              41.872607
+            ],
+            [
+              -88.084017,
+              41.872412
+            ],
+            [
+              -88.085213,
+              41.871479
+            ],
+            [
+              -88.086026,
+              41.870815
+            ],
+            [
+              -88.086473,
+              41.8705
+            ],
+            [
+              -88.08713,
+              41.86997
+            ],
+            [
+              -88.087881,
+              41.869357
+            ],
+            [
+              -88.087996,
+              41.869274
+            ],
+            [
+              -88.088104,
+              41.869197
+            ],
+            [
+              -88.088331,
+              41.869196
+            ],
+            [
+              -88.088466,
+              41.869071
+            ],
+            [
+              -88.088835,
+              41.868836
+            ],
+            [
+              -88.088967,
+              41.868761
+            ],
+            [
+              -88.089307,
+              41.868576
+            ],
+            [
+              -88.089367,
+              41.868544
+            ],
+            [
+              -88.089489,
+              41.868371
+            ],
+            [
+              -88.08977,
+              41.868244
+            ],
+            [
+              -88.090238,
+              41.868031
+            ],
+            [
+              -88.090634,
+              41.867856
+            ],
+            [
+              -88.091083,
+              41.86767
+            ],
+            [
+              -88.091539,
+              41.867496
+            ],
+            [
+              -88.091539,
+              41.867496
+            ],
+            [
+              -88.091904,
+              41.867379
+            ],
+            [
+              -88.092002,
+              41.867347
+            ],
+            [
+              -88.092116,
+              41.867311
+            ],
+            [
+              -88.092775,
+              41.867123
+            ],
+            [
+              -88.093325,
+              41.866989
+            ],
+            [
+              -88.094144,
+              41.86681
+            ],
+            [
+              -88.095197,
+              41.866613
+            ],
+            [
+              -88.096449,
+              41.866351
+            ],
+            [
+              -88.096491,
+              41.866342
+            ],
+            [
+              -88.096579,
+              41.866326
+            ],
+            [
+              -88.097395,
+              41.866178
+            ],
+            [
+              -88.097612,
+              41.866136
+            ],
+            [
+              -88.098713,
+              41.865914
+            ],
+            [
+              -88.100077,
+              41.865607
+            ],
+            [
+              -88.10037,
+              41.865521
+            ],
+            [
+              -88.10089,
+              41.865403
+            ],
+            [
+              -88.101038,
+              41.865383
+            ],
+            [
+              -88.101054,
+              41.865381
+            ],
+            [
+              -88.101075,
+              41.86538
+            ],
+            [
+              -88.10118,
+              41.865416
+            ],
+            [
+              -88.101237,
+              41.865436
+            ],
+            [
+              -88.101247,
+              41.865436
+            ],
+            [
+              -88.101256,
+              41.865436
+            ],
+            [
+              -88.101271,
+              41.865437
+            ],
+            [
+              -88.101304,
+              41.865439
+            ],
+            [
+              -88.102399,
+              41.865221
+            ],
+            [
+              -88.102845,
+              41.865132
+            ],
+            [
+              -88.103563,
+              41.86499
+            ],
+            [
+              -88.10405,
+              41.864892
+            ],
+            [
+              -88.104121,
+              41.864885
+            ],
+            [
+              -88.104262,
+              41.864896
+            ],
+            [
+              -88.104415,
+              41.864876
+            ],
+            [
+              -88.105057,
+              41.864761
+            ],
+            [
+              -88.105101,
+              41.864752
+            ],
+            [
+              -88.105117,
+              41.864749
+            ],
+            [
+              -88.105167,
+              41.864739
+            ],
+            [
+              -88.105242,
+              41.864725
+            ],
+            [
+              -88.105274,
+              41.864718
+            ],
+            [
+              -88.105505,
+              41.864679
+            ],
+            [
+              -88.10592,
+              41.864577
+            ],
+            [
+              -88.10615,
+              41.864547
+            ],
+            [
+              -88.106454,
+              41.864509
+            ],
+            [
+              -88.106517,
+              41.864501
+            ],
+            [
+              -88.106544,
+              41.864499
+            ],
+            [
+              -88.106617,
+              41.864494
+            ],
+            [
+              -88.10671,
+              41.864487
+            ],
+            [
+              -88.106732,
+              41.864486
+            ],
+            [
+              -88.106899,
+              41.86447
+            ],
+            [
+              -88.107036,
+              41.864454
+            ],
+            [
+              -88.107534,
+              41.864402
+            ],
+            [
+              -88.107787,
+              41.864377
+            ],
+            [
+              -88.107967,
+              41.864363
+            ],
+            [
+              -88.108045,
+              41.864349
+            ],
+            [
+              -88.108099,
+              41.864347
+            ],
+            [
+              -88.108129,
+              41.864342
+            ],
+            [
+              -88.108197,
+              41.864332
+            ],
+            [
+              -88.108256,
+              41.864323
+            ],
+            [
+              -88.108306,
+              41.864315
+            ],
+            [
+              -88.108535,
+              41.864299
+            ],
+            [
+              -88.108972,
+              41.864263
+            ],
+            [
+              -88.109804,
+              41.864183
+            ],
+            [
+              -88.109846,
+              41.864181
+            ],
+            [
+              -88.109906,
+              41.864178
+            ],
+            [
+              -88.109983,
+              41.864174
+            ],
+            [
+              -88.110017,
+              41.864172
+            ],
+            [
+              -88.110146,
+              41.864167
+            ],
+            [
+              -88.110569,
+              41.864132
+            ],
+            [
+              -88.110762,
+              41.864127
+            ],
+            [
+              -88.111083,
+              41.864125
+            ],
+            [
+              -88.111371,
+              41.864118
+            ],
+            [
+              -88.111404,
+              41.864127
+            ],
+            [
+              -88.111472,
+              41.86413
+            ],
+            [
+              -88.111584,
+              41.864139
+            ]
+          ]
+        }
+      ],
+      "computed_at": "2026-11-08T15:54:08.809378-06:00"
+    }
+  },
+  "path_reports": {
+    "bike": null
+  },
+  "reconciliation": [
+    {
+      "id": "e8903b84-526b-4e64-b462-760846d104ab",
+      "identity_key": "d60fcabff488cdf317e57289d05b37b6e71252c857ded064e36f77c926c52010",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "lat": 41.8856864,
+          "lng": -87.9695738,
+          "area": "Villa Park",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+            "place_name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+            "address": "220 S Villa Avenue, Villa Park, IL"
+          }
+        },
+        "key": "d60fcabff488cdf317e57289d05b37b6e71252c857ded064e36f77c926c52010",
+        "place_key": "75857bf6931a69d0972fe0db7fb00299b33ca85b5019c244bbbf6be8d3c026e3",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "lat": 41.8856864,
+          "lng": -87.9695738,
+          "area": "Villa Park",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+            "place_name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+            "address": "220 S Villa Avenue, Villa Park, IL"
+          }
+        },
+        "key": "d60fcabff488cdf317e57289d05b37b6e71252c857ded064e36f77c926c52010",
+        "place_key": "75857bf6931a69d0972fe0db7fb00299b33ca85b5019c244bbbf6be8d3c026e3",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "be2a6c28-3afe-411b-828e-cae98cb9128e",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+        "moment_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a"
+      },
+      "created_at": "2026-11-08T15:54:07.954952-06:00"
+    },
+    {
+      "id": "c9c88d78-c9f0-4f4a-b4d5-57fc0964d52a",
+      "identity_key": "dfdb48ce04b722f053e2f107db08315b6fa21f8bbd95faf628d113e216e0b33e",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Former Ardmore Avenue CA&E station",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "lat": 41.8833524,
+          "lng": -87.9796374,
+          "area": "Villa Park",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+            "place_name": "Former Ardmore Avenue CA&E station",
+            "address": "10 W Park Boulevard, Villa Park, IL"
+          }
+        },
+        "key": "dfdb48ce04b722f053e2f107db08315b6fa21f8bbd95faf628d113e216e0b33e",
+        "place_key": "ad7d3ec7c6d59e0bcba78c666cc9edd0886b5c1c0094ea5082a2393afd051230",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Former Ardmore Avenue CA&E station",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "lat": 41.8833524,
+          "lng": -87.9796374,
+          "area": "Villa Park",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+            "place_name": "Former Ardmore Avenue CA&E station",
+            "address": "10 W Park Boulevard, Villa Park, IL"
+          }
+        },
+        "key": "dfdb48ce04b722f053e2f107db08315b6fa21f8bbd95faf628d113e216e0b33e",
+        "place_key": "ad7d3ec7c6d59e0bcba78c666cc9edd0886b5c1c0094ea5082a2393afd051230",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "b9e0b06c-0b0c-4d68-89d1-1a3e2e93a7ad",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+        "moment_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a"
+      },
+      "created_at": "2026-11-08T15:54:08.026103-06:00"
+    },
+    {
+      "id": "6bbd12f4-82a9-4fdf-8d01-e2dd95b9d49c",
+      "identity_key": "c1d0a1cc6e50858ddc3c5d30056fb32055faad08e8ed9c390b7bca09bd5d44f9",
+      "proposal": {
+        "item": {
+          "kind": "place",
+          "title": "Founders Park / Main Stem interpretation point",
+          "text": "",
+          "url": "https://ipp.org/history/",
+          "lat": 41.8641389,
+          "lng": -88.1115835,
+          "area": "Wheaton",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+            "place_name": "Founders Park / Main Stem interpretation point",
+            "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL"
+          }
+        },
+        "key": "c1d0a1cc6e50858ddc3c5d30056fb32055faad08e8ed9c390b7bca09bd5d44f9",
+        "place_key": "4855ead09d2e3c0ed9a84c650f6006db4d38c54831643824b95f974256a36857",
+        "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "place",
+          "title": "Founders Park / Main Stem interpretation point",
+          "text": "",
+          "url": "https://ipp.org/history/",
+          "lat": 41.8641389,
+          "lng": -88.1115835,
+          "area": "Wheaton",
+          "evidence": "recorded_source_review",
+          "origins": [],
+          "identity": {
+            "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+            "place_name": "Founders Park / Main Stem interpretation point",
+            "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL"
+          }
+        },
+        "key": "c1d0a1cc6e50858ddc3c5d30056fb32055faad08e8ed9c390b7bca09bd5d44f9",
+        "place_key": "4855ead09d2e3c0ed9a84c650f6006db4d38c54831643824b95f974256a36857",
+        "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+        "place_id": "",
+        "moment_id": "",
+        "outcome": "new_place",
+        "issues": []
+      },
+      "place_candidate_id": "ed124257-a98c-482c-9219-5883be79572d",
+      "moment_candidate_id": null,
+      "review_version": 1,
+      "decision": {
+        "version": 1,
+        "outcome": "existing_place_existing_moment",
+        "place_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+        "moment_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+        "aliases": null,
+        "historical_addresses": null,
+        "note": "Disposable curator links the supported short draft. No history, arrival or media publication is approved.",
+        "reviewer_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a"
+      },
+      "created_at": "2026-11-08T15:54:08.094918-06:00"
+    },
+    {
+      "id": "58b0920e-afa6-404b-844e-15ca557b07fb",
+      "identity_key": "491091a9087efb4ba843f08eef6d4b9dddc4f597e2eedde72071828179adfc50",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+          "title": "Remembering the campaign to turn railway land into a path",
+          "text": "",
+          "url": "https://ipp.org/history/",
+          "area": "Wheaton",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "491091a9087efb4ba843f08eef6d4b9dddc4f597e2eedde72071828179adfc50",
+        "place_key": "c064315d02f4c49eb9a268d64b1045eca12e9202c8f734103075341f105c2e4a",
+        "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+        "place_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+        "moment_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+          "title": "Remembering the campaign to turn railway land into a path",
+          "text": "",
+          "url": "https://ipp.org/history/",
+          "area": "Wheaton",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "491091a9087efb4ba843f08eef6d4b9dddc4f597e2eedde72071828179adfc50",
+        "place_key": "c064315d02f4c49eb9a268d64b1045eca12e9202c8f734103075341f105c2e4a",
+        "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+        "place_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+        "moment_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:54:08.531207-06:00"
+    },
+    {
+      "id": "679dacb8-731f-4dd0-82c8-b4f3b3bde6d7",
+      "identity_key": "17bcde0d3b22716b463be11ebcbcb1cb53ce996f336ffeb7860c946d1f4e82b8",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+          "title": "An earlier station and a developing suburb",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "area": "Villa Park",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "17bcde0d3b22716b463be11ebcbcb1cb53ce996f336ffeb7860c946d1f4e82b8",
+        "place_key": "90a06c70442d98e3dec688cd100aadd0505c86556be95ab5b5d6c4038fa1864b",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+        "moment_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+          "title": "An earlier station and a developing suburb",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "area": "Villa Park",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "17bcde0d3b22716b463be11ebcbcb1cb53ce996f336ffeb7860c946d1f4e82b8",
+        "place_key": "90a06c70442d98e3dec688cd100aadd0505c86556be95ab5b5d6c4038fa1864b",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+        "moment_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:54:08.531207-06:00"
+    },
+    {
+      "id": "fa9abf00-ed42-454a-8f6d-a904231f27c4",
+      "identity_key": "3eafc7948e1c53c884536dcf5ce52e7f210f0630cf7f80204683b2a2671802b1",
+      "proposal": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+          "title": "The former interurban station as an interpretation anchor",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "area": "Villa Park",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "3eafc7948e1c53c884536dcf5ce52e7f210f0630cf7f80204683b2a2671802b1",
+        "place_key": "e5080c6a092487d31c6e8972b6f38fcf63ca7cc51ac606cb9d2bffab765dcb6f",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+        "moment_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "assessment": {
+        "item": {
+          "kind": "moment",
+          "entity_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+          "title": "The former interurban station as an interpretation anchor",
+          "text": "",
+          "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+          "area": "Villa Park",
+          "evidence": "recorded_draft_collection",
+          "origins": []
+        },
+        "key": "3eafc7948e1c53c884536dcf5ce52e7f210f0630cf7f80204683b2a2671802b1",
+        "place_key": "e5080c6a092487d31c6e8972b6f38fcf63ca7cc51ac606cb9d2bffab765dcb6f",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "place_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+        "moment_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+        "outcome": "existing_place_existing_moment",
+        "issues": []
+      },
+      "place_candidate_id": null,
+      "moment_candidate_id": null,
+      "review_version": 0,
+      "decision": null,
+      "created_at": "2026-11-08T15:54:08.531207-06:00"
+    }
+  ],
+  "entities": [
+    {
+      "key": "place:3dfa1c93-b22c-4990-858c-42088508939b",
+      "kind": "place",
+      "id": "3dfa1c93-b22c-4990-858c-42088508939b",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "3dfa1c93-b22c-4990-858c-42088508939b",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "slug": "villa-park-historical-museum-former-villa-avenue-ca-e-station",
+        "name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8856864,
+        "longitude": -87.9695738,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "220 S Villa Avenue, Villa Park, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:54:08.166719-06:00",
+        "updated_at": "2026-11-08T15:54:08.166719-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:be2a6c28-3afe-411b-828e-cae98cb9128e",
+      "kind": "place",
+      "id": "be2a6c28-3afe-411b-828e-cae98cb9128e",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "3dfa1c93-b22c-4990-858c-42088508939b",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "slug": "villa-park-historical-museum-former-villa-avenue-ca-e-station",
+        "name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8856864,
+        "longitude": -87.9695738,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "220 S Villa Avenue, Villa Park, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:54:08.166719-06:00",
+        "updated_at": "2026-11-08T15:54:08.166719-06:00"
+      },
+      "candidate": {
+        "id": "be2a6c28-3afe-411b-828e-cae98cb9128e",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "75857bf6931a69d0972fe0db7fb00299b33ca85b5019c244bbbf6be8d3c026e3",
+        "submitted_by_account_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+          "slug": "",
+          "address": "220 S Villa Avenue, Villa Park, IL",
+          "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+          "summary": "",
+          "latitude": 41.8856864,
+          "longitude": -87.9695738,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+        "reviewed_at": "2026-11-08T15:54:08.166719-06:00",
+        "created_at": "2026-11-08T15:54:07.954952-06:00",
+        "updated_at": "2026-11-08T15:54:08.166719-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Villa Park Historical Museum / former Villa Avenue CA&E station",
+        "slug": "",
+        "address": "220 S Villa Avenue, Villa Park, IL",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "summary": "",
+        "latitude": 41.8856864,
+        "longitude": -87.9695738,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+      "kind": "place",
+      "id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "slug": "former-ardmore-avenue-ca-e-station",
+        "name": "Former Ardmore Avenue CA&E station",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8833524,
+        "longitude": -87.9796374,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "10 W Park Boulevard, Villa Park, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:54:08.258087-06:00",
+        "updated_at": "2026-11-08T15:54:08.258087-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:b9e0b06c-0b0c-4d68-89d1-1a3e2e93a7ad",
+      "kind": "place",
+      "id": "b9e0b06c-0b0c-4d68-89d1-1a3e2e93a7ad",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "slug": "former-ardmore-avenue-ca-e-station",
+        "name": "Former Ardmore Avenue CA&E station",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8833524,
+        "longitude": -87.9796374,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "10 W Park Boulevard, Villa Park, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:54:08.258087-06:00",
+        "updated_at": "2026-11-08T15:54:08.258087-06:00"
+      },
+      "candidate": {
+        "id": "b9e0b06c-0b0c-4d68-89d1-1a3e2e93a7ad",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "ad7d3ec7c6d59e0bcba78c666cc9edd0886b5c1c0094ea5082a2393afd051230",
+        "submitted_by_account_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Former Ardmore Avenue CA&E station",
+          "slug": "",
+          "address": "10 W Park Boulevard, Villa Park, IL",
+          "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+          "summary": "",
+          "latitude": 41.8833524,
+          "longitude": -87.9796374,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+        "reviewed_at": "2026-11-08T15:54:08.258087-06:00",
+        "created_at": "2026-11-08T15:54:08.026103-06:00",
+        "updated_at": "2026-11-08T15:54:08.258087-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Former Ardmore Avenue CA&E station",
+        "slug": "",
+        "address": "10 W Park Boulevard, Villa Park, IL",
+        "city_id": "d558a39b-3dab-4103-ade1-4ed31efe36b5",
+        "summary": "",
+        "latitude": 41.8833524,
+        "longitude": -87.9796374,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "place:14571d97-8cbd-4fe6-a761-39aca313ff1c",
+      "kind": "place",
+      "id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+        "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+        "slug": "founders-park-main-stem-interpretation-point",
+        "name": "Founders Park / Main Stem interpretation point",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8641389,
+        "longitude": -88.1115835,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:54:08.349384-06:00",
+        "updated_at": "2026-11-08T15:54:08.349384-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "candidate:ed124257-a98c-482c-9219-5883be79572d",
+      "kind": "place",
+      "id": "ed124257-a98c-482c-9219-5883be79572d",
+      "required": false,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+        "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+        "slug": "founders-park-main-stem-interpretation-point",
+        "name": "Founders Park / Main Stem interpretation point",
+        "summary": "",
+        "kind": "site",
+        "latitude": 41.8641389,
+        "longitude": -88.1115835,
+        "arrival_radius_m": 40,
+        "arrival_point": null,
+        "arrival_version": 0,
+        "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL",
+        "status": "draft",
+        "primary_moment_id": null,
+        "moment_count": 0,
+        "created_at": "2026-11-08T15:54:08.349384-06:00",
+        "updated_at": "2026-11-08T15:54:08.349384-06:00"
+      },
+      "candidate": {
+        "id": "ed124257-a98c-482c-9219-5883be79572d",
+        "kind": "place",
+        "origin": "draft",
+        "source_name": "brief_reconciliation",
+        "external_id": "4855ead09d2e3c0ed9a84c650f6006db4d38c54831643824b95f974256a36857",
+        "submitted_by_account_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a",
+        "target_place_id": null,
+        "target_moment_id": null,
+        "payload": {
+          "kind": "",
+          "name": "Founders Park / Main Stem interpretation point",
+          "slug": "",
+          "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL",
+          "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+          "summary": "",
+          "latitude": 41.8641389,
+          "longitude": -88.1115835,
+          "arrival_radius_m": 0
+        },
+        "status": "approved",
+        "reviewer_account_id": "2fd25ce0-ec5d-4688-afb0-bdb11d06b28a",
+        "review_note": "Disposable pilot review: draft identity only. Position is a location lead; arrivals remain unreviewed.",
+        "approved_entity_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+        "reviewed_at": "2026-11-08T15:54:08.349384-06:00",
+        "created_at": "2026-11-08T15:54:08.094918-06:00",
+        "updated_at": "2026-11-08T15:54:08.349384-06:00"
+      },
+      "proposed": {
+        "kind": "",
+        "name": "Founders Park / Main Stem interpretation point",
+        "slug": "",
+        "address": "North side of Liberty Drive between West Street and Wheaton Avenue, Wheaton, IL",
+        "city_id": "3db355a4-11dd-4366-801f-ae7e8ca14ca4",
+        "summary": "",
+        "latitude": 41.8641389,
+        "longitude": -88.1115835,
+        "arrival_radius_m": 0
+      },
+      "proposal_source": "candidate_editor",
+      "changes": [
+        {
+          "field": "kind",
+          "before": "site",
+          "after": ""
+        }
+      ]
+    },
+    {
+      "key": "moment:f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+      "kind": "moment",
+      "id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+        "place_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+        "slug": "the-former-interurban-station-as-an-interpretation-anchor",
+        "title": "The former interurban station as an interpretation anchor",
+        "excerpt": "The Village distinguishes the 1929 Villa Avenue station from Ardmore\u2019s earlier station. The museum address is 220 S Villa Avenue. This exterior chapter introduces the former electric railway corridor; it does not promise entry into the\u2026",
+        "date_start": "1929-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Station history and museum context",
+            "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+            "publisher": "Village of Villa Park",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "About the Trail",
+            "url": "https://ipp.org/about-the-trail/",
+            "publisher": "Illinois Prairie Path corporation",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:54:08.189575-06:00",
+        "updated_at": "2026-11-08T15:54:08.189575-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+      "kind": "moment",
+      "id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+        "place_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+        "slug": "an-earlier-station-and-a-developing-suburb",
+        "title": "An earlier station and a developing suburb",
+        "excerpt": "The Village dates Ardmore station to 1910 and connects the electric railway with suburban development. This is a separate station identity from Villa Avenue and the Great Western depot. The draft uses an exterior interpretation point, with\u2026",
+        "date_start": "1910-01-01",
+        "date_end": null,
+        "date_precision": "year",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Station history and museum context",
+            "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+            "publisher": "Village of Villa Park",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:54:08.275925-06:00",
+        "updated_at": "2026-11-08T15:54:08.275925-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    },
+    {
+      "key": "moment:4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+      "kind": "moment",
+      "id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+      "required": true,
+      "disposition": "reused_draft",
+      "current": {
+        "id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+        "place_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+        "slug": "remembering-the-campaign-to-turn-railway-land-into-a-path",
+        "title": "Remembering the campaign to turn railway land into a path",
+        "excerpt": "The Prairie Path history traces the campaign to May Watts\u2019s 1963 letter and the work of many volunteers. Founders Park provides a later place to interpret that effort. The newsletter and City locate the park along Liberty Drive. This\u2026",
+        "date_start": "1963-09-30",
+        "date_end": null,
+        "date_precision": "day",
+        "date_display": "",
+        "hero_media": null,
+        "has_narration": false,
+        "status": "draft",
+        "topic_ids": [],
+        "body": "",
+        "media": [],
+        "sources": [
+          {
+            "title": "Illinois Prairie Path history",
+            "url": "https://ipp.org/history/",
+            "publisher": "Illinois Prairie Path corporation",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Winter 2017 newsletter, page 3: Founders Park",
+            "url": "https://www.ipp.org/wp-content/uploads/IPP-2017-DECEMBER-Newsletter-.pdf",
+            "publisher": "Illinois Prairie Path corporation",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "June 23, 2025 council packet, PDF page 7, Exhibit A",
+            "url": "https://www.wheaton.il.us/AgendaCenter/ViewFile/Agenda/_06232025-2882?packet=true",
+            "publisher": "City of Wheaton",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          },
+          {
+            "title": "Illinois Prairie Path",
+            "url": "https://openlands.org/regional-trails/illinois-prairie-path/",
+            "publisher": "Openlands",
+            "retrieved_at": "2026-11-08",
+            "license": "",
+            "note": ""
+          }
+        ],
+        "topics": [],
+        "narration": null,
+        "created_at": "2026-11-08T15:54:08.366189-06:00",
+        "updated_at": "2026-11-08T15:54:08.366189-06:00"
+      },
+      "candidate": null,
+      "proposed": null,
+      "proposal_source": "",
+      "changes": []
+    }
+  ],
+  "evidence": [],
+  "tasks": [
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:3dfa1c93-b22c-4990-858c-42088508939b",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "primary_history_missing",
+      "entity_key": "place:14571d97-8cbd-4fe6-a761-39aca313ff1c",
+      "detail": "The place needs a selected primary history."
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+      "detail": "history needs at least 250 words of sourced context; research further rather than padding"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+      "detail": "history needs at least three readable paragraphs"
+    },
+    {
+      "code": "history_incomplete",
+      "entity_key": "moment:4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+      "detail": "attach a picture with a caption, credit, reusable license, license URL, and original source URL"
+    },
+    {
+      "code": "route_not_usable",
+      "entity_key": "bike",
+      "detail": "Route readiness is unreviewed; inspect the mode's retained quality report."
+    }
+  ],
+  "visitor_stories": [
+    {
+      "position": 1,
+      "place_id": "3dfa1c93-b22c-4990-858c-42088508939b",
+      "moment_id": "f8dc4fde-32b9-4c18-a823-dbdf5325f9ce",
+      "candidate_id": "",
+      "title": "The former interurban station as an interpretation anchor",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://www.invillapark.com/262/Historical-Preservation-Commission",
+        "https://ipp.org/about-the-trail/"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 2,
+      "place_id": "e92e3be1-f30a-480b-bcfe-5af18c6780ee",
+      "moment_id": "8c1e0f2a-a744-4a9f-b93d-a36146774f93",
+      "candidate_id": "",
+      "title": "An earlier station and a developing suburb",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://www.invillapark.com/262/Historical-Preservation-Commission"
+      ],
+      "evidence_ids": []
+    },
+    {
+      "position": 3,
+      "place_id": "14571d97-8cbd-4fe6-a761-39aca313ff1c",
+      "moment_id": "4d868d2c-e6e8-46d9-b0db-7db941438ccc",
+      "candidate_id": "",
+      "title": "Remembering the campaign to turn railway land into a path",
+      "body": "",
+      "text_source": "curated_record",
+      "source_urls": [
+        "https://ipp.org/history/",
+        "https://www.ipp.org/wp-content/uploads/IPP-2017-DECEMBER-Newsletter-.pdf",
+        "https://www.wheaton.il.us/AgendaCenter/ViewFile/Agenda/_06232025-2882?packet=true",
+        "https://openlands.org/regional-trails/illinois-prairie-path/"
+      ],
+      "evidence_ids": []
+    }
+  ]
+}

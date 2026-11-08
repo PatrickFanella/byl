@@ -1,0 +1,25 @@
+{
+  "qualification": "software-only; no field observations or production collection activation",
+  "checks": [
+    {
+      "scenario": "parallel-road shortcut",
+      "fixture": "backend/internal/routing/quality_test.go: TestPathQualityFindings / parallel road within identical geometry",
+      "expected": "blocked / unexpected_network_way even when geometry is identical",
+      "command": "cd backend && go test -race -count=1 ./internal/routing -run TestPathQualityFindings"
+    },
+    {
+      "scenario": "legitimate crossing and known parallel road",
+      "fixture": "web/src/lib/tour/fixtures/deviation-v1.json",
+      "expected": "Shared client conformance distinguishes reviewed crossings from a known adjacent road; no device/field calibration claim.",
+      "shared_copies": [
+        "ios-invisible-museum/InvisibleMuseumKit/Tests/InvisibleMuseumKitTests/Fixtures/deviation-v1.json",
+        "android/core/src/test/resources/fixtures/deviation-v1.json"
+      ]
+    },
+    {
+      "scenario": "crossing-arrival correction",
+      "fixture": "backend/internal/http/prairie_path_pilot_test.go: TestPrairiePathPilotReplayReconcilesDraftsAndKeepsPublicationBlocked",
+      "expected": "A synthetic reviewed arrival correction retains historical-site coordinates and unknown access remains ineligible for navigation."
+    }
+  ]
+}

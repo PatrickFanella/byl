@@ -1,0 +1,104 @@
+{
+  "provider": "Valhalla/FOSSGIS public development demo",
+  "retrieved_at": "2026-11-08T21:45:44.258598+00:00",
+  "request": {
+    "locations": [
+      {
+        "lat": 41.8858235,
+        "lon": -87.9695911,
+        "type": "break",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8834778,
+        "lon": -87.9796543,
+        "type": "break",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8822812,
+        "lon": -87.9861567,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8815641,
+        "lon": -88.0346951,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.879871,
+        "lon": -88.050253,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8757753,
+        "lon": -88.0664795,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.87608,
+        "lon": -88.0768172,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8744818,
+        "lon": -88.0812581,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.867496,
+        "lon": -88.091539,
+        "type": "via",
+        "radius": 20,
+        "search_cutoff": 25
+      },
+      {
+        "lat": 41.8641389,
+        "lon": -88.1115835,
+        "type": "break",
+        "radius": 20,
+        "search_cutoff": 25
+      }
+    ],
+    "costing": "bicycle",
+    "units": "kilometers"
+  },
+  "endpoint": "https://valhalla1.openstreetmap.de/route",
+  "original_response_sha256": "ad98d28f6cf9fa3f40fbcdb893488317512c72268e53e134db5c58fb816a5946",
+  "fixture_sha256": "a5b59b3b5c3f5e853c5147e885bf475afb51db695eafbed976308d0bd5019c57",
+  "fixture_transformation": "Original encoded shapes and summary metrics only; no geometry edits.",
+  "control_selection": "Three story breaks retained. Seven shaping nodes selected by removing lowest-impact intermediate controls. This is a routing request, not a replacement for the full 401-node network reference.",
+  "provider_constraint": "Public demo rejected 19 locations: max bicycle locations 10. Full corridor-controlled runtime qualification remains separate.",
+  "trip_shape": "point_to_point",
+  "return_included": false,
+  "distance_m": 12372,
+  "cycling_seconds": 3111.007,
+  "planned_dwell_minutes": 9,
+  "planned_narration_minutes": 3,
+  "conditional_total_minutes": 63.85,
+  "attribution": "© OpenStreetMap contributors; routing by Valhalla/FOSSGIS public development demo",
+  "data_license": "ODbL-1.0",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "source_credit_url": "https://www.openstreetmap.org/copyright",
+  "qualification": "needs_research",
+  "limitations": [
+    "Arrivals are proposed mapped-trail viewpoints; no public arrival approval.",
+    "No current access or field-duration evidence.",
+    "Strict topology inspection is incomplete; no approximate-match fallback.",
+    "Full corridor-controlled runtime qualification is separate from this ten-control comparison."
+  ]
+}

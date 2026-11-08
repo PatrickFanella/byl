@@ -1,0 +1,138 @@
+[
+  {
+    "id": "ipp-history",
+    "url": "https://ipp.org/history/",
+    "title": "Illinois Prairie Path history",
+    "publisher": "Illinois Prairie Path corporation",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "Describes May Watts’s 1963 letter and volunteer work securing a path lease and developing the former railway corridor."
+    ],
+    "limitations": [
+      "The archive guide locates records but does not expose every document. A commemorative interpretation point is not the place where a letter was written."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "ipp-overview",
+    "url": "https://ipp.org/about-the-trail/",
+    "title": "About the Trail",
+    "publisher": "Illinois Prairie Path corporation",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "Describes the former CA&E right-of-way and the Wheaton split into Elgin and Aurora branches."
+    ],
+    "limitations": [
+      "Primarily crushed limestone is a system-wide description, not a surface finding for every segment."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "ipp-map",
+    "url": "https://ipp.org/pdf/IPP-free-map-color-updated.pdf",
+    "title": "Free Illinois Prairie Path color map, 2009 update",
+    "publisher": "Illinois Prairie Path corporation; Bob Thomas / Steve Hinchee",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "Rendered map distinguishes Main Stem, Elgin/Aurora branches and the separate Great Western Trail."
+    ],
+    "limitations": [
+      "Coarse orientation only; not a georeferenced topology, arrival survey or current access certificate."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "villa-park-stations",
+    "url": "https://www.invillapark.com/262/Historical-Preservation-Commission",
+    "title": "Station history and museum context",
+    "publisher": "Village of Villa Park",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "Identifies the 1910 Ardmore station at 10 W Park Boulevard and the 1929 Villa Avenue station.",
+      "Lists the Historical Society museum at 220 S Villa Avenue."
+    ],
+    "limitations": [
+      "The CGW depot is a separate building. Historical station roles do not imply present interior entry or reviewed approaches."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "founders-newsletter",
+    "url": "https://www.ipp.org/wp-content/uploads/IPP-2017-DECEMBER-Newsletter-.pdf",
+    "title": "Winter 2017 newsletter, page 3: Founders Park",
+    "publisher": "Illinois Prairie Path corporation",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "Describes the park honoring May Watts and locates it along Liberty Drive between West Street and Wheaton Avenue."
+    ],
+    "limitations": [
+      "A 2017 improvement account is not a current condition or exact boulder-coordinate survey."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "wheaton-location",
+    "url": "https://www.wheaton.il.us/AgendaCenter/ViewFile/Agenda/_06232025-2882?packet=true",
+    "title": "June 23, 2025 council packet, PDF page 7, Exhibit A",
+    "publisher": "City of Wheaton",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "Lists Founders Park on the north side of Liberty Drive between West Street and Wheaton Avenue."
+    ],
+    "limitations": [
+      "Used for location context only. A council packet does not establish current posted conditions."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "openlands",
+    "url": "https://openlands.org/regional-trails/illinois-prairie-path/",
+    "title": "Illinois Prairie Path",
+    "publisher": "Openlands",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "Describes Openlands’ role in the conversion campaign and a separate combined Prairie Path/Great Western loop."
+    ],
+    "limitations": [
+      "Its 24-mile combined loop is not this point-to-point pilot and supplies no timing guarantee here."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "closure-check",
+    "url": "https://ipp.org/construction-updates/",
+    "title": "Trail Closure and Maintenance Information",
+    "publisher": "Illinois Prairie Path corporation",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant text inspected; map rendered where stated.",
+    "claims": [
+      "On retrieval, page included an April 9 Elmhurst interchange notice and March 2025 Elgin Branch parking notes."
+    ],
+    "limitations": [
+      "The April notice lacks an explicit year in the inspected text. These locations are outside the selected westbound Main Stem segment; their absence here does not prove the pilot is open. Recheck current official conditions and the field before release."
+    ],
+    "media_reuse": "No photographs or map page copied."
+  },
+  {
+    "id": "museum-newsletter",
+    "url": "https://www.invillapark.com/CivicSend/ViewMessage/message/292980",
+    "title": "Village Roundup newsletter, June 15, 2026: museum event",
+    "publisher": "Village of Villa Park",
+    "retrieved_at": "2026-11-08",
+    "inspection": "Relevant municipal newsletter text inspected.",
+    "claims": [
+      "Explicitly identifies the museum as housed in the historic 1929 CA&E station."
+    ],
+    "limitations": [
+      "Event-specific June opening hours are not current visitor hours or an arrival approval."
+    ],
+    "media_reuse": "No image copied."
+  }
+]
