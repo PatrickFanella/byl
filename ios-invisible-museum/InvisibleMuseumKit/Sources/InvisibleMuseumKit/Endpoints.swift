@@ -142,6 +142,23 @@ public struct Endpoints {
         try await client.post("/api/v1/me/route-briefs", body: input, headers: ["Idempotency-Key": key])
     }
 
+    public func submitReport(_ input: RouteReportInput, key: String) async throws -> RouteReport {
+        try await client.post("/api/v1/me/route-reports", body: input, headers: ["Idempotency-Key": key])
+    }
+
+    public func reports(offset: Int = 0) async throws -> [RouteReport] {
+        let page: ListPage<RouteReport> = try await client.get("/api/v1/me/route-reports", query: ["offset": String(max(0, offset)), "limit": "21"])
+        return page.items
+    }
+
+    public func report(_ id: String) async throws -> RouteReport {
+        try await client.get("/api/v1/me/route-reports/\(id)")
+    }
+
+    public func reportCorrection(_ id: String) async throws -> RouteCorrectionOutcome {
+        try await client.get("/api/v1/me/route-reports/\(id)/correction")
+    }
+
     public func myTours() async throws -> [TourSummary] {
         let page: ListPage<TourSummary> = try await client.get("/api/v1/me/tours")
         return page.items

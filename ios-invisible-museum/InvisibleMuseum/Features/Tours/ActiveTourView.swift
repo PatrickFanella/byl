@@ -12,6 +12,8 @@ struct ActiveTourView: View {
     @State private var confirmUpdate = false
     @State private var updateBusy = false
     @State private var updateError: String?
+    @State private var showReport = false
+    @State private var reviewAfterReport = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -35,6 +37,9 @@ struct ActiveTourView: View {
                         .foregroundStyle(Museum.text)
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
+                    if active.revision != nil && model.isSignedIn {
+                        Button("Report") { showReport = true }.disabled(active.revoked)
+                    }
                     if active.revision != nil {
                         Button("Trip") { showTripReview = true }.disabled(active.revoked)
                     }
@@ -56,6 +61,21 @@ struct ActiveTourView: View {
                     .presentationBackground(Museum.background)
             }
             .sheet(isPresented: $showTripReview) { tripReview }
+            .sheet(isPresented: $showReport, onDismiss: {
+                if reviewAfterReport { reviewAfterReport = false; showTripReview = true }
+            }) {
+                NavigationStack {
+                    if let revision = active.revision, !active.revoked {
+                        RouteReportEntryView(tourID: revision.tourID, revisionID: revision.id, mode: active.mode,
+                            cachedRevision: revision, initialTarget: active.nextStop.map { "entrance:\($0.id)" }) {
+                            reviewAfterReport = true
+                            showReport = false
+                            Task { await active.checkForUpdate() }
+                        }
+                        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { showReport = false } } }
+                    }
+                }.environment(model)
+            }
             .confirmationDialog("End this tour?", isPresented: $showEndConfirm, titleVisibility: .visible) {
                 Button("Keep my progress and end") { model.endTour(resetProgress: false) }
                 Button("Start over next time", role: .destructive) { model.endTour(resetProgress: true) }
@@ -72,7 +92,7 @@ struct ActiveTourView: View {
                 await active.checkForUpdate()
             }
             .onChange(of: active.revoked) { _, revoked in
-                if revoked { model.narration.stop(); model.location.stop(); showTripReview = false }
+                if revoked { model.narration.stop(); model.location.stop(); showTripReview = false; showReport = false }
             }
             .onAppear {
                 model.location.requestWhenInUseAuthorization()
