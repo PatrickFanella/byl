@@ -4,7 +4,18 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { session } from '#lib/auth.ts';
-	import { getMoment, getRoute, getTour, myProgress, putProgress } from '#lib/visitor.ts';
+	import {
+		getMoment,
+		getRoute,
+		getTour,
+		myProgress,
+		putProgress,
+		getTourRevision,
+		listTourRevisions,
+		getRevisionProgress,
+		putRevisionProgress
+	} from '#lib/visitor.ts';
+	import { ApiError } from '#lib/api/index.ts';
 	import { ActiveWalk } from '#lib/tour/walk.svelte.ts';
 	import { distanceText } from '#lib/tour/estimate.ts';
 	import { mapsURL } from '#lib/tour/directions.ts';
@@ -13,6 +24,7 @@
 	import Map from '#lib/components/Map.svelte';
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
 	import ArrivalPanel from '#lib/components/visitor/ArrivalPanel.svelte';
+	import JourneySummary from '#lib/components/visitor/JourneySummary.svelte';
 
 	const ref = page.params.ref ?? '';
 	const mode = page.url.searchParams.get('mode') === 'bike' ? 'bike' : 'walk';
@@ -22,6 +34,19 @@
 	const walk: ActiveWalk = new ActiveWalk(ref, mode, {
 		fetchTour: getTour,
 		fetchRoute: getRoute,
+		fetchRevision: getTourRevision,
+		listRevisions: async (id) => (await listTourRevisions(id)).items,
+		revisionProgressApi: (id, revision) => ({
+			get: async () => {
+				try {
+					return await getRevisionProgress(id, revision);
+				} catch (e) {
+					if (e instanceof ApiError && e.status === 404) return null;
+					throw e;
+				}
+			},
+			put: (body) => putRevisionProgress(id, revision, body)
+		}),
 		storage: localStorage,
 		progressApi: {
 			get: async () => (await myProgress()).items,
@@ -112,9 +137,15 @@
 		let narrationURL: string | null = null;
 		let body = featured.excerpt;
 		try {
-			const m = await getMoment(featured.id);
-			narrationURL = m.narration?.public_url ?? null;
-			body = m.body || body;
+			if (walk.revision) {
+				const m = walk.pinnedMoment(featured.id);
+				narrationURL = m?.narration?.public_url ?? null;
+				body = m?.body || body;
+			} else {
+				const m = await getMoment(featured.id);
+				narrationURL = m.narration?.public_url ?? null;
+				body = m.body || body;
+			}
 		} catch {
 			// offline: read the excerpt
 		}
@@ -146,8 +177,8 @@
 
 	const markers = $derived(
 		walk.stops.map((s) => ({
-			lat: s.place.latitude,
-			lng: s.place.longitude,
+			lat: s.place.arrival_point?.point?.latitude ?? s.place.latitude,
+			lng: s.place.arrival_point?.point?.longitude ?? s.place.longitude,
 			label: `${s.position}. ${s.place.name}`,
 			position: s.position,
 			visited: walk.isVisited(s),
@@ -211,6 +242,56 @@
 				/>
 			</div>
 		{:else}
+			{#if walk.revision}<section
+					aria-label="Trip revision"
+					class="rounded-lg border border-byl-border bg-byl-background p-3 text-sm"
+				>
+					<p>
+						Following revision {walk.revision.number}. Stories, path and visits stay on this
+						revision.
+					</p>
+					<button
+						class="mt-2 underline disabled:opacity-50"
+						disabled={walk.updateBusy}
+						onclick={() => walk.checkForUpdate()}>Check for route updates</button
+					>
+					{#if walk.updateMessage}<p role="status" class="mt-2 text-byl-warning">
+							{walk.updateMessage}
+						</p>{/if}
+					{#if walk.latestRevision}<div class="mt-3 border-t border-byl-border pt-3">
+							<p role="status">
+								Revision {walk.latestRevision.number} is available. Your current trip has not changed.
+							</p>
+							{#each walk.updatedGuidance as stop (stop.id)}<p class="mt-2 text-byl-warning">
+									<strong>Updated reviewed guidance · {stop.place.name}:</strong>
+									{stop.note}
+								</p>{/each}
+							<details class="mt-2">
+								<summary class="cursor-pointer">Review the newer itinerary</summary>
+								<ol class="mt-2 list-decimal pl-5">
+									{#each walk.latestRevision.snapshot?.tour.stops ?? [] as stop (stop.id)}<li>
+											{stop.place.name}
+										</li>{/each}
+								</ol>
+								<p class="mt-2">
+									Available modes: {walk.latestRevision.snapshot?.tour.modes.join(', ')}. Stop
+									visits stay separate for each revision. A changed order does not carry visits to
+									different places.
+								</p>
+							</details>
+							<button
+								class="mt-3 rounded border border-byl-border-control px-3 py-2 disabled:opacity-50"
+								disabled={walk.updateBusy ||
+									!walk.latestRevision.snapshot?.tour.modes.includes(mode)}
+								onclick={async () => {
+									stopAudio();
+									await walk.adoptLatest();
+								}}>Use revision {walk.latestRevision.number} with its own progress</button
+							>
+						</div>{/if}
+				</section>{:else}<p class="rounded bg-byl-background px-3 py-1 text-xs text-byl-warning">
+					This older API does not provide revision-pinned trips.
+				</p>{/if}
 			{#if walk.fromCache}
 				<div class="inline-block rounded bg-byl-background px-3 py-1 text-xs text-byl-muted">
 					Offline: using the saved route
@@ -221,6 +302,10 @@
 					{walk.routeMessage}. Stops still work; use Directions.
 				</div>
 			{/if}
+			<details class="rounded-lg border border-byl-border bg-byl-background p-3">
+				<summary class="cursor-pointer text-sm">Path readiness and trip timing</summary
+				><JourneySummary {mode} journey={walk.route?.journey ?? walk.tour?.journeys?.[mode]} />
+			</details>
 			{#if walk.nextStop}
 				{@const next = walk.nextStop}
 				<div class="rounded-lg border border-byl-border bg-byl-background p-4">
@@ -241,6 +326,7 @@
 							<div class="text-xs text-byl-muted">{walk.progressText}</div>
 						</div>
 					</div>
+					{#if next.note}<p class="mt-2 text-sm text-byl-warning">{next.note}</p>{/if}
 					{#if geoState === 'denied'}
 						<p class="mt-2 text-xs text-byl-muted">
 							Location is off. Tap I'm here at each stop, or allow location in your browser.
@@ -264,7 +350,12 @@
 						>
 						<a
 							class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
-							href={mapsURL(next.place.latitude, next.place.longitude, mode, ua)}
+							href={mapsURL(
+								next.place.arrival_point?.point?.latitude ?? next.place.latitude,
+								next.place.arrival_point?.point?.longitude ?? next.place.longitude,
+								mode,
+								ua
+							)}
 							target="_blank"
 							rel="noreferrer">Directions</a
 						>
@@ -289,6 +380,10 @@
 	{#if walk.arrivedStop}
 		<ArrivalPanel
 			stop={walk.arrivedStop}
+			pinned={!!walk.revision}
+			pinnedMoment={walk.arrivedStop.featured_moment
+				? walk.pinnedMoment(walk.arrivedStop.featured_moment.id)
+				: null}
 			isLast={walk.isComplete}
 			{playing}
 			onlisten={() => toggleListen(walk.arrivedStop!)}

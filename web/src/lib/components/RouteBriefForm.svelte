@@ -13,6 +13,14 @@
 		onsaved
 	}: { brief?: RouteBrief; onsaved: (saved: RouteBrief) => void | Promise<void> } = $props();
 	const initial = untrack(() => brief?.submitted);
+	let baseline = $state(JSON.stringify(initial ?? null));
+	let expectedVersion = $state(untrack(() => brief?.version ?? 0));
+	// Status-only refreshes are safe. Changed submitted fields require an
+	// explicit editor replacement, otherwise preserved local values could
+	// overwrite another curator's changes using the newly refreshed version.
+	$effect(() => {
+		if (brief && JSON.stringify(brief.submitted) === baseline) expectedVersion = brief.version;
+	});
 	const fields = [
 		{
 			key: 'topic',
@@ -97,6 +105,7 @@
 	let lastAttempt = '';
 	let requestKey = '';
 	const locked = $derived(brief?.status === 'processing');
+	const newerSavedBrief = $derived(!!brief && brief.version !== expectedVersion);
 	const lines = (value: string) =>
 		value
 			.split('\n')
@@ -106,6 +115,20 @@
 	async function focusError() {
 		await tick();
 		form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+	}
+	function replaceEditor() {
+		if (!brief) return;
+		for (const field of fields) {
+			const value = brief.submitted[field.key];
+			values[field.key] = Array.isArray(value) ? value.join('\n') : (value ?? '');
+		}
+		modes = [...(brief.submitted.modes ?? ['walk', 'bike'])];
+		shape = brief.submitted.trip_shape;
+		duration = brief.submitted.duration_minutes ?? undefined;
+		baseline = JSON.stringify(brief.submitted);
+		expectedVersion = brief.version;
+		errors = {};
+		message = '';
 	}
 
 	async function save(event: SubmitEvent) {
@@ -134,8 +157,10 @@
 		busy = true;
 		try {
 			const saved = brief
-				? await updateRouteBrief(brief.id, brief.version, submitted)
+				? await updateRouteBrief(brief.id, expectedVersion, submitted)
 				: await createRouteBrief(submitted, requestKey);
+			baseline = JSON.stringify(saved.submitted);
+			expectedVersion = saved.version;
 			await onsaved(saved);
 		} catch (error) {
 			if (error instanceof ApiError) {
@@ -157,6 +182,15 @@
 </script>
 
 <form bind:this={form} onsubmit={save} novalidate class="mt-6 max-w-3xl space-y-5">
+	{#if newerSavedBrief}<div class="border-l-2 border-byl-warning pl-3">
+			<p>
+				A newer saved brief is available. Your edits stay here and cannot overwrite it. Copy any
+				text you need before replacing the editor.
+			</p>
+			<button type="button" class="mt-2 underline" disabled={busy || locked} onclick={replaceEditor}
+				>Replace editor with saved brief</button
+			>
+		</div>{/if}
 	{#if message}<p role="alert" class="text-sm text-byl-danger">{message}</p>{/if}
 	{#if locked}<p class="text-sm text-byl-muted">
 			Processing is in progress. Editing is available after processing stops.
