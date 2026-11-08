@@ -1543,6 +1543,7 @@ components:
         current_revision_id: { type: string, format: uuid, nullable: true, description: Null before first release; compare the current published pointer as well as the working draft }
     TourSnapshot:
       type: object
+      required: [tour, moments, routes, routing_intent]
       properties:
         tour: { $ref: "#/components/schemas/TourDetail" }
         moments: { type: object, additionalProperties: { $ref: "#/components/schemas/MomentDetail" }, description: Full reviewed selected stories and source/media metadata as captured at release }
@@ -1563,6 +1564,7 @@ components:
             stops: { type: array, items: { type: object, properties: { stop_id: { type: string }, place_id: { type: string }, latitude: { type: number }, longitude: { type: number }, site_latitude: { type: number, description: Present for approved navigation }, site_longitude: { type: number, description: Present for approved navigation }, arrival_point: { $ref: "#/components/schemas/ApprovedArrival", nullable: true } } } }
     TourRevision:
       type: object
+      required: [id, tour_id, number, draft_version, published_at]
       properties:
         id: { type: string, format: uuid }
         tour_id: { type: string, format: uuid }
@@ -2172,6 +2174,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/MomentSummary"
         - type: object
+          required: [body, media, sources, topics]
           properties:
             body: { type: string, description: Markdown }
             media: { type: array, items: { $ref: "#/components/schemas/MediaAsset" } }
@@ -2316,6 +2319,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/TourSummary"
         - type: object
+          required: [stops]
           properties:
             journeys:
               type: object

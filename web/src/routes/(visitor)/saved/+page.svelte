@@ -5,9 +5,14 @@
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
 	import SignInPrompt from '#lib/components/visitor/SignInPrompt.svelte';
 	import TourCard from '#lib/components/visitor/TourCard.svelte';
+	import { activeRevisionKey } from '#lib/tour/walk.svelte.ts';
 
 	const current = session.store;
-	const saved = new Loader<{ tours: TourSummary[]; progress: Record<string, TourProgress> }>(
+	const saved = new Loader<{
+		tours: TourSummary[];
+		progress: Record<string, TourProgress>;
+		pinned: Record<string, { revisionID: string; mode: string }>;
+	}>(
 		async () => {
 			const [t, p] = await Promise.all([mySaved(), myProgress()]);
 			const best: Record<string, TourProgress> = {};
@@ -15,7 +20,23 @@
 				if ((best[rec.tour_id]?.visited_positions.length ?? -1) < rec.visited_positions.length)
 					best[rec.tour_id] = rec;
 			}
-			return { tours: t.items, progress: best };
+			const pinned: Record<string, { revisionID: string; mode: string }> = {};
+			for (const tour of t.items) {
+				try {
+					const pin = JSON.parse(
+						localStorage.getItem(activeRevisionKey(tour.id, $current?.account.id ?? 'anonymous')) ??
+							'null'
+					);
+					if (pin?.tourID === tour.id && typeof pin.revisionID === 'string')
+						pinned[tour.id] = {
+							revisionID: pin.revisionID,
+							mode: pin.mode === 'bike' ? 'bike' : 'walk'
+						};
+				} catch {
+					/* Storage may be unavailable; legacy progress remains readable. */
+				}
+			}
+			return { tours: t.items, progress: best, pinned };
 		},
 		(v) => v.tours.length === 0
 	);
@@ -45,7 +66,13 @@
 					{@const p = saved.data?.progress[tour.id]}
 					<div class="space-y-2">
 						<TourCard {tour} />
-						{#if p}
+						{#if saved.data?.pinned[tour.id]}
+							<a
+								class="inline-block px-1 text-sm underline"
+								href="/tours/{tour.slug}/walk?mode={saved.data.pinned[tour.id].mode}"
+								>Resume saved revision and its progress</a
+							>
+						{:else if p}
 							<div class="flex items-center gap-3 px-1 text-xs text-byl-muted">
 								<progress
 									class="h-1.5 flex-1 overflow-hidden rounded"
