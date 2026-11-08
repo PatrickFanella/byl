@@ -56,6 +56,8 @@ makes the stored plan unavailable for guidance. Its retained information remains
 visible with the reason so a visitor can review what they previously chose.
 Byl does not infer that they boarded or that a scheduled train actually ran.
 A replacement always requires a fresh explicit request, review and acceptance.
+An authoritative platform/selection review response also suspends directions
+from the older chosen plan across reload, without replacing its retained train.
 Switching tour revisions retains separate stop progress and requires a plan for
 the newly selected revision; it does not carry the older timetable forward.
 
@@ -85,6 +87,12 @@ sections, capability refusal and the ordinary bike alternative. Playwright cases
 cover the mixed detail/active flow, same-plan reload, narrow layout, explicit
 handoff/focus restoration, no service, stale source, a mismatched response,
 disabled admission, explicit revision/plan updates and storage failure.
+
+The corpus in `web/src/lib/tour/fixtures/backend-transit-*` was emitted by the
+real Go public HTTP handlers against an isolated PostgreSQL database with the
+existing synthetic transit provider. It checks optional position-derived leg
+IDs, fractional walking seconds projected to integers and actual timestamp
+formatting; its provenance and original response hashes are recorded beside it.
 
 Timetable, platform and plan responses in these tests are clearly synthetic.
 The ordinary browser API fixture remains real for unrelated paths. These checks

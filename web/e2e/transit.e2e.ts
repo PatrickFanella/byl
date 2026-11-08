@@ -46,11 +46,16 @@ async function setup(page: Page, kind = 'scheduled') {
 			plan.revision_id = latest.id;
 			plan.connector_version = latest.snapshot!.tour.transit!.version;
 		}
-		if (kind === 'no_service')
+		if (kind === 'no_service' || kind === 'needs_review')
 			plan = {
 				...plan,
-				state: 'no_service',
-				service: { state: 'no_service', scheduled: true, live: false, issues: ['no_service'] },
+				state: kind === 'needs_review' ? 'needs_review' : 'no_service',
+				service: {
+					state: kind === 'needs_review' ? 'needs_review' : 'no_service',
+					scheduled: true,
+					live: false,
+					issues: ['no_service']
+				},
 				segments: []
 			};
 		if (kind === 'stale')
@@ -63,6 +68,9 @@ async function setup(page: Page, kind = 'scheduled') {
 		revision,
 		requests: () => requests,
 		departures,
+		setState: (state: string) => {
+			kind = state;
+		},
 		update: () => {
 			latest = structuredClone(revision);
 			latest.id = '40000000-0000-4000-8000-000000008888';
@@ -133,6 +141,20 @@ test('retains a chosen timetable across reload and progress, with explicit walki
 	await page.keyboard.press('Escape');
 	await expect(dialog).toHaveCount(0);
 	await expect(opener).toBeFocused();
+	const alight = page.getByRole('button', {
+		name: 'Walking directions from alighting station to story stop',
+		exact: true
+	});
+	await alight.click();
+	const alightURL = new URL(
+		(await dialog
+			.getByRole('link', { name: 'Open external walking directions ↗' })
+			.getAttribute('href'))!
+	);
+	expect(alightURL.searchParams.get('origin')).toBe('41.874257,-87.817318');
+	await page.keyboard.press('Escape');
+	await expect(alight).toBeFocused();
+
 	expect(
 		await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
 	).toBeTruthy();
@@ -200,6 +222,36 @@ test('an explicit revision update clears the old revision plan without choosing 
 	await choose(page);
 	expect(f.requests()).toBe(2);
 	await expect(page.getByText('0 of 3 stops', { exact: true })).toBeVisible();
+});
+
+test('a platform review result suspends old directions across reload while retaining the chosen train', async ({
+	page
+}) => {
+	const f = await setup(page);
+	await page.goto(`/tours/${f.tour.slug}/walk`);
+	await choose(page);
+	f.setState('needs_review');
+	await page.getByRole('button', { name: 'Request a timetable to review' }).click();
+	await expect(
+		page.getByText('This retained connection requires review before platform directions.', {
+			exact: false
+		})
+	).toBeVisible();
+	await expect(page.getByLabel('Retained scheduled plan')).toBeVisible();
+	await expect(
+		page.getByRole('button', { name: 'Walking directions to boarding platform', exact: true })
+	).toHaveCount(0);
+	await page.reload();
+	await showTransit(page);
+	await expect(
+		page.getByText('This retained connection requires review before platform directions.', {
+			exact: false
+		})
+	).toBeVisible();
+	expect(f.requests()).toBe(2);
+	await expect(
+		page.getByRole('button', { name: 'Walking directions to boarding platform', exact: true })
+	).toHaveCount(0);
 });
 
 test('failed private storage leaves the timetable proposal unaccepted', async ({ page }) => {

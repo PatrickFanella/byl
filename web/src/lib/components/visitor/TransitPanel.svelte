@@ -86,7 +86,8 @@
 		now = Date.now();
 	}
 	function openDirections(board: boolean) {
-		if (!control.isAdmitted(now) || !planCanGuide(control.selected, now)) return;
+		if (control.guidanceBlocked || !control.isAdmitted(now) || !planCanGuide(control.selected, now))
+			return;
 		const point = board
 			? { latitude: selected.board.latitude, longitude: selected.board.longitude }
 			: to?.place.arrival_point?.point;
@@ -227,7 +228,11 @@
 						saved.service.source.retrieved_at
 					)} America/Chicago.
 				</p>{/if}
-			{#if control.isAdmitted(now) && planCanGuide(saved, now)}
+			{#if control.guidanceBlocked}<p class="text-byl-warning">
+					This retained connection requires review before platform directions. Request and
+					explicitly choose a fresh usable plan.
+				</p>{/if}
+			{#if !control.guidanceBlocked && control.isAdmitted(now) && planCanGuide(saved, now)}
 				<div class="flex flex-wrap gap-2">
 					<button
 						class="rounded border border-byl-border-control px-3 py-2"

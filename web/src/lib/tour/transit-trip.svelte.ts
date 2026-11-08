@@ -22,6 +22,7 @@ export class TransitTrip {
 	busy = $state(false);
 	message = $state('');
 	gate = $state<boolean | null>(null);
+	guidanceBlocked = $state(false);
 	private key: string;
 	private ended = false;
 	private storageBlocked = false;
@@ -40,7 +41,9 @@ export class TransitTrip {
 		this.gateChecked = deps.now?.() ?? Date.now();
 		this.key = transitPlanKey(deps.base, owner, revision.tour_id);
 		try {
-			this.selected = readTransitPlan(storage, this.key, revision);
+			const saved = readTransitPlan(storage, this.key, revision);
+			this.selected = saved?.plan ?? null;
+			this.guidanceBlocked = saved?.guidance_blocked ?? false;
 		} catch {
 			this.storageBlocked = true;
 			this.message =
@@ -98,6 +101,26 @@ export class TransitTrip {
 			if (!this.current(generation)) return;
 			if (!validTransitPlan(plan, this.revision) || Date.parse(plan.requested_departure_at) !== at)
 				throw Error('The timetable does not match this retained revision and selected departure.');
+			if (
+				this.selected &&
+				(['needs_review', 'unsupported'].includes(plan.state) ||
+					(plan.state !== 'scheduled' &&
+						Date.parse(plan.requested_departure_at) ===
+							Date.parse(this.selected.requested_departure_at)))
+			) {
+				this.guidanceBlocked = true;
+				try {
+					saveTransitPlan(this.storage, this.key, this.selected, this.revision, true);
+				} catch {
+					try {
+						this.storage.removeItem(this.key);
+					} catch {
+						/* The current trip remains blocked. */
+					}
+					this.message =
+						'The connection needs review and that status could not be saved. Platform directions are stopped; remove the saved timetable before reopening.';
+				}
+			}
 			this.proposed = plan;
 		} catch (e) {
 			if (this.current(generation)) {
@@ -124,6 +147,7 @@ export class TransitTrip {
 			return false;
 		try {
 			saveTransitPlan(this.storage, this.key, this.proposed, this.revision);
+			this.guidanceBlocked = false;
 			this.selected = this.proposed;
 			this.proposed = null;
 			this.message =
@@ -143,6 +167,7 @@ export class TransitTrip {
 			this.generation++;
 			this.busy = false;
 			this.storageBlocked = false;
+			this.guidanceBlocked = false;
 			this.selected = null;
 			this.proposed = null;
 			this.message = 'The saved timetable was removed. Stories and stop progress are unchanged.';

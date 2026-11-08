@@ -1,3 +1,6 @@
+import apiPlan from './fixtures/backend-transit-plan.json' with { type: 'json' };
+import apiRevision from './fixtures/backend-transit-revision.json' with { type: 'json' };
+import type { TourRevision, ScheduledTransitPlan } from '#lib/visitor.ts';
 import { describe, it, expect, vi } from 'vitest';
 import { ActiveWalk, type WalkDeps } from './walk.svelte';
 import { TransitTrip } from './transit-trip.svelte';
@@ -25,34 +28,60 @@ function setup() {
 	return { revision, plan, disk, api, trip, setIdentity: (v: boolean) => (identity = v) };
 }
 describe('retained scheduled transit', () => {
+	it('accepts the actual backend HTTP contract with a synthetic provider and isolated PostgreSQL', () => {
+		expect(
+			validTransitPlan(apiPlan as ScheduledTransitPlan, apiRevision as unknown as TourRevision)
+		).toBe(true);
+	});
 	it('validates the mixed contract without making a continuous walking line', () => {
 		const { revision, plan } = transitFixture(now);
 		expect(validTransitPlan(plan, revision)).toBe(true);
 		expect(plan.segments.filter((s) => s.geometry).map((s) => s.kind)).toEqual(['walk']);
 	});
-	it.each(['revision', 'connector', 'platform', 'live', 'geometry', 'order', 'walk', 'raw'])(
-		'refuses altered %s responses',
-		(kind) => {
-			const { revision, plan } = transitFixture(now);
-			if (kind === 'revision') plan.revision_id = 'other';
-			if (kind === 'connector') plan.connector_version++;
-			if (kind === 'platform') plan.service.board!.id = 'other';
-			if (kind === 'live') Object.assign(plan.service, { live: true });
-			if (kind === 'geometry')
-				plan.segments[2].geometry = {
-					type: 'LineString',
-					coordinates: [
-						[0, 0],
-						[1, 1]
-					]
-				};
-			if (kind === 'order')
-				[plan.segments[1], plan.segments[2]] = [plan.segments[2], plan.segments[1]];
-			if (kind === 'walk') plan.segments[4].geometry!.coordinates[0][0] = 0;
-			if (kind === 'raw') Object.assign(plan, { raw_fixes: [{ lat: 1, lng: 2 }] });
-			expect(validTransitPlan(plan, revision)).toBe(false);
-		}
-	);
+	it('matches backend position-derived stop IDs and integer projection of fractional walking seconds', () => {
+		const { revision, plan } = transitFixture(now);
+		Object.assign(revision.snapshot!.tour.transit!.walking_legs![0], {
+			from_stop_id: undefined,
+			to_stop_id: undefined,
+			duration_s: 120.75
+		});
+		expect(validTransitPlan(plan, revision)).toBe(true);
+	});
+
+	it.each([
+		'revision',
+		'connector',
+		'platform',
+		'live',
+		'geometry',
+		'order',
+		'walk',
+		'raw',
+		'nested raw',
+		'source'
+	])('refuses altered %s responses', (kind) => {
+		const { revision, plan } = transitFixture(now);
+		if (kind === 'revision') plan.revision_id = 'other';
+		if (kind === 'connector') plan.connector_version++;
+		if (kind === 'platform') plan.service.board!.id = 'other';
+		if (kind === 'live') Object.assign(plan.service, { live: true });
+		if (kind === 'geometry')
+			plan.segments[2].geometry = {
+				type: 'LineString',
+				coordinates: [
+					[0, 0],
+					[1, 1]
+				]
+			};
+		if (kind === 'order')
+			[plan.segments[1], plan.segments[2]] = [plan.segments[2], plan.segments[1]];
+		if (kind === 'walk') plan.segments[4].geometry!.coordinates[0][0] = 0;
+		if (kind === 'raw') Object.assign(plan, { raw_fixes: [{ lat: 1, lng: 2 }] });
+		if (kind === 'nested raw')
+			Object.assign(plan.segments[4], { from_platform_id: { lat: 1, lng: 2 } });
+		if (kind === 'source') Object.assign(plan.service.source!, { license_url: { lat: 1, lng: 2 } });
+		expect(validTransitPlan(plan, revision)).toBe(false);
+	});
 	it('accepts unavailable service only without segments and never adopts it', async () => {
 		const x = setup();
 		x.api.plan.mockResolvedValue({
@@ -108,6 +137,33 @@ describe('retained scheduled transit', () => {
 		expect(planCanGuide(x.plan, Date.parse(x.plan.service.departure_at!))).toBe(false);
 		expect(transitPlanStatus(x.plan, now + 25 * 3600000)).toContain('stale');
 	});
+	it('authoritative platform review blocks old guidance across reload without replacing the chosen train', async () => {
+		const x = setup();
+		await x.trip.request(x.plan.requested_departure_at);
+		x.trip.accept();
+		x.api.plan.mockResolvedValue({
+			...x.plan,
+			state: 'needs_review',
+			service: {
+				state: 'needs_review',
+				scheduled: true,
+				live: false,
+				issues: ['selection_requires_review']
+			},
+			segments: []
+		});
+		await x.trip.request(x.plan.requested_departure_at);
+		expect(x.trip.selected).toEqual(x.plan);
+		expect(x.trip.guidanceBlocked).toBe(true);
+		const restored = new TransitTrip(x.revision, x.api, x.disk, 'owner', () => true, true);
+		expect(restored.selected).toEqual(x.plan);
+		expect(restored.guidanceBlocked).toBe(true);
+		x.api.plan.mockResolvedValue(x.plan);
+		await restored.request(x.plan.requested_departure_at);
+		restored.accept();
+		expect(restored.guidanceBlocked).toBe(false);
+	});
+
 	it('late responses after identity loss, removal or end cannot replace a retained plan', async () => {
 		for (const action of ['identity', 'remove', 'end']) {
 			const x = setup();

@@ -158,6 +158,14 @@ export function validTransitPlan(plan: TransitPlan, revision: TourRevision): boo
 			plan.service.issues.some((v) => typeof v !== 'string' || v.length > 4096)
 		)
 			return false;
+		if (
+			plan.service.source &&
+			(plan.service.source.license_url !== 'https://www.transitchicago.com/developers/terms/' ||
+				typeof plan.service.source.publisher !== 'string' ||
+				typeof plan.service.source.sha256 !== 'string' ||
+				!Number.isFinite(instant(plan.service.source.retrieved_at)))
+		)
+			return false;
 		if (plan.state !== 'scheduled')
 			return (
 				plan.segments.length === 0 && plan.service.live === false && plan.service.scheduled === true
@@ -213,12 +221,26 @@ export function validTransitPlan(plan: TransitPlan, revision: TourRevision): boo
 		let inserted = false;
 		const expected: string[] = [];
 		const connectorKeys = ['walk_to_stop', 'boarding_wait', 'transit', 'walk_from_stop'];
-		for (const leg of selected.walking_legs ?? []) {
+		const retained = (selected.walking_legs ?? []).map((leg) => {
+			const from = stops.find((s) => s.position === leg.from_position)?.id;
+			const to = stops.find((s) => s.position === leg.to_position)?.id;
+			if (
+				!from ||
+				!to ||
+				(leg.from_stop_id && leg.from_stop_id !== from) ||
+				(leg.to_stop_id && leg.to_stop_id !== to)
+			)
+				return null;
+			return { leg, from, to };
+		});
+		if (retained.some((leg) => leg === null)) return false;
+		for (const entry of retained) {
+			const { leg, from, to } = entry!;
 			if (!inserted && leg.from_position >= position) {
 				expected.push(...connectorKeys);
 				inserted = true;
 			}
-			expected.push(`walk:${leg.from_stop_id}:${leg.to_stop_id}`);
+			expected.push(`walk:${from}:${to}`);
 		}
 		if (!inserted) expected.push(...connectorKeys);
 		if (
@@ -276,6 +298,19 @@ export function validTransitPlan(plan: TransitPlan, revision: TourRevision): boo
 				])
 			)
 				return false;
+			for (const key of [
+				'from_stop_id',
+				'to_stop_id',
+				'from_platform_id',
+				'to_platform_id'
+			] as const)
+				if (
+					segment[key] !== undefined &&
+					(typeof segment[key] !== 'string' || segment[key]!.length > 120)
+				)
+					return false;
+			for (const key of ['departure_at', 'arrival_at'] as const)
+				if (segment[key] !== undefined && !Number.isFinite(instant(segment[key]))) return false;
 			const expected = bases[segment.kind];
 			if (
 				!expected ||
@@ -297,12 +332,13 @@ export function validTransitPlan(plan: TransitPlan, revision: TourRevision): boo
 					)
 				)
 					return false;
-				const leg = selected.walking_legs?.find(
-					(l) => l.from_stop_id === segment.from_stop_id && l.to_stop_id === segment.to_stop_id
-				);
+				const leg = retained.find(
+					(entry) =>
+						entry !== null && entry.from === segment.from_stop_id && entry.to === segment.to_stop_id
+				)?.leg;
 				if (
 					!leg ||
-					segment.duration_s !== leg.duration_s ||
+					segment.duration_s !== Math.trunc(leg.duration_s) ||
 					JSON.stringify(segment.geometry?.coordinates) !== JSON.stringify(leg.geometry) ||
 					segment.geometry?.type !== 'LineString'
 				)
@@ -369,42 +405,59 @@ export function readTransitPlan(
 	storage: Storage,
 	key: string,
 	revision: TourRevision
-): TransitPlan | null {
+): { plan: TransitPlan; guidance_blocked: boolean } | null {
 	const raw = storage.getItem(key);
 	if (raw === null) return null;
 	if (new TextEncoder().encode(raw).byteLength > 262144)
 		throw Error(
 			'The saved timetable is too large to read. Remove it explicitly before planning again.'
 		);
-	const plan = JSON.parse(raw) as TransitPlan;
+	const record = JSON.parse(raw) as {
+		version: number;
+		plan: TransitPlan;
+		guidance_blocked: boolean;
+	};
 	if (
-		!plan ||
-		typeof plan !== 'object' ||
-		Array.isArray(plan) ||
-		typeof plan.revision_id !== 'string'
+		!record ||
+		record.version !== 1 ||
+		typeof record.guidance_blocked !== 'boolean' ||
+		Object.keys(record).some((k) => !['version', 'plan', 'guidance_blocked'].includes(k)) ||
+		!record.plan ||
+		typeof record.plan.revision_id !== 'string'
 	)
 		throw Error(
 			'The saved timetable could not be validated. Remove it explicitly before planning again.'
 		);
-	if (plan.revision_id !== revision.id) return null;
-	if (!validTransitPlan(plan, revision))
+	if (record.plan.revision_id !== revision.id) return null;
+	if (!validTransitPlan(record.plan, revision))
 		throw Error(
 			'The saved timetable could not be validated. Remove it explicitly before planning again.'
 		);
-	return plan;
+	return { plan: record.plan, guidance_blocked: record.guidance_blocked };
 }
 export function saveTransitPlan(
 	storage: Storage,
 	key: string,
 	plan: TransitPlan,
-	revision: TourRevision
+	revision: TourRevision,
+	blocked = false
 ) {
 	if (!validTransitPlan(plan, revision))
 		throw Error('The timetable does not match this retained revision.');
-	const raw = JSON.stringify(plan);
+	const raw = JSON.stringify({ version: 1, plan, guidance_blocked: blocked });
 	if (new TextEncoder().encode(raw).byteLength > 262144)
 		throw Error('The timetable could not be retained on this device.');
-	storage.setItem(key, raw);
-	if (storage.getItem(key) !== raw)
+	const previous = storage.getItem(key);
+	try {
+		storage.setItem(key, raw);
+		if (storage.getItem(key) !== raw) throw Error();
+	} catch {
+		try {
+			if (previous === null) storage.removeItem(key);
+			else storage.setItem(key, previous);
+		} catch {
+			/* No in-memory adoption. */
+		}
 		throw Error('The timetable could not be retained on this device.');
+	}
 }

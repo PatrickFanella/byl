@@ -42,6 +42,33 @@ export function transitFixture(now = Date.now(), departure = now + 3600000) {
 	third.place.name = 'Synthetic final story';
 	third.place.latitude += 0.001;
 	tour.stops.push(third);
+	for (const [i, stop] of tour.stops.entries())
+		Object.assign(stop.place, {
+			arrival_point: {
+				id: `40000000-0000-4000-8000-00000000f00${i}`,
+				version: 1,
+				point: {
+					name: 'Synthetic reviewed arrival',
+					kind: 'entrance',
+					latitude: stop.place.latitude,
+					longitude: stop.place.longitude,
+					access: [
+						{
+							mode: 'walk',
+							status: 'allowed',
+							surface: 'unknown',
+							source_url: 'https://example.org/synthetic-arrival',
+							source_title: 'Synthetic test fixture',
+							retrieved_at: new Date(now).toISOString(),
+							notes: 'Not field evidence.'
+						}
+					],
+					notes: 'Synthetic fixture only.'
+				},
+				reviewed_at: new Date(now).toISOString()
+			}
+		});
+
 	tour.stop_count = 3;
 	tour.modes = ['walk'];
 	tour.routes = {};
