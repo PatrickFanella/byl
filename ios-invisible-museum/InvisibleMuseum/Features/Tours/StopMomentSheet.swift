@@ -45,6 +45,8 @@ struct StopMomentSheet: View {
                 } else {
                     MuseumEmptyView(title: "No moment featured here", message: "This stop is a waypoint; look around and carry on.", symbol: "mappin")
                 }
+                HappeningsSection(placeID: stop.place.id, origin: active?.api.client.baseURL ?? model.client.baseURL, tripContext: true)
+                    .id("\((active?.api.client.baseURL ?? model.client.baseURL).absoluteString)|\(stop.id)")
                 others
                 Button(isLast ? "Finish" : "Continue to the next stop") { dismiss() }
                     .buttonStyle(.museum(.primary, size: .large))

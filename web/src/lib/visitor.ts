@@ -1,5 +1,5 @@
 // Typed calls for the visitor site: public content plus the signed-in /me routes.
-import { api } from '#lib/api/index.ts';
+import { api, ApiClient } from '#lib/api/index.ts';
 import type { components } from '#lib/api/types.ts';
 
 type Schemas = components['schemas'];
@@ -28,6 +28,7 @@ export type MomentDetail = MomentSummary & {
 };
 export type TourDetail = Schemas['TourDetail'];
 export type TourRevision = Schemas['TourRevision'];
+export type Happening = Schemas['Happening'];
 export type RevisionProgress = Schemas['RevisionProgress'];
 export type Account = Schemas['Account'];
 export type RouteSuggestion = Schemas['RouteBrief'];
@@ -88,6 +89,14 @@ export const listPlacesNear = (city: string, lat: number, lng: number, radiusM =
 	);
 export const getPlace = (ref: string) =>
 	api.get<PlaceDetail>(`/api/v1/places/${encodeURIComponent(ref)}`);
+const currentNoticesAPI = new ApiClient({
+	baseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
+	token: () => null
+});
+export const getPlaceHappenings = (place: string, cursor = '') =>
+	currentNoticesAPI.list<Happening>(
+		`/api/v1/places/${encodeURIComponent(place)}/happenings${qs({ limit: 20, cursor })}`
+	);
 export const getMoment = (id: string) =>
 	api.get<MomentDetail>(`/api/v1/moments/${encodeURIComponent(id)}`);
 

@@ -85,5 +85,8 @@ func prepare() error {
 		return err
 	}
 	_, err = store.PublishTourRevision(ctx, tour.ID, "", models.PublishRevisionRequest{DraftVersion: tour.DraftVersion, CurrentRevisionID: tour.RevisionID})
-	return err
+	if err != nil {
+		return err
+	}
+	return prepareHappening(ctx, pool, store, seed.Stops[0].Place.ID)
 }

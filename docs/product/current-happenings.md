@@ -80,5 +80,32 @@ cancellation/rejection, public/private boundaries and unchanged historical rows.
 HTTP tests cover default-off import, anonymous/visitor rejection, strict input,
 stale approval and paging. Recorded synthetic source fixtures prove engineering
 behavior, not that an organizer's real event is current or that a route was
-visited. Browser presentation belongs to issue #58; a merged backend is not a
-deployment or field-verification claim.
+visited. A merged change is not a deployment or field-verification claim.
+
+## Optional client presentation
+
+Web, SwiftUI and Compose place and arrival views start with notices hidden.
+`Show current notices` explicitly fetches the public, anonymous endpoint; hiding
+it discards the view's data and invalidates any pending response. Refresh and
+paging are explicit. An unavailable endpoint, including an older API returning
+404, stays inside the notice panel. It does not sign out the visitor or replace
+the historical story, stop order, progress, retained revision or narration.
+Started native trips fetch notices from the trip's original API origin.
+
+Cards keep the occurrence dates and city timezone, organizer, source link,
+captured date, last source check in UTC, review deadline and expiry visible.
+`Scheduled for these dates` describes the source's date precision; it does not
+claim that an event is live. Cancelled, expired, conflicting, stale and unavailable
+notices have explicit labels. While the panel is open, a local minute clock
+rechecks the city date and source age without fetching or changing the notice.
+Unsafe source URLs are not links. Source citation grants no media-reuse rights.
+
+The canonical response fixture is
+`backend/api/fixtures/happenings-v1/responses.json`, copied byte-for-byte to the
+three client test resources. A web test enforces equality. Its 17 cases include
+synthetic active/future/cancelled/expired/empty responses and named malformed,
+unknown-state, source-health and clock fallback cases. They are frozen contract
+fixtures, not captured real announcements. Browser tests additionally publish a
+synthetic notice through the real review package in an isolated PostgreSQL
+database. Package tests and unsigned native builds remain distinct from device
+interaction and field qualification.
