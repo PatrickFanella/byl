@@ -36,10 +36,17 @@ jobs:
     - name: Test backend
       shell: bash
       run: |-
-        # This disposable database uses RAM storage; all migrations still run per schema.
+        # This disposable database skips durability writes; all migrations still run per schema.
         # Record its ID because Gitea does not populate job.services.postgres.id.
-        postgres_id="$(docker run --detach --rm --network bridge --cpus=1 --memory=1g --tmpfs /var/lib/postgresql/data:rw,size=512m -e POSTGRES_USER=museum -e POSTGRES_PASSWORD=museum -e POSTGRES_DB=museum_test postgres:16-alpine -c fsync=off -c synchronous_commit=off -c full_page_writes=off)"
-        trap 'docker stop "$postgres_id" >/dev/null' EXIT
+        postgres_id="$(docker run --detach --network bridge --cpus=1 --memory=1g -e POSTGRES_USER=museum -e POSTGRES_PASSWORD=museum -e POSTGRES_DB=museum_test postgres:16-alpine -c fsync=off -c synchronous_commit=off -c full_page_writes=off)"
+        cleanup() {
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            docker logs "$postgres_id" >&2 || true
+          fi
+          docker rm --force --volumes "$postgres_id" >/dev/null || true
+        }
+        trap cleanup EXIT
         postgres_host="$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$postgres_id")"
         test -n "$postgres_host"
         for attempt in {1..30}; do
