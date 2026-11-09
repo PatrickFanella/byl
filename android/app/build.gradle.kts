@@ -24,7 +24,7 @@ android {
         versionName = "1.0"
         // Web client id of the Google OAuth app used for Credential Manager sign-in; empty hides Google sign-in.
         buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", "\"${localProps.getProperty("museum.googleServerClientId", "")}\"")
-        buildConfigField("String", "API_BASE_URL", "\"${localProps.getProperty("museum.apiBaseUrl", "https://museum-api.subcult.tv")}\"")
+        buildConfigField("String", "API_BASE_URL", "\"${localProps.getProperty("museum.apiBaseUrl", "https://byl.subcult.tv")}\"")
     }
 
     buildTypes {

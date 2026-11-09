@@ -7,7 +7,7 @@ import InvisibleMuseumKit
 @MainActor
 @Observable
 final class AppModel {
-    static let defaultBaseURL = "https://museum-api.subcult.tv"
+    static let defaultBaseURL = "https://byl.subcult.tv"
     static let baseURLDefaultsKey = "InvisibleMuseum.apiBaseURL"
     static let citySlugDefaultsKey = "InvisibleMuseum.citySlug"
 

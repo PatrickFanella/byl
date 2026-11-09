@@ -46,13 +46,13 @@ make nuc-up
 make nuc-smoke
 ```
 
-The iOS app defaults to:
+The native apps default to:
 
 ```txt
-https://museum-api.subcult.tv
+https://byl.subcult.tv
 ```
 
-That works from the simulator or a physical device anywhere with internet access. Use the API URL override if you want to point at a local backend.
+This is the active public Byl origin, including its `/api/v1` routes. The former `museum-api.subcult.tv` origin returns HTTP 410. Use the API URL override to point a development build at a local backend.
 
 ## Useful commands
 
@@ -247,20 +247,20 @@ forbid cleartext and hide the server-override form.
 
 ## API URL configuration
 
-The default API base URL is `https://museum-api.subcult.tv`.
+The default API base URL is `https://byl.subcult.tv`.
 
-Override order in the app:
+iOS override order:
 
 1. `UserDefaults["InvisibleMuseum.apiBaseURL"]`
 2. Process environment `InvisibleMuseum.apiBaseURL`
 3. Info.plist key `InvisibleMuseum.apiBaseURL`
-4. Default `https://museum-api.subcult.tv`
+4. Default `https://byl.subcult.tv`
 
 For NUC/Almaz deployment, the intended shape is:
 
 ```txt
 iOS app
-  -> https://museum-api.subcult.tv
+  -> https://byl.subcult.tv
   -> Cloudflare / Caddy on Almaz
   -> Go API + PostgreSQL on NUC
 ```

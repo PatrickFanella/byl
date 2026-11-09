@@ -34,6 +34,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="byl.subcult.tv" android:pathPrefix="/t/" />
                 <data android:scheme="https" android:host="museum-api.subcult.tv" android:pathPrefix="/t/" />
             </intent-filter>
         </activity>
