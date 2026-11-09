@@ -20,7 +20,7 @@ struct InvisibleMuseumApp: App {
                     else { model.didLeaveForeground() }
                 }
                 .onOpenURL { url in
-                    // invisiblemuseum://tour/{slug} and https://museum-api.subcult.tv/t/{slug}
+                    // invisiblemuseum://tour/{slug} and https://byl.subcult.tv/t/{slug}
                     let parts = url.pathComponents.filter { $0 != "/" }
                     if url.scheme == "invisiblemuseum", url.host == "tour", let slug = parts.first {
                         model.pendingTourSlug = slug
