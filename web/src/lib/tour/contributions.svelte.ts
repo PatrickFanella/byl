@@ -338,6 +338,8 @@ export class TripContributions {
 					const current = this.d.store.read().find((x) => x.id === r!.id && x.key === r!.key);
 					if (
 						this.stopped ||
+						!this.admitted ||
+						this.now() - this.gateChecked > 60_000 ||
 						!this.d.sameIdentity() ||
 						!current?.enabled ||
 						current.withdrawing ||

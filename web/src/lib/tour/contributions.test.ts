@@ -316,6 +316,40 @@ describe('opt-in contribution lifecycle and private queue', () => {
 		expect(f.api.submit).not.toHaveBeenCalled();
 		expect(f.store.read()).toHaveLength(1);
 	});
+	for (const change of ['expired', 'disabled'] as const)
+		it(`keeps queued summaries when admission becomes ${change} during consent revalidation`, async () => {
+			const f = fixture();
+			vi.mocked(f.api.submit).mockRejectedValue(new Error('offline'));
+			await f.controller.optIn();
+			await passage(f);
+			const sent = vi.mocked(f.api.submit).mock.calls.length;
+			let finish!: (v: typeof f.consent) => void;
+			vi.mocked(f.api.grant).mockImplementationOnce(
+				() =>
+					new Promise((resolve) => {
+						finish = resolve;
+					})
+			);
+			const uploading = f.controller.flush();
+			await vi.waitFor(() => expect(finish).toBeTypeOf('function'));
+			if (change === 'expired') f.setNow(epoch + 270_000);
+			else {
+				f.gate(false);
+				const checking = f.controller.refresh();
+				await vi.waitFor(() => expect(f.controller.admitted).toBe(false));
+				finish(f.consent);
+				await checking;
+			}
+			if (change === 'expired') finish(f.consent);
+			await uploading;
+			expect(f.api.submit).toHaveBeenCalledTimes(sent);
+			expect(f.store.read()[0].queue).toHaveLength(1);
+			vi.mocked(f.api.submit).mockResolvedValue({});
+			f.gate(true);
+			await f.controller.refresh();
+			expect(f.api.submit).toHaveBeenCalledTimes(sent + 1);
+			expect(f.store.read()[0].queue).toEqual([]);
+		});
 	it('collection expires in memory when its admission check is stale', async () => {
 		const f = fixture();
 		await f.controller.optIn();
