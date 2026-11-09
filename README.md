@@ -280,3 +280,11 @@ web checks and browser flows, Kotlin core tests, Swift package tests, and an uns
 ## License
 
 Licensed under `GPL-3.0-or-later`. See [LICENSE](LICENSE).
+
+## Public mirror CI
+
+Pull-request verification runs on standard GitHub-hosted runners in the public
+[PatrickFanella/invisible-museum mirror](https://github.com/PatrickFanella/invisible-museum/actions/workflows/mirror-ci.yml).
+Gitea remains the source for changes and pull requests. Its required
+`GitHub CI / Mirror CI gate` status follows the exact mirrored commit. Main-branch
+release verification and deployments run in Gitea.
