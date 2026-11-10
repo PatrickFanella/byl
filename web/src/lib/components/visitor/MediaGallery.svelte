@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { safeHref } from '#lib/format.ts';
 	import type { MediaAsset } from '#lib/visitor.ts';
 	import MediaFigure from '#lib/components/visitor/MediaFigure.svelte';
 	let { media }: { media: MediaAsset[] } = $props();
@@ -38,14 +39,17 @@
 						</p>
 						<p class="text-xs text-byl-muted">
 							{#if !asset.external && asset.license_url}<a
-									href={asset.license_url}
+									href={safeHref(asset.license_url)}
 									target="_blank"
 									rel="noreferrer"
 									class="underline">{asset.license}</a
 								> ·
 							{/if}
-							<a href={asset.source_url} target="_blank" rel="noreferrer" class="underline"
-								>Original source</a
+							<a
+								href={safeHref(asset.source_url)}
+								target="_blank"
+								rel="noreferrer"
+								class="underline">Original source</a
 							>
 						</p>
 					</li>

@@ -62,13 +62,19 @@
 			.then((r) => {
 				if (tour.data === t) route = r;
 			})
-			.catch(() => (route = null));
+			.catch(() => {
+				if (tour.data === t) route = null;
+			});
 	});
 	$effect(() => {
 		const t = tour.data;
+		// A late answer for the previous tour must not mark this one saved.
+		saved = false;
 		if (!t || !$current) return;
 		mySaved()
-			.then((p) => (saved = p.items.some((s) => s.id === t.id)))
+			.then((p) => {
+				if (tour.data === t) saved = p.items.some((s) => s.id === t.id);
+			})
 			.catch(() => {});
 	});
 

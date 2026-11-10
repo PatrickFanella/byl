@@ -13,3 +13,8 @@ export function excerpt(s: string | null | undefined, n = 140): string {
 	if (!s) return '';
 	return s.length > n ? s.slice(0, n).trimEnd() + '…' : s;
 }
+
+/** Returns an http(s) URL for use as a link target, or undefined so stored javascript: and data: URLs never render as links. */
+export function safeHref(url: unknown): string | undefined {
+	return typeof url === 'string' && /^https?:\/\//i.test(url.trim()) ? url.trim() : undefined;
+}

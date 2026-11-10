@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { safeHref } from '#lib/format.ts';
 	import type { MediaAsset } from '#lib/visitor.ts';
 	let { asset }: { asset: MediaAsset } = $props();
 </script>
@@ -26,13 +27,13 @@
 			{#if asset.license}
 				· {#if asset.license_url}<a
 						class="underline"
-						href={asset.license_url}
+						href={safeHref(asset.license_url)}
 						target="_blank"
 						rel="noreferrer">{asset.license}</a
 					>{:else}{asset.license}{/if}
 			{/if}
 			{#if asset.source_url}
-				· <a class="underline" href={asset.source_url} target="_blank" rel="noreferrer"
+				· <a class="underline" href={safeHref(asset.source_url)} target="_blank" rel="noreferrer"
 					>Image source</a
 				>{/if}
 		</p>

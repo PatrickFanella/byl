@@ -19,19 +19,21 @@
 
 	let { data }: PageProps = $props();
 	let tour = $derived(data.tour);
-	let title = $derived(tour.title);
-	let summary = $derived(tour.summary);
-	let topic = $derived(tour.topic_id ?? '');
-	let visibility = $derived(tour.visibility);
-	let walk = $derived(tour.modes.includes('walk'));
-	let bike = $derived(tour.modes.includes('bike'));
 	type StopDraft = {
 		place_id: string;
 		place_name: string;
 		featured_moment_id: string;
 		note: string;
 	};
-	let stops: StopDraft[] = $derived(
+	const serverDetails = $derived({
+		title: tour.title,
+		summary: tour.summary,
+		topic: tour.topic_id ?? '',
+		visibility: tour.visibility,
+		walk: tour.modes.includes('walk'),
+		bike: tour.modes.includes('bike')
+	});
+	const serverStops: StopDraft[] = $derived(
 		tour.stops.map((s) => ({
 			place_id: s.place.id,
 			place_name: s.place.name,
@@ -39,6 +41,29 @@
 			note: s.note
 		}))
 	);
+	// Each section's draft reseeds only when the server copy of that section changes, so saving
+	// details keeps unsaved stop edits and saving stops keeps unsaved detail edits.
+	let title = $state('');
+	let summary = $state('');
+	let topic = $state('');
+	let visibility: typeof serverDetails.visibility = $state('private');
+	let walk = $state(false);
+	let bike = $state(false);
+	let stops: StopDraft[] = $state([]);
+	let seededDetails = '';
+	let seededStops = '';
+	$effect.pre(() => {
+		const key = JSON.stringify(serverDetails);
+		if (key === seededDetails) return;
+		seededDetails = key;
+		({ title, summary, topic, visibility, walk, bike } = serverDetails);
+	});
+	$effect.pre(() => {
+		const key = JSON.stringify(serverStops);
+		if (key === seededStops) return;
+		seededStops = key;
+		stops = serverStops.map((s) => ({ ...s }));
+	});
 	let addPlace = $state('');
 	let notice = $state({ kind: 'info' as 'info' | 'error' | 'success', message: '' });
 	let busy = $state('');

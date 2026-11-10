@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { plainText, plan } from './narration';
+import { describe, expect, it, vi } from 'vitest';
+import { NarrationPlayer, plainText, plan } from './narration';
 
 describe('plan', () => {
 	it('prefers recorded narration', () => {
@@ -42,5 +42,38 @@ fenced code
 		expect(plainText(md)).toBe(
 			'Title Some emphasis and strong words, code, an and a link. a list item numbered quoted Trailing spaces'
 		);
+	});
+});
+
+describe('NarrationPlayer', () => {
+	it('ignores the late end event of an utterance it cancelled', () => {
+		type Utterance = { text: string; onend: (() => void) | null; onerror: (() => void) | null };
+		const spoken: Utterance[] = [];
+		vi.stubGlobal(
+			'SpeechSynthesisUtterance',
+			class {
+				onend: (() => void) | null = null;
+				onerror: (() => void) | null = null;
+				constructor(public text: string) {}
+			}
+		);
+		const synth = { speak: (u: Utterance) => spoken.push(u), cancel: vi.fn() };
+		vi.stubGlobal('speechSynthesis', synth);
+		try {
+			const player = new NarrationPlayer();
+			const ended = vi.fn();
+			player.onEnd = ended;
+			player.play({ kind: 'speech', text: 'Stop A' });
+			player.play({ kind: 'speech', text: 'Stop B' });
+			spoken[0].onerror?.(); // cancel() interrupts A after B has started
+			expect(player.isPlaying).toBe(true);
+			expect(ended).not.toHaveBeenCalled();
+			player.stop();
+			expect(synth.cancel).toHaveBeenCalledTimes(2);
+			spoken[1].onend?.();
+			expect(ended).not.toHaveBeenCalled();
+		} finally {
+			vi.unstubAllGlobals();
+		}
 	});
 });
