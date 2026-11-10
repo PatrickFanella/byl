@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -57,6 +58,9 @@ func (d Deps) createMyTour(w http.ResponseWriter, r *http.Request) {
 	if !d.checkStopsPublished(w, r, cityID, req.Stops) {
 		return
 	}
+	if !d.userTourLimit(w, d.Store.CheckUserTourCreate(r.Context(), a.ID)) {
+		return
+	}
 	// User routes carry no curator-chosen moments; the place's primary moment is featured.
 	for i := range req.Stops {
 		req.Stops[i].FeaturedMomentID = nil
@@ -74,6 +78,20 @@ func (d Deps) createMyTour(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusCreated, tour)
+}
+
+// userTourLimit writes 429 for a user tour quota, or the error, and reports whether to continue.
+func (d Deps) userTourLimit(w http.ResponseWriter, err error) bool {
+	if errors.Is(err, repository.ErrSubmissionLimit) {
+		writeError(w, http.StatusTooManyRequests, "submission_limit", fmt.Sprintf("at most %d new tours per 24 hours and %d tours per account; stop changes wait while %d route computations are pending",
+			repository.UserToursPerDay, repository.UserToursOwned, repository.UserRouteBacklog))
+		return false
+	}
+	if err != nil {
+		d.fail(w, err)
+		return false
+	}
+	return true
 }
 
 // myTour loads a tour the current account owns, or writes 404.
@@ -114,6 +132,9 @@ func (d Deps) updateMyTour(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Stops != nil {
 		if !d.checkStopsPublished(w, r, tour.CityID, req.Stops) {
+			return
+		}
+		if !d.userTourLimit(w, d.Store.CheckUserRouteBacklog(r.Context(), accountFrom(r.Context()).ID)) {
 			return
 		}
 		for i := range req.Stops {

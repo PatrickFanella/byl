@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"invisible-museum/backend/internal/models"
+	"invisible-museum/backend/internal/repository"
 	"invisible-museum/backend/internal/testdb"
 )
 
@@ -241,5 +242,44 @@ func TestProgressUpdatesMergeAndReset(t *testing.T) {
 	next := put(map[string]any{"mode": "walk", "visited_positions": []int{3}})
 	if next.status != 200 || len(next.body["visited_positions"].([]any)) != 1 || next.body["completed_at"] != nil {
 		t.Fatalf("new walk must not restore old stops: %d %s", next.status, next.raw)
+	}
+}
+
+func TestUserToursAreLimitedPerAccount(t *testing.T) {
+	env := newTestEnv(t)
+	me := env.signIn(t, "busy@example.com", "")
+	created := 0
+	for ; created < repository.UserToursPerDay+1; created++ {
+		r := env.do(t, http.MethodPost, "/api/v1/me/tours", me, userRoute(testdb.SeedPlaceStationID, testdb.SeedPlaceTivoliID))
+		if r.status == http.StatusTooManyRequests {
+			if errCode(r) != "submission_limit" {
+				t.Fatalf("limit code: %s", r.raw)
+			}
+			break
+		}
+		if r.status != http.StatusCreated {
+			t.Fatalf("create %d: %d %s", created, r.status, r.raw)
+		}
+	}
+	// No worker drains this environment, so the pending route backlog is what stops the account.
+	if created == 0 || created > repository.UserRouteBacklog {
+		t.Fatalf("tours created before the limit: %d", created)
+	}
+	if r := env.do(t, http.MethodPost, "/api/v1/me/tours", env.signIn(t, "calm@example.com", ""), userRoute(testdb.SeedPlaceStationID, testdb.SeedPlaceTivoliID)); r.status != http.StatusCreated {
+		t.Fatalf("another account must not share the limit: %d %s", r.status, r.raw)
+	}
+	if _, err := env.store.Pool().Exec(context.Background(), `UPDATE jobs SET status = 'done'`); err != nil {
+		t.Fatal(err)
+	}
+	for ; created < repository.UserToursPerDay; created++ {
+		if r := env.do(t, http.MethodPost, "/api/v1/me/tours", me, userRoute(testdb.SeedPlaceStationID, testdb.SeedPlaceTivoliID)); r.status != http.StatusCreated {
+			t.Fatalf("create %d after the backlog drained: %d %s", created, r.status, r.raw)
+		}
+		if _, err := env.store.Pool().Exec(context.Background(), `UPDATE jobs SET status = 'done'`); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if r := env.do(t, http.MethodPost, "/api/v1/me/tours", me, userRoute(testdb.SeedPlaceStationID, testdb.SeedPlaceTivoliID)); r.status != http.StatusTooManyRequests {
+		t.Fatalf("the daily limit must apply: %d %s", r.status, r.raw)
 	}
 }
