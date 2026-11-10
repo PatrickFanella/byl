@@ -81,6 +81,9 @@ func (s *Store) queryMoments(ctx context.Context, q dbtx, where string, args ...
 		}
 		topicsByMoment[mid] = append(topicsByMoment[mid], tid)
 	}
+	if err := topicRows.Err(); err != nil {
+		return nil, err
+	}
 	for i := range out {
 		if ids := topicsByMoment[out[i].ID]; ids != nil {
 			out[i].TopicIDs = ids

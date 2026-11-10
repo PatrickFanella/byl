@@ -141,7 +141,7 @@ func (s *Store) currentHappeningProjection(ctx context.Context, raw, private []b
 // PublicHappenings reads only approved notice snapshots for an already-public
 // place. It performs no discovery, retrieval, historical edit or trip mutation.
 func (s *Store) PublicHappenings(ctx context.Context, place string, limit, offset int, now time.Time) ([]models.Happening, error) {
-	id, err := s.ResolvePlaceID(ctx, place, "")
+	id, err := s.resolvePlaceID(ctx, place, "", true)
 	if err != nil {
 		return nil, err
 	}

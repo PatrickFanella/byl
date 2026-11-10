@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -133,5 +134,27 @@ func TestConcurrentProgressUpdatesKeepEveryStop(t *testing.T) {
 	}
 	if !slices.Equal(p.VisitedPositions, []int{1, 2, 3, 4}) {
 		t.Fatalf("concurrent updates lost stops: %v", p.VisitedPositions)
+	}
+}
+
+func TestListSavedReturnsEverySavedTour(t *testing.T) {
+	s, ctx := newStore(t)
+	a, err := s.UpsertAccount(ctx, models.AuthProviderDev, "saver", "saver@example.com", "", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range 51 {
+		tour, err := s.CreateTour(ctx, CreateTourInput{CityID: testdb.SeedCityID, Title: fmt.Sprintf("Saved %02d", i), Modes: []models.TravelMode{models.TravelModeWalk},
+			Status: models.EntityStatusPublished, Visibility: models.TourVisibilityPublic, Stops: []models.StopInput{{PlaceID: testdb.SeedPlaceStationID}}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := s.Save(ctx, a.ID, tour.ID); err != nil {
+			t.Fatal(err)
+		}
+	}
+	saved, err := s.ListSaved(ctx, a.ID)
+	if err != nil || len(saved) != 51 {
+		t.Fatalf("saved tours past the first page were dropped: %d %v", len(saved), err)
 	}
 }

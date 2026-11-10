@@ -56,7 +56,7 @@ func (s *Store) ListCandidates(ctx context.Context, f CandidateFilter) ([]models
 	}
 	args = append(args, limit+1, offset)
 	rows, err := s.pool.Query(ctx, `SELECT `+candidateCols+` FROM candidates WHERE `+strings.Join(where, " AND ")+
-		fmt.Sprintf(` ORDER BY created_at LIMIT $%d OFFSET $%d`, len(args)-1, len(args)), args...)
+		fmt.Sprintf(` ORDER BY created_at, id LIMIT $%d OFFSET $%d`, len(args)-1, len(args)), args...)
 	if err != nil {
 		return nil, "", mapErr(err)
 	}

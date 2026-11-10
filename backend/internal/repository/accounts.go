@@ -51,7 +51,7 @@ func (s *Store) GetAccount(ctx context.Context, id string) (*models.Account, err
 
 // ListAccounts returns accounts newest first.
 func (s *Store) ListAccounts(ctx context.Context, limit, offset int) ([]models.Account, error) {
-	rows, err := s.pool.Query(ctx, `SELECT `+accountCols+` FROM accounts ORDER BY created_at DESC LIMIT $1 OFFSET $2`, clamp(limit), offset)
+	rows, err := s.pool.Query(ctx, `SELECT `+accountCols+` FROM accounts ORDER BY created_at DESC, id DESC LIMIT $1 OFFSET $2`, clamp(limit), offset)
 	if err != nil {
 		return nil, err
 	}
@@ -116,9 +116,17 @@ func (s *Store) Unsave(ctx context.Context, accountID, tourID string) error {
 
 // ListSaved returns an account's bookmarked tours.
 func (s *Store) ListSaved(ctx context.Context, accountID string) ([]models.TourSummary, error) {
-	tours, _, err := s.ListTours(ctx, TourFilter{SavedByAccountID: accountID, IncludeUnpublished: true})
-	if err != nil {
-		return nil, err
+	var tours []models.TourSummary
+	for cursor := ""; ; {
+		page, next, err := s.ListTours(ctx, TourFilter{SavedByAccountID: accountID, IncludeUnpublished: true, Cursor: cursor})
+		if err != nil {
+			return nil, err
+		}
+		tours = append(tours, page...)
+		if next == "" {
+			break
+		}
+		cursor = next
 	}
 	out := []models.TourSummary{}
 	for _, tour := range tours {

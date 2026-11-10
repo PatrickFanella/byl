@@ -76,7 +76,7 @@ func (s *Store) GetJob(ctx context.Context, id string) (*models.Job, error) {
 
 // ListJobs returns jobs, optionally filtered by status, newest first.
 func (s *Store) ListJobs(ctx context.Context, status models.JobStatus, limit, offset int) ([]models.Job, error) {
-	rows, err := s.pool.Query(ctx, `SELECT `+jobCols+` FROM jobs WHERE ($1 = '' OR status::text = $1) ORDER BY created_at DESC LIMIT $2 OFFSET $3`, string(status), clamp(limit), offset)
+	rows, err := s.pool.Query(ctx, `SELECT `+jobCols+` FROM jobs WHERE ($1 = '' OR status::text = $1) ORDER BY created_at DESC, id DESC LIMIT $2 OFFSET $3`, string(status), clamp(limit), offset)
 	if err != nil {
 		return nil, mapErr(err)
 	}
@@ -179,6 +179,9 @@ func (s *Store) Stats(ctx context.Context) (*models.Stats, error) {
 		st.PendingCandidates[k] = n
 	}
 	rows.Close()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	jrows, err := s.pool.Query(ctx, `SELECT status::text, count(*) FROM jobs GROUP BY status`)
 	if err != nil {
 		return nil, mapErr(err)
@@ -193,6 +196,9 @@ func (s *Store) Stats(ctx context.Context) (*models.Stats, error) {
 		st.Jobs[k] = n
 	}
 	jrows.Close()
+	if err := jrows.Err(); err != nil {
+		return nil, err
+	}
 	err = s.pool.QueryRow(ctx, `SELECT
 		(SELECT count(*) FROM places WHERE status = 'published'),
 		(SELECT count(*) FROM moments WHERE status = 'published'),
