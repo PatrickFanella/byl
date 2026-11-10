@@ -1,6 +1,5 @@
 name: CI
 'on':
-  pull_request: {}
   push:
     branches:
     - main
@@ -14,6 +13,9 @@ concurrency:
 jobs:
   verify:
     name: Backend quality
+    env:
+      GOMAXPROCS: "2"
+      GOFLAGS: "-p=2"
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -21,7 +23,8 @@ jobs:
     - uses: actions/setup-go@v6
       with:
         go-version: "1.25"
-        cache: false
+        cache: true
+        cache-dependency-path: backend/go.sum
     - name: Verify backend modules and vet
       shell: bash
       run: |-
@@ -35,9 +38,17 @@ jobs:
     - name: Test backend
       shell: bash
       run: |-
-        # Record our own container ID because Gitea does not populate job.services.postgres.id.
-        postgres_id="$(docker run --detach --rm --network bridge -e POSTGRES_USER=museum -e POSTGRES_PASSWORD=museum -e POSTGRES_DB=museum_test postgres:16-alpine)"
-        trap 'docker stop "$postgres_id" >/dev/null' EXIT
+        # This disposable database skips durability writes; all migrations still run per schema.
+        # Record its ID because Gitea does not populate job.services.postgres.id.
+        postgres_id="$(docker run --detach --network bridge --cpus=1 --memory=1g -e POSTGRES_USER=museum -e POSTGRES_PASSWORD=museum -e POSTGRES_DB=museum_test postgres:16-alpine -c fsync=off -c synchronous_commit=off -c full_page_writes=off)"
+        cleanup() {
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            docker logs "$postgres_id" >&2 || true
+          fi
+          docker rm --force --volumes "$postgres_id" >/dev/null || true
+        }
+        trap cleanup EXIT
         postgres_host="$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$postgres_id")"
         test -n "$postgres_host"
         for attempt in {1..30}; do
@@ -67,10 +78,13 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: "22"
+        cache: npm
+        cache-dependency-path: web/package-lock.json
     - uses: actions/setup-go@v6
       with:
         go-version: "1.25"
-        cache: false
+        cache: true
+        cache-dependency-path: backend/go.sum
     - name: Install
       shell: bash
       run: npm install -g npm@11 && npm ci --legacy-peer-deps

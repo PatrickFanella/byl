@@ -1,0 +1,173 @@
+name: Mirror CI
+run-name: Mirror CI ${{ github.sha }}
+'on':
+  push: null
+  workflow_dispatch: null
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    name: Backend quality
+    env:
+      GOMAXPROCS: '2'
+      GOFLAGS: -p=2
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-go@v6
+      with:
+        go-version: '1.25'
+        cache: true
+        cache-dependency-path: backend/go.sum
+    - name: Verify backend modules and vet
+      shell: bash
+      run: |-
+        go mod verify
+        go vet ./...
+      working-directory: backend
+    - name: Check formatting
+      shell: bash
+      run: test -z "$(gofmt -l .)"
+      working-directory: backend
+    - name: Test backend
+      shell: bash
+      run: |-
+        # This disposable database skips durability writes; all migrations still run per schema.
+        # Record its ID because Gitea does not populate job.services.postgres.id.
+        postgres_id="$(docker run --detach --network bridge --cpus=1 --memory=1g -e POSTGRES_USER=museum -e POSTGRES_PASSWORD=museum -e POSTGRES_DB=museum_test postgres:16-alpine -c fsync=off -c synchronous_commit=off -c full_page_writes=off)"
+        cleanup() {
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            docker logs "$postgres_id" >&2 || true
+          fi
+          docker rm --force --volumes "$postgres_id" >/dev/null || true
+        }
+        trap cleanup EXIT
+        postgres_host="$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$postgres_id")"
+        test -n "$postgres_host"
+        for attempt in {1..30}; do
+          if docker exec "$postgres_id" pg_isready -h 127.0.0.1 -U museum -d museum_test >/dev/null; then
+            break
+          fi
+          if [ "$attempt" -eq 30 ]; then
+            echo 'Test database did not become ready' >&2
+            exit 1
+          fi
+          sleep 1
+        done
+        TEST_DATABASE_URL="postgres://museum:museum@$postgres_host:5432/museum_test?sslmode=disable" go test -count=1 -timeout 20m ./...
+      working-directory: backend
+    - name: Build backend
+      shell: bash
+      run: go build ./...
+      working-directory: backend
+    if: github.repository == 'PatrickFanella/invisible-museum'
+  web:
+    name: Web quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+    - uses: actions/checkout@v6
+    - name: Verify selected BYL assets and generated native palettes
+      run: python3 scripts/sync-byl.py --check && python3 scripts/generate-byl-palette.py --check && python3 scripts/build-pilot-content.py
+        --check
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: npm
+        cache-dependency-path: web/package-lock.json
+    - uses: actions/setup-go@v6
+      with:
+        go-version: '1.25'
+        cache: true
+        cache-dependency-path: backend/go.sum
+    - name: Install
+      shell: bash
+      run: npm install -g npm@11 && npm ci --legacy-peer-deps
+      working-directory: web
+    - name: Check, lint, unit test, build
+      shell: bash
+      run: |-
+        npm run gen:api
+        npm run check
+        npm run lint
+        npm run test:unit -- --run
+        npm run build
+      working-directory: web
+    - name: Install browser
+      run: npx playwright install --with-deps chromium
+      working-directory: web
+    - name: Test visitor and curator flows against an isolated API
+      run: bash scripts/test-web-e2e.sh
+    if: github.repository == 'PatrickFanella/invisible-museum'
+  android:
+    name: Android core
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v6
+    - name: Test Kotlin core with pinned Gradle and JDK
+      run: bash scripts/test-android-core-container.sh
+    if: github.repository == 'PatrickFanella/invisible-museum'
+  ios:
+    name: iOS build and package tests
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v6
+    - name: Test shared Swift package
+      run: swift test
+      working-directory: ios-invisible-museum/InvisibleMuseumKit
+    - name: Build unsigned iOS app
+      run: xcodebuild -quiet -project InvisibleMuseum.xcodeproj -scheme InvisibleMuseum -sdk iphoneos -destination
+        generic/platform=iOS -derivedDataPath "$RUNNER_TEMP/invisible-museum-ios" CODE_SIGNING_ALLOWED=NO build
+      working-directory: ios-invisible-museum
+    if: github.repository == 'PatrickFanella/invisible-museum'
+  release:
+    name: Release image smoke tests
+    if: github.repository == 'PatrickFanella/invisible-museum'
+    needs:
+    - verify
+    - web
+    - android
+    - ios
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v6
+    - name: Check release automation syntax
+      run: |
+        bash -n scripts/release.sh scripts/smoke-release.sh scripts/byl-pre-deploy.sh
+        python3 -c 'from pathlib import Path; [compile(p.read_text(), str(p), "exec") for p in (Path("scripts/verify_release.py"), Path("scripts/publish-release.py"))]'
+    - name: Build and smoke-test release images
+      run: bash scripts/release.sh
+  mirror-gate:
+    name: Mirror CI gate
+    if: always() && github.repository == 'PatrickFanella/invisible-museum'
+    needs:
+    - verify
+    - web
+    - android
+    - ios
+    - release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+    - name: Require every verification job
+      env:
+        RESULTS: ${{ toJSON(needs) }}
+      run: |
+        python3 - <<'PY'
+        import json, os
+        results = json.loads(os.environ["RESULTS"])
+        expected = {'verify', 'web', 'release', 'ios', 'android'}
+        assert set(results) == expected, results
+        for name, result in results.items():
+            assert result["result"] == "success", name + " did not pass"
+        PY
