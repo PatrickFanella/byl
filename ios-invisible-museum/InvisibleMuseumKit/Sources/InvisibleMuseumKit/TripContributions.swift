@@ -161,6 +161,8 @@ public final class TripContributions {
             }
             // The original choice and retry key must be durable before POST.
             try store.write(records); acceptedGeneration = generation; stopped = false; uploadsAuthorized = true; try restore()
+            // An upload already in flight read the store before this choice; wait for it, then upload afresh.
+            if let work = flushing { await work.value }
             await flush(); try restore()
             guard epoch == choiceEpoch, generation == store.choiceGeneration, !ended, optedIn, freshGate, !stopped, sameIdentity() else { return }
             paused = false; resumeSampling()

@@ -3,6 +3,7 @@ package tv.subcult.museum.core
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant
+import java.time.OffsetDateTime
 import java.time.Duration
 import kotlin.math.*
 
@@ -143,5 +144,8 @@ import kotlin.math.*
         return null
     }
 }
-fun transitInstant(text: String): Instant? = runCatching { Instant.parse(text) }.getOrNull()
+// Instant.parse only accepts a trailing Z before JDK 12, and Android 8–13 ship that parser. The API
+// serializes CTA times with their Chicago offset, so parse any ISO-8601 offset explicitly.
+fun parseInstant(text: String): Instant = OffsetDateTime.parse(text).toInstant()
+fun transitInstant(text: String): Instant? = runCatching { parseInstant(text) }.getOrNull()
 private fun validTransitLine(coordinates: List<List<Double>>) = coordinates.size >= 2 && coordinates.all { it.size == 2 && it[0].isFinite() && it[1].isFinite() && it[0] in -180.0..180.0 && it[1] in -90.0..90.0 }

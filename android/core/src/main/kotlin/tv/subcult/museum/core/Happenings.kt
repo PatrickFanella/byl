@@ -33,7 +33,7 @@ data class Happening(
         listOf(startsOn, endsOn, reviewOn, expiresOn).forEach { require(it.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))); LocalDate.parse(it) }
         require(endsOn >= startsOn)
         val today = now.atZone(ZoneId.of(timezone)).toLocalDate().toString()
-        val checked = Instant.parse(lastCheckedAt)
+        val checked = parseInstant(lastCheckedAt)
         when {
             declaredState == "cancelled" || state == "cancelled" -> HappeningStatus.CANCELLED
             declaredState == "date_conflict" || state == "date_conflict" -> HappeningStatus.DATE_CONFLICT
@@ -51,7 +51,7 @@ data class Happening(
         "${LocalDate.parse(startsOn).format(f)}${if (startsOn == endsOn) "" else " – ${LocalDate.parse(endsOn).format(f)}"} · $timezone · dates only"
     } catch (_: Exception) { "Occurrence dates unavailable" }
     val checkedText: String get() = try {
-        "Last source check: ${Instant.parse(lastCheckedAt).atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm 'UTC'", Locale.US))}"
+        "Last source check: ${parseInstant(lastCheckedAt).atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm 'UTC'", Locale.US))}"
     } catch (_: Exception) { "Source check unavailable" }
 
     companion object {
