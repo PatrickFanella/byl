@@ -420,7 +420,7 @@ paths:
       summary: "Archive a moment"
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
-      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: The moment is the primary history of a published place }, "401": { description: Unauthorized } }
   /api/v1/admin/moments/{id}/publish:
     post:
       summary: "Publish a sourced history of at least 250 words and three paragraphs with a credited reusable picture; enqueues narration"
@@ -432,7 +432,7 @@ paths:
       summary: "Return a moment to draft"
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
-      responses: { "200": { description: OK }, "404": { description: Not found }, "401": { description: Unauthorized } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: The moment is the primary history of a published place }, "401": { description: Unauthorized } }
   /api/v1/admin/moments/{id}/media:
     put:
       summary: "Replace the ordered media list"

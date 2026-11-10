@@ -134,11 +134,16 @@ func TestAdminContentLifecycle(t *testing.T) {
 	if r := env.get(t, "/api/v1/moments/"+momentID, ""); r.status != 200 || len(r.body["media"].([]any)) != 1 {
 		t.Fatalf("public moment: %d %s", r.status, r.raw)
 	}
-	if r := env.do(t, http.MethodPost, "/api/v1/admin/moments/"+momentID+"/unpublish", curator, nil); r.status != 200 || r.body["status"] != "draft" {
-		t.Fatalf("unpublish: %d %s", r.status, r.raw)
+	for _, req := range []struct{ method, path string }{{http.MethodPost, "/unpublish"}, {http.MethodDelete, ""}} {
+		if r := env.do(t, req.method, "/api/v1/admin/moments/"+momentID+req.path, curator, nil); r.status != 409 || !strings.Contains(errMessage(r), "primary history") {
+			t.Fatalf("a published place's primary history must stay published (%s): %d %s", req.method, r.status, r.raw)
+		}
 	}
 	if r := env.do(t, http.MethodDelete, "/api/v1/admin/places/"+placeID, curator, nil); r.status != 200 || r.body["status"] != "archived" {
 		t.Fatalf("archive place: %d %s", r.status, r.raw)
+	}
+	if r := env.do(t, http.MethodPost, "/api/v1/admin/moments/"+momentID+"/unpublish", curator, nil); r.status != 200 || r.body["status"] != "draft" {
+		t.Fatalf("unpublish: %d %s", r.status, r.raw)
 	}
 	// Topics and cities.
 	if r := env.do(t, http.MethodPost, "/api/v1/admin/topics", curator, map[string]any{"city_id": testdb.SeedCityID, "name": "Schools"}); r.status != 201 || r.body["slug"] != "schools" {

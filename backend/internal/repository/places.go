@@ -297,3 +297,24 @@ func (s *Store) NearestPublishedPlace(ctx context.Context, cityID string, pt geo
 	}
 	return &p, nil
 }
+
+// PublishedPlacesWithPrimaryMoment returns the slugs of published places whose primary history is momentID.
+func (s *Store) PublishedPlacesWithPrimaryMoment(ctx context.Context, momentID string) ([]string, error) {
+	if !isUUID(momentID) {
+		return nil, nil
+	}
+	rows, err := s.pool.Query(ctx, `SELECT slug FROM places WHERE primary_moment_id = $1 AND status = 'published' ORDER BY slug`, momentID)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var slug string
+		if err := rows.Scan(&slug); err != nil {
+			return nil, err
+		}
+		out = append(out, slug)
+	}
+	return out, rows.Err()
+}
