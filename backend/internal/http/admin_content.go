@@ -323,6 +323,17 @@ func (d Deps) adminPublishMoment(w http.ResponseWriter, r *http.Request) {
 func (d Deps) adminSetMomentStatus(status models.EntityStatus) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
+		if status != models.EntityStatusPublished {
+			places, err := d.Store.PublishedPlacesWithPrimaryMoment(r.Context(), id)
+			if err != nil {
+				d.fail(w, err)
+				return
+			}
+			if len(places) > 0 {
+				writeError(w, http.StatusConflict, "conflict", "moment is the primary history of published places: "+strings.Join(places, ", ")+"; choose another primary history or unpublish them first")
+				return
+			}
+		}
 		if err := d.Store.SetMomentStatus(r.Context(), id, status); err != nil {
 			d.fail(w, err)
 			return
