@@ -1,7 +1,9 @@
 name: Mirror CI
 run-name: Mirror CI ${{ github.sha }}
 'on':
-  push: null
+  push:
+    branches-ignore:
+    - main
   workflow_dispatch: null
 permissions:
   contents: read
@@ -17,8 +19,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v6
-    - uses: actions/setup-go@v6
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+    - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
       with:
         go-version: '1.25'
         cache: true
@@ -65,22 +67,22 @@ jobs:
       shell: bash
       run: go build ./...
       working-directory: backend
-    if: github.repository == 'PatrickFanella/invisible-museum'
+    if: github.repository == 'subculture-collective/byl'
   web:
     name: Web quality
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
     - name: Verify selected BYL assets and generated native palettes
       run: python3 scripts/sync-byl.py --check && python3 scripts/generate-byl-palette.py --check && python3 scripts/build-pilot-content.py
         --check
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
       with:
         node-version: '22'
         cache: npm
         cache-dependency-path: web/package-lock.json
-    - uses: actions/setup-go@v6
+    - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
       with:
         go-version: '1.25'
         cache: true
@@ -103,22 +105,22 @@ jobs:
       working-directory: web
     - name: Test visitor and curator flows against an isolated API
       run: bash scripts/test-web-e2e.sh
-    if: github.repository == 'PatrickFanella/invisible-museum'
+    if: github.repository == 'subculture-collective/byl'
   android:
     name: Android core
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
     - name: Test Kotlin core with pinned Gradle and JDK
       run: bash scripts/test-android-core-container.sh
-    if: github.repository == 'PatrickFanella/invisible-museum'
+    if: github.repository == 'subculture-collective/byl'
   ios:
     name: iOS build and package tests
     runs-on: macos-26
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
     - name: Test shared Swift package
       run: swift test
       working-directory: ios-invisible-museum/InvisibleMuseumKit
@@ -126,10 +128,10 @@ jobs:
       run: xcodebuild -quiet -project InvisibleMuseum.xcodeproj -scheme InvisibleMuseum -sdk iphoneos -destination
         generic/platform=iOS -derivedDataPath "$RUNNER_TEMP/invisible-museum-ios" CODE_SIGNING_ALLOWED=NO build
       working-directory: ios-invisible-museum
-    if: github.repository == 'PatrickFanella/invisible-museum'
+    if: github.repository == 'subculture-collective/byl'
   release:
     name: Release image smoke tests
-    if: github.repository == 'PatrickFanella/invisible-museum'
+    if: github.repository == 'subculture-collective/byl'
     needs:
     - verify
     - web
@@ -140,7 +142,7 @@ jobs:
     permissions:
       contents: read
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
     - name: Check release automation syntax
       run: |
         bash -n scripts/release.sh scripts/smoke-release.sh scripts/byl-pre-deploy.sh
@@ -149,7 +151,7 @@ jobs:
       run: bash scripts/release.sh
   mirror-gate:
     name: Mirror CI gate
-    if: always() && github.repository == 'PatrickFanella/invisible-museum'
+    if: always() && github.repository == 'subculture-collective/byl'
     needs:
     - verify
     - web
