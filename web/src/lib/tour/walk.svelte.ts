@@ -346,7 +346,20 @@ export class ActiveWalk {
 			const next = releases
 				.filter((r) => r.id && (r.number ?? 0) > (current.number ?? 0))
 				.sort((a, b) => (b.number ?? 0) - (a.number ?? 0))[0];
-			const latest = next ? await this.deps.fetchRevision(this.tour.id, next.id!) : null;
+			let latest: TourRevision | null = null;
+			if (next) {
+				try {
+					latest = await this.deps.fetchRevision(this.tour.id, next.id!);
+				} catch (e) {
+					// Only the tour's own listing decides that it is gone; a newer release this
+					// client cannot open (for example transit while transit is off) leaves the pin alone.
+					if (!this.unavailable(e)) throw e;
+					if (this.revision === current)
+						this.updateMessage =
+							'A newer revision exists but cannot be opened here. The pinned trip is unchanged.';
+					return;
+				}
+			}
 			if (
 				latest &&
 				(latest.id !== next?.id ||

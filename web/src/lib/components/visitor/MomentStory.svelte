@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { safeHref } from '#lib/format.ts';
 	import { plainText } from '#lib/tour/narration.ts';
 	import type { MomentDetail } from '#lib/visitor.ts';
 	import MediaGallery from '#lib/components/visitor/MediaGallery.svelte';
@@ -45,7 +46,7 @@
 		<div class="rounded-lg border border-byl-border bg-byl-surface p-4 text-sm">
 			{#if s.url}
 				<a
-					href={s.url}
+					href={safeHref(s.url)}
 					target="_blank"
 					rel="noreferrer"
 					class="font-semibold text-byl-action hover:underline">{s.title || s.url} ↗</a

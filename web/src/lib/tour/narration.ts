@@ -33,6 +33,9 @@ export function plainText(markdown: string): string {
 export class NarrationPlayer {
 	private audio: HTMLAudioElement | null = null;
 	private speaking = false;
+	// Each play gets a new generation; events from a cancelled or replaced playback are ignored,
+	// because speechSynthesis.cancel() fires the old utterance's end/error asynchronously.
+	private generation = 0;
 	onEnd: (() => void) | null = null;
 
 	get isPlaying(): boolean {
@@ -41,22 +44,25 @@ export class NarrationPlayer {
 
 	play(p: NarrationPlan): void {
 		this.stop();
+		const generation = this.generation;
+		const done = () => this.finished(generation);
 		if (p.kind === 'stream') {
 			const a = new Audio(p.url);
-			a.onended = () => this.finished();
-			a.onerror = () => this.finished();
+			a.onended = done;
+			a.onerror = done;
 			this.audio = a;
-			void a.play().catch(() => this.finished());
+			void a.play().catch(done);
 		} else if (p.kind === 'speech' && typeof speechSynthesis !== 'undefined') {
 			const u = new SpeechSynthesisUtterance(p.text);
-			u.onend = () => this.finished();
-			u.onerror = () => this.finished();
+			u.onend = done;
+			u.onerror = done;
 			this.speaking = true;
 			speechSynthesis.speak(u);
 		}
 	}
 
 	stop(): void {
+		this.generation++;
 		if (this.audio) {
 			this.audio.pause();
 			this.audio = null;
@@ -65,7 +71,8 @@ export class NarrationPlayer {
 		this.speaking = false;
 	}
 
-	private finished(): void {
+	private finished(generation: number): void {
+		if (generation !== this.generation) return;
 		this.audio = null;
 		this.speaking = false;
 		this.onEnd?.();

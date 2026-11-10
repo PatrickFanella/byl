@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { safeHref } from '#lib/format.ts';
 	import {
 		getPathQuality,
 		errorMessage,
@@ -100,7 +101,7 @@
 					<p class="mt-1 break-words">“{inspection.quote}”</p>
 					<a
 						class="mt-1 block break-all underline"
-						href={inspection.url}
+						href={safeHref(inspection.url)}
 						target="_blank"
 						rel="noreferrer">Inspected source · {inspection.reference}</a
 					>

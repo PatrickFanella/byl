@@ -19,7 +19,7 @@
 		sleep
 	} from '#lib/admin.ts';
 	import { ApiError } from '#lib/api/index.ts';
-	import { when } from '#lib/format.ts';
+	import { when, safeHref } from '#lib/format.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -241,7 +241,7 @@
 		>
 	{/if}
 	{#if payload.source_url}
-		· <a class="underline" href={String(payload.source_url)} target="_blank" rel="noreferrer"
+		· <a class="underline" href={safeHref(payload.source_url)} target="_blank" rel="noreferrer"
 			>source</a
 		>
 	{/if}
@@ -294,7 +294,7 @@
 						<blockquote class="mt-2 border-l-2 border-byl-border pl-3">
 							<p>{citation.quote}</p>
 							<p>
-								<a class="underline" href={source?.url} target="_blank" rel="noreferrer"
+								<a class="underline" href={safeHref(source?.url)} target="_blank" rel="noreferrer"
 									>{source?.title || 'Inspected source'}</a
 								>
 								· {citation.passage}
@@ -315,7 +315,7 @@
 							<blockquote class="mt-2 border-l-2 border-byl-border pl-3 text-byl-muted">
 								<p>{citation.quote}</p>
 								<p>
-									<a class="underline" href={source?.url} target="_blank" rel="noreferrer"
+									<a class="underline" href={safeHref(source?.url)} target="_blank" rel="noreferrer"
 										>{source?.title || 'Inspected source'}</a
 									>
 									· {citation.passage}
@@ -335,7 +335,7 @@
 							<blockquote class="mt-2 border-l-2 border-byl-border pl-3 text-byl-muted">
 								<p>{citation.quote}</p>
 								<p>
-									<a class="underline" href={source?.url} target="_blank" rel="noreferrer"
+									<a class="underline" href={safeHref(source?.url)} target="_blank" rel="noreferrer"
 										>{source?.title || 'Inspected source'}</a
 									>
 									· {citation.passage}

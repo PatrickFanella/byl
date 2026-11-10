@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { safeHref } from '#lib/format.ts';
 	import { onDestroy, untrack } from 'svelte';
 	import { session } from '#lib/auth.ts';
 	import { ApiError, type Schemas } from '#lib/api/index.ts';
@@ -502,13 +503,16 @@
 							.intent.source.retrieved_on}
 					</p>
 					<p class="text-sm">
-						<a class="underline" href={corridor.intent.source.url} target="_blank" rel="noreferrer"
-							>Reference source</a
+						<a
+							class="underline"
+							href={safeHref(corridor.intent.source.url)}
+							target="_blank"
+							rel="noreferrer">Reference source</a
 						>
 						·
 						<a
 							class="underline"
-							href={corridor.intent.source.license_url}
+							href={safeHref(corridor.intent.source.license_url)}
 							target="_blank"
 							rel="noreferrer">{corridor.intent.source.license}</a
 						>

@@ -292,6 +292,26 @@ describe('revision-pinned trips', () => {
 		expect(w.route).toBeNull();
 		expect(w.arrivedStop).toBeNull();
 	});
+	it('keeps the pinned trip when only a newer revision cannot be opened', async () => {
+		const f = revisions();
+		const w = new ActiveWalk('loop', 'walk', f.d);
+		await w.load();
+		await vi.waitFor(() => expect(w.updateBusy).toBe(false));
+		w.markArrived();
+		f.publish();
+		const pinned = f.d.fetchRevision!;
+		f.d.fetchRevision = async (tour, id) => {
+			if (id === 'rev-2') throw new ApiError(403, 'unsupported_itinerary', 'transit is off');
+			return pinned(tour, id);
+		};
+		await w.checkForUpdate();
+		expect(w.status).not.toBe('error');
+		expect(w.revision?.id).toBe('rev-1');
+		expect(w.tour).not.toBeNull();
+		expect([...w.visited]).toEqual(['s-1']);
+		expect(w.latestRevision).toBeNull();
+		expect(w.updateMessage).toContain('cannot be opened here');
+	});
 	it('loads a coherent snapshot and retains it through publication and explicit reordered adoption', async () => {
 		const f = revisions();
 		const w = new ActiveWalk('loop', 'walk', f.d);

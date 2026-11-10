@@ -35,6 +35,11 @@ test('a computed development route stays a draft with actionable quality finding
 	await page.getByRole('button', { name: 'Add stop' }).click();
 	await picker.selectOption({ label: 'Fishel Park' });
 	await page.getByRole('button', { name: 'Add stop' }).click();
+	// Saving the details section must keep the stops that have not been saved yet.
+	await page.getByLabel('Summary').fill('Unsaved stops survive a details save.');
+	await page.getByRole('button', { name: 'Save details' }).click();
+	await expect(page.getByText('Saved.', { exact: true })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Fishel Park', exact: true })).toBeVisible();
 	await page.getByRole('button', { name: 'Save stops' }).click();
 	await expect(page.getByText(/stops saved/i)).toBeVisible();
 
