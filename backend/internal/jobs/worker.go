@@ -96,6 +96,10 @@ func (w *Worker) Run(ctx context.Context) {
 // staleAfter is how long a job may sit in running before another worker reclaims it.
 const staleAfter = 10 * time.Minute
 
+// jobTimeout ends a run before staleAfter, so a slow job fails and retries instead of being
+// reclaimed and run a second time alongside itself.
+const jobTimeout = staleAfter - time.Minute
+
 // RunOnce claims and runs at most one job. It reports whether a job was claimed.
 func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 	if n, err := w.store.ReclaimStaleJobs(ctx, staleAfter); err != nil {
@@ -110,7 +114,9 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 	if job == nil {
 		return false, nil
 	}
-	note, runErr := w.dispatch(ctx, job)
+	runCtx, cancel := context.WithTimeout(ctx, jobTimeout)
+	note, runErr := w.dispatch(runCtx, job)
+	cancel()
 	return true, w.finish(ctx, job, note, runErr)
 }
 
@@ -121,17 +127,9 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runEr
 	fenced := job.Kind == models.JobKindResearchBrief || job.Kind == models.JobKindFetchEvidence || job.Kind == models.JobKindInvestigateRouteReport
 	wctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 15*time.Second)
 	defer cancel()
+	// Every outcome is fenced on this claim, so a run that was reclaimed cannot overwrite the newer claim.
 	if runErr == nil {
-		if fenced {
-			return w.store.FinishClaimedJob(wctx, job, note, nil, false)
-		}
-		if err := w.store.CompleteJob(wctx, job.ID); err != nil {
-			return err
-		}
-		if note != "" {
-			return w.store.SetJobNote(wctx, job.ID, note)
-		}
-		return nil
+		return w.store.FinishClaimedJob(wctx, job, note, nil, false)
 	}
 	interrupted := ctx.Err() != nil
 	final := (job.Attempts >= job.MaxAttempts || errors.Is(runErr, ErrNoRetry)) && !interrupted
@@ -144,22 +142,16 @@ func (w *Worker) finish(ctx context.Context, job *models.Job, note string, runEr
 			}
 			w.log.Error("record final failure", "id", job.ID, "error", err)
 		}
-		if fenced {
-			return w.store.FinishClaimedJob(wctx, job, runErr.Error(), nil, true)
-		}
-		return w.store.FailJob(wctx, job.ID, runErr.Error(), nil)
+		return w.store.FinishClaimedJob(wctx, job, runErr.Error(), nil, true)
 	}
 	retry := w.now().Add(w.backoff(job.Attempts))
 	if interrupted {
 		retry = w.now()
 	}
-	if fenced {
-		if retry.After(w.now().Add(30 * time.Second)) {
-			retry = w.now().Add(30 * time.Second)
-		}
-		return w.store.FinishClaimedJob(wctx, job, runErr.Error(), &retry, false)
+	if fenced && retry.After(w.now().Add(30*time.Second)) {
+		retry = w.now().Add(30 * time.Second)
 	}
-	return w.store.FailJob(wctx, job.ID, runErr.Error(), &retry)
+	return w.store.FinishClaimedJob(wctx, job, runErr.Error(), &retry, false)
 }
 
 // dispatch runs the job and returns its completion note (empty for most kinds) or error.

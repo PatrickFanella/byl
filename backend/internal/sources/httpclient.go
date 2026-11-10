@@ -76,12 +76,22 @@ var ErrPrivateHost = errors.New("sources: host resolves to a private address")
 // GetPublic is Get for URLs supplied by users: every connection, including those made after a
 // redirect, is dialled only when the host resolves to public addresses (unless
 // AllowPrivateHosts is set), which closes the SSRF path through a crafted media_url.
+//
+// It streams large downloads: the shared client's overall timeout, which would also cut off
+// reading the body, is lifted, and only the response headers must arrive within it. The caller
+// bounds the whole download through ctx.
 func (c *Client) GetPublic(ctx context.Context, url string) (*http.Response, error) {
-	if c.AllowPrivateHosts {
-		return c.Get(ctx, url)
-	}
 	hc := *c.HTTP
-	hc.Transport = publicOnlyTransport(c.HTTP.Transport)
+	headerTimeout := hc.Timeout
+	hc.Timeout = 0
+	if c.AllowPrivateHosts {
+		return c.do(ctx, &hc, url)
+	}
+	transport := publicOnlyTransport(c.HTTP.Transport)
+	if t, ok := transport.(*http.Transport); ok && t.ResponseHeaderTimeout == 0 {
+		t.ResponseHeaderTimeout = headerTimeout
+	}
+	hc.Transport = transport
 	hc.CheckRedirect = func(r *http.Request, via []*http.Request) error {
 		if len(via) >= 10 {
 			return errors.New("stopped after 10 redirects")

@@ -125,9 +125,18 @@ func (s *Store) FinishClaimedJob(ctx context.Context, job *models.Job, note stri
 }
 
 // ReclaimStaleJobs requeues jobs that have been running longer than olderThan (a worker died mid-job).
+// A job that has used all its attempts fails instead, so one that crashes its worker is not
+// reclaimed forever. Research, evidence and route-investigation jobs keep requeueing: their
+// fenced handlers record the private outcome that a final failure needs.
 func (s *Store) ReclaimStaleJobs(ctx context.Context, olderThan time.Duration) (int64, error) {
-	tag, err := s.pool.Exec(ctx, `UPDATE jobs SET status = 'queued', run_after = now(), last_error = 'reclaimed: worker did not finish', updated_at = now()
-		WHERE status = 'running' AND started_at < now() - $1::interval`, olderThan)
+	tag, err := s.pool.Exec(ctx, `UPDATE jobs SET
+		status = CASE WHEN attempts >= max_attempts AND kind NOT IN ($2, $3, $4) THEN 'failed'::job_status ELSE 'queued'::job_status END,
+		finished_at = CASE WHEN attempts >= max_attempts AND kind NOT IN ($2, $3, $4) THEN now() ELSE finished_at END,
+		run_after = now(),
+		last_error = CASE WHEN attempts >= max_attempts AND kind NOT IN ($2, $3, $4) THEN 'reclaimed: worker did not finish; attempts exhausted' ELSE 'reclaimed: worker did not finish' END,
+		updated_at = now()
+		WHERE status = 'running' AND started_at < now() - $1::interval`, olderThan,
+		models.JobKindResearchBrief, models.JobKindFetchEvidence, models.JobKindInvestigateRouteReport)
 	if err != nil {
 		return 0, mapErr(err)
 	}

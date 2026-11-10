@@ -26,7 +26,12 @@ const (
 	FeedURL    = "https://www.transitchicago.com/downloads/sch_data/google_transit.zip"
 	LicenseURL = "https://www.transitchicago.com/developers/terms/"
 	MaxFeedAge = 24 * time.Hour
-	maxArchive = 80 << 20
+	// The November 2026 feed is 68.7 MiB and expands to 409 MiB, with 5.92 million stop_times rows
+	// across two overlapping service periods. These limits leave room for a feed about twice that size.
+	maxArchive  = 160 << 20
+	maxTable    = 1 << 30
+	maxExpanded = 5 << 28 // 1.25 GiB
+	maxRows     = 15_000_000
 )
 
 type Source struct {
@@ -122,7 +127,7 @@ func table(files map[string]*zip.File, name string, required []string, visit fun
 	if !ok {
 		return fmt.Errorf("missing GTFS table %s", name)
 	}
-	if f.UncompressedSize64 > 400<<20 {
+	if f.UncompressedSize64 > maxTable {
 		return errors.New("GTFS table exceeds size limit")
 	}
 	in, err := f.Open()
@@ -130,7 +135,7 @@ func table(files map[string]*zip.File, name string, required []string, visit fun
 		return err
 	}
 	defer func() { _ = in.Close() }()
-	r := csv.NewReader(io.LimitReader(in, 400<<20+1))
+	r := csv.NewReader(io.LimitReader(in, maxTable+1))
 	r.ReuseRecord = true
 	header, err := r.Read()
 	if err != nil {
@@ -157,7 +162,7 @@ func table(files map[string]*zip.File, name string, required []string, visit fun
 		if err != nil {
 			return err
 		}
-		if count >= 6_000_000 {
+		if count >= maxRows {
 			return errors.New("GTFS row limit exceeded")
 		}
 		for _, v := range values {
@@ -208,7 +213,7 @@ func ParseCTA(data []byte, retrievedAt time.Time) (*Feed, error) {
 	files := map[string]*zip.File{}
 	var size uint64
 	for _, file := range z.File {
-		if file.UncompressedSize64 > 500<<20 {
+		if file.UncompressedSize64 > maxTable {
 			return nil, errors.New("GTFS table exceeds size limit")
 		}
 		if _, ok := files[file.Name]; ok {
@@ -216,7 +221,7 @@ func ParseCTA(data []byte, retrievedAt time.Time) (*Feed, error) {
 		}
 		files[file.Name] = file
 		size += file.UncompressedSize64
-		if size > 500<<20 {
+		if size > maxExpanded {
 			return nil, errors.New("GTFS archive expands beyond size limit")
 		}
 	}

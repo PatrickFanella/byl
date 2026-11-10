@@ -87,3 +87,61 @@ func TestFailJobRetriesThenFails(t *testing.T) {
 		t.Fatalf("complete: %+v", done)
 	}
 }
+
+func TestReclaimStaleJobsFailsJobsThatUsedEveryAttempt(t *testing.T) {
+	s, ctx := newStore(t)
+	if _, err := s.pool.Exec(ctx, `DELETE FROM jobs`); err != nil {
+		t.Fatal(err)
+	}
+	stale := func(kind string, attempts int) string {
+		t.Helper()
+		j, err := s.EnqueueReturning(ctx, kind, map[string]string{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := s.pool.Exec(ctx, `UPDATE jobs SET status='running', attempts=$2, started_at=now()-interval '1 hour' WHERE id=$1`, j.ID, attempts); err != nil {
+			t.Fatal(err)
+		}
+		return j.ID
+	}
+	exhausted, retrying, fenced := stale("noop", 3), stale("noop", 1), stale(models.JobKindResearchBrief, 3)
+	if n, err := s.ReclaimStaleJobs(ctx, 10*time.Minute); err != nil || n != 3 {
+		t.Fatalf("reclaim: %d %v", n, err)
+	}
+	for id, want := range map[string]models.JobStatus{exhausted: models.JobStatusFailed, retrying: models.JobStatusQueued, fenced: models.JobStatusQueued} {
+		j, err := s.GetJob(ctx, id)
+		if err != nil || j.Status != want {
+			t.Fatalf("job %s: got %+v %v, want %s", id, j, err, want)
+		}
+	}
+}
+
+func TestFinishClaimedJobIgnoresAReclaimedClaim(t *testing.T) {
+	s, ctx := newStore(t)
+	if _, err := s.pool.Exec(ctx, `DELETE FROM jobs`); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Enqueue(ctx, "noop", map[string]string{}); err != nil {
+		t.Fatal(err)
+	}
+	first, err := s.ClaimJob(ctx, time.Now())
+	if err != nil || first == nil {
+		t.Fatal(err)
+	}
+	if _, err := s.pool.Exec(ctx, `UPDATE jobs SET started_at=now()-interval '1 hour' WHERE id=$1`, first.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.ReclaimStaleJobs(ctx, 10*time.Minute); err != nil {
+		t.Fatal(err)
+	}
+	second, err := s.ClaimJob(ctx, time.Now())
+	if err != nil || second == nil || second.ID != first.ID {
+		t.Fatalf("reclaimed job was not claimed again: %+v %v", second, err)
+	}
+	if err := s.FinishClaimedJob(ctx, first, "stale run", nil, true); err != nil {
+		t.Fatal(err)
+	}
+	if j, _ := s.GetJob(ctx, first.ID); j.Status != models.JobStatusRunning {
+		t.Fatalf("the stale run overwrote the newer claim: %+v", j)
+	}
+}
