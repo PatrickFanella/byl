@@ -464,18 +464,54 @@ type Client struct {
 	feed        *Feed
 	attemptedAt time.Time
 	lastErr     error
+	// refreshing is closed when the refresh in progress finishes; nil when none is running.
+	refreshing chan struct{}
 }
 
+// load returns the current feed. One refresh runs at a time, detached from any request, so a
+// caller that gives up neither cancels the download for everyone else nor starts another one.
 func (c *Client) load(ctx context.Context, now time.Time) (*Feed, error) {
 	c.mu.Lock()
-	defer c.mu.Unlock()
 	if c.feed != nil && now.Sub(c.feed.Source.RetrievedAt) <= MaxFeedAge && now.After(c.feed.Source.RetrievedAt.Add(-5*time.Minute)) {
+		defer c.mu.Unlock()
 		return c.feed, nil
 	}
 	if c.lastErr != nil && now.Sub(c.attemptedAt) < time.Minute {
+		defer c.mu.Unlock()
 		return c.feed, c.lastErr
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, FeedURL, nil)
+	done := c.refreshing
+	if done == nil {
+		done = make(chan struct{})
+		c.refreshing = done
+		go c.refresh(now, done)
+	}
+	c.mu.Unlock()
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-done:
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.feed, c.lastErr
+}
+
+func (c *Client) refresh(now time.Time, done chan struct{}) {
+	feed, err := c.fetch(now)
+	c.mu.Lock()
+	if err == nil {
+		c.feed = feed
+	}
+	c.attemptedAt, c.lastErr = now, err
+	c.refreshing = nil
+	c.mu.Unlock()
+	close(done)
+}
+
+// fetch downloads and parses the feed, bounded by the client timeout rather than a caller's context.
+func (c *Client) fetch(now time.Time) (*Feed, error) {
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, FeedURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -498,29 +534,18 @@ func (c *Client) load(ctx context.Context, now time.Time) (*Feed, error) {
 		return nil
 	}
 	response, err := client.Do(req)
-	if err == nil {
-		func() {
-			defer func() { _ = response.Body.Close() }()
-			if response.StatusCode != http.StatusOK {
-				err = errors.New("CTA timetable provider unavailable")
-				return
-			}
-			var data []byte
-			data, err = io.ReadAll(io.LimitReader(response.Body, maxArchive+1))
-			if err == nil {
-				var next *Feed
-				next, err = ParseCTA(data, now)
-				if err == nil {
-					c.feed = next
-				}
-			}
-		}()
+	if err != nil {
+		return nil, err
 	}
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
+	defer func() { _ = response.Body.Close() }()
+	if response.StatusCode != http.StatusOK {
+		return nil, errors.New("CTA timetable provider unavailable")
 	}
-	c.attemptedAt, c.lastErr = now, err
-	return c.feed, err
+	data, err := io.ReadAll(io.LimitReader(response.Body, maxArchive+1))
+	if err != nil {
+		return nil, err
+	}
+	return ParseCTA(data, now)
 }
 
 func (c *Client) Connect(ctx context.Context, r Request, now time.Time) Connection {

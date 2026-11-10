@@ -263,3 +263,31 @@ func TestCTAInjectedClientCannotFollowForeignRedirect(t *testing.T) {
 		t.Fatalf("foreign source fetched/accepted: fetched=%v result=%+v", foreign, result)
 	}
 }
+
+func TestCTAClientRefreshSurvivesCancelledCallers(t *testing.T) {
+	data, now := recordedCTA(t, nil)
+	var calls atomic.Int32
+	release := make(chan struct{})
+	c := Client{HTTP: &http.Client{Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
+		calls.Add(1)
+		<-release
+		return &http.Response{StatusCode: 200, Body: io.NopCloser(bytes.NewReader(data))}, nil
+	})}}
+	for range 5 {
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+		if result := c.Connect(ctx, recordedRequest(), now); result.State == "scheduled" {
+			t.Fatal("a cancelled caller received a connection before the feed loaded")
+		}
+		cancel()
+	}
+	if calls.Load() != 1 {
+		t.Fatalf("each cancelled caller restarted the download: %d fetches", calls.Load())
+	}
+	close(release)
+	if result := c.Connect(context.Background(), recordedRequest(), now); result.State != "scheduled" {
+		t.Fatalf("the shared refresh did not finish for later callers: %s", result.State)
+	}
+	if calls.Load() != 1 {
+		t.Fatalf("fetches: %d", calls.Load())
+	}
+}
