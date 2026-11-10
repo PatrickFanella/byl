@@ -16,7 +16,8 @@ func scanAccount(row interface{ Scan(...any) error }) (models.Account, error) {
 	return a, err
 }
 
-// UpsertAccount creates or refreshes the account for a verified identity.
+// UpsertAccount creates or refreshes the account for a verified identity. A bootstrap admin gets the
+// admin role only when the account is created, so a later demotion survives the next sign-in.
 func (s *Store) UpsertAccount(ctx context.Context, provider models.AuthProvider, subject, email, displayName string, bootstrapAdmin bool) (*models.Account, error) {
 	role := models.AccountRoleVisitor
 	if bootstrapAdmin {
@@ -28,9 +29,8 @@ func (s *Store) UpsertAccount(ctx context.Context, provider models.AuthProvider,
 		ON CONFLICT (provider, provider_subject) DO UPDATE SET
 			email = CASE WHEN EXCLUDED.email = '' THEN accounts.email ELSE EXCLUDED.email END,
 			display_name = CASE WHEN EXCLUDED.display_name = '' THEN accounts.display_name ELSE EXCLUDED.display_name END,
-			role = CASE WHEN $6 AND accounts.role <> 'admin' THEN 'admin'::account_role ELSE accounts.role END,
 			last_sign_in_at = now(), updated_at = now()
-		RETURNING `+accountCols, provider, subject, email, strings.TrimSpace(displayName), role, bootstrapAdmin))
+		RETURNING `+accountCols, provider, subject, email, strings.TrimSpace(displayName), role))
 	if err != nil {
 		return nil, mapErr(err)
 	}

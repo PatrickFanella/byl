@@ -173,3 +173,25 @@ func TestVerifierDropsUnverifiedEmail(t *testing.T) {
 		t.Fatalf("missing email_verified must not be trusted: %+v", id)
 	}
 }
+
+func TestVerifierKeepsCachedKeyWhenRefreshFails(t *testing.T) {
+	f, srv := newFakeJWKS(t)
+	v := NewJWKSVerifier(srv.URL, []string{"https://issuer.example"}, []string{"client-a"}, time.Nanosecond)
+	ctx := context.Background()
+	if _, err := v.Verify(ctx, f.sign(t, baseClaims("client-a"), "k1")); err != nil {
+		t.Fatal(err)
+	}
+	f.serve = false
+	if _, err := v.Verify(ctx, f.sign(t, baseClaims("client-a"), "k1")); err != nil {
+		t.Fatalf("a failed refresh must fall back to the cached key: %v", err)
+	}
+	if _, err := v.Verify(ctx, f.sign(t, baseClaims("client-a"), "k1")); err != nil {
+		t.Fatalf("stale key during backoff: %v", err)
+	}
+	if got := f.hits.Load(); got != 2 {
+		t.Fatalf("expected one retry inside the backoff window, got %d fetches", got)
+	}
+	if _, err := v.Verify(ctx, f.sign(t, baseClaims("client-a"), "unknown")); err == nil {
+		t.Fatal("unknown kid accepted while the provider is failing")
+	}
+}

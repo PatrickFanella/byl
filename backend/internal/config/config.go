@@ -136,6 +136,9 @@ func Load() (Config, error) {
 	if cfg.SessionTTLHours, err = envInt("SESSION_TTL_HOURS", 2160); err != nil {
 		return Config{}, err
 	}
+	if cfg.SessionTTLHours < 1 || cfg.SessionTTLHours > maxSessionTTLHours {
+		return Config{}, fmt.Errorf("SESSION_TTL_HOURS must be between 1 and %d", maxSessionTTLHours)
+	}
 	if cfg.JobWorkers, err = envInt("JOB_WORKERS", 2); err != nil {
 		return Config{}, err
 	}
@@ -213,6 +216,9 @@ func envBool(key string) bool {
 	}
 	return false
 }
+
+// maxSessionTTLHours keeps the session lifetime at two years or less, well inside time.Duration's range.
+const maxSessionTTLHours = 2 * 8760
 
 func envInt(key string, def int) (int, error) {
 	v := strings.TrimSpace(os.Getenv(key))

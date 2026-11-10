@@ -2,10 +2,12 @@ package httpapi
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
 	"invisible-museum/backend/internal/models"
+	"invisible-museum/backend/internal/repository"
 )
 
 // SessionResolver turns a bearer token into an account.
@@ -37,11 +39,26 @@ func bearerToken(r *http.Request) (string, bool) {
 	return token, token != ""
 }
 
+// sessionUnavailable answers 503 when a session lookup fails for a reason other than an unknown or
+// expired token, so clients keep their session through a database outage instead of signing out.
+func (d Deps) sessionUnavailable(w http.ResponseWriter, err error) bool {
+	if err == nil || errors.Is(err, repository.ErrNotFound) {
+		return false
+	}
+	d.logger().Error("session lookup failed", "error", err)
+	writeError(w, http.StatusServiceUnavailable, "unavailable", "sessions are temporarily unavailable")
+	return true
+}
+
 // optionalAuth attaches the account when a valid token is present and passes anonymous requests through.
 func (d Deps) optionalAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if token, ok := bearerToken(r); ok && d.Sessions != nil {
-			if a, err := d.Sessions.Resolve(r.Context(), token); err == nil && a != nil {
+			a, err := d.Sessions.Resolve(r.Context(), token)
+			if d.sessionUnavailable(w, err) {
+				return
+			}
+			if err == nil && a != nil {
 				r = r.WithContext(withAccount(r.Context(), a))
 			}
 		}
@@ -66,6 +83,9 @@ func (d Deps) requireAuth(next http.Handler) http.Handler {
 			return
 		}
 		a, err := d.Sessions.Resolve(r.Context(), token)
+		if d.sessionUnavailable(w, err) {
+			return
+		}
 		if err != nil || a == nil {
 			writeError(w, http.StatusUnauthorized, "unauthorized", "invalid or expired session")
 			return

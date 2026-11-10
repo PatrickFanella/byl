@@ -23,6 +23,13 @@ func TestUpsertAccountRolesAndIdempotency(t *testing.T) {
 	if admin.Role != models.AccountRoleAdmin {
 		t.Fatalf("bootstrap admin: %+v", admin)
 	}
+	if err := s.SetRole(ctx, admin.ID, models.AccountRoleVisitor); err != nil {
+		t.Fatal(err)
+	}
+	demoted, err := s.UpsertAccount(ctx, models.AuthProviderGoogle, "sub-2", "boss@example.com", "Boss", true)
+	if err != nil || demoted.Role != models.AccountRoleVisitor {
+		t.Fatalf("a demoted bootstrap admin must stay demoted on sign-in: %v %+v", err, demoted)
+	}
 	if err := s.SetRole(ctx, a.ID, models.AccountRoleCurator); err != nil {
 		t.Fatal(err)
 	}

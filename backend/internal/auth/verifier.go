@@ -43,7 +43,14 @@ type jwksVerifier struct {
 	keys               map[string]*rsa.PublicKey
 	fetchedAt          time.Time
 	unknownRefreshedAt time.Time
+	failedAt           time.Time
 }
+
+// staleKeyLimit bounds how long a cached key keeps verifying tokens while the JWKS endpoint fails.
+const staleKeyLimit = 24 * time.Hour
+
+// refreshBackoff spaces out retries of a failed JWKS fetch while a stale key is still usable.
+const refreshBackoff = 30 * time.Second
 
 // NewJWKSVerifier verifies RS256 tokens against a JWKS endpoint.
 func NewJWKSVerifier(jwksURL string, issuers, audiences []string, cacheTTL time.Duration) Verifier {
@@ -123,16 +130,26 @@ func contains(list []string, s string) bool {
 func (v *jwksVerifier) key(ctx context.Context, kid string) (*rsa.PublicKey, error) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
-	if k, ok := v.keys[kid]; ok && time.Since(v.fetchedAt) < v.cacheTTL {
-		return k, nil
+	cached, known := v.keys[kid]
+	if known && time.Since(v.fetchedAt) < v.cacheTTL {
+		return cached, nil
 	}
-	if _, known := v.keys[kid]; !known && !v.fetchedAt.IsZero() {
+	// A cached key outlives a failed refresh for a bounded time, so a provider blip does not reject valid tokens.
+	usableStale := known && time.Since(v.fetchedAt) < staleKeyLimit
+	if usableStale && time.Since(v.failedAt) < refreshBackoff {
+		return cached, nil
+	}
+	if !known && !v.fetchedAt.IsZero() {
 		if time.Since(v.unknownRefreshedAt) < 30*time.Second {
 			return nil, fmt.Errorf("unknown key id %q", kid)
 		}
 		v.unknownRefreshedAt = time.Now()
 	}
 	if err := v.refresh(ctx); err != nil {
+		v.failedAt = time.Now()
+		if usableStale {
+			return cached, nil
+		}
 		return nil, err
 	}
 	if k, ok := v.keys[kid]; ok {

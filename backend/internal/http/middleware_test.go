@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"invisible-museum/backend/internal/models"
+	"invisible-museum/backend/internal/repository"
 )
 
 type fakeResolver struct{ accounts map[string]*models.Account }
@@ -16,7 +17,10 @@ func (f fakeResolver) Resolve(_ context.Context, token string) (*models.Account,
 	if a, ok := f.accounts[token]; ok {
 		return a, nil
 	}
-	return nil, errors.New("no session")
+	if token == "outage" {
+		return nil, errors.New("connection refused")
+	}
+	return nil, repository.ErrNotFound
 }
 
 func protectedRouter(resolver SessionResolver) http.Handler {
@@ -46,6 +50,7 @@ func TestRequireAuth(t *testing.T) {
 		{"missing header", "", "/auth", 401},
 		{"wrong scheme", "Basic abc", "/auth", 401},
 		{"unknown token", "Bearer nope", "/auth", 401},
+		{"session store outage", "Bearer outage", "/auth", 503},
 		{"valid", "Bearer good", "/auth", 200},
 		{"visitor on curator route", "Bearer good", "/curator", 403},
 	}
@@ -73,6 +78,20 @@ func TestOptionalAuthPassesAnonymous(t *testing.T) {
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/", nil))
 	if rec.Code != 204 {
+		t.Fatalf("status %d", rec.Code)
+	}
+}
+
+func TestOptionalAuthReportsSessionOutage(t *testing.T) {
+	deps := Deps{Sessions: fakeResolver{}}
+	h := deps.optionalAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("handler must not run anonymously when the session lookup failed")
+	}))
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set("Authorization", "Bearer outage")
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, req)
+	if rec.Code != http.StatusServiceUnavailable {
 		t.Fatalf("status %d", rec.Code)
 	}
 }
