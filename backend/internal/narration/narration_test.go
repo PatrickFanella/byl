@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestNoneReturnsNothing(t *testing.T) {
@@ -47,5 +49,38 @@ func TestOpenAIPostsSpeechRequest(t *testing.T) {
 	defer bad.Close()
 	if _, err := NewOpenAI(bad.URL, "k", "m", "v", bad.Client()).Synthesize(context.Background(), "x"); err == nil {
 		t.Fatal("expected error on 500")
+	}
+}
+
+func TestOpenAISplitsLongTextWithinTheInputLimit(t *testing.T) {
+	var inputs []string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var got map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&got)
+		input, _ := got["input"].(string)
+		if utf8.RuneCountInString(input) > maxSpeechInput {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		inputs = append(inputs, input)
+		_, _ = w.Write([]byte("part;"))
+	}))
+	defer srv.Close()
+	sentence := "The depot opened beside the new line in 1864. "
+	text := "Title\n\n" + strings.Repeat(sentence, 120) + "\n\n" + strings.Repeat("ž", 5000)
+	a, err := NewOpenAI(srv.URL, "", "m", "v", srv.Client()).Synthesize(context.Background(), text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(inputs) < 3 || string(a.Data) != strings.Repeat("part;", len(inputs)) {
+		t.Fatalf("expected joined parts, got %d inputs and %q", len(inputs), a.Data)
+	}
+	if strings.Join(strings.Fields(strings.Join(inputs, " ")), "") != strings.Join(strings.Fields(text), "") {
+		t.Fatal("splitting lost or reordered text")
+	}
+	for _, in := range inputs[:len(inputs)-2] {
+		if !strings.HasSuffix(in, ".") && in != "Title" {
+			t.Fatalf("a sentence was cut mid-way: %q", in[len(in)-20:])
+		}
 	}
 }

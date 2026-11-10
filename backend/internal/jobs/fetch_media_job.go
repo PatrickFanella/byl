@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"invisible-museum/backend/internal/blob"
 	"invisible-museum/backend/internal/models"
@@ -18,6 +19,9 @@ import (
 )
 
 const fetchMediaMaxBytes = 64 << 20
+
+// fetchMediaTimeout bounds one download, well inside the stale-job reclaim window.
+const fetchMediaTimeout = 5 * time.Minute
 
 // fetchMedia downloads an approved media candidate's file into blob storage and records it on the asset.
 func (w *Worker) fetchMedia(ctx context.Context, p models.FetchMediaPayload) error {
@@ -60,6 +64,9 @@ func (w *Worker) fetchMedia(ctx context.Context, p models.FetchMediaPayload) err
 	if err != nil || (u.Scheme != "http" && u.Scheme != "https") {
 		return fmt.Errorf("%w: media_url is not http(s)", ErrNoRetry)
 	}
+	// GetPublic streams without an overall client timeout; bound the download here instead.
+	ctx, cancel := context.WithTimeout(ctx, fetchMediaTimeout)
+	defer cancel()
 	resp, err := w.Sources.Client().GetPublic(ctx, payload.MediaURL)
 	if err != nil {
 		if errors.Is(err, sources.ErrPrivateHost) {

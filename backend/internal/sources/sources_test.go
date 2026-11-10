@@ -3,6 +3,7 @@ package sources
 import (
 	"context"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -253,5 +254,29 @@ func TestPublicOnlyTransportIgnoresProxyEnvironment(t *testing.T) {
 	}
 	if tr.Proxy != nil {
 		t.Fatal("public-only transport must dial targets directly")
+	}
+}
+
+func TestGetPublicStreamsBodiesPastTheClientTimeout(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		for range 4 {
+			_, _ = w.Write([]byte("chunk"))
+			w.(http.Flusher).Flush()
+			time.Sleep(50 * time.Millisecond)
+		}
+	}))
+	defer srv.Close()
+	c := NewHTTPClient("ua")
+	c.MinInterval, c.AllowPrivateHosts = 0, true
+	c.HTTP.Timeout = 100 * time.Millisecond
+	resp, err := c.GetPublic(context.Background(), srv.URL+"/large")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil || string(body) != strings.Repeat("chunk", 4) {
+		t.Fatalf("a slow body must not hit the client timeout: %q %v", body, err)
 	}
 }
