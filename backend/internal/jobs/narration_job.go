@@ -9,6 +9,7 @@ import (
 
 	"invisible-museum/backend/internal/blob"
 	"invisible-museum/backend/internal/models"
+	"invisible-museum/backend/internal/repository"
 )
 
 func (w *Worker) generateNarration(ctx context.Context, p models.GenerateNarrationPayload) error {
@@ -28,16 +29,24 @@ func (w *Worker) generateNarration(ctx context.Context, p models.GenerateNarrati
 	if err := w.blob.Put(ctx, key, audio.MimeType, bytes.NewReader(audio.Data), int64(len(audio.Data))); err != nil {
 		return fmt.Errorf("store audio: %w", err)
 	}
-	asset, err := w.store.CreateMedia(ctx, models.MediaAsset{
-		Kind: models.MediaKindAudio, StorageKey: key, PublicURL: w.blob.PublicURL(key), MimeType: audio.MimeType,
-		DurationSeconds: audio.DurationSeconds, Caption: "Narration: " + m.Title, Credit: "Invisible Museum narration",
-		License: "all-rights-reserved", Status: models.EntityStatusPublished,
+	// Record and link the asset together; a failed link leaves no published asset or blob behind
+	// for the retry to duplicate.
+	err = w.store.Transaction(ctx, func(tx *repository.Store) error {
+		asset, err := tx.CreateMedia(ctx, models.MediaAsset{
+			Kind: models.MediaKindAudio, StorageKey: key, PublicURL: w.blob.PublicURL(key), MimeType: audio.MimeType,
+			DurationSeconds: audio.DurationSeconds, Caption: "Narration: " + m.Title, Credit: "Invisible Museum narration",
+			License: "all-rights-reserved", Status: models.EntityStatusPublished,
+		})
+		if err != nil {
+			return fmt.Errorf("record asset: %w", err)
+		}
+		return tx.SetMomentNarration(ctx, m.ID, &asset.ID)
 	})
 	if err != nil {
-		_ = w.blob.Delete(ctx, key)
-		return fmt.Errorf("record asset: %w", err)
+		_ = w.blob.Delete(context.WithoutCancel(ctx), key)
+		return err
 	}
-	return w.store.SetMomentNarration(ctx, m.ID, &asset.ID)
+	return nil
 }
 
 var (

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"math"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -253,5 +254,39 @@ func TestImportNoteStaysWithItsJob(t *testing.T) {
 	got, _ := store.GetJob(ctx, imp.ID)
 	if got.Status != models.JobStatusDone || got.LastError != note {
 		t.Fatalf("import job after finish: %+v", got)
+	}
+}
+
+func TestNarrationLinkFailureLeavesNoAssetOrFile(t *testing.T) {
+	store := repository.New(testdb.Open(t))
+	dir := t.TempDir()
+	fs, err := blob.NewFS(dir, "http://media.test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	w := New(store, routing.NewStraightLine(), &fakeNarrator{}, fs, 1, quiet())
+	ctx := context.Background()
+	drain(t, w, ctx)
+	pool := testdbPool(t, store)
+	if _, err := pool.Exec(ctx, `CREATE FUNCTION refuse_narration_link() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'synthetic link failure'; END $$;
+		CREATE TRIGGER refuse_narration_link BEFORE UPDATE OF narration_media_id ON moments FOR EACH ROW EXECUTE FUNCTION refuse_narration_link()`); err != nil {
+		t.Fatal(err)
+	}
+	var before int
+	if err := pool.QueryRow(ctx, `SELECT count(*) FROM media_assets WHERE kind = 'audio'`).Scan(&before); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Enqueue(ctx, models.JobKindGenerateNarration, models.GenerateNarrationPayload{MomentID: testdb.SeedMomentTalkiesID}); err != nil {
+		t.Fatal(err)
+	}
+	w.backoff = func(int) time.Duration { return 0 }
+	drain(t, w, ctx)
+	var after int
+	if err := pool.QueryRow(ctx, `SELECT count(*) FROM media_assets WHERE kind = 'audio'`).Scan(&after); err != nil || after != before {
+		t.Fatalf("failed links left %d audio assets behind (%v)", after-before, err)
+	}
+	files, _ := filepath.Glob(filepath.Join(dir, "narration", "*"))
+	if len(files) != 0 {
+		t.Fatalf("failed links left narration files: %v", files)
 	}
 }
