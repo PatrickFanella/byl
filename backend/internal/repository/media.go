@@ -45,7 +45,7 @@ func (s *Store) GetMedia(ctx context.Context, id string) (*models.MediaAsset, er
 
 // ListMedia returns assets newest first.
 func (s *Store) ListMedia(ctx context.Context, limit, offset int) ([]models.MediaAsset, error) {
-	rows, err := s.pool.Query(ctx, `SELECT `+mediaCols+` FROM media_assets ORDER BY created_at DESC LIMIT $1 OFFSET $2`, clamp(limit), offset)
+	rows, err := s.pool.Query(ctx, `SELECT `+mediaCols+` FROM media_assets ORDER BY created_at DESC, id DESC LIMIT $1 OFFSET $2`, clamp(limit), offset)
 	if err != nil {
 		return nil, err
 	}

@@ -65,7 +65,7 @@ func (s *Store) ListPlaces(ctx context.Context, f PlaceFilter) ([]models.PlaceSu
 	}
 
 	cols := placeCols
-	order := "p.name"
+	order := "p.name, p.id"
 	withDistance := false
 	if f.Near != nil {
 		withDistance = true
@@ -79,7 +79,7 @@ func (s *Store) ListPlaces(ctx context.Context, f PlaceFilter) ([]models.PlaceSu
 		if f.RadiusM > 0 {
 			where = append(where, fmt.Sprintf("%s <= $%d", dist, add(f.RadiusM)))
 		}
-		order = "distance_m, p.name"
+		order = "distance_m, p.name, p.id"
 	}
 
 	limit := clamp(f.Limit)
@@ -119,6 +119,12 @@ func (s *Store) ListPlaces(ctx context.Context, f PlaceFilter) ([]models.PlaceSu
 
 // ResolvePlaceID turns an id, or a slug within cityRef, into an id.
 func (s *Store) ResolvePlaceID(ctx context.Context, ref, cityRef string) (string, error) {
+	return s.resolvePlaceID(ctx, ref, cityRef, false)
+}
+
+// resolvePlaceID with publishedOnly ignores unpublished places when matching a slug without a city,
+// so a draft that reuses a published slug elsewhere is neither revealed nor makes public lookups ambiguous.
+func (s *Store) resolvePlaceID(ctx context.Context, ref, cityRef string, publishedOnly bool) (string, error) {
 	if isUUID(ref) {
 		var id string
 		err := s.pool.QueryRow(ctx, `SELECT id FROM places WHERE id = $1`, ref).Scan(&id)
@@ -128,7 +134,7 @@ func (s *Store) ResolvePlaceID(ctx context.Context, ref, cityRef string) (string
 	var err error
 	if cityRef == "" {
 		var ids []string
-		err = s.pool.QueryRow(ctx, `SELECT array_agg(id::text) FROM places WHERE slug = $1`, ref).Scan(&ids)
+		err = s.pool.QueryRow(ctx, `SELECT array_agg(id::text) FROM places WHERE slug = $1 AND (status = 'published' OR NOT $2)`, ref, publishedOnly).Scan(&ids)
 		if err != nil {
 			return "", mapErr(err)
 		}
@@ -151,7 +157,7 @@ func (s *Store) ResolvePlaceID(ctx context.Context, ref, cityRef string) (string
 
 // GetPlace returns a place with its moments. Unpublished places and moments are hidden unless includeUnpublished.
 func (s *Store) GetPlace(ctx context.Context, ref, cityRef string, includeUnpublished bool) (*models.PlaceDetail, error) {
-	id, err := s.ResolvePlaceID(ctx, ref, cityRef)
+	id, err := s.resolvePlaceID(ctx, ref, cityRef, !includeUnpublished)
 	if err != nil {
 		return nil, err
 	}
@@ -206,22 +212,26 @@ func (s *Store) CreatePlace(ctx context.Context, req models.CreatePlaceRequest) 
 	return s.GetPlace(ctx, id, "", true)
 }
 
-// UpdatePlace patches a place.
+// UpdatePlace patches a place. The field update and the primary moment change commit together.
 func (s *Store) UpdatePlace(ctx context.Context, id string, req models.UpdatePlaceRequest) (*models.PlaceDetail, error) {
-	tag, err := s.pool.Exec(ctx, `UPDATE places SET name = COALESCE($2, name), summary = COALESCE($3, summary), kind = COALESCE($4, kind),
-		latitude = COALESCE($5, latitude), longitude = COALESCE($6, longitude), arrival_radius_m = COALESCE($7, arrival_radius_m),
-		address = COALESCE($8, address), updated_at = $9 WHERE id = $1`,
-		id, req.Name, req.Summary, req.Kind, req.Latitude, req.Longitude, req.ArrivalRadiusM, req.Address, time.Now())
-	if err != nil {
-		return nil, mapErr(err)
-	}
-	if tag.RowsAffected() == 0 {
-		return nil, ErrNotFound
-	}
-	if req.PrimaryMomentID != nil {
-		if err := s.SetPrimaryMoment(ctx, id, req.PrimaryMomentID); err != nil {
-			return nil, err
+	err := s.Transaction(ctx, func(tx *Store) error {
+		tag, err := tx.pool.Exec(ctx, `UPDATE places SET name = COALESCE($2, name), summary = COALESCE($3, summary), kind = COALESCE($4, kind),
+			latitude = COALESCE($5, latitude), longitude = COALESCE($6, longitude), arrival_radius_m = COALESCE($7, arrival_radius_m),
+			address = COALESCE($8, address), updated_at = $9 WHERE id = $1`,
+			id, req.Name, req.Summary, req.Kind, req.Latitude, req.Longitude, req.ArrivalRadiusM, req.Address, time.Now())
+		if err != nil {
+			return mapErr(err)
 		}
+		if tag.RowsAffected() == 0 {
+			return ErrNotFound
+		}
+		if req.PrimaryMomentID != nil {
+			return tx.SetPrimaryMoment(ctx, id, req.PrimaryMomentID)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return s.GetPlace(ctx, id, "", true)
 }

@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"invisible-museum/backend/internal/models"
 	"invisible-museum/backend/internal/testdb"
@@ -243,5 +244,27 @@ func TestRegionalTopicCoverageSerializesWithTourCreation(t *testing.T) {
 		if winners != 1 {
 			t.Fatalf("concurrent tour writes violated coverage: %d succeeded", winners)
 		}
+	}
+}
+
+func TestPublicPlaceSlugIgnoresDraftsInOtherCities(t *testing.T) {
+	s, ctx := newStore(t)
+	seed, err := s.GetPlace(ctx, testdb.SeedPlaceStationID, "", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	other, _ := regionalCity(t, s, ctx, "Lisle")
+	if _, err := s.CreatePlace(ctx, models.CreatePlaceRequest{CityID: other.ID, Slug: seed.Slug, Name: "Unpublished namesake", Latitude: 41.8, Longitude: -88.1}); err != nil {
+		t.Fatal(err)
+	}
+	public, err := s.GetPlace(ctx, seed.Slug, "", false)
+	if err != nil || public.ID != seed.ID {
+		t.Fatalf("a draft elsewhere must not make the public slug ambiguous: %+v %v", public, err)
+	}
+	if _, err := s.PublicHappenings(ctx, seed.Slug, 10, 0, time.Now()); err != nil {
+		t.Fatalf("public happenings by slug: %v", err)
+	}
+	if _, err := s.GetPlace(ctx, seed.Slug, "", true); !errors.Is(err, ErrConflict) {
+		t.Fatalf("curator lookups still see both places: %v", err)
 	}
 }

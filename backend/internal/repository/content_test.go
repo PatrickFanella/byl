@@ -166,6 +166,17 @@ func TestCreateAndUpdatePlaceAndMoment(t *testing.T) {
 	if err != nil || p2.Name != name || p2.Slug != "lyman-woods" {
 		t.Fatalf("update: %v %+v", err, p2)
 	}
+	foreignMoment, rejected := testdb.SeedPlaceStationID, "Rejected Rename"
+	var foreign string
+	if err := s.pool.QueryRow(ctx, `SELECT id FROM moments WHERE place_id=$1 LIMIT 1`, foreignMoment).Scan(&foreign); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.UpdatePlace(ctx, p.ID, models.UpdatePlaceRequest{Name: &rejected, PrimaryMomentID: &foreign}); !errors.Is(err, ErrInvalidReference) {
+		t.Fatalf("another place's moment must be rejected: %v", err)
+	}
+	if again, err := s.GetPlace(ctx, p.ID, "", true); err != nil || again.Name != name {
+		t.Fatalf("a rejected update must not save its other fields: %v %+v", err, again)
+	}
 	m, err := s.CreateMoment(ctx, models.CreateMomentRequest{
 		PlaceID: p.ID, Title: "Preserve Established", Body: "First line.\n\nSecond paragraph.",
 		DateStart: "1981-01-01", DatePrecision: models.DatePrecisionYear, DateDisplay: "1981",

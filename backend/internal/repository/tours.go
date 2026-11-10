@@ -149,6 +149,9 @@ func (s *Store) queryTours(ctx context.Context, q dbtx, where string, args ...an
 			topics[tp.ID] = tp
 		}
 		trows.Close()
+		if err := trows.Err(); err != nil {
+			return nil, err
+		}
 	}
 	media, err := s.mediaByIDs(ctx, q, mediaIDs)
 	if err != nil {
@@ -636,7 +639,7 @@ func (s *Store) DeleteTour(ctx context.Context, id string) error {
 			return mapErr(err)
 		}
 		var retained bool
-		if err := tx.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_revisions WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_corridor_proposals WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_path_quality_reports WHERE tour_id=$1)`, id).Scan(&retained); err != nil {
+		if err := tx.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tour_revisions WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_corridor_proposals WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_path_quality_reports WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM tour_transit_choices WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM route_corrections WHERE tour_id=$1) OR EXISTS(SELECT 1 FROM route_contribution_consents WHERE tour_id=$1)`, id).Scan(&retained); err != nil {
 			return err
 		}
 		if !retained {

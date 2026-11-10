@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"invisible-museum/backend/internal/models"
+	"invisible-museum/backend/internal/testdb"
 )
 
 func transitFixture(t *testing.T) (*Store, context.Context, string, *models.TourRevision, models.TransitSelectionRequest, *models.ApprovedTransit) {
@@ -152,4 +153,28 @@ func TestTransitRejectsInvalidStopsAndStaleSource(t *testing.T) {
 
 func TestTransitMigrationRetainsExistingRowsAndHashes(t *testing.T) {
 	assertNavigationMigrationPreservesRows(t, 19)
+}
+
+func TestDeleteDraftTourWithTransitSelectionRetainsTheSelection(t *testing.T) {
+	s, ctx, actor, _, in, verified := transitFixture(t)
+	draft, err := s.CreateTour(ctx, CreateTourInput{CityID: testdb.SeedCityID, Title: "Unpublished transit draft", Modes: []models.TravelMode{models.TravelModeWalk},
+		Status: models.EntityStatusDraft, Visibility: models.TourVisibilityPublic,
+		Stops: []models.StopInput{{PlaceID: testdb.SeedPlaceStationID}, {PlaceID: testdb.SeedPlaceTivoliID}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	intent := *in.Intent
+	intent.FromStopID, intent.ToStopID = draft.Stops[0].ID, draft.Stops[1].ID
+	in.Intent, in.DraftVersion = &intent, draft.DraftVersion
+	verified.Intent = intent
+	if _, err := s.SetTourTransit(ctx, draft.ID, actor, in, verified, time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.DeleteTour(ctx, draft.ID); err != nil {
+		t.Fatalf("a never-published tour with a reviewed transit selection must still delete: %v", err)
+	}
+	var choices int
+	if err := s.pool.QueryRow(ctx, `SELECT count(*) FROM tour_transit_choices WHERE tour_id=$1`, draft.ID).Scan(&choices); err != nil || choices != 1 {
+		t.Fatalf("reviewed transit selection must be retained: %d %v", choices, err)
+	}
 }
