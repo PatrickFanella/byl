@@ -186,4 +186,11 @@ class ScheduledTransitTest {
         assertEquals(candidate!!.id,next.revision?.id); assertEquals(c.visitedStopIds,next.visitedStopIds)
         assertNull(next.transit?.state?.value?.selected); assertNotNull(controller(rev = first).state.value.selected)
     }
+
+    @Test fun `parses timetable times serialized with a Chicago offset`() {
+        // JVM tests run on a parser that accepts offsets in Instant.parse; Android 8–13 does not.
+        assertEquals(Instant.parse("2026-11-10T14:15:30Z"), transitInstant("2026-11-10T08:15:30-06:00"))
+        assertEquals(Instant.parse("2026-11-10T14:15:30.250Z"), transitInstant("2026-11-10T14:15:30.25Z"))
+        assertNull(transitInstant("2026-11-10 08:15"))
+    }
 }

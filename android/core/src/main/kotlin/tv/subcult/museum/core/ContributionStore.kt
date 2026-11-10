@@ -73,9 +73,11 @@ class ContributionStore(private val directory: File, private val now: () -> Long
     @Synchronized internal fun prune() {
         if (erasureWritePending) stopAll()
         val today = contributionDay(now())
-        val records = read().filter { r -> (r.consent?.expiresOn ?: day(r.choice.requestedOn)!!.plusDays(31).toString()) > today }
+        val current = read()
+        val records = current.filter { r -> (r.consent?.expiresOn ?: day(r.choice.requestedOn)!!.plusDays(31).toString()) > today }
             .map { r -> r.copy(queue = r.queue.filter { it.summary.observationPeriod <= today && day(it.summary.observationPeriod)!!.plusDays(7).toString() > today }) }
-        write(records)
+        // Pruning runs on every refresh; rewrite and fsync only when something actually expired.
+        if (records != current) write(records)
     }
     @Synchronized internal fun stopAll() {
         choiceGeneration++

@@ -26,6 +26,8 @@ struct HomeView: View {
             .task(id: model.selectedCity?.id) { await loadTours() }
             .task(id: nearbyKey) { await loadNearby() }
             .onAppear { model.location.requestWhenInUseAuthorization(); model.location.start() }
+            // Nearby places only need location while Home is visible; an active trip keeps its own updates.
+            .onDisappear { if model.active == nil { model.location.stop() } }
         }
     }
 

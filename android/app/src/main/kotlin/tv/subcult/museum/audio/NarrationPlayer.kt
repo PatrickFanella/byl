@@ -32,14 +32,19 @@ class NarrationPlayer(context: Context) {
         stop()
         when (plan) {
             is NarrationPlan.Stream -> {
-                audioManager.requestAudioFocus(focusRequest)
-                player = MediaPlayer().apply {
+                val media = MediaPlayer().apply {
                     setAudioAttributes(attributes)
                     setOnCompletionListener { finished() }
                     setOnErrorListener { _, _, _ -> finished(); true }
                     setOnPreparedListener { it.start() }
-                    runCatching { setDataSource(plan.url); prepareAsync() }.onFailure { finished() }
                 }
+                // A source that cannot be set is released here; it never takes focus or reports playing.
+                if (runCatching { media.setDataSource(plan.url); media.prepareAsync() }.isFailure) {
+                    media.release()
+                    return
+                }
+                audioManager.requestAudioFocus(focusRequest)
+                player = media
                 _isPlaying.value = true
             }
             is NarrationPlan.Speech -> {
@@ -71,7 +76,12 @@ class NarrationPlayer(context: Context) {
                         override fun onError(utteranceId: String?) { finished() }
                     })
                     pendingSpeech?.let { tts?.speak(it, TextToSpeech.QUEUE_FLUSH, null, "narration") }
-                } else finished()
+                } else {
+                    // Drop the failed engine so the next narration retries instead of waiting on it forever.
+                    tts?.shutdown()
+                    tts = null
+                    finished()
+                }
                 pendingSpeech = null
             }
         }
