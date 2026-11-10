@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -284,12 +285,53 @@ func (d Deps) adminUpdateMoment(w http.ResponseWriter, r *http.Request) {
 		writeValidation(w, f)
 		return
 	}
-	m, err := d.Store.UpdateMoment(r.Context(), chi.URLParam(r, "id"), req)
-	if err != nil {
-		d.fail(w, err)
+	id := chi.URLParam(r, "id")
+	if !d.editPublishedMoment(w, r, id, func(tx *repository.Store) error {
+		_, err := tx.UpdateMoment(r.Context(), id, req)
+		return err
+	}) {
 		return
 	}
-	writeJSON(w, http.StatusOK, m)
+	d.respondMoment(w, r, id)
+}
+
+// errPublishedMomentIncomplete carries the publication blockers an edit would introduce.
+type errPublishedMomentIncomplete struct{ blockers []string }
+
+func (e errPublishedMomentIncomplete) Error() string {
+	return "published history would be incomplete: " + strings.Join(e.blockers, "; ")
+}
+
+// editPublishedMoment applies change in a transaction. A published moment must still pass its
+// publication checks afterwards, since public pages read the live row; otherwise nothing is saved.
+func (d Deps) editPublishedMoment(w http.ResponseWriter, r *http.Request, id string, change func(*repository.Store) error) bool {
+	err := d.Store.Transaction(r.Context(), func(tx *repository.Store) error {
+		if err := change(tx); err != nil {
+			return err
+		}
+		m, err := tx.GetMoment(r.Context(), id, true)
+		if err != nil || m.Status != models.EntityStatusPublished {
+			return err
+		}
+		blockers, err := tx.MomentPublishBlockers(r.Context(), id)
+		if err != nil {
+			return err
+		}
+		if len(blockers) > 0 {
+			return errPublishedMomentIncomplete{blockers}
+		}
+		return nil
+	})
+	var incomplete errPublishedMomentIncomplete
+	if errors.As(err, &incomplete) {
+		writeError(w, http.StatusConflict, "conflict", incomplete.Error()+"; unpublish it first or keep it complete")
+		return false
+	}
+	if err != nil {
+		d.fail(w, err)
+		return false
+	}
+	return true
 }
 
 func (d Deps) adminPublishMoment(w http.ResponseWriter, r *http.Request) {
@@ -381,8 +423,9 @@ func (d Deps) adminSetMomentSources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := chi.URLParam(r, "id")
-	if err := d.Store.ReplaceMomentSources(r.Context(), id, req.Sources); err != nil {
-		d.fail(w, err)
+	if !d.editPublishedMoment(w, r, id, func(tx *repository.Store) error {
+		return tx.ReplaceMomentSources(r.Context(), id, req.Sources)
+	}) {
 		return
 	}
 	d.respondMoment(w, r, id)

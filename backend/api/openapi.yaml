@@ -415,7 +415,7 @@ paths:
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateMomentRequest" } } } }
-      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: The edit would leave a published history incomplete }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
     delete:
       summary: "Archive a moment"
       security: [{ bearer: [] }]
@@ -446,7 +446,7 @@ paths:
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/SourcesRequest" } } } }
-      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
+      responses: { "200": { description: OK }, "404": { description: Not found }, "409": { description: The edit would leave a published history incomplete }, "422": { description: Validation failed }, "401": { description: Unauthorized } }
   /api/v1/admin/moments/{id}/topics:
     put:
       summary: "Replace the topic set"

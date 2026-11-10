@@ -109,6 +109,16 @@ func TestAdminContentLifecycle(t *testing.T) {
 	if r := env.do(t, http.MethodPut, "/api/v1/admin/moments/"+momentID+"/sources", curator, map[string]any{"sources": []map[string]any{{"title": ""}}}); r.status != 422 {
 		t.Fatalf("sources validation: %d", r.status)
 	}
+	published := env.get(t, "/api/v1/moments/"+momentID, "")
+	if r := env.do(t, http.MethodPatch, "/api/v1/admin/moments/"+momentID, curator, map[string]any{"body": "Too short."}); r.status != 409 || !strings.Contains(errMessage(r), "incomplete") {
+		t.Fatalf("a published moment must stay complete after an edit: %d %s", r.status, r.raw)
+	}
+	if r := env.do(t, http.MethodPut, "/api/v1/admin/moments/"+momentID+"/sources", curator, map[string]any{"sources": []any{}}); r.status != 409 {
+		t.Fatalf("a published moment must keep its sources: %d %s", r.status, r.raw)
+	}
+	if r := env.get(t, "/api/v1/moments/"+momentID, ""); r.body["body"] != published.body["body"] || len(r.body["sources"].([]any)) != len(published.body["sources"].([]any)) {
+		t.Fatalf("a refused edit changed the public moment: %s", r.raw)
+	}
 	if r := env.do(t, http.MethodPatch, "/api/v1/admin/places/"+placeID, curator, map[string]any{"primary_moment_id": momentID}); r.status != 200 || r.body["primary_moment"] == nil {
 		t.Fatalf("primary moment: %d %s", r.status, r.raw)
 	}
