@@ -247,7 +247,7 @@ paths:
       description: New personal routes are owner-only drafts. Visibility applies after publication; sharing requires current passing path quality and explicit publication.
       security: [{ bearer: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateUserTourRequest" } } } }
-      responses: { "201": { description: Draft created, unlisted visibility by default }, "404": { description: Unknown city }, "422": { description: Validation failed } }
+      responses: { "201": { description: Draft created, unlisted visibility by default }, "404": { description: Unknown city }, "422": { description: Validation failed }, "429": { description: "submission_limit: 20 new routes per 24 hours, 100 per account, or 20 route computations already pending" } }
   /api/v1/me/tours/{id}:
     get:
       summary: Get one of my routes
@@ -259,7 +259,7 @@ paths:
       security: [{ bearer: [] }]
       parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateUserTourRequest" } } } }
-      responses: { "200": { description: OK }, "404": { description: Not mine or not found }, "422": { description: Validation failed } }
+      responses: { "200": { description: OK }, "404": { description: Not mine or not found }, "422": { description: Validation failed }, "429": { description: "submission_limit: stop changes wait while 20 route computations are pending" } }
     delete:
       summary: Delete one of my routes
       security: [{ bearer: [] }]
