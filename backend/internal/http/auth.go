@@ -71,7 +71,13 @@ func (d Deps) googleSignIn(w http.ResponseWriter, r *http.Request) {
 	d.issueSession(w, r, models.AuthProviderGoogle, id.Subject, id.Email, id.Name)
 }
 
+// maxDisplayNameRunes caps a display name; Apple's arrives from the client unverified.
+const maxDisplayNameRunes = 100
+
 func (d Deps) issueSession(w http.ResponseWriter, r *http.Request, provider models.AuthProvider, subject, email, name string) {
+	if runes := []rune(strings.TrimSpace(name)); len(runes) > maxDisplayNameRunes {
+		name = strings.TrimSpace(string(runes[:maxDisplayNameRunes]))
+	}
 	bootstrap := d.IsBootstrap != nil && d.IsBootstrap(email)
 	acct, err := d.Store.UpsertAccount(r.Context(), provider, subject, email, name, bootstrap)
 	if err != nil {

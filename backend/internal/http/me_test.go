@@ -3,6 +3,7 @@ package httpapi
 import (
 	"context"
 	"net/http"
+	"strings"
 	"testing"
 
 	"invisible-museum/backend/internal/models"
@@ -22,6 +23,10 @@ func TestDevAuthAndSessions(t *testing.T) {
 	r = env.get(t, "/api/v1/me", token)
 	if r.status != 200 || r.body["role"] != "admin" || r.body["email"] != "admin@example.com" {
 		t.Fatalf("bootstrap admin: %d %s", r.status, r.raw)
+	}
+	long := env.do(t, http.MethodPost, "/api/v1/auth/dev", "", map[string]string{"email": "long@example.com", "display_name": strings.Repeat("é", 300)})
+	if acct, _ := long.body["account"].(map[string]any); long.status != 200 || acct["display_name"] != strings.Repeat("é", maxDisplayNameRunes) {
+		t.Fatalf("display names must be capped at %d runes: %d %s", maxDisplayNameRunes, long.status, long.raw)
 	}
 	visitor := env.signIn(t, "v@example.com", "")
 	if r := env.get(t, "/api/v1/me", visitor); r.body["role"] != "visitor" {

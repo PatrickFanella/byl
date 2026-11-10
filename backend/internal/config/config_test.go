@@ -185,3 +185,12 @@ func TestPublicBriefIntakeIsExplicitAndDefaultOff(t *testing.T) {
 		})
 	}
 }
+
+func TestLoadRejectsUnusableSessionTTL(t *testing.T) {
+	for _, value := range []string{"0", "3000000"} {
+		setEnv(t, map[string]string{"DATABASE_URL": "postgres://x", "SESSION_TTL_HOURS": value})
+		if _, err := Load(); err == nil || !strings.Contains(err.Error(), "SESSION_TTL_HOURS") {
+			t.Fatalf("SESSION_TTL_HOURS=%s: expected an error, got %v", value, err)
+		}
+	}
+}
