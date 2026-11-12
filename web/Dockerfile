@@ -11,7 +11,7 @@ RUN npx openapi-typescript /backend/api/openapi.yaml -o src/lib/api/types.ts && 
 ARG REVISION=development
 RUN printf '{"revision":"%s"}\n' "$REVISION" > /app/build/release.json
 
-FROM nginx:1.30-alpine
+FROM nginx:1.31-alpine
 ARG REVISION=development
 LABEL org.opencontainers.image.source="https://git.subcult.tv/subculture-collective/invisible-museum" \
       org.opencontainers.image.revision=$REVISION
