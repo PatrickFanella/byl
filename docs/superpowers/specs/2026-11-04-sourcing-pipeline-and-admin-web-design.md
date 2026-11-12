@@ -272,7 +272,7 @@ LLM_API_KEY=
 LLM_BASE_URL=                             (optional override)
 LLM_MODEL=claude-opus-5-5 | gpt-4o | ...
 LOCAL_ARCHIVE_URLS=https://www.dghistory.org/..., https://www.dgparks.org/...
-SOURCES_USER_AGENT=InvisibleMuseum/0.2 (+https://github.com/PatrickFanella/invisible-museum)
+SOURCES_USER_AGENT=InvisibleMuseum/0.2 (+https://github.com/subculture-collective/byl)
 PUBLIC_GOOGLE_CLIENT_ID=                  (web)
 PUBLIC_API_BASE_URL=                      (web, default same origin)
 ```

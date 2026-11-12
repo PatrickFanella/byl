@@ -66,7 +66,7 @@ services:
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_MODEL: ${LLM_MODEL:-}
       LOCAL_ARCHIVE_URLS: ${LOCAL_ARCHIVE_URLS:-}
-      SOURCES_USER_AGENT: ${SOURCES_USER_AGENT:-InvisibleMuseum/0.2 (+https://github.com/PatrickFanella/invisible-museum)}
+      SOURCES_USER_AGENT: ${SOURCES_USER_AGENT:-InvisibleMuseum/0.2 (+https://github.com/subculture-collective/byl)}
       SOURCES_ALLOW_PRIVATE_HOSTS: ${SOURCES_ALLOW_PRIVATE_HOSTS:-false}
       JOB_WORKERS: ${JOB_WORKERS:-2}
     networks:

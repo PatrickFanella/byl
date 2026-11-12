@@ -22,10 +22,10 @@ The display name is Byl. Existing bundle/application IDs, API addresses, storage
 Run from the repository root:
 
 ```sh
-rtk proxy python3 scripts/sync-byl.py --source /home/onnwee/Work/Subcult/subcult-tv/studio/brands/byl
-rtk proxy python3 scripts/generate-byl-palette.py
-rtk proxy python3 scripts/sync-byl.py --check
-rtk proxy python3 scripts/generate-byl-palette.py --check
+python3 scripts/sync-byl.py --source <subcult-tv checkout>/studio/brands/byl
+python3 scripts/generate-byl-palette.py
+python3 scripts/sync-byl.py --check
+python3 scripts/generate-byl-palette.py --check
 ```
 
 The importer uses an explicit asset selection and refuses changes to previously imported consumer files. Review later Studio changes before updating the selection. Fonts retain their SIL Open Font License notices in web assets, the iOS resource folder and Android license assets. Native palette generation reads the imported `tokens.json`; edit the Studio source to change shared values.

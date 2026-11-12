@@ -103,7 +103,7 @@ func Load() (Config, error) {
 		LLMAPIKey:          strings.TrimSpace(os.Getenv("LLM_API_KEY")),
 		LLMModel:           strings.TrimSpace(os.Getenv("LLM_MODEL")),
 		LocalArchiveURLs:   envList("LOCAL_ARCHIVE_URLS"),
-		SourcesUserAgent:   envOr("SOURCES_USER_AGENT", "InvisibleMuseum/0.2 (+https://github.com/PatrickFanella/invisible-museum)"),
+		SourcesUserAgent:   envOr("SOURCES_USER_AGENT", "InvisibleMuseum/0.2 (+https://github.com/subculture-collective/byl)"),
 		DiscoveryProviders: strings.Split(envOr("BRIEF_DISCOVERY_PROVIDERS", "wikipedia_search,loc,internet_archive"), ","),
 		DiscoverySeedURLs:  envList("BRIEF_DISCOVERY_SEED_URLS"),
 
