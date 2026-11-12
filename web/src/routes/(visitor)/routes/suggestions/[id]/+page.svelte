@@ -8,7 +8,7 @@
 
 <svelte:head><title>Suggestion status · Byl</title></svelte:head>
 <a href="/routes/suggestions" class="text-sm text-byl-muted hover:underline">← Tour suggestions</a>
-<h1 class="mt-2 text-3xl font-semibold">Suggestion status</h1>
+<h1 class="byl-title mt-2">Suggestion status</h1>
 {#if !$current}
 	<div class="mt-6"><SignInPrompt reason="Sign in to read your private suggestion status." /></div>
 {:else}

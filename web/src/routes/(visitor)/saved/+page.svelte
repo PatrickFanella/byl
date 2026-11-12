@@ -47,8 +47,8 @@
 
 <svelte:head><title>Saved · Byl</title></svelte:head>
 
-<div class="text-xs font-bold tracking-normal text-byl-action">Saved</div>
-<h1 class="text-3xl font-semibold">Tours to come back to</h1>
+<div class="byl-eyebrow">Saved</div>
+<h1 class="byl-title">Tours to come back to</h1>
 
 <div class="mt-6">
 	{#if !$current}

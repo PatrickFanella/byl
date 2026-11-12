@@ -17,7 +17,7 @@
 			alt={asset.caption}
 			width={asset.width ?? undefined}
 			height={asset.height ?? undefined}
-			class="max-h-[32rem] w-full rounded-lg bg-byl-surface object-contain"
+			class="byl-figure-image max-h-[32rem] w-full bg-byl-surface object-contain"
 		/>
 	</a>
 	<figcaption class="mt-2 max-w-2xl space-y-1 text-sm text-byl-muted">

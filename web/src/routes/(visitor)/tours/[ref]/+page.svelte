@@ -18,7 +18,6 @@
 	import LoadState from '#lib/components/visitor/LoadState.svelte';
 	import SectionHeader from '#lib/components/visitor/SectionHeader.svelte';
 	import StopRow from '#lib/components/visitor/StopRow.svelte';
-	import TourCard from '#lib/components/visitor/TourCard.svelte';
 	import SignInPrompt from '#lib/components/visitor/SignInPrompt.svelte';
 	import Map from '#lib/components/Map.svelte';
 	import { validTransitSelection } from '#lib/tour/transit.ts';
@@ -110,25 +109,39 @@
 
 <svelte:head><title>{tour.data?.title ?? 'Tour'} · Byl</title></svelte:head>
 
-<a href="/tours" class="text-sm text-byl-muted hover:underline">← Tours</a>
+<a href="/tours" class="byl-back">← Tours</a>
 
-<div class="mt-3">
+<div>
 	<LoadState status={tour.status} message={tour.message} onretry={() => tour.run()}>
 		{#if tour.data}
 			{@const t = tour.data}
-			<div class="grid gap-6 lg:grid-cols-3">
-				<div class="space-y-5 lg:col-span-2">
-					<TourCard tour={t} href={`/tours/${t.slug}`} />
-					<h1 class="sr-only">{t.title}</h1>
-					{#if t.status !== 'published'}<p class="rounded-lg border border-byl-border p-3 text-sm">
+			<header>
+				{#if t.topic}<p class="byl-eyebrow">{t.topic.name}</p>{/if}
+				<h1 class="byl-title">{t.title}</h1>
+				{#if t.summary}<p class="byl-lede mt-3">{t.summary}</p>{/if}
+				<p class="byl-meta mt-3">
+					<span>{t.stop_count} stops</span>
+					{#each t.modes as mode (mode)}
+						{#if estimateText(t.routes?.[mode])}<span>{estimateText(t.routes?.[mode])}</span>{/if}
+					{/each}
+					{#if t.owner_account_id}<span>visitor route</span>{/if}
+				</p>
+			</header>
+			<div class="byl-detail mt-8">
+				<div class="space-y-6">
+					{#if t.hero_media?.public_url}<img
+							src={t.hero_media.public_url}
+							alt=""
+							class="byl-figure-image aspect-[4/3] w-full object-cover"
+						/>{/if}
+					{#if t.status !== 'published'}<p class="byl-panel text-sm">
 							Draft · Only you can open this route. Its path needs review before publication or
 							sharing.
 						</p>{/if}
-					{#if t.summary}<p class="text-byl-muted">{t.summary}</p>{/if}
 
 					{#if !t.transit || t.modes.some((m) => m !== 'walk')}
-						<div class="rounded-lg border border-byl-border bg-byl-surface p-4">
-							<div class="text-xs font-bold tracking-normal text-byl-action">Getting around</div>
+						<div class="border-y border-byl-border py-5">
+							<div class="byl-eyebrow">Getting around</div>
 							<ul class="mt-2 space-y-1 text-sm">
 								{#each t.modes.filter((m) => !t.transit || m !== 'walk') as mode (mode)}
 									{@const r = t.routes?.[mode]}
@@ -172,9 +185,7 @@
 								{#if t.journeys?.[mode]?.state !== 'blocked' && mixedReady}
 									<a
 										href="/tours/{t.slug}/walk?mode={mode}"
-										class="rounded-lg px-4 py-2 text-sm font-semibold {mode === t.modes[0]
-											? 'bg-byl-action text-byl-action-text'
-											: 'border border-byl-border hover:bg-byl-surface'}"
+										class="byl-btn {mode === t.modes[0] ? 'byl-btn-primary' : ''}"
 										>{t.transit && mode === 'walk'
 											? 'Open mixed trip'
 											: mode === 'bike'
@@ -183,15 +194,12 @@
 									>
 								{/if}
 							{/each}
-							<button
-								class="rounded-lg border border-byl-border px-4 py-2 text-sm hover:bg-byl-surface disabled:opacity-50"
-								onclick={toggleSave}
-								disabled={saveBusy}>{saved ? '♥ Saved' : '♡ Save for later'}</button
+							<button class="byl-btn" onclick={toggleSave} disabled={saveBusy}
+								>{saved ? '♥ Saved' : '♡ Save for later'}</button
 							>
 							{#if !t.transit}<a
 									href="invisiblemuseum://tour/{t.slug}"
-									class="rounded-lg border border-byl-border px-4 py-2 text-sm text-byl-muted hover:bg-byl-surface"
-									>Open in the app</a
+									class="byl-btn byl-btn-quiet">Open in the app</a
 								>{/if}
 						{/if}
 					</div>
@@ -207,7 +215,7 @@
 					{/if}
 					{#if saveError}<p class="text-sm text-byl-danger">{saveError}</p>{/if}
 
-					<section class="space-y-3">
+					<section class="byl-section space-y-4">
 						<SectionHeader title="Stops" eyebrow="{t.stops.length} places" />
 						{#if t.stops.length === 0}
 							<LoadState
@@ -216,11 +224,15 @@
 								emptyMessage="This tour has no published places."
 							/>
 						{/if}
-						{#each t.stops as stop (stop.id)}<StopRow {stop} />{/each}
+						{#if t.stops.length}
+							<ol class="byl-rows">
+								{#each t.stops as stop (stop.id)}<li><StopRow {stop} /></li>{/each}
+							</ol>
+						{/if}
 					</section>
 				</div>
 				<aside class="space-y-3">
-					<div class="overflow-hidden rounded-lg border border-byl-border">
+					<div class="byl-map-frame">
 						<Map
 							markers={stopMarkers}
 							line={t.transit ? [] : line}
@@ -228,7 +240,7 @@
 								coords: l.geometry as [number, number][],
 								state: 'future' as const
 							}))}
-							height="24rem"
+							height="clamp(14rem, 45vh, 24rem)"
 						/>
 					</div>
 					{#if t.transit}<p class="text-xs text-byl-muted">

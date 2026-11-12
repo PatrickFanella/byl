@@ -19,13 +19,13 @@
 <LoadState status={moment.status} message={moment.message} onretry={() => moment.run()}>
 	{#if moment.data}
 		{@const m = moment.data}
-		<a href="/places/{m.place_id}" class="text-sm text-byl-muted hover:underline">← Place</a>
+		<a href="/places/{m.place_id}" class="byl-back">← Place</a>
 		{#if m.date_display}
-			<div class="mt-3 text-xs font-bold tracking-normal text-byl-action">
+			<div class="byl-eyebrow">
 				{m.date_display}
 			</div>
 		{/if}
-		<h1 class="text-3xl font-semibold">{m.title}</h1>
+		<h1 class="byl-title">{m.title}</h1>
 		{#if m.has_narration || m.narration}
 			<p class="mt-1 text-xs text-byl-muted">Audio guide available on the tour</p>
 		{/if}

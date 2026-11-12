@@ -298,3 +298,263 @@ a.bg-byl-action {
 		margin-left: 240px;
 	}
 }
+
+/*
+ * Platform Index editorial layer. Sizes, spacing and roles follow the Studio pack
+ * (studio/brands/byl: tokens.json, design-system/FOUNDATIONS.md and COMPONENTS.md).
+ * These rules are unlayered so they hold against utility classes on the same element.
+ */
+.byl-header {
+	min-height: 72px;
+}
+.byl-visitor .byl-nav a {
+	color: var(--byl-text-secondary);
+}
+.byl-visitor .byl-nav a:hover {
+	background: var(--byl-surface);
+}
+.byl-visitor .byl-nav a[aria-current='page'] {
+	color: var(--byl-text);
+	font-weight: 700;
+	box-shadow: inset 0 -3px 0 var(--byl-action);
+}
+.byl-eyebrow {
+	font-family: var(--byl-font-body);
+	font-size: var(--byl-type-caption);
+	line-height: 1rem;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--byl-text-secondary);
+}
+.byl-title {
+	font-size: 2rem;
+	line-height: 2.5rem;
+}
+.byl-eyebrow + .byl-title,
+.byl-eyebrow + .byl-h2 {
+	margin-top: 4px;
+}
+.byl-display {
+	font-size: 2.25rem;
+	line-height: 2.75rem;
+}
+.byl-h2 {
+	font-size: var(--byl-type-h2);
+	line-height: 2.25rem;
+}
+.byl-h3 {
+	font-size: var(--byl-type-h3);
+	line-height: 1.875rem;
+}
+.byl-lede {
+	max-width: var(--byl-reading-max);
+	font-size: var(--byl-type-reading);
+	line-height: 1.875rem;
+	color: var(--byl-text-secondary);
+}
+.byl-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 16px;
+	font-size: var(--byl-type-small);
+	line-height: 1.25rem;
+	color: var(--byl-text-secondary);
+	font-variant-numeric: tabular-nums;
+}
+.byl-back {
+	display: inline-flex;
+	align-items: center;
+	min-height: 48px;
+	font-size: var(--byl-type-small);
+	color: var(--byl-text-secondary);
+}
+.byl-back:hover {
+	text-decoration: underline;
+}
+.byl-section {
+	margin-top: 48px;
+	padding-top: 32px;
+	border-top: 1px solid var(--byl-border-subtle);
+}
+.byl-opening {
+	padding-block: 16px 8px;
+}
+.byl-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 48px;
+	padding: 8px 16px;
+	border: 1px solid var(--byl-border-control);
+	border-radius: var(--byl-radius-control);
+	background: transparent;
+	color: var(--byl-text);
+	font-size: 1rem;
+	line-height: 1.5rem;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background-color var(--byl-motion-feedback-ms) var(--byl-motion-easing);
+}
+.byl-btn:hover {
+	background: var(--byl-surface);
+}
+.byl-btn-primary,
+.byl-btn-primary:hover {
+	border-color: var(--byl-action);
+	background: var(--byl-action);
+	color: var(--byl-action-text);
+}
+.byl-btn-quiet {
+	font-weight: 400;
+}
+.byl-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 40px;
+	padding: 6px 12px;
+	border: 1px solid var(--byl-border-control);
+	border-radius: var(--byl-radius-control);
+	background: transparent;
+	color: var(--byl-text);
+	font-size: var(--byl-type-small);
+	line-height: 1.25rem;
+}
+.byl-chip:hover {
+	background: var(--byl-surface);
+}
+.byl-chip[aria-pressed='true'] {
+	border-color: var(--byl-action);
+	background: var(--byl-action);
+	color: var(--byl-action-text);
+	font-weight: 700;
+}
+.byl-chip[aria-pressed='true']::before {
+	content: '✓' / '';
+}
+.byl-rows {
+	border-top: 1px solid var(--byl-border-subtle);
+}
+.byl-row {
+	display: flex;
+	gap: 16px;
+	padding: 16px 0;
+	border-bottom: 1px solid var(--byl-border-subtle);
+}
+a.byl-row:hover .byl-row-title {
+	text-decoration: underline;
+}
+.byl-row-title {
+	display: block;
+	font-weight: 700;
+}
+.byl-marker {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: 2px solid var(--byl-action);
+	border-radius: var(--byl-radius-round);
+	color: var(--byl-text);
+	font-size: var(--byl-type-small);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+.byl-marker-current {
+	background: var(--byl-action);
+	color: var(--byl-action-text);
+}
+.byl-marker-visited {
+	border-color: var(--byl-success);
+	background: var(--byl-success-surface);
+	color: var(--byl-success);
+}
+.byl-thumb {
+	flex-shrink: 0;
+	width: 96px;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	border-radius: var(--byl-radius-artwork);
+	background: var(--byl-surface);
+}
+.byl-tour {
+	display: flex;
+	gap: 16px;
+	padding: 16px 0;
+	border-top: 1px solid var(--byl-border-control);
+}
+.byl-tour-title {
+	display: block;
+	font-family: var(--byl-font-display);
+	font-size: var(--byl-type-h3);
+	line-height: 1.875rem;
+	overflow-wrap: anywhere;
+}
+.byl-tour:hover .byl-tour-title {
+	text-decoration: underline;
+}
+.byl-tour .byl-thumb {
+	width: 128px;
+}
+.byl-panel {
+	padding: 20px;
+	border-radius: var(--byl-radius-panel);
+	background: var(--byl-surface);
+}
+.byl-notice-danger {
+	background: var(--byl-danger-surface);
+	color: var(--byl-danger);
+}
+.byl-map-frame {
+	overflow: hidden;
+	border: 1px solid var(--byl-border-control);
+	border-radius: var(--byl-radius-artwork);
+}
+.byl-figure-image {
+	border-radius: var(--byl-radius-artwork);
+}
+.byl-detail {
+	display: grid;
+	gap: 24px;
+}
+.byl-detail > aside {
+	order: -1;
+}
+.byl-home-grid {
+	display: grid;
+}
+@media (max-width: 639px) {
+	.byl-visitor .byl-nav a[aria-current='page'] {
+		box-shadow: inset 0 3px 0 var(--byl-action);
+	}
+}
+@media (min-width: 960px) {
+	.byl-title {
+		font-size: var(--byl-type-h1);
+		line-height: 3rem;
+	}
+	.byl-display {
+		font-size: var(--byl-type-display);
+		line-height: 4rem;
+	}
+	.byl-section {
+		margin-top: 64px;
+	}
+	.byl-detail {
+		grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+		align-items: start;
+	}
+	.byl-detail > aside {
+		order: 0;
+		position: sticky;
+		top: 24px;
+	}
+	.byl-home-grid {
+		grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+		column-gap: 24px;
+		align-items: start;
+	}
+}

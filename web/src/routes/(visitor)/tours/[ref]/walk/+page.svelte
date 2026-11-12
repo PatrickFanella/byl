@@ -393,13 +393,13 @@
 			<ContributionPanel {contributions} signedIn={$current !== null} trip />
 			{#if walk.nextStop}
 				{@const next = walk.nextStop}
-				<div class="rounded-lg border border-byl-border bg-byl-background p-4">
+				<div class="byl-panel">
 					<div class="flex items-start justify-between gap-3">
 						<div class="min-w-0">
-							<div class="text-xs font-bold tracking-normal text-byl-action">
+							<div class="byl-eyebrow">
 								Next · stop {next.position} of {walk.stops.length}
 							</div>
-							<div class="text-xl font-semibold">{next.place.name}</div>
+							<div class="byl-h3 font-[family-name:var(--byl-font-display)]">{next.place.name}</div>
 							{#if next.featured_moment}
 								<div class="truncate text-sm text-byl-muted">{next.featured_moment.title}</div>
 							{/if}
@@ -430,7 +430,7 @@
 					{/if}
 					<div class="mt-3 flex flex-wrap gap-2">
 						<button
-							class="rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
+							class="byl-btn byl-btn-primary"
 							onclick={() => {
 								contributions.lifecycle('manual_arrival');
 								walk.markArrived();
@@ -438,7 +438,7 @@
 						>
 						{#if !walk.transitInterval}
 							<a
-								class="rounded-lg border border-byl-border px-3 py-2 text-sm hover:bg-byl-surface"
+								class="byl-btn"
 								href={mapsURL(
 									next.place.arrival_point?.point?.latitude ?? next.place.latitude,
 									next.place.arrival_point?.point?.longitude ?? next.place.longitude,
@@ -451,18 +451,15 @@
 					</div>
 				</div>
 			{:else}
-				<div class="rounded-lg border border-byl-border bg-byl-background p-4">
-					<div class="text-xs font-bold tracking-normal text-byl-success">Tour complete</div>
+				<div class="byl-panel">
+					<div class="byl-eyebrow">Tour complete</div>
 					<div class="text-lg font-semibold">
 						You {walk.tour?.transit ? 'visited' : 'walked'} every stop of {walk.tour?.title}.
 					</div>
 					{#if !$current}
 						<p class="mt-1 text-sm text-byl-muted">Sign in to keep this on your account.</p>
 					{/if}
-					<button
-						class="mt-3 rounded-lg bg-byl-action px-3 py-2 text-sm font-semibold text-byl-action-text"
-						onclick={() => end(false)}>Done</button
-					>
+					<button class="byl-btn byl-btn-primary mt-3" onclick={() => end(false)}>Done</button>
 				</div>
 			{/if}
 		{/if}

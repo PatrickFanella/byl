@@ -50,7 +50,7 @@
 
 <svelte:head><title>Suggest a route change · Byl</title></svelte:head>
 <a href={`/tours/${encodeURIComponent(ref)}`} class="text-sm text-byl-muted underline">← Tour</a>
-<h1 class="mt-3 text-3xl font-semibold">Suggest a route change</h1>
+<h1 class="byl-title mt-3">Suggest a route change</h1>
 <p class="mt-3 max-w-2xl text-byl-muted">
 	Report a closure, entrance or path problem. You do not need to draw a replacement. Curators review
 	observations before changing a public route.

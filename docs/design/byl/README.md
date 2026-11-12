@@ -44,3 +44,21 @@ The CI web job checks imported hashes and generated palettes. `web/e2e/appearanc
 The [screenshots](screenshots/) show the integrated web profile in both themes at compact and wide widths, plus the Android appearance screen. They are app captures, not Studio mockups.
 
 iOS compilation and package tests require macOS/Xcode and are covered by the existing hosted CI job. No local iOS build or simulator result is claimed. Physical-device GPS, audio interruption, provider sign-in, VoiceOver/TalkBack, outdoor readability and native large-text journeys remain release qualification checks. No deployment or store publication is part of this integration.
+
+## Editorial layout pass — November 12, 2026
+
+A Studio review compared the live front page with the pack's reference boards. The identity, tokens, fonts and both appearances were already in place. The page hierarchy was not: page headings were 30px, section headings 18px, tours and stops sat in bordered cards, and buttons used 14px regular text.
+
+The visitor pages now follow `design-system/FOUNDATIONS.md` and `COMPONENTS.md`:
+
+- Headings use the token scale (32/40 growing to 40/48 at 960px, 28/36 sections, 22/30 items; the home opening uses the 56/64 display size at 960px). Metadata labels are small uppercase in the secondary text role.
+- Sections are separated by rules with 48px (64px wide) spacing. Home places tours and nearby places on the eight/four-column grid.
+- Tours are ruled rows. The stop index uses 32px numbered outline markers, ruled rows and each stop's own photograph.
+- Tour detail shows its title, summary and estimates as a page heading. On compact screens the map precedes the actions and the stop list.
+- Buttons are 48px, 16px Public Sans Bold with the control border. Topic and mode filters are 40px chips with a check and `aria-pressed`. The current navigation item uses weight and an indicator.
+- Empty and error states use opaque panels. Photographs and the map have square corners.
+- The home page title is "Byl · Local history, on foot or by bike".
+
+The shared classes are in `web/src/routes/layout.css` under "Platform Index editorial layer". Route builder, report and suggestion forms, the transit panel and the curator pages keep their earlier component styling apart from the shared heading and label classes.
+
+Captures from a local production build against a seeded local API: `screenshots/web-home-*` and `screenshots/web-tour-*` (before and after at 1440px light, after at 390px dark). The local API had not computed routes, so the estimates read "Route being computed".

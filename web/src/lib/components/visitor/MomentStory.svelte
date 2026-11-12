@@ -20,8 +20,8 @@
 	{#each paragraphs as p, i (i)}<p>{p}</p>{/each}
 </article>
 
-{#if media.length}<section class="mt-8 space-y-3" aria-label="Related material">
-		<h2 class="text-lg font-semibold">Related material</h2>
+{#if media.length}<section class="byl-section space-y-3" aria-label="Related material">
+		<h2 class="byl-h2">Related material</h2>
 		<MediaGallery {media} />
 	</section>{/if}
 
@@ -33,7 +33,7 @@
 	</div>
 {/if}
 
-<section class="mt-8 space-y-3">
+<section class="byl-section space-y-3">
 	<SectionHeader title="Sources" eyebrow="Where this comes from" />
 	{#if m.sources.length === 0}
 		<LoadState
@@ -42,24 +42,28 @@
 			emptyMessage="This moment was written without a cited source."
 		/>
 	{/if}
-	{#each m.sources as s, i (i)}
-		<div class="rounded-lg border border-byl-border bg-byl-surface p-4 text-sm">
-			{#if s.url}
-				<a
-					href={safeHref(s.url)}
-					target="_blank"
-					rel="noreferrer"
-					class="font-semibold text-byl-action hover:underline">{s.title || s.url} ↗</a
-				>
-			{:else}
-				<div class="font-semibold">{s.title}</div>
-			{/if}
-			<div class="text-xs text-byl-muted">
-				{[s.publisher, s.license, s.retrieved_at ? `retrieved ${s.retrieved_at}` : '']
-					.filter(Boolean)
-					.join(' · ')}
-			</div>
-			{#if s.note}<div class="mt-1 text-xs text-byl-muted italic">{s.note}</div>{/if}
-		</div>
-	{/each}
+	{#if m.sources.length}
+		<ul class="byl-rows max-w-[66ch]">
+			{#each m.sources as s, i (i)}
+				<li class="byl-row flex-col gap-1 text-sm">
+					{#if s.url}
+						<a
+							href={safeHref(s.url)}
+							target="_blank"
+							rel="noreferrer"
+							class="font-bold text-byl-action underline">{s.title || s.url} ↗</a
+						>
+					{:else}
+						<div class="font-bold">{s.title}</div>
+					{/if}
+					<div class="text-byl-muted">
+						{[s.publisher, s.license, s.retrieved_at ? `retrieved ${s.retrieved_at}` : '']
+							.filter(Boolean)
+							.join(' · ')}
+					</div>
+					{#if s.note}<div class="text-byl-muted italic">{s.note}</div>{/if}
+				</li>
+			{/each}
+		</ul>
+	{/if}
 </section>

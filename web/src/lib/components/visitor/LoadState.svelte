@@ -27,19 +27,16 @@
 		{loadingText}
 	</div>
 {:else if status === 'error'}
-	<div class="rounded-lg border border-byl-danger bg-byl-surface p-4">
-		<div class="text-xs tracking-normal text-byl-danger">Something went wrong</div>
+	<div class="byl-panel byl-notice-danger" role="alert">
+		<div class="font-bold">Something went wrong</div>
 		<p class="mt-1 text-sm">{message}</p>
 		{#if onretry}
-			<button
-				class="mt-3 rounded-lg border border-byl-border px-3 py-1.5 text-sm hover:bg-byl-surface"
-				onclick={onretry}>Try again</button
-			>
+			<button class="byl-btn mt-3" onclick={onretry}>Try again</button>
 		{/if}
 	</div>
 {:else if status === 'empty'}
-	<div class="rounded-lg border border-byl-border bg-byl-surface p-4">
-		<div class="font-semibold">{emptyTitle}</div>
+	<div class="byl-panel">
+		<div class="font-bold">{emptyTitle}</div>
 		{#if emptyMessage}<p class="mt-1 text-sm text-byl-muted">{emptyMessage}</p>{/if}
 	</div>
 {:else if children}

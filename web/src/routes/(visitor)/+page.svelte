@@ -62,18 +62,24 @@
 	});
 </script>
 
-<svelte:head><title>Byl</title></svelte:head>
+<svelte:head>
+	<title>Byl · Local history, on foot or by bike</title>
+	<meta name="description" content="Local history, on foot or by bike." />
+</svelte:head>
 
-<section class="space-y-3">
-	<div class="text-xs font-bold tracking-normal text-byl-action">Byl</div>
-	<h1 class="text-3xl font-semibold">
+<section class="byl-opening space-y-4">
+	<p class="byl-eyebrow">Local history, on foot or by bike</p>
+	<h1 class="byl-display">
 		{city.current ? `${city.current.name} on foot` : 'Your city on foot'}
 	</h1>
-	<p class="max-w-2xl text-byl-muted">
+	<p class="byl-lede">
 		Walk or ride through the stories that happened right where you are standing. Each tour follows
 		one topic through a handful of places, with stories and sources at each stop.
 	</p>
-	<CityPicker />
+	<div class="flex flex-wrap items-center gap-3 pt-2">
+		<a href="/tours" class="byl-btn byl-btn-primary">Browse tours</a>
+		<CityPicker />
+	</div>
 </section>
 
 {#if city.status === 'error'}
@@ -81,74 +87,73 @@
 		<LoadState status="error" message={city.message} onretry={() => city.load()} />
 	</div>
 {:else}
-	<section class="mt-8 space-y-4">
-		<SectionHeader title="Tours" eyebrow="By topic" />
-		<LoadState
-			status={city.status === 'ready' ? tours.status : 'loading'}
-			message={tours.message}
-			emptyTitle="No tours yet"
-			emptyMessage="Curated tours for this city are still being written."
-			onretry={() => tours.run()}
-		>
-			<div class="space-y-6">
-				{#each groups as [key, group] (key)}
-					<section class="space-y-3">
-						<h3 class="text-lg font-semibold">{group.name}</h3>
-						<div class="grid gap-4 sm:grid-cols-2">
-							{#each group.tours as tour (tour.id)}<TourCard {tour} />{/each}
-						</div>
-					</section>
-				{/each}
-			</div>
-		</LoadState>
-	</section>
-
-	<section class="mt-8 space-y-4">
-		<SectionHeader title="Near you" eyebrow="Places" />
-		{#if geoState === 'denied'}
+	<div class="byl-home-grid">
+		<section class="byl-section space-y-6">
+			<SectionHeader title="Tours" eyebrow="By topic" />
 			<LoadState
-				status="empty"
-				emptyTitle="Location is off"
-				emptyMessage="Allow location access in your browser to see the places around you."
-			/>
-		{:else if geoState === 'unavailable'}
-			<LoadState
-				status="empty"
-				emptyTitle="Location unavailable"
-				emptyMessage="Pick a tour to travel to its first stop."
-			/>
-		{:else if !position}
-			<LoadState status="loading" loadingText="Waiting for your location…" />
-		{:else}
-			<LoadState
-				status={nearby.status}
-				message={nearby.message}
-				emptyTitle="Nothing within 2 km"
-				emptyMessage="Pick a tour to travel to its first stop."
-				onretry={() => nearby.run()}
+				status={city.status === 'ready' ? tours.status : 'loading'}
+				message={tours.message}
+				emptyTitle="No tours yet"
+				emptyMessage="Curated tours for this city are still being written."
+				onretry={() => tours.run()}
 			>
-				<ul class="divide-y divide-byl-border rounded-lg border border-byl-border bg-byl-surface">
-					{#each (nearby.data ?? []).slice(0, 8) as place (place.id)}
-						<li>
-							<a
-								href="/places/{place.id}"
-								class="flex items-center gap-3 px-4 py-3 hover:bg-byl-surface"
-							>
-								<span class="flex-1">
-									<span class="block font-semibold">{place.name}</span>
-									<span class="block text-xs text-byl-muted">
-										{place.distance_m != null
-											? `${distanceText(place.distance_m)} · `
-											: ''}{place.moment_count}
-										{place.moment_count === 1 ? 'moment' : 'moments'}
-									</span>
-								</span>
-								<span class="text-byl-muted">›</span>
-							</a>
-						</li>
+				<div class="space-y-8">
+					{#each groups as [key, group] (key)}
+						<section class="space-y-3">
+							<h3 class="byl-h3">{group.name}</h3>
+							<div class="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+								{#each group.tours as tour (tour.id)}<TourCard {tour} showTopic={false} />{/each}
+							</div>
+						</section>
 					{/each}
-				</ul>
+				</div>
 			</LoadState>
-		{/if}
-	</section>
+		</section>
+
+		<section class="byl-section space-y-6">
+			<SectionHeader title="Near you" eyebrow="Places" />
+			{#if geoState === 'denied'}
+				<LoadState
+					status="empty"
+					emptyTitle="Location is off"
+					emptyMessage="Allow location access in your browser to see the places around you."
+				/>
+			{:else if geoState === 'unavailable'}
+				<LoadState
+					status="empty"
+					emptyTitle="Location unavailable"
+					emptyMessage="Pick a tour to travel to its first stop."
+				/>
+			{:else if !position}
+				<LoadState status="loading" loadingText="Waiting for your location…" />
+			{:else}
+				<LoadState
+					status={nearby.status}
+					message={nearby.message}
+					emptyTitle="Nothing within 2 km"
+					emptyMessage="Pick a tour to travel to its first stop."
+					onretry={() => nearby.run()}
+				>
+					<ul class="byl-rows">
+						{#each (nearby.data ?? []).slice(0, 8) as place (place.id)}
+							<li>
+								<a href="/places/{place.id}" class="byl-row items-center">
+									<span class="flex-1">
+										<span class="byl-row-title">{place.name}</span>
+										<span class="byl-meta">
+											{place.distance_m != null
+												? `${distanceText(place.distance_m)} · `
+												: ''}{place.moment_count}
+											{place.moment_count === 1 ? 'moment' : 'moments'}
+										</span>
+									</span>
+									<span class="text-byl-muted" aria-hidden="true">›</span>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</LoadState>
+			{/if}
+		</section>
+	</div>
 {/if}

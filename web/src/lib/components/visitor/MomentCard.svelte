@@ -18,7 +18,7 @@
 		{#if hero}<img src={hero} alt="" class="h-44 w-full object-cover" />{/if}
 		<div class="bg-byl-background p-4">
 			{#if moment.date_display}
-				<div class="text-xs font-bold tracking-normal text-byl-action">
+				<div class="byl-eyebrow">
 					{moment.date_display}
 				</div>
 			{/if}

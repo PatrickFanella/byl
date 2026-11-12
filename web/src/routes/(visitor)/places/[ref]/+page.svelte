@@ -39,25 +39,25 @@
 <LoadState status={place.status} message={place.message} onretry={() => place.run()}>
 	{#if place.data}
 		{@const p = place.data}
-		<div class="text-xs font-bold tracking-normal text-byl-action">
+		<div class="byl-eyebrow">
 			{p.kind.replace(/_/g, ' ')}
 		</div>
-		<h1 class="text-3xl font-semibold">{p.name}</h1>
+		<h1 class="byl-title">{p.name}</h1>
 		{#if p.address}<p class="mt-1 text-sm text-byl-muted">{p.address}</p>{/if}
-		{#if p.summary}<p class="mt-3 max-w-2xl text-byl-muted">{p.summary}</p>{/if}
+		{#if p.summary}<p class="byl-lede mt-3">{p.summary}</p>{/if}
 		<div class="mt-6"><HappeningsPanel placeID={p.id} /></div>
 		{#if hero}<div class="mt-6"><MediaFigure asset={hero} /></div>{/if}
 
 		{#if p.moments.length > 1}
-			<nav aria-label="Events and stories at this place" class="mt-8 max-w-2xl">
+			<nav aria-label="Events and stories at this place" class="byl-section max-w-[66ch]">
 				<SectionHeader title="Events and stories" eyebrow="At this place" />
-				<ol class="mt-3 divide-y divide-byl-border border-y border-byl-border">
+				<ol class="byl-rows mt-4">
 					{#each p.moments as moment (moment.id)}
 						<li>
 							<a
 								href="?featured={moment.id}#story"
 								aria-current={featured?.id === moment.id ? 'true' : undefined}
-								class="flex flex-col gap-1 py-4 hover:underline sm:flex-row sm:gap-6"
+								class="byl-row flex-col gap-1 hover:underline sm:flex-row sm:gap-6"
 							>
 								<span class="text-sm text-byl-muted sm:w-32 sm:shrink-0"
 									>{moment.date_display || 'Date not recorded'}</span
@@ -75,7 +75,7 @@
 		{/if}
 
 		{#if featured}
-			<section id="story" class="mt-8 scroll-mt-6 space-y-3" aria-label="Selected history">
+			<section id="story" class="byl-section scroll-mt-6 space-y-3" aria-label="Selected history">
 				<SectionHeader
 					title={featured.title}
 					eyebrow={featured.date_display || 'History and context'}
@@ -89,7 +89,7 @@
 			</section>
 		{/if}
 		{#if p.media?.length}
-			<section class="mt-10 space-y-4" aria-label="From this place">
+			<section class="byl-section space-y-4" aria-label="From this place">
 				<SectionHeader title="From this place" eyebrow="Photos and records" />
 				<MediaGallery media={p.media.filter((asset) => asset.id !== hero?.id)} />
 			</section>

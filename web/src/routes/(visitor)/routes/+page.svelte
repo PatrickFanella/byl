@@ -38,8 +38,8 @@
 
 <svelte:head><title>Your routes · Byl</title></svelte:head>
 
-<div class="text-xs font-bold tracking-normal text-byl-action">Your routes</div>
-<h1 class="text-3xl font-semibold">Curate your own gallery</h1>
+<div class="byl-eyebrow">Your routes</div>
+<h1 class="byl-title">Curate your own gallery</h1>
 <p class="mt-1 max-w-2xl text-byl-muted">
 	Order the places you love into a walk or ride and share it by link.
 </p>

@@ -26,46 +26,51 @@
 		void mode;
 		if (city.current) tours.run();
 	});
-
-	const chip = (on: boolean) =>
-		`rounded px-3 py-1.5 text-sm ${on ? 'bg-byl-action text-byl-action-text' : 'border border-byl-border text-byl-muted hover:bg-byl-surface'}`;
 </script>
 
 <svelte:head><title>Tours · Byl</title></svelte:head>
 
-<div class="text-xs font-bold tracking-normal text-byl-action">
+<div class="byl-eyebrow">
 	{city.current?.name ?? 'Tours'}
 </div>
-<h1 class="text-3xl font-semibold">Tours</h1>
-<p class="mt-1 max-w-2xl text-byl-muted">
+<h1 class="byl-title">Tours</h1>
+<p class="byl-lede mt-3">
 	Each tour is a gallery: one topic, a handful of places, and the moment at each that belongs to the
 	story.
 </p>
 <div class="mt-3"><CityPicker /></div>
 
-<div class="mt-5 space-y-3">
+<div class="mt-8 space-y-3">
 	{#if city.current?.topics?.length}
 		<div class="flex flex-wrap gap-2">
-			<button class={chip(topic === '')} onclick={() => (topic = '')}>All topics</button>
+			<button class="byl-chip" aria-pressed={topic === ''} onclick={() => (topic = '')}
+				>All topics</button
+			>
 			{#each city.current.topics as t (t.id)}
-				<button class={chip(topic === t.id)} onclick={() => (topic = topic === t.id ? '' : t.id)}
-					>{t.name}</button
+				<button
+					class="byl-chip"
+					aria-pressed={topic === t.id}
+					onclick={() => (topic = topic === t.id ? '' : t.id)}>{t.name}</button
 				>
 			{/each}
 		</div>
 	{/if}
 	<div class="flex gap-2">
-		<button class={chip(mode === '')} onclick={() => (mode = '')}>Any</button>
-		<button class={chip(mode === 'walk')} onclick={() => (mode = mode === 'walk' ? '' : 'walk')}
-			>Walking</button
+		<button class="byl-chip" aria-pressed={mode === ''} onclick={() => (mode = '')}>Any</button>
+		<button
+			class="byl-chip"
+			aria-pressed={mode === 'walk'}
+			onclick={() => (mode = mode === 'walk' ? '' : 'walk')}>Walking</button
 		>
-		<button class={chip(mode === 'bike')} onclick={() => (mode = mode === 'bike' ? '' : 'bike')}
-			>Biking</button
+		<button
+			class="byl-chip"
+			aria-pressed={mode === 'bike'}
+			onclick={() => (mode = mode === 'bike' ? '' : 'bike')}>Biking</button
 		>
 	</div>
 </div>
 
-<div class="mt-6">
+<div class="mt-8">
 	<LoadState
 		status={city.status === 'ready' ? tours.status : city.status === 'error' ? 'error' : 'loading'}
 		message={tours.message || city.message}
@@ -75,7 +80,7 @@
 			: 'Curated tours for this city are still being written.'}
 		onretry={() => tours.run()}
 	>
-		<div class="grid gap-4 sm:grid-cols-2">
+		<div class="grid gap-x-6 gap-y-4 sm:grid-cols-2">
 			{#each tours.data ?? [] as tour (tour.id)}<TourCard {tour} />{/each}
 		</div>
 	</LoadState>

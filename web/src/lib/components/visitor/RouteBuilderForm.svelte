@@ -133,7 +133,7 @@
 					placeholder="Optional: what ties these places together?"></textarea>
 			</label>
 			<div class="space-y-2 text-sm">
-				<div class="text-xs font-bold tracking-normal text-byl-action">Travel</div>
+				<div class="byl-eyebrow">Travel</div>
 				<div class="flex gap-2">
 					<button
 						type="button"
@@ -149,9 +149,7 @@
 				{#if builder.modes.length === 0}<p class="text-xs text-byl-danger">
 						Pick at least one way to travel.
 					</p>{/if}
-				<div class="pt-2 text-xs font-bold tracking-normal text-byl-action">
-					Who can open it after publication
-				</div>
+				<div class="byl-eyebrow pt-2">Who can open it after publication</div>
 				<div class="flex gap-2">
 					<button
 						type="button"

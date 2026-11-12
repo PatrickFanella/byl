@@ -4,7 +4,7 @@
 
 <div>
 	{#if eyebrow}
-		<div class="text-xs font-bold tracking-normal text-byl-action">{eyebrow}</div>
+		<div class="byl-eyebrow">{eyebrow}</div>
 	{/if}
-	<h2 class="text-lg font-semibold">{title}</h2>
+	<h2 class="byl-h2">{title}</h2>
 </div>

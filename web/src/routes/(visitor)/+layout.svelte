@@ -35,7 +35,7 @@
 </script>
 
 <svelte:head>
-	<title>Byl</title>
+	<title>Byl · Local history, on foot or by bike</title>
 </svelte:head>
 
 {#if isSignIn}
@@ -51,12 +51,8 @@
 					<a href="/" aria-label="Byl home"><Brand /></a>
 					<nav bind:this={navigation} class="byl-nav text-sm" aria-label="Main navigation">
 						{#each nav as item (item.href)}
-							<a
-								href={item.href}
-								aria-current={active(item.href) ? 'page' : undefined}
-								class="rounded px-3 py-1.5 hover:bg-byl-surface {active(item.href)
-									? 'bg-byl-action text-byl-action-text hover:bg-byl-action'
-									: 'text-byl-muted'}">{item.label}</a
+							<a href={item.href} aria-current={active(item.href) ? 'page' : undefined}
+								>{item.label}</a
 							>
 						{/each}
 					</nav>

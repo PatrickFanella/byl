@@ -69,13 +69,13 @@
 
 <svelte:head><title>Profile · Byl</title></svelte:head>
 
-<div class="text-xs font-bold tracking-normal text-byl-action">Profile</div>
+<div class="byl-eyebrow">Profile</div>
 <div class="my-6"><AppearancePicker /></div>
-<h1 class="text-3xl font-semibold">{$current?.account.display_name || 'Visitor'}</h1>
+<h1 class="byl-title">{$current?.account.display_name || 'Visitor'}</h1>
 
 <div class="mt-6 grid gap-4 sm:grid-cols-2">
 	<section class="rounded-lg border border-byl-border bg-byl-surface p-5">
-		<div class="text-xs font-bold tracking-normal text-byl-action">Account</div>
+		<div class="byl-eyebrow">Account</div>
 		{#if $current}
 			<p class="mt-2 text-sm">{$current.account.email}</p>
 			<p class="text-xs text-byl-muted">{$current.account.role}</p>
@@ -97,7 +97,7 @@
 		{/if}
 	</section>
 	<section class="rounded-lg border border-byl-border bg-byl-surface p-5">
-		<div class="text-xs font-bold tracking-normal text-byl-action">On the tour</div>
+		<div class="byl-eyebrow">On the tour</div>
 		<label class="mt-2 flex items-start gap-3 text-sm">
 			<input
 				type="checkbox"
@@ -123,7 +123,7 @@
 		<ContributionSettings />
 	</section>
 	<section class="rounded-lg border border-byl-border bg-byl-surface p-5 sm:col-span-2">
-		<div class="text-xs font-bold tracking-normal text-byl-action">About</div>
+		<div class="byl-eyebrow">About</div>
 		<p class="mt-2 text-sm text-byl-muted">
 			Stories are drawn from open archives and reviewed by curators; each moment lists its sources
 			and media credits.

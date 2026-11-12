@@ -82,7 +82,7 @@
 	<div class="mt-5"><HappeningsPanel placeID={stop.place.id} tripContext /></div>
 	{#if !pinned && stop.place.moment_count > 1}
 		<div class="mt-5 space-y-2">
-			<div class="text-xs font-bold tracking-normal text-byl-action">Also at this place</div>
+			<div class="byl-eyebrow">Also at this place</div>
 			<LoadState
 				status={place.status === 'ready' && others.length === 0 ? 'empty' : place.status}
 				message={place.message}

@@ -21,7 +21,7 @@
 <svelte:head><title>Edit route · Byl</title></svelte:head>
 
 <a href="/routes" class="text-sm text-byl-muted hover:underline">← Your routes</a>
-<h1 class="mt-2 text-3xl font-semibold">Edit route</h1>
+<h1 class="byl-title mt-2">Edit route</h1>
 <div class="mt-5">
 	{#if !$current}
 		<SignInPrompt reason="Sign in to build routes that follow you to every device." />
