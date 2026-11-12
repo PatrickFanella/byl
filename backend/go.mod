@@ -1,6 +1,6 @@
 module invisible-museum/backend
 
-go 1.25.7
+go 1.25.0
 
 require (
 	github.com/anthropics/anthropic-sdk-go/v2 v2.9.0
@@ -8,7 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/jackc/pgx/v5 v5.13.0
 	github.com/minio/minio-go/v7 v7.3.0
-	github.com/pressly/goose/v3 v3.27.3
+	github.com/pressly/goose/v3 v3.27.0
 	golang.org/x/net v0.58.0
 	golang.org/x/text v0.41.0
 	gopkg.in/yaml.v3 v3.0.1

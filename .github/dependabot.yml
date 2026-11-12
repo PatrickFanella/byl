@@ -25,8 +25,9 @@ updates:
         versions: [">= 0.42.0"]
       - dependency-name: github.com/minio/minio-go/v7
         versions: [">= 7.4.0"]
+      # goose 3.27.1 and later need Go 1.25.7; the Gitea runners cache 1.25.6.
       - dependency-name: github.com/pressly/goose/v3
-        versions: [">= 3.28.0"]
+        versions: [">= 3.27.1"]
 
   - package-ecosystem: npm
     directory: /web
