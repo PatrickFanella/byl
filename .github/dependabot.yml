@@ -40,6 +40,9 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Pinned exactly in package.json: 6.17.0 fails the web checks, and map
+      # updates change what visitors see. Update it by hand.
+      - dependency-name: maplibre-gl
 
   - package-ecosystem: docker
     directories:
