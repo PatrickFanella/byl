@@ -1,0 +1,69 @@
+# Quiet by design: pull requests that pass CI merge themselves, and a merge to
+# main deploys. Each ecosystem gets at most one grouped minor/patch pull
+# request a month, for direct dependencies only. Major versions are left for a
+# person to schedule.
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /backend
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      go-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+      # These releases need Go 1.26; the backend builds with Go 1.25.
+      # Drop these entries when the toolchain moves.
+      - dependency-name: golang.org/x/crypto
+        versions: [">= 0.56.0"]
+      - dependency-name: golang.org/x/net
+        versions: [">= 0.59.0"]
+      - dependency-name: golang.org/x/text
+        versions: [">= 0.42.0"]
+      - dependency-name: github.com/minio/minio-go/v7
+        versions: [">= 7.4.0"]
+      - dependency-name: github.com/pressly/goose/v3
+        versions: [">= 3.28.0"]
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: docker
+    directories:
+      - /backend
+      - /web
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      docker-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+      # The Go toolchain moves together with go.mod and the workflows.
+      - dependency-name: golang
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

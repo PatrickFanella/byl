@@ -7,7 +7,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/api ./c
     CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/migrate ./cmd/migrate && \
     CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/contribution-retention ./cmd/contribution-retention
 
-FROM alpine:3.20
+FROM alpine:3.24
 ARG REVISION=development
 LABEL org.opencontainers.image.source="https://git.subcult.tv/subculture-collective/invisible-museum" \
       org.opencontainers.image.revision=$REVISION
