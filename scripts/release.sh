@@ -10,13 +10,15 @@ trap cleanup EXIT
 if [[ $deploy == true ]]; then
   : "${HOMELAB_DEPLOY_KEY:?missing app-specific deploy key}"
   : "${HOMELAB_KNOWN_HOSTS:?missing pinned host key}"
+  : "${DEPLOY_TARGET:?missing DEPLOY_TARGET secret (user@host)}"
+  [[ $DEPLOY_TARGET == ?*@?* ]] || { echo "DEPLOY_TARGET must be user@host" >&2; exit 1; }
   umask 077
   printf '%s\n' "$HOMELAB_DEPLOY_KEY" > "$scratch/key"
   printf '%s\n' "$HOMELAB_KNOWN_HOSTS" > "$scratch/known_hosts"
   cat > "$scratch/ssh_config" <<EOF
 Host byl-deploy
-  HostName 10.0.0.56
-  User onnwee
+  HostName ${DEPLOY_TARGET#*@}
+  User ${DEPLOY_TARGET%@*}
   IdentityFile $scratch/key
   UserKnownHostsFile $scratch/known_hosts
   StrictHostKeyChecking yes

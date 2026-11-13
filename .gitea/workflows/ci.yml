@@ -150,6 +150,7 @@ jobs:
         DEPLOY: 'true'
         HOMELAB_DEPLOY_KEY: ${{ secrets.HOMELAB_DEPLOY_KEY }}
         HOMELAB_KNOWN_HOSTS: ${{ secrets.HOMELAB_KNOWN_HOSTS }}
+        DEPLOY_TARGET: ${{ secrets.DEPLOY_TARGET }}
       run: bash scripts/release.sh
     - name: Publish successful deployment as a Gitea release
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'

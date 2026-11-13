@@ -2,7 +2,7 @@
 # Installed by the operator, never taken from an uploaded image.
 set -euo pipefail
 umask 077
-root=/srv/apps/projects/byl
+root=/srv/deploy/byl
 revision=$(git ls-remote --exit-code https://git.subcult.tv/subculture-collective/invisible-museum.git refs/heads/main | cut -f1)
 [[ $revision =~ ^[0-9a-f]{40}$ ]]
 image="fleet-deploy/byl/api:$revision"
